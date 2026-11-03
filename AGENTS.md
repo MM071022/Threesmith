@@ -31,7 +31,11 @@ node dist/cli.js --help
   detection, baselines), `png.ts` and `diff.ts` the pixel work, `server.ts` the static server, `browser.ts` flags and
   Chromium discovery.
 - `src/mcp/server.ts`: MCP tools. `src/ci.ts`: the receipt. `action.yml`: the GitHub Action.
-- `bench/`: tasks and a model-free grader. `skills/threesmith/`: the agent skill.
+- `src/hooks/hooks.ts`: Claude Code hooks (`threesmith hook <event>`), run by `plugins/threesmith/hooks/run.mjs`. They fail open.
+  `src/doctor/`: `threesmith doctor`.
+- `scripts/sync-version.mjs` copies the package version into the manifests (`test/manifests.test.ts` checks it);
+  `scripts/build-mcpb.mjs` builds the Claude Desktop bundle.
+- `bench/`: tasks and a model-free grader. `plugins/threesmith/`: the Claude Code plugin (skill, reviewer agent, hooks); `.claude-plugin/` is its marketplace.
 
 ## Rules for changes
 

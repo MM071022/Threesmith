@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Threesmith: three.js for coding agents</title>
+<meta name="description" content="MCP server and CLI that stops AI agents from writing outdated three.js: version-pinned API lookup, a scored review, a headless WebGL check and a GitHub Action receipt.">
+<link rel="icon" href="favicon.svg">
+<style>
+:root{--bg:#fff;--fg:#1b2430;--mut:#5b6877;--card:#f3f6fa;--acc:#2f6fa3;--code:#eef2f7}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141a;--fg:#e6ebf1;--mut:#9aa7b5;--card:#18202a;--acc:#6fb0e6;--code:#18202a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:48px 16px 80px}
+h1{font-size:2.4rem;margin:0 0 8px}h2{margin-top:2.4rem}p.lead{font-size:1.2rem;color:var(--mut)}
+pre{background:var(--code);padding:14px 16px;border-radius:10px;overflow:auto}code{font:14px ui-monospace,monospace}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--card);border-radius:12px;padding:14px 16px}.card b{display:block;margin-bottom:4px}
+a{color:var(--acc)}table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--card)}
+</style>
+</head>
+<body><main>
+<h1>Threesmith</h1>
+<p class="lead">three.js ships a release almost every month and removes old APIs. Agents write the old ones. Threesmith checks their code against <b>the three version your project has installed</b>.</p>
+<pre><code>claude mcp add threesmith -- npx -y threesmith mcp
+npx threesmith review        # scored review
+npx threesmith api Mesh      # exact API of your version
+npx threesmith check .       # open the page headless</code></pre>
+<div class="grid">
+<div class="card"><b>API lookup</b>Read from <code>node_modules/three</code>: signatures, deprecations, import paths. Typos get "did you mean".</div>
+<div class="card"><b>Scored review</b>39 rules. Removed APIs, wrong imports, black scenes, shadows that never draw, per-frame allocations, missing dispose.</div>
+<div class="card"><b>Headless check</b>Chromium with software WebGL 2: console errors, no canvas, lost context, blank frames, screenshot, baselines.</div>
+<div class="card"><b>CI receipt</b>A GitHub Action that posts the review and the visual check on every pull request.</div>
+</div>
+<h2>Works with</h2>
+<p>Claude Code (plugin with hooks), Claude Desktop (<code>.mcpb</code>), Codex, Cursor, Cline, Gemini CLI, or any MCP client. See <a href="https://github.com/laaielichter/Threesmith/blob/main/llms-install.md">llms-install.md</a>.</p>
+<h2>Honest limits</h2>
+<ul><li>WebGL 2 is reliable in CI; WebGPU is best effort.</li><li>The review reads text, not types. It can be wrong: report it.</li><li>No benchmark results are published yet.</li></ul>
+<p><a href="https://github.com/laaielichter/Threesmith">GitHub</a> · made by laaielichter · MIT</p>
+</main></body></html>

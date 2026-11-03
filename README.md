@@ -23,6 +23,7 @@ npx threesmith check .       # open the page in headless Chromium
 | `three_review` | `threesmith review [path]` | Score 0-100 (and grade) over five categories with file:line findings and a fix for each. |
 | `three_check` | `threesmith check <folder\|url>` | Headless Chromium with software WebGL 2: console and page errors, failed requests, no canvas / no GL context, lost context, **blank frames**, three revision, screenshot, optional baseline compare. |
 | `three_version` | `threesmith api` | Which release is installed. |
+| – | `threesmith doctor` | Checks Node, installed three, Playwright and a working headless WebGL. |
 | – | `threesmith ci` | One markdown receipt (review + optional check) for CI. Fails on errors or a minimum score. |
 
 ### The review
@@ -49,9 +50,19 @@ and an issue with the snippet is the most useful bug report. Every rule has a te
 ### Add it to your agent
 
 ```sh
-# Claude Code
+# Claude Code: the plugin also adds a skill, a reviewer agent and hooks
+/plugin marketplace add laaielichter/Threesmith
+/plugin install threesmith@threesmith
+
+# Claude Code: MCP server only
 claude mcp add threesmith -- npx -y threesmith mcp
 ```
+
+The hooks review every three.js file Claude edits and send the errors back, point at `three_api` when a build prints a
+removed API or a wrong import, and name errors still open before Claude stops. `THREESMITH_HOOKS=0` turns them off.
+Claude Desktop: `npm run build:mcpb` makes `build/threesmith.mcpb` (attached to releases). Gemini CLI:
+`gemini-extension.json`. Cline and other agents: [llms-install.md](llms-install.md). Docker: `Dockerfile`.
+`threesmith doctor` shows what is missing (three, Playwright, Chromium with WebGL).
 
 Generic MCP config:
 
@@ -59,7 +70,7 @@ Generic MCP config:
 { "mcpServers": { "threesmith": { "command": "npx", "args": ["-y", "threesmith", "mcp"] } } }
 ```
 
-`skills/threesmith/SKILL.md` is an agent skill that tells the agent when to call each tool.
+`plugins/threesmith/skills/threesmith/SKILL.md` is an agent skill that tells the agent when to call each tool.
 
 ### GitHub Action
 

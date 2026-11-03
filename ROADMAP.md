@@ -6,6 +6,7 @@ Done in 0.1.0 (each has tests):
 - [x] Scored review with 39 rules, release-gated, symbol validation against the installed exports.
 - [x] Headless WebGL 2 check: errors, blank frames, context loss, screenshot, baselines with diff image.
 - [x] MCP server (5 tools), CLI, `ci` receipt, GitHub Action, agent skill.
+- [x] Claude Code plugin with hooks, Claude Desktop bundle, Gemini extension, Docker, `doctor`.
 - [x] Benchmark tasks and a model-free grader.
 
 Next:

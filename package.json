@@ -16,7 +16,7 @@
   },
   "files": [
     "dist",
-    "skills",
+    "plugins/threesmith/skills",
     "PRIVACY.md"
   ],
   "engines": {
@@ -27,9 +27,31 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "check": "npm run typecheck && npm test && npm run build",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "version": "node scripts/sync-version.mjs && git add server.json plugins/threesmith gemini-extension.json",
+    "build:mcpb": "node scripts/build-mcpb.mjs"
   },
-  "keywords": ["threejs", "three.js", "webgl", "webgpu", "mcp", "mcp-server", "model-context-protocol", "claude-code", "codex", "ai-agent", "coding-agent", "linter", "code-review", "screenshot", "headless", "github-action", "ci", "cli", "agent-skills"],
+  "keywords": [
+    "threejs",
+    "three.js",
+    "webgl",
+    "webgpu",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude-code",
+    "codex",
+    "ai-agent",
+    "coding-agent",
+    "linter",
+    "code-review",
+    "screenshot",
+    "headless",
+    "github-action",
+    "ci",
+    "cli",
+    "agent-skills"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/laaielichter/Threesmith.git"
@@ -47,7 +69,9 @@
     "playwright-core": ">=1.40"
   },
   "peerDependenciesMeta": {
-    "playwright-core": { "optional": true }
+    "playwright-core": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

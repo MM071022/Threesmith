@@ -8,7 +8,7 @@ runs, with the raw outputs attached, so anyone can rerun them.
 Two arms, same model, same prompts, same three.js version (`three@0.187.0`):
 
 - **baseline**: the agent with its normal tools.
-- **threesmith**: the same agent with the Threesmith MCP server (`threesmith mcp`) and the skill in `skills/threesmith`.
+- **threesmith**: the same agent with the Threesmith MCP server (`threesmith mcp`) and the skill in `plugins/threesmith/skills/threesmith`.
 
 For each task in `tasks/tasks.json`, run each arm N times (N >= 10, fresh empty directory with `npm i three@0.187.0`),
 then grade the produced directory:

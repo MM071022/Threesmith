@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, appendFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { Command } from "commander";
 import { formatSearch, lookup, search } from "./api/lookup.js";
@@ -8,6 +8,8 @@ import { indexFor } from "./core.js";
 import { formatMarkdown, formatText } from "./review/format.js";
 import { review } from "./review/review.js";
 import type { Severity } from "./review/types.js";
+import { doctor, formatDoctor } from "./doctor/doctor.js";
+import { HOOK_EVENTS, runHook, type HookEvent, type HookInput } from "./hooks/hooks.js";
 import { VERSION } from "./version.js";
 
 function out(s: string): void {
@@ -142,9 +144,42 @@ export function buildProgram(): Command {
     });
 
   program
+    .command("doctor")
+    .description("Check what Threesmith needs here: Node, installed three, Playwright, Chromium with WebGL")
+    .option("-p, --path <dir>", "project directory", ".")
+    .option("--three <dir>", "path to a three package")
+    .option("--json", "JSON output")
+    .action(async (o: { path: string; three?: string; json?: boolean }) => {
+      const items = await doctor(o.path, o.three);
+      out(o.json ? JSON.stringify(items, null, 2) : formatDoctor(items));
+      if (items.some((i) => !i.ok)) process.exitCode = 1;
+    });
+
+  program
+    .command("hook")
+    .description("Claude Code hook: reads the hook input on stdin, prints the hook output as JSON (used by the plugin)")
+    .argument("<event>", HOOK_EVENTS.join(" | "))
+    .action((event: string) => {
+      if (!(HOOK_EVENTS as readonly string[]).includes(event)) {
+        process.exitCode = 2;
+        return;
+      }
+      try {
+        const input = JSON.parse(readFileSync(0, "utf8") || "{}") as HookInput;
+        const result = runHook(event as HookEvent, input);
+        if (result) out(JSON.stringify(result));
+      } catch {
+        /* fail open: a hook never gets in the way */
+      }
+    });
+
+  program
     .command("mcp")
     .description("Run the MCP server on stdio (for Claude Code, Codex, Cursor, ...)")
-    .action(async () => {
+    .option("--project <dir>", "default project directory for the tools (default: THREESMITH_PROJECT or the working directory)")
+    .action(async (o: { project?: string }) => {
+      const project = o.project ?? process.env["THREESMITH_PROJECT"];
+      if (project && !project.startsWith("${")) process.chdir(project);
       const { serveStdio } = await import("./mcp/server.js");
       await serveStdio();
     });

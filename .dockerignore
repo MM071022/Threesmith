@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+coverage
+.git
+.github
+bench
+docs
+test
+*.tgz
+build
+examples
+plugins
+mcpb
