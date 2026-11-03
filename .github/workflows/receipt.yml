@@ -18,5 +18,17 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci && npm run build
+      - name: Install Chromium for the headless check
+        run: npx playwright-core install --with-deps chromium
       - name: Review the demo with the local build
         run: node dist/cli.js ci examples/demo --check examples/demo --root . --baseline demo --fail-on error --min-score 90
+      - name: Upload the screenshot and visual diff
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: threesmith-demo-visual
+          path: |
+            examples/demo/.threesmith/last.png
+            examples/demo/.threesmith/diff/*.png
+          include-hidden-files: true
+          if-no-files-found: ignore
