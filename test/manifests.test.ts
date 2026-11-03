@@ -29,6 +29,6 @@ describe("manifests", () => {
   });
   it("lists every mcp tool in the readme", () => {
     const readme = readFileSync("README.md", "utf8");
-    for (const t of ["three_api", "three_search", "three_review", "three_fix", "three_check", "three_version"]) expect(readme).toContain(t);
+    for (const t of ["three_api", "three_search", "three_review", "three_fix", "three_check", "three_inspect", "three_explain", "three_version"]) expect(readme).toContain(t);
   });
 });

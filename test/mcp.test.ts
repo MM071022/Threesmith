@@ -19,7 +19,7 @@ describe("mcp server", () => {
   it("lists the tools", async () => {
     const c = await client();
     const names = (await c.listTools()).tools.map((t) => t.name).sort();
-    expect(names).toEqual(["three_api", "three_check", "three_fix", "three_review", "three_search", "three_version"]);
+    expect(names).toEqual(["three_api", "three_check", "three_explain", "three_fix", "three_inspect", "three_review", "three_search", "three_version"]);
   });
 
   it("answers api, search and version from the pinned install", async () => {

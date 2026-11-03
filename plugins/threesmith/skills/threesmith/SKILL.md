@@ -18,6 +18,12 @@ three.js changes every month. Do not write API calls from memory; check them aga
    It reports console errors, missing canvas or WebGL context, blank frames and returns a screenshot. Look at the
    screenshot. Use `baseline` to catch visual regressions after a change, and `steps` (click, press, drag, wheel) to reach a state that only shows after an interaction.
 
+4. **When a scene is black, empty, stretched or wrong**, call `three_inspect` before guessing. It reads the running
+   scene and says per object why it is not visible (no light, camera inside or pointed away, beyond `far`, zero scale,
+   NaN, invisible material, layers), and whether GPU memory keeps growing.
+5. **When an error appears** (console, build, test), call `three_explain` with the full message. Shader errors from
+   `three_check` already name the file and line in the project.
+
 ## Rules of thumb
 
 - Import addons from `three/addons/...`, not `three/examples/jsm/...`. `OrbitControls`, `GLTFLoader` etc. are not in `three`.

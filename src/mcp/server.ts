@@ -4,6 +4,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { formatSearch, lookup, search } from "../api/lookup.js";
 import { check, formatCheck, parseSteps } from "../check/check.js";
+import { formatScene } from "../check/inspect.js";
+import { explain, formatExplanations } from "../explain/explain.js";
 import { indexFor } from "../core.js";
 import { formatMarkdown } from "../review/format.js";
 import { fix, formatFix } from "../review/fix.js";
@@ -111,6 +113,7 @@ export function createServer(): McpServer {
         update_baseline: z.boolean().optional(),
         tolerance: z.number().min(0).max(1).optional(),
         webgpu: z.boolean().optional(),
+        inspect: z.boolean().optional().describe("Also read the live scene graph and say why objects are not visible (done anyway when the frame is blank)."),
         steps: z
           .array(
             z.union([
@@ -140,6 +143,7 @@ export function createServer(): McpServer {
           ...(a.update_baseline ? { updateBaseline: true } : {}),
           ...(a.tolerance !== undefined ? { tolerance: a.tolerance } : {}),
           ...(a.webgpu ? { webgpu: true } : {}),
+          ...(a.inspect ? { inspect: true } : {}),
           ...(a.steps ? { steps: parseSteps(JSON.stringify(a.steps)) } : {}),
           ...(a.ignore ? { ignore: a.ignore } : {}),
         });
@@ -149,6 +153,64 @@ export function createServer(): McpServer {
       } catch (e) {
         return fail(e);
       }
+    },
+  );
+
+  server.registerTool(
+    "three_inspect",
+    {
+      title: "Inspect the live three.js scene",
+      description:
+        "Open the page headless and read the running scene: the scene graph (types, names, positions, geometry, materials, lights), the camera, renderer stats (draw calls, triangles, geometries, textures) and whether GPU memory keeps growing. Diagnoses why objects are not visible: no lights, camera inside or pointed away, behind the camera, beyond far, zero scale, NaN positions, invisible materials, wrong layers, stretched aspect, shadows switched off. Use it when a scene is black, empty or wrong, before guessing.",
+      inputSchema: {
+        target: z.string().describe("Folder with the page, or http(s) URL."),
+        entry: z.string().optional(),
+        root: z.string().optional(),
+        wait: z.number().int().min(0).max(30000).optional(),
+        leak_ms: z.number().int().min(0).max(30000).optional().describe("Sample GPU memory this many ms apart (default 1500, 0 = off)."),
+        max_nodes: z.number().int().min(1).max(400).optional(),
+      },
+    },
+    async (a) => {
+      try {
+        const r = await check({
+          target: a.target,
+          inspect: true,
+          ...(a.entry ? { entry: a.entry } : {}),
+          ...(a.root ? { root: a.root } : {}),
+          ...(a.wait !== undefined ? { wait: a.wait } : {}),
+          ...(a.leak_ms !== undefined ? { leakMs: a.leak_ms } : {}),
+        });
+        const problems = r.issues.filter((i) => i.kind !== "scene");
+        const parts = [r.scene ? formatScene(r.scene, { maxNodes: a.max_nodes ?? 80 }) : "No scene report."];
+        if (problems.length) parts.push("", formatCheck({ ...r, issues: problems, scene: undefined } as typeof r));
+        const content: Content[] = [{ type: "text", text: parts.join("\n") }];
+        if (r.screenshot) content.push({ type: "image", data: readFileSync(r.screenshot).toString("base64"), mimeType: "image/png" });
+        return { content };
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "three_explain",
+    {
+      title: "Explain a three.js error",
+      description:
+        "Likely cause and fix of a three.js error or warning from the console, a build, a test run or a bug report: missing exports and wrong import paths (with the right path for the installed version), classes that no longer exist, two copies of three, objects used before a model loaded, 404 HTML instead of a model, Draco/KTX2 decoders, NaN geometry, lost contexts, shader compile errors, CORS, file://, WebGPU init. Paste the message as it was printed.",
+      inputSchema: { message: z.string(), ...common },
+      annotations: { readOnlyHint: true },
+    },
+    ({ message, path, three }) => {
+      let index;
+      try {
+        index = indexFor(path ?? process.cwd(), three);
+      } catch {
+        index = undefined;
+      }
+      const r = explain(message, index);
+      return text(formatExplanations(r));
     },
   );
 

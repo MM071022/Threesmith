@@ -30,6 +30,9 @@ node dist/cli.js --help
 - `src/check/`: `check.ts` is the headless run (Playwright, SwiftShader WebGL, console/page/request errors, blank
   detection, baselines), `png.ts` and `diff.ts` the pixel work, `server.ts` the static server, `browser.ts` flags and
   Chromium discovery.
+- `src/check/inspect.ts`: the scene inspector that runs in the page (devtools hook, visibility diagnosis); a new
+  diagnosis needs a case in `test/inspect.test.ts`. `src/explain/`: error explanations (`explain.ts`, a pattern needs a
+  case in `test/explain.test.ts`) and `locate.ts`, which finds a shader line in the project.
 - `src/mcp/server.ts`: MCP tools. `src/ci.ts`: the receipt. `action.yml`: the GitHub Action.
 - `src/hooks/hooks.ts`: Claude Code hooks (`threesmith hook <event>`), run by `plugins/threesmith/hooks/run.mjs`. They fail open.
   `src/doctor/`: `threesmith doctor`.

@@ -10,6 +10,8 @@ import { formatFix, fix } from "./review/fix.js";
 import { review } from "./review/review.js";
 import type { Severity } from "./review/types.js";
 import { doctor, formatDoctor } from "./doctor/doctor.js";
+import { explain, formatExplanations } from "./explain/explain.js";
+import { formatScene } from "./check/inspect.js";
 import { HOOK_EVENTS, runHook, type HookEvent, type HookInput } from "./hooks/hooks.js";
 import { VERSION } from "./version.js";
 
@@ -100,11 +102,13 @@ export function buildProgram(): Command {
     .option("--update-baseline", "overwrite the baseline with this run")
     .option("--tolerance <ratio>", "share of changed pixels that fails the baseline", "0.005")
     .option("--webgpu", "also enable WebGPU flags (best effort)")
+    .option("--inspect", "also read the live scene graph and say why objects are not visible (done anyway when the frame is blank)")
     .option("--steps <json|file>", 'steps before the screenshot, e.g. \'[{"type":"click","selector":"#start"},{"type":"drag","from":[100,100],"to":[300,120]}]\' (types: wait, click, press, drag, wheel, wait-for)')
     .option("--ignore <text...>", "console messages containing this text are ignored")
     .option("--json", "JSON output")
-    .action(async (target: string, o: { entry: string; root?: string; wait: string; width: string; height: string; baseline?: string; updateBaseline?: boolean; tolerance: string; webgpu?: boolean; steps?: string; ignore?: string[]; json?: boolean }) => {
+    .action(async (target: string, o: { entry: string; root?: string; wait: string; width: string; height: string; baseline?: string; updateBaseline?: boolean; tolerance: string; webgpu?: boolean; inspect?: boolean; steps?: string; ignore?: string[]; json?: boolean }) => {
       const r = await check({
+        ...(o.inspect ? { inspect: true } : {}),
         ...(o.steps ? { steps: parseSteps(o.steps.trim().startsWith("[") ? o.steps : readFileSync(o.steps, "utf8")) } : {}),
         target,
         entry: o.entry,
@@ -120,6 +124,54 @@ export function buildProgram(): Command {
       });
       out(o.json ? JSON.stringify(r, null, 2) : formatCheck(r));
       if (!r.ok) process.exitCode = 1;
+    });
+
+  program
+    .command("inspect")
+    .description("Open the page headless and show the live scene graph, camera, renderer stats, GPU memory growth and why objects are not visible")
+    .argument("<target>", "folder with the page, or an http(s) URL")
+    .option("--entry <file>", "HTML file inside the folder", "index.html")
+    .option("--root <dir>", "folder to serve, when the page needs files above its own folder")
+    .option("--wait <ms>", "let the scene run this long", "2000")
+    .option("--leak <ms>", "sample GPU memory this many ms apart (0 = off)", "1500")
+    .option("--steps <json|file>", "steps before inspecting (see check --steps)")
+    .option("--nodes <n>", "max scene nodes to print", "80")
+    .option("--json", "JSON output")
+    .action(async (target: string, o: { entry: string; root?: string; wait: string; leak: string; steps?: string; nodes: string; json?: boolean }) => {
+      const r = await check({
+        target,
+        entry: o.entry,
+        ...(o.root ? { root: o.root } : {}),
+        wait: Number(o.wait),
+        inspect: true,
+        leakMs: Number(o.leak),
+        ...(o.steps ? { steps: parseSteps(o.steps.trim().startsWith("[") ? o.steps : readFileSync(o.steps, "utf8")) } : {}),
+      });
+      if (o.json) out(JSON.stringify(r, null, 2));
+      else {
+        const problems = r.issues.filter((i) => i.kind !== "scene");
+        out([formatScene(r.scene ?? { found: false, renderer: null, camera: null, counts: { objects: 0, meshes: 0, lights: 0, nodesShown: 0 }, nodes: [], diagnoses: [] }, { maxNodes: Number(o.nodes) }), ...(problems.length ? ["", formatCheck({ ...r, issues: problems, scene: undefined } as typeof r)] : [])].join("\n"));
+      }
+      if (!r.ok) process.exitCode = 1;
+    });
+
+  program
+    .command("explain")
+    .description("Explain a three.js error or warning (console, build or test output): likely cause and fix. Reads stdin when no text is given")
+    .argument("[message...]", "the error text")
+    .option("-p, --path <dir>", "project directory, for exact names and import paths", ".")
+    .option("--json", "JSON output")
+    .action((words: string[], o: { path: string; json?: boolean }) => {
+      const text = words.length ? words.join(" ") : readFileSync(0, "utf8");
+      let index;
+      try {
+        index = indexFor(o.path);
+      } catch {
+        index = undefined;
+      }
+      const r = explain(text, index);
+      out(o.json ? JSON.stringify(r, null, 2) : formatExplanations(r));
+      if (!r.length) process.exitCode = 1;
     });
 
   program

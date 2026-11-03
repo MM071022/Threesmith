@@ -5,6 +5,7 @@ import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { findThree } from "../api/install.js";
 import { review } from "../review/review.js";
 import type { Finding } from "../review/types.js";
+import { explain } from "../explain/explain.js";
 
 /**
  * Hooks for coding agents (Claude Code's hook events), so Threesmith is in the agent's loop without the agent having to
@@ -166,10 +167,12 @@ export const THREE_MESSAGE =
 export function postBash(input: HookInput): HookOutput | undefined {
   const text = outputText(input.tool_response).slice(-200_000);
   const m = THREE_MESSAGE.exec(text);
-  if (!m) return undefined;
+  const known = explain(text);
+  if (!m && !(known.length && /three/i.test(text))) return undefined;
   return context_("PostToolUse", [
-    `Threesmith: the output above has a three.js problem ("${m[0].slice(0, 120)}").`,
-    "Next: look the name up with three_api (exact API of the installed version) and run three_review; removed APIs and wrong import paths (three/addons/..., three/webgpu) are the usual cause.",
+    `Threesmith: the output above has a three.js problem${m ? ` ("${m[0].slice(0, 120)}")` : ""}.`,
+    ...known.slice(0, 3).map((e) => `- ${e.title}: ${e.cause} Fix: ${e.fix}`),
+    "Next: look names up with three_api (exact API of the installed version); three_explain with the full message, three_inspect when the scene looks wrong.",
   ]);
 }
 
