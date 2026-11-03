@@ -1,0 +1,27 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.laaielichter/threesmith",
+  "title": "Threesmith",
+  "description": "three.js for coding agents: version-pinned API lookup, scored review of outdated code, headless WebGL check with screenshots.",
+  "repository": {
+    "url": "https://github.com/laaielichter/Threesmith",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "threesmith",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" },
+      "packageArguments": [{ "type": "positional", "value": "mcp" }],
+      "environmentVariables": [
+        {
+          "name": "THREESMITH_CHROMIUM",
+          "description": "Path to a Chromium binary for three_check (default: Playwright's Chromium)",
+          "format": "filepath"
+        }
+      ]
+    }
+  ]
+}
