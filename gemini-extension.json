@@ -5,7 +5,11 @@
   "mcpServers": {
     "threesmith": {
       "command": "npx",
-      "args": ["-y", "threesmith@0.1.0", "mcp"]
+      "args": [
+        "-y",
+        "threesmith@0.1.0",
+        "mcp"
+      ]
     }
   }
 }
