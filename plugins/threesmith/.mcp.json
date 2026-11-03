@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "threesmith": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "threesmith@0.1.0",
+        "mcp"
+      ],
+      "env": {
+        "THREESMITH_PROJECT": "${user_config.project}"
+      }
+    }
+  }
+}

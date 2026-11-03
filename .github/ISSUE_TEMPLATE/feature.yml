@@ -1,0 +1,11 @@
+name: Idea or new rule
+description: A mistake agents keep making in three.js, or something Threesmith should do
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should it do?
+      description: For a rule: the bad code, the good code, the three release that changed it, and a link to the migration guide or changelog.
+    validations:
+      required: true

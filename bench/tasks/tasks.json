@@ -1,0 +1,27 @@
+[
+  {
+    "id": "spinning-cube",
+    "prompt": "Create a three.js page (index.html + main.js, ES modules, three from node_modules via an import map) with a lit, shaded cube that rotates. It must fill the window and stay correct when the window is resized.",
+    "grade": { "minScore": 90, "mustNotFire": ["resize-no-projection", "no-resize-handling", "no-lights", "never-renders"], "check": true }
+  },
+  {
+    "id": "orbit-and-shadows",
+    "prompt": "Create a three.js scene with a floor, three objects, one directional light with shadows and OrbitControls with damping. Use the current three.js API.",
+    "grade": { "minScore": 90, "mustNotFire": ["shadows-not-enabled", "controls-damping-no-update", "unknown-symbol"], "check": true }
+  },
+  {
+    "id": "gltf-viewer",
+    "prompt": "Create a minimal glTF viewer: load ./model.glb with GLTFLoader, light it with an environment (RoomEnvironment), frame the model with the camera, and use OrbitControls.",
+    "grade": { "minScore": 90, "mustNotFire": ["unknown-symbol", "texture-encoding", "output-encoding"], "check": false }
+  },
+  {
+    "id": "instanced-field",
+    "prompt": "Render 5000 small cubes with random positions and colors that slowly rotate, at a smooth frame rate. Do not allocate objects inside the animation loop.",
+    "grade": { "minScore": 90, "mustNotFire": ["many-meshes-no-instancing", "alloc-in-loop", "create-heavy-in-loop"], "check": true }
+  },
+  {
+    "id": "cleanup",
+    "prompt": "Write a small class Viewer with mount(el) and destroy(). destroy() must release everything: geometries, materials, textures, the renderer, listeners and the animation loop.",
+    "grade": { "minScore": 90, "mustNotFire": ["no-dispose", "unknown-symbol"], "check": false }
+  }
+]

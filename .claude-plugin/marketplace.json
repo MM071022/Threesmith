@@ -1,0 +1,12 @@
+{
+  "name": "threesmith",
+  "description": "Threesmith: three.js tools for Claude Code.",
+  "owner": { "name": "laaielichter", "url": "https://github.com/laaielichter" },
+  "plugins": [
+    {
+      "name": "threesmith",
+      "source": "./plugins/threesmith",
+      "description": "Version-pinned three.js API lookup, a scored review of outdated or broken code, and a headless WebGL check with screenshots."
+    }
+  ]
+}

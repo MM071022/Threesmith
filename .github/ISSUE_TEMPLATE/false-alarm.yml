@@ -1,0 +1,33 @@
+name: Wrong review finding
+description: The review reports a problem that is not real, or misses one three.js or the browser reports
+labels: ["bug"]
+body:
+  - type: input
+    id: finding
+    attributes:
+      label: Finding line
+      description: The rule id and line from `threesmith review`, for example `main.js:12 [alloc-in-loop]`
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: three version
+      description: From `threesmith api` or package.json, for example 0.187.0
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Code
+      description: The smallest snippet that triggers it.
+      render: javascript
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is wrong
+      description: For example, this runs without warnings on that three version.
+    validations:
+      required: true

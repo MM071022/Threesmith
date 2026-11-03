@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Install Chromium for the browser tests
+        run: npx playwright-core install --with-deps chromium
+      - run: npm test
+      - name: Smoke test the CLI and the MCP server
+        run: |
+          node dist/cli.js --help
+          printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}' \
+            | timeout 20 node dist/cli.js mcp | grep -q '"serverInfo"'
+      - name: Manifests carry the package version
+        run: |
+          node scripts/sync-version.mjs
+          git diff --exit-code server.json gemini-extension.json plugins
+      - name: Build the Claude Desktop bundle and start its server
+        if: matrix.node == 24
+        run: |
+          npm run build:mcpb
+          mkdir -p build/unpacked && unzip -q build/threesmith.mcpb -d build/unpacked
+          printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}' \
+            | timeout 20 node build/unpacked/dist/cli.js mcp | grep -q '"serverInfo"'

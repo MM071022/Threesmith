@@ -1,0 +1,39 @@
+{
+  "manifest_version": "0.3",
+  "name": "threesmith",
+  "display_name": "Threesmith",
+  "version": "0.0.0",
+  "description": "three.js tools for Claude: the exact API of your installed three version, a scored review of outdated or broken code, and a headless WebGL check with screenshots.",
+  "long_description": "Threesmith gives Claude checked three.js knowledge for your project: the API of the three version you have installed (read from node_modules, not from memory), a scored review that catches removed APIs, wrong import paths, black scenes, shadows that never draw, per-frame allocations and missing cleanup, and a headless Chromium check that opens your page with software WebGL, reports console errors and blank frames and returns a screenshot. Choose your project folder in the settings; tools also accept a path. The browser check needs playwright-core and Chromium in the project (npm i -D playwright-core).",
+  "author": { "name": "laaielichter", "url": "https://github.com/laaielichter" },
+  "repository": { "type": "git", "url": "https://github.com/laaielichter/Threesmith" },
+  "homepage": "https://github.com/laaielichter/Threesmith",
+  "documentation": "https://github.com/laaielichter/Threesmith#readme",
+  "support": "https://github.com/laaielichter/Threesmith/issues",
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/cli.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/cli.js", "mcp"],
+      "env": { "THREESMITH_PROJECT": "${user_config.project}" }
+    }
+  },
+  "tools_generated": true,
+  "keywords": ["threejs", "three.js", "webgl", "3d"],
+  "license": "MIT",
+  "privacy_policies": ["https://github.com/laaielichter/Threesmith/blob/main/PRIVACY.md"],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=22.12.0" }
+  },
+  "user_config": {
+    "project": {
+      "type": "directory",
+      "title": "three.js project",
+      "description": "The folder with your package.json and node_modules/three. Tools use it when Claude does not pass a path.",
+      "required": false
+    }
+  }
+}

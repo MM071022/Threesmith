@@ -1,0 +1,15 @@
+{
+  "name": "threesmith",
+  "version": "0.1.0",
+  "description": "Makes Gemini CLI better at three.js: the exact API of the installed three version, a scored review of outdated or broken code, and a headless WebGL check with screenshots.",
+  "mcpServers": {
+    "threesmith": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "threesmith@0.1.0",
+        "mcp"
+      ]
+    }
+  }
+}

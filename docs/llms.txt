@@ -1,0 +1,11 @@
+# Threesmith
+
+> MCP server and CLI that makes coding agents better at three.js: the exact API of the installed three version, a scored review of outdated or broken code, and a headless WebGL check with screenshots.
+
+- Install: `claude mcp add threesmith -- npx -y threesmith mcp` (Node 22.12+; three must be installed in the project)
+- Tools: three_api (exact API of the installed version), three_search, three_review (score 0-100, file:line findings with fixes), three_check (headless Chromium, console errors, blank frames, screenshot, baselines), three_version
+- CLI: threesmith api | search | review | check | ci | doctor | mcp
+- GitHub Action: laaielichter/Threesmith (review receipt on pull requests, optional headless check and screenshot baseline)
+- Privacy: nothing leaves the machine, no telemetry
+- Source: https://github.com/laaielichter/Threesmith
+- Agent install guide: https://github.com/laaielichter/Threesmith/blob/main/llms-install.md

@@ -1,0 +1,28 @@
+{
+  "name": "threesmith",
+  "version": "0.1.0",
+  "description": "Makes Claude Code better at three.js: the exact API of the installed three version, a scored review of outdated or broken code, and a headless WebGL check with screenshots. Reviews every three.js file Claude edits.",
+  "author": {
+    "name": "laaielichter",
+    "url": "https://github.com/laaielichter"
+  },
+  "homepage": "https://github.com/laaielichter/Threesmith",
+  "repository": "https://github.com/laaielichter/Threesmith",
+  "license": "MIT",
+  "keywords": [
+    "threejs",
+    "three.js",
+    "webgl",
+    "webgpu",
+    "mcp",
+    "3d"
+  ],
+  "userConfig": {
+    "project": {
+      "type": "directory",
+      "title": "three.js project",
+      "description": "The folder with the project's package.json (and node_modules/three). Tools use it when Claude does not pass a path. Empty: the folder Claude Code runs in.",
+      "required": false
+    }
+  }
+}

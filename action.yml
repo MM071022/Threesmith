@@ -1,0 +1,112 @@
+name: Threesmith receipt
+description: Review of a three.js project (scored, pinned to the installed three version) and an optional headless WebGL check with screenshot baseline, as one markdown receipt on a pull request.
+author: laaielichter
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  path:
+    description: Project directory.
+    default: "."
+  min-score:
+    description: Fail when the review score is lower than this (0-100). Empty means no minimum.
+    default: ""
+  fail-on:
+    description: "Fail on findings of this severity or worse: error, warn, info or none."
+    default: "error"
+  check:
+    description: Folder with an index.html (or a URL) to open in headless Chromium. Empty skips the browser check.
+    default: ""
+  entry:
+    description: HTML file inside the check folder.
+    default: "index.html"
+  root:
+    description: Folder to serve for the check when the page needs files above its own folder (for example node_modules). Empty serves the check folder.
+    default: ""
+  baseline:
+    description: Name of a screenshot baseline in .threesmith/baselines (created on the first run).
+    default: ""
+  wait:
+    description: Milliseconds to let the scene run before the screenshot.
+    default: "2000"
+  comment:
+    description: "Post the receipt as a comment on the pull request (needs permissions: pull-requests: write)."
+    default: "false"
+  token:
+    description: Token used to post the comment.
+    default: ${{ github.token }}
+  command:
+    description: How to run Threesmith. Change it only to run a build of your own.
+    default: npx -y threesmith@latest
+outputs:
+  ok:
+    description: "true when the review and the check passed."
+    value: ${{ steps.run.outputs.ok }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: 24
+    - name: Install Chromium for the browser check
+      if: inputs.check != ''
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: |
+        npm init -y >/dev/null
+        npm i --no-audit --no-fund playwright-core >/dev/null
+        npx playwright-core install --with-deps chromium
+        echo "NODE_PATH=$PWD/node_modules" >> "$GITHUB_ENV"
+    - name: Run Threesmith
+      id: run
+      shell: bash
+      env:
+        THREESMITH: ${{ inputs.command }}
+        PROJECT: ${{ inputs.path }}
+        MIN_SCORE: ${{ inputs.min-score }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        CHECK: ${{ inputs.check }}
+        ENTRY: ${{ inputs.entry }}
+        BASELINE: ${{ inputs.baseline }}
+        ROOT: ${{ inputs.root }}
+        WAIT: ${{ inputs.wait }}
+      run: |
+        flags=(--fail-on "$FAIL_ON")
+        if [ -n "$MIN_SCORE" ]; then flags+=(--min-score "$MIN_SCORE"); fi
+        if [ -n "$CHECK" ]; then flags+=(--check "$CHECK" --entry "$ENTRY" --wait "$WAIT"); fi
+        if [ -n "$ROOT" ]; then flags+=(--root "$ROOT"); fi
+        if [ -n "$BASELINE" ]; then flags+=(--baseline "$BASELINE"); fi
+        receipt="$RUNNER_TEMP/threesmith-receipt.md"
+        set +e
+        $THREESMITH ci "$PROJECT" "${flags[@]}" --out "$receipt" --summary "$GITHUB_STEP_SUMMARY"
+        code=$?
+        set -e
+        echo "receipt=$receipt" >> "$GITHUB_OUTPUT"
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        if [ "$code" = "0" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+    - name: Upload the screenshot and visual diff
+      if: always() && inputs.check != ''
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: threesmith-visual
+        path: |
+          ${{ inputs.check }}/.threesmith/last.png
+          ${{ inputs.check }}/.threesmith/diff/*.png
+        include-hidden-files: true
+        if-no-files-found: ignore
+    - name: Comment on the pull request
+      if: inputs.comment == 'true' && github.event_name == 'pull_request'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        PR: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
+        RECEIPT: ${{ steps.run.outputs.receipt }}
+      run: |
+        gh pr comment "$PR" --repo "$REPO" --body-file "$RECEIPT" --edit-last || gh pr comment "$PR" --repo "$REPO" --body-file "$RECEIPT"
+    - name: Fail when a step failed
+      if: steps.run.outputs.code != '0'
+      shell: bash
+      env:
+        CODE: ${{ steps.run.outputs.code }}
+      run: exit "$CODE"
