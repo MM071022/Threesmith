@@ -10,6 +10,7 @@ First version.
 - `threesmith ci`, GitHub Action, MCP server (`three_api`, `three_search`, `three_review`, `three_check`, `three_version`).
 - `threesmith fix` / `three_fix`: mechanical renames, dry run unless `--write`.
 - Inline `// threesmith-disable-next-line|-line|-file [rule]` comments.
+- `check --steps` / `steps` in `three_check`: click, press, drag, wheel, wait, wait-for before the screenshot.
 - Install buttons (VS Code, Cursor) in the README and on the site.
 - Benchmark tasks and grader (no results yet).
 - Claude Code plugin (skill, `three-reviewer` agent, hooks that review edited files), Claude Desktop bundle, Gemini CLI extension, Dockerfile, `llms-install.md`, `threesmith doctor`, `mcp --project`.

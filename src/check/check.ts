@@ -27,8 +27,31 @@ export interface CheckOptions {
   threshold?: number;
   /** Where baselines and diffs live. Default <folder>/.threesmith. */
   stateDir?: string;
+  /** Steps to run (click, press, drag, wheel, wait) after the scene has started and before the screenshot. */
+  steps?: Step[];
   /** Console warnings that are not a problem. Substring match. */
   ignore?: string[];
+}
+
+/** Things to do on the page before the screenshot, in order. */
+export type Step =
+  | { type: "wait"; ms: number }
+  | { type: "click"; selector?: string; x?: number; y?: number }
+  | { type: "press"; key: string }
+  | { type: "drag"; from: [number, number]; to: [number, number] }
+  | { type: "wheel"; deltaY: number }
+  | { type: "wait-for"; selector: string; timeout?: number };
+
+export function parseSteps(input: string): Step[] {
+  const data = JSON.parse(input) as unknown;
+  if (!Array.isArray(data)) throw new Error("steps must be a JSON array");
+  const types = new Set(["wait", "click", "press", "drag", "wheel", "wait-for"]);
+  for (const s of data) {
+    if (!s || typeof s !== "object" || !types.has((s as { type?: string }).type ?? "")) {
+      throw new Error(`unknown step ${JSON.stringify(s)}; types: ${[...types].join(", ")}`);
+    }
+  }
+  return data as Step[];
 }
 
 export type IssueKind =
@@ -44,6 +67,7 @@ export type IssueKind =
   | "baseline-diff"
   | "baseline-size"
   | "baseline-missing"
+  | "step-failed"
   | "load-failed";
 
 export interface Issue {
@@ -137,6 +161,26 @@ export async function check(opts: CheckOptions): Promise<CheckResult> {
       return result;
     }
     await page.waitForTimeout(opts.wait ?? 2000);
+    for (const [i, step] of (opts.steps ?? []).entries()) {
+      try {
+        if (step.type === "wait") await page.waitForTimeout(Math.min(step.ms, 30_000));
+        else if (step.type === "click") {
+          if (step.selector) await page.click(step.selector, { timeout: 5000 });
+          else await page.mouse.click(step.x ?? 0, step.y ?? 0);
+        } else if (step.type === "press") await page.keyboard.press(step.key);
+        else if (step.type === "drag") {
+          await page.mouse.move(step.from[0], step.from[1]);
+          await page.mouse.down();
+          await page.mouse.move(step.to[0], step.to[1], { steps: 12 });
+          await page.mouse.up();
+        } else if (step.type === "wheel") await page.mouse.wheel(0, step.deltaY);
+        else await page.waitForSelector(step.selector, { timeout: step.timeout ?? 5000 });
+      } catch (e) {
+        issues.push({ kind: "step-failed", severity: "error", message: `step ${i + 1} (${step.type}) failed: ${(e as Error).message.split("\n")[0]}` });
+        break;
+      }
+      await page.waitForTimeout(100); // let the next frame draw
+    }
     const stats = await page.evaluate(`(async () => {
       const w = window;
       let adapter = null;

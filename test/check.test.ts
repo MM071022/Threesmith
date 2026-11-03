@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { findChromium } from "../src/check/browser.js";
-import { check } from "../src/check/check.js";
+import { check, parseSteps } from "../src/check/check.js";
 import { project, THREE_DIR } from "./helpers.js";
 
 const have = !!findChromium();
@@ -75,4 +75,36 @@ describe.skipIf(!have)("headless check (needs Chromium)", () => {
     const updated = await check({ ...base, updateBaseline: true });
     expect(updated.baseline?.status).toBe("updated");
   }, 120_000);
+
+  it("runs steps (click, press, drag) before the screenshot and reports a failing step", async () => {
+    // red cube until a click on the button or a key press turns it green
+    const interactive = scene("0xff0000").replace(
+      "renderer.setAnimationLoop",
+      `const btn = document.createElement('button'); btn.id = 'go'; btn.textContent = 'go'; btn.style.cssText = 'position:fixed;top:0;left:0';
+document.body.appendChild(btn);
+const turn = () => mesh.material.color.set(0x00ff00);
+btn.addEventListener('click', turn);
+window.addEventListener('keydown', (e) => { if (e.key === 'g') turn(); });
+renderer.setAnimationLoop`,
+    );
+    const dir = page(interactive);
+    const base = { target: dir, wait: 500, baseline: "i" };
+    expect((await check(base)).baseline?.status).toBe("created");
+    expect((await check(base)).baseline?.status).toBe("match");
+    const clicked = await check({ ...base, steps: [{ type: "click", selector: "#go" }] });
+    expect(clicked.baseline?.status).toBe("diff");
+    const pressed = await check({ ...base, steps: [{ type: "press", key: "g" }, { type: "wait", ms: 100 }] });
+    expect(pressed.baseline?.status).toBe("diff");
+    const missing = await check({ ...base, steps: [{ type: "click", selector: "#nope" }] });
+    expect(missing.issues.map((i) => i.kind)).toContain("step-failed");
+    expect(missing.ok).toBe(false);
+  }, 120_000);
+});
+
+describe("steps parsing", () => {
+  it("accepts known steps and rejects others", () => {
+    expect(parseSteps('[{"type":"click","selector":"#a"},{"type":"wait","ms":10}]')).toHaveLength(2);
+    expect(() => parseSteps('[{"type":"eval","code":"1"}]')).toThrow(/unknown step/);
+    expect(() => parseSteps("{}")).toThrow(/array/);
+  });
 });

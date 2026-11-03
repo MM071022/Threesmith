@@ -3,7 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { formatSearch, lookup, search } from "../api/lookup.js";
-import { check, formatCheck } from "../check/check.js";
+import { check, formatCheck, parseSteps } from "../check/check.js";
 import { indexFor } from "../core.js";
 import { formatMarkdown } from "../review/format.js";
 import { fix, formatFix } from "../review/fix.js";
@@ -111,6 +111,19 @@ export function createServer(): McpServer {
         update_baseline: z.boolean().optional(),
         tolerance: z.number().min(0).max(1).optional(),
         webgpu: z.boolean().optional(),
+        steps: z
+          .array(
+            z.union([
+              z.object({ type: z.literal("wait"), ms: z.number().int().min(0).max(30000) }),
+              z.object({ type: z.literal("click"), selector: z.string().optional(), x: z.number().optional(), y: z.number().optional() }),
+              z.object({ type: z.literal("press"), key: z.string() }),
+              z.object({ type: z.literal("drag"), from: z.tuple([z.number(), z.number()]), to: z.tuple([z.number(), z.number()]) }),
+              z.object({ type: z.literal("wheel"), deltaY: z.number() }),
+              z.object({ type: z.literal("wait-for"), selector: z.string(), timeout: z.number().int().optional() }),
+            ]),
+          )
+          .optional()
+          .describe("Interactions before the screenshot: click (selector or x,y), press (key), drag, wheel, wait, wait-for."),
         ignore: z.array(z.string()).optional(),
       },
     },
@@ -127,6 +140,7 @@ export function createServer(): McpServer {
           ...(a.update_baseline ? { updateBaseline: true } : {}),
           ...(a.tolerance !== undefined ? { tolerance: a.tolerance } : {}),
           ...(a.webgpu ? { webgpu: true } : {}),
+          ...(a.steps ? { steps: parseSteps(JSON.stringify(a.steps)) } : {}),
           ...(a.ignore ? { ignore: a.ignore } : {}),
         });
         const content: Content[] = [{ type: "text", text: formatCheck(r) }];

@@ -16,7 +16,7 @@ three.js changes every month. Do not write API calls from memory; check them aga
    `three_fix` applies the pure renames (dry run unless `write`); then fix the rest by hand, then the warnings that apply. Do not silence a rule to get a better score; if a finding is wrong, say so.
 3. **Before saying a scene works**, call `three_check` on the folder with the page (CLI: `threesmith check <folder>`).
    It reports console errors, missing canvas or WebGL context, blank frames and returns a screenshot. Look at the
-   screenshot. Use `baseline` to catch visual regressions after a change.
+   screenshot. Use `baseline` to catch visual regressions after a change, and `steps` (click, press, drag, wheel) to reach a state that only shows after an interaction.
 
 ## Rules of thumb
 

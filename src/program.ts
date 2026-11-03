@@ -2,7 +2,7 @@ import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname } from "node:path";
 import { Command } from "commander";
 import { formatSearch, lookup, search } from "./api/lookup.js";
-import { check, formatCheck } from "./check/check.js";
+import { check, formatCheck, parseSteps } from "./check/check.js";
 import { ci } from "./ci.js";
 import { indexFor } from "./core.js";
 import { formatMarkdown, formatText } from "./review/format.js";
@@ -100,10 +100,12 @@ export function buildProgram(): Command {
     .option("--update-baseline", "overwrite the baseline with this run")
     .option("--tolerance <ratio>", "share of changed pixels that fails the baseline", "0.005")
     .option("--webgpu", "also enable WebGPU flags (best effort)")
+    .option("--steps <json|file>", 'steps before the screenshot, e.g. \'[{"type":"click","selector":"#start"},{"type":"drag","from":[100,100],"to":[300,120]}]\' (types: wait, click, press, drag, wheel, wait-for)')
     .option("--ignore <text...>", "console messages containing this text are ignored")
     .option("--json", "JSON output")
-    .action(async (target: string, o: { entry: string; root?: string; wait: string; width: string; height: string; baseline?: string; updateBaseline?: boolean; tolerance: string; webgpu?: boolean; ignore?: string[]; json?: boolean }) => {
+    .action(async (target: string, o: { entry: string; root?: string; wait: string; width: string; height: string; baseline?: string; updateBaseline?: boolean; tolerance: string; webgpu?: boolean; steps?: string; ignore?: string[]; json?: boolean }) => {
       const r = await check({
+        ...(o.steps ? { steps: parseSteps(o.steps.trim().startsWith("[") ? o.steps : readFileSync(o.steps, "utf8")) } : {}),
         target,
         entry: o.entry,
         ...(o.root ? { root: o.root } : {}),

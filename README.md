@@ -28,7 +28,7 @@ npx threesmith check .       # open the page in headless Chromium
 | `three_search` | `threesmith search orbit --members` | Find classes, constants and members by name. |
 | `three_review` | `threesmith review [path]` | Score 0-100 (and grade) over five categories with file:line findings and a fix for each. |
 | `three_fix` | `threesmith fix [path] --write` | Applies the renames that mean exactly the same (`BoxBufferGeometry` -> `BoxGeometry`, `THREE.Math` -> `MathUtils`, `applyMatrix` -> `applyMatrix4`, `three/examples/jsm` -> `three/addons`, `outputEncoding` -> `outputColorSpace`, capped pixel ratio). Dry run unless `--write`. |
-| `three_check` | `threesmith check <folder\|url>` | Headless Chromium with software WebGL 2: console and page errors, failed requests, no canvas / no GL context, lost context, **blank frames**, three revision, screenshot, optional baseline compare. |
+| `three_check` | `threesmith check <folder\|url>` | Headless Chromium with software WebGL 2: console and page errors, failed requests, no canvas / no GL context, lost context, **blank frames**, three revision, screenshot, optional baseline compare. `--steps` clicks, presses keys, drags or scrolls first, so you can baseline a state after an interaction. |
 | `three_version` | `threesmith api` | Which release is installed. |
 | – | `threesmith doctor` | Checks Node, installed three, Playwright and a working headless WebGL. |
 | – | `threesmith ci` | One markdown receipt (review + optional check) for CI. Fails on errors or a minimum score. |
