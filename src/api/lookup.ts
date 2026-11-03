@@ -138,6 +138,9 @@ export function lookup(index: ApiIndex, query: string, opts: { inherited?: boole
     for (const p of e.constructorParams) lines.push(`- \`${p.name}\`: ${p.type}${p.optional ? " (optional)" : ""} – ${firstSentence(p.description, 140)}`);
     lines.push("");
   }
+  if (!e.members.length && !e.constructorParams.length && !e.description) {
+    lines.push(`This release (r${index.install.release}) has no JSDoc for \`${e.name}\`; only its existence and import path are known. Check the types (@types/three) or the source: ${e.file}`, "");
+  }
   const own = r.members.filter((m) => m.from === e.name && m.name !== "constructor");
   const inherited = r.members.filter((m) => m.from !== e.name);
   const props = own.filter((m) => m.kind === "property");
