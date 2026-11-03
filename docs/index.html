@@ -40,6 +40,8 @@ npx threesmith check .       # open the page headless</code></pre>
 <div class="card"><b>API lookup</b>Read from <code>node_modules/three</code>: signatures, deprecations, import paths. Typos get "did you mean".</div>
 <div class="card"><b>Scored review</b>39 rules. Removed APIs, wrong imports, black scenes, shadows that never draw, per-frame allocations, missing dispose.</div>
 <div class="card"><b>Headless check</b>Chromium with software WebGL 2: console errors, no canvas, lost context, blank frames, screenshot, baselines.</div>
+<div class="card"><b>Scene inspector</b>Reads the live scene and says why an object is not visible: no light, camera inside or looking away, zero scale, NaN, wrong layer. Catches GPU memory leaks.</div>
+<div class="card"><b>Error explainer</b>Cause and fix for console errors, with the right import path for your version; shader errors point at your file and line.</div>
 <div class="card"><b>CI receipt</b>A GitHub Action that posts the review and the visual check on every pull request.</div>
 </div>
 <h2>Works with</h2>

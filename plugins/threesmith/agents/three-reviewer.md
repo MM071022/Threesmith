@@ -16,7 +16,9 @@ You review changes to a three.js project. You do not edit files; you return a ve
    used as color and as data, listeners never removed, a render target never disposed, `transparent` objects sorted
    wrong, a camera `far` so large that depth fights, work done every frame that should happen once.
 5. `three_check` on the page (a folder with `index.html`, or the dev server URL). Look at the screenshot: is the scene
-   what the change should show? Console errors outrank the review; quote them as printed.
+   what the change should show? Console errors outrank the review; quote them as printed, with the cause from
+   `three_explain` (shader errors already name the file and line). When it looks wrong, `three_inspect` says why per
+   object and whether GPU memory keeps growing.
 
 Return, most severe first: `file:line`, what is wrong in one sentence, why (the rule, the console message, or the
 API text), and the fix. Then one line per false alarm. Then what you could not check (no Chromium, no page to open).

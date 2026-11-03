@@ -4,6 +4,11 @@ import { findChromium, loadPlaywright, WEBGL_ARGS, WEBGPU_ARGS } from "./browser
 import { blankness, diff } from "./diff.js";
 import { decodePng, encodePng } from "./png.js";
 import { serveStatic } from "./server.js";
+import { indexFor } from "../core.js";
+import type { ApiIndex } from "../api/index-builder.js";
+import { explain, parseShaderErrors, type Explanation } from "../explain/explain.js";
+import { locateCode } from "../explain/locate.js";
+import { INSPECT_EVAL, INSPECT_INIT, MEMORY_EVAL, formatScene, type SceneReport } from "./inspect.js";
 
 export interface CheckOptions {
   /** Folder with the page, or an http(s) URL of a running dev server. */
@@ -29,6 +34,10 @@ export interface CheckOptions {
   stateDir?: string;
   /** Steps to run (click, press, drag, wheel, wait) after the scene has started and before the screenshot. */
   steps?: Step[];
+  /** Read the live scene graph and diagnose why objects are not visible. Done anyway when the frame is blank. */
+  inspect?: boolean;
+  /** Sample GPU memory twice this many ms apart to catch leaks (0 = off). Default 1500 with inspect, else 0. */
+  leakMs?: number;
   /** Console warnings that are not a problem. Substring match. */
   ignore?: string[];
 }
@@ -68,12 +77,20 @@ export type IssueKind =
   | "baseline-size"
   | "baseline-missing"
   | "step-failed"
+  | "scene"
+  | "leak"
   | "load-failed";
 
 export interface Issue {
   kind: IssueKind;
   severity: "error" | "warn";
   message: string;
+  /** Full text of a console message (shader errors span many lines). */
+  detail?: string;
+  /** Known causes and fixes for this message. */
+  explanations?: Explanation[];
+  /** For shader errors: where the failing line is in the project. */
+  shader?: { stage: string; line: number; message: string; code?: string; source?: string }[];
 }
 
 export interface CheckResult {
@@ -89,6 +106,7 @@ export interface CheckResult {
     webgpuAdapter: boolean | null;
   };
   screenshot?: string;
+  scene?: SceneReport;
   baseline?: { name: string; status: "created" | "updated" | "match" | "diff" | "size" | "missing"; ratio?: number; diffImage?: string };
 }
 
@@ -136,16 +154,38 @@ export async function check(opts: CheckOptions): Promise<CheckResult> {
   try {
     const page = await browser.newPage({ viewport: { width: opts.width ?? 800, height: opts.height ?? 600 }, deviceScaleFactor: 1 });
     await page.addInitScript(INIT);
-    page.on("pageerror", (e) => issues.push({ kind: "page-error", severity: "error", message: String(e.message ?? e).split("\n")[0] ?? "" }));
+    await page.addInitScript(INSPECT_INIT);
+    let index: ApiIndex | undefined;
+    try {
+      index = isUrl ? undefined : indexFor(folder);
+    } catch {
+      index = undefined; // three not installed next to the page: explanations without exact names
+    }
+    const annotate = (issue: Issue, text: string): Issue => {
+      const ex = explain(text, index);
+      if (ex.length) issue.explanations = ex;
+      if (text.includes("\n")) issue.detail = text.slice(0, 4000);
+      if (ex.some((e) => e.id === "shader-error")) {
+        issue.shader = parseShaderErrors(text).map((e) => {
+          const source = !isUrl && e.code ? locateCode(serveRoot, e.code) : undefined;
+          return { ...e, ...(source ? { source } : {}) };
+        });
+      }
+      return issue;
+    };
+    page.on("pageerror", (e) => {
+      const text = String(e.message ?? e);
+      issues.push(annotate({ kind: "page-error", severity: "error", message: text.split("\n")[0] ?? "" }, text));
+    });
     page.on("console", (m) => {
       const text = m.text();
       if (skip(text)) return;
       if (m.type() === "error") {
         // failed resource loads are reported by requestfailed/response with the URL
         if (/Failed to load resource/.test(text)) return;
-        issues.push({ kind: "console-error", severity: "error", message: text.split("\n")[0] ?? "" });
+        issues.push(annotate({ kind: "console-error", severity: "error", message: text.split("\n")[0] ?? "" }, text));
       } else if (m.type() === "warning" && /THREE\./.test(text)) {
-        issues.push({ kind: "console-warn", severity: "warn", message: text.split("\n")[0] ?? "" });
+        issues.push(annotate({ kind: "console-warn", severity: "warn", message: text.split("\n")[0] ?? "" }, text));
       }
     });
     page.on("requestfailed", (r) => {
@@ -235,6 +275,31 @@ export async function check(opts: CheckOptions): Promise<CheckResult> {
       issues.push({ kind: "blank", severity: "error", message: `The screenshot is ${(bl.dominant * 100).toFixed(1)}% one color: nothing visible was drawn (no lights, camera inside the object, or nothing added to the scene?).` });
     }
 
+    const blank = issues.some((i) => i.kind === "blank");
+    if ((opts.inspect || blank) && stats.canvases) {
+      const leakMs = opts.leakMs ?? (opts.inspect ? 1500 : 0);
+      const before = leakMs > 0 ? ((await page.evaluate(MEMORY_EVAL)) as { geometries: number; textures: number } | null) : null;
+      if (before) await page.waitForTimeout(leakMs);
+      const after = before ? ((await page.evaluate(MEMORY_EVAL)) as { geometries: number; textures: number } | null) : null;
+      const scene = (await page.evaluate(INSPECT_EVAL)) as SceneReport;
+      if (before && after) scene.memory = { before, after, ms: leakMs };
+      result.scene = scene;
+      for (const d of scene.diagnoses.filter((x) => x.severity === "error")) {
+        issues.push({ kind: "scene", severity: blank ? "error" : "warn", message: `${d.object ? d.object + ": " : ""}${d.message} Fix: ${d.fix}` });
+      }
+      if (before && after) {
+        const g = after.geometries - before.geometries;
+        const t = after.textures - before.textures;
+        if (g >= 3 || t >= 3) {
+          issues.push({
+            kind: "leak",
+            severity: "warn",
+            message: `GPU memory keeps growing while the scene runs: +${g} geometries, +${t} textures in ${leakMs} ms. Something creates geometries/materials/textures every frame or replaces objects without dispose().`,
+          });
+        }
+      }
+    }
+
     if (opts.baseline) {
       const dir = join(stateDir, "baselines");
       const file = join(dir, `${opts.baseline}.png`);
@@ -280,7 +345,14 @@ export function formatCheck(r: CheckResult): string {
   const out = [`Threesmith check: ${r.ok ? "PASS" : "FAIL"} – ${r.url}`];
   const s = r.stats;
   out.push(`canvases ${s.canvases} · contexts ${s.contexts.join(",") || "none"} · frames ${s.frames} · three ${s.threeRevision ? "r" + s.threeRevision : "?"}`);
-  for (const i of r.issues) out.push(`${i.severity === "error" ? "✖" : "▲"} [${i.kind}] ${i.message}`);
+  for (const i of r.issues) {
+    out.push(`${i.severity === "error" ? "✖" : "▲"} [${i.kind}] ${i.message}`);
+    for (const e of i.shader ?? []) {
+      out.push(`    ${e.stage} shader line ${e.line}: ${e.message}${e.code ? `\n      ${e.code}` : ""}${e.source ? `\n      in your code: ${e.source}` : ""}`);
+    }
+    for (const e of i.explanations ?? []) out.push(`    why: ${e.cause}\n    fix: ${e.fix}${e.detail ? `\n    ${e.detail}` : ""}`);
+  }
+  if (r.scene) out.push("", formatScene(r.scene, { maxNodes: 40 }));
   if (r.baseline) out.push(`baseline ${r.baseline.name}: ${r.baseline.status}${r.baseline.ratio !== undefined ? ` (${(r.baseline.ratio * 100).toFixed(2)}% changed)` : ""}${r.baseline.diffImage ? ` – diff: ${r.baseline.diffImage}` : ""}`);
   if (r.screenshot) out.push(`screenshot: ${r.screenshot}`);
   return out.join("\n");

@@ -148,7 +148,7 @@ export interface Collected {
 }
 
 /** Read a file without a check-then-read gap: open it once, check its size on the handle, read from the handle. */
-function readLimited(path: string): string | undefined {
+export function readLimited(path: string): string | undefined {
   let fd: number | undefined;
   try {
     fd = openSync(path, "r");

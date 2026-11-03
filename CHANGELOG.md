@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- `threesmith inspect` / `three_inspect`: the live scene graph, camera and renderer stats from the running page, with a
+  diagnosis of why objects are not visible, and GPU memory sampled twice to catch leaks. `check --inspect` adds it to a
+  check, and a blank frame gets it automatically.
+- `threesmith explain` / `three_explain`: cause and fix for 18 kinds of three.js runtime errors, with the right import
+  path for the installed version. `check` attaches it to every console error.
+- Shader compile errors in `check` are parsed and pointed at the file and line in your project.
+- The Claude Code hook explains three.js errors in command output.
+
 ## 0.1.0
 
 First version.
