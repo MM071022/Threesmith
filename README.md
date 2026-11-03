@@ -1,5 +1,11 @@
 # Threesmith
 
+[![CI](https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml/badge.svg)](https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_MCP_server-0098FF?logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=threesmith&config=%7B%22name%22%3A%22threesmith%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22threesmith%22%2C%22mcp%22%5D%7D)
+[![Install in Cursor](https://img.shields.io/badge/Cursor-Install_MCP_server-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=threesmith&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsInRocmVlc21pdGgiLCJtY3AiXX0%3D)
+[![Add to Claude Code](https://img.shields.io/badge/Claude_Code-Add_plugin-D97757)](#add-it-to-your-agent)
+
 **three.js for coding agents.** An MCP server and CLI that stops AI agents from writing outdated three.js and tells
 them when a scene is broken.
 
@@ -21,6 +27,7 @@ npx threesmith check .       # open the page in headless Chromium
 | `three_api` | `threesmith api WebGLRenderer.setSize` | Constructor, properties, methods, deprecations and the right import path, read from `node_modules/three` (no network, no stale training data). Unknown names get "did you mean". |
 | `three_search` | `threesmith search orbit --members` | Find classes, constants and members by name. |
 | `three_review` | `threesmith review [path]` | Score 0-100 (and grade) over five categories with file:line findings and a fix for each. |
+| `three_fix` | `threesmith fix [path] --write` | Applies the renames that mean exactly the same (`BoxBufferGeometry` -> `BoxGeometry`, `THREE.Math` -> `MathUtils`, `applyMatrix` -> `applyMatrix4`, `three/examples/jsm` -> `three/addons`, `outputEncoding` -> `outputColorSpace`, capped pixel ratio). Dry run unless `--write`. |
 | `three_check` | `threesmith check <folder\|url>` | Headless Chromium with software WebGL 2: console and page errors, failed requests, no canvas / no GL context, lost context, **blank frames**, three revision, screenshot, optional baseline compare. |
 | `three_version` | `threesmith api` | Which release is installed. |
 | – | `threesmith doctor` | Checks Node, installed three, Playwright and a working headless WebGL. |
@@ -44,7 +51,8 @@ on an older one; a rule whose replacement does not exist yet in your version sta
 - **lifecycle**: no resize handling, removed objects never disposed.
 - **color**: color textures without `colorSpace`, color management switched off.
 
-It is heuristic, not a type checker: it reads text, not types. If a finding is wrong, `--disable <rule>` skips a rule,
+It is heuristic, not a type checker: it reads text, not types. If a finding is wrong, `--disable <rule>` skips a rule, or
+`// threesmith-disable-next-line <rule>` (also `-disable-line`, `-disable-file`) skips it in the code,
 and an issue with the snippet is the most useful bug report. Every rule has a test.
 
 ### Add it to your agent

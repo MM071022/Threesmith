@@ -16,11 +16,22 @@ pre{background:var(--code);padding:14px 16px;border-radius:10px;overflow:auto}co
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .card{background:var(--card);border-radius:12px;padding:14px 16px}.card b{display:block;margin-bottom:4px}
 a{color:var(--acc)}table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--card)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:var(--acc);color:#fff;text-decoration:none;font-weight:600;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(47,111,163,.35)}
+.btn.alt{background:var(--card);color:var(--fg)}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
 </style>
 </head>
 <body><main>
 <h1>Threesmith</h1>
 <p class="lead">three.js ships a release almost every month and removes old APIs. Agents write the old ones. Threesmith checks their code against <b>the three version your project has installed</b>.</p>
+<div class="btns">
+<a class="btn" href="https://vscode.dev/redirect/mcp/install?name=threesmith&amp;config=%7B%22name%22%3A%22threesmith%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22threesmith%22%2C%22mcp%22%5D%7D">Install in VS Code</a>
+<a class="btn" href="https://cursor.com/en/install-mcp?name=threesmith&amp;config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsInRocmVlc21pdGgiLCJtY3AiXX0%3D">Install in Cursor</a>
+<a class="btn alt" href="https://github.com/laaielichter/Threesmith#add-it-to-your-agent">Claude Code plugin</a>
+<a class="btn alt" href="https://github.com/laaielichter/Threesmith">GitHub</a>
+</div>
 <pre><code>claude mcp add threesmith -- npx -y threesmith mcp
 npx threesmith review        # scored review
 npx threesmith api Mesh      # exact API of your version

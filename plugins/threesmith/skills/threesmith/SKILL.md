@@ -13,7 +13,7 @@ three.js changes every month. Do not write API calls from memory; check them aga
    `<Class.member>`). It reads the installed three, so the answer is right for this project. Use `three_search` to find
    a name. If a name is "not exported", it does not exist in this version: do not invent it.
 2. **After writing or changing three.js code**, call `three_review` (CLI: `threesmith review`). Fix every error first,
-   then the warnings that apply. Do not silence a rule to get a better score; if a finding is wrong, say so.
+   `three_fix` applies the pure renames (dry run unless `write`); then fix the rest by hand, then the warnings that apply. Do not silence a rule to get a better score; if a finding is wrong, say so.
 3. **Before saying a scene works**, call `three_check` on the folder with the page (CLI: `threesmith check <folder>`).
    It reports console errors, missing canvas or WebGL context, blank frames and returns a screenshot. Look at the
    screenshot. Use `baseline` to catch visual regressions after a change.

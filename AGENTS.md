@@ -26,7 +26,7 @@ node dist/cli.js --help
   and parses classes, members and constants from the JSDoc in `three/src`, `lookup.ts` does lookup, search and
   did-you-mean, `jsdoc.ts` parses doc blocks.
 - `src/review/`: `source.ts` reads files (comments blanked, imports parsed), `rules.ts` holds every rule,
-  `review.ts` runs them, gates them by the installed release and scores, `format.ts` prints.
+  `review.ts` runs them, gates them by the installed release and scores, `format.ts` prints, `fix.ts` applies the mechanical renames (a rule that gets a fix needs a case in `test/fix.test.ts`).
 - `src/check/`: `check.ts` is the headless run (Playwright, SwiftShader WebGL, console/page/request errors, blank
   detection, baselines), `png.ts` and `diff.ts` the pixel work, `server.ts` the static server, `browser.ts` flags and
   Chromium discovery.

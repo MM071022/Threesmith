@@ -6,6 +6,7 @@ import { check, formatCheck } from "./check/check.js";
 import { ci } from "./ci.js";
 import { indexFor } from "./core.js";
 import { formatMarkdown, formatText } from "./review/format.js";
+import { formatFix, fix } from "./review/fix.js";
 import { review } from "./review/review.js";
 import type { Severity } from "./review/types.js";
 import { doctor, formatDoctor } from "./doctor/doctor.js";
@@ -72,6 +73,19 @@ export function buildProgram(): Command {
         if (o.minScore !== undefined && r.score !== null && r.score < Number(o.minScore)) process.exitCode = 1;
       },
     );
+
+  program
+    .command("fix")
+    .description("Apply the mechanical fixes of the review (renames with the same meaning); dry run unless --write")
+    .argument("[path]", "directory or file", ".")
+    .option("--three <dir>", "path to a three package")
+    .option("--write", "change the files")
+    .option("--only <rules>", "comma separated rule ids")
+    .option("--json", "JSON output")
+    .action((path: string, o: { three?: string; write?: boolean; only?: string; json?: boolean }) => {
+      const r = fix({ path, ...(o.three ? { three: o.three } : {}), ...(o.write ? { write: true } : {}), ...(o.only ? { only: o.only.split(",") } : {}) });
+      out(o.json ? JSON.stringify({ ...r, files: r.files.map(({ fixed: _f, ...rest }) => rest) }, null, 2) : formatFix(r));
+    });
 
   program
     .command("check")

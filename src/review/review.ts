@@ -71,6 +71,18 @@ export function score(findings: Finding[]): { total: number; categories: Categor
   return { total, categories: cats };
 }
 
+/** Does an inline comment switch this finding off? `threesmith-disable-next-line [rule, ...]`, `-disable-line`, `-disable-file`. */
+export function isDisabled(f: Finding, lines: string[]): boolean {
+  const covers = (text: string | undefined, kind: string): boolean => {
+    if (!text) return false;
+    const m = new RegExp(`threesmith-disable-${kind}\\b([^\\n*]*)`).exec(text);
+    if (!m) return false;
+    const ids = (m[1] ?? "").replace(/\*\/.*$/, "").split(/[\s,]+/).filter((x) => /^[a-z][a-z0-9-]+$/.test(x));
+    return ids.length === 0 || ids.includes(f.rule);
+  };
+  return covers(lines[f.line - 2], "next-line") || covers(lines[f.line - 1], "line") || lines.some((l) => covers(l, "file"));
+}
+
 export function review(opts: ReviewOptions): ReviewResult {
   const root = opts.path;
   const isDir = statSync(root).isDirectory();
@@ -112,6 +124,10 @@ export function review(opts: ReviewOptions): ReviewResult {
       });
     }
   }
+  const raw = new Map(collected.files.map((f) => [f.path, f.raw.split("\n")]));
+  const kept = findings.filter((f) => !isDisabled(f, raw.get(f.file) ?? []));
+  findings.length = 0;
+  findings.push(...kept);
   const order: Record<Severity, number> = { error: 0, warn: 1, info: 2 };
   findings.sort((a, b) => order[a.severity] - order[b.severity] || a.file.localeCompare(b.file) || a.line - b.line);
   const counts: Record<Severity, number> = { error: 0, warn: 0, info: 0 };

@@ -6,6 +6,7 @@ import { formatSearch, lookup, search } from "../api/lookup.js";
 import { check, formatCheck } from "../check/check.js";
 import { indexFor } from "../core.js";
 import { formatMarkdown } from "../review/format.js";
+import { fix, formatFix } from "../review/fix.js";
 import { review } from "../review/review.js";
 import { VERSION } from "../version.js";
 
@@ -70,6 +71,23 @@ export function createServer(): McpServer {
       try {
         const r = review({ path: target ?? process.cwd(), ...(three ? { three } : {}), ...(disable ? { disable } : {}) });
         return { content: [{ type: "text" as const, text: formatMarkdown(r, { limit: limit ?? 40 }) }, { type: "text" as const, text: JSON.stringify({ score: r.score, grade: r.grade, counts: r.counts, findings: r.findings.slice(0, limit ?? 40) }) }] };
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "three_fix",
+    {
+      title: "Apply mechanical three.js fixes",
+      description:
+        "Apply the renames the review can fix without a decision (BoxBufferGeometry -> BoxGeometry, THREE.Math -> MathUtils, applyMatrix -> applyMatrix4, three/examples/jsm -> three/addons, outputEncoding -> outputColorSpace, uncapped pixel ratio). Shows what it would change unless write is true. Run three_review afterwards.",
+      inputSchema: { target: z.string().optional(), write: z.boolean().optional(), only: z.array(z.string()).optional(), three: common.three },
+    },
+    ({ target, write, only, three }) => {
+      try {
+        return text(formatFix(fix({ path: target ?? process.cwd(), ...(three ? { three } : {}), ...(write ? { write: true } : {}), ...(only ? { only } : {}) })));
       } catch (e) {
         return fail(e);
       }
