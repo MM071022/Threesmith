@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { findChromium, loadPlaywright, WEBGL_ARGS, WEBGPU_ARGS } from "./browser.js";
 import { blankness, diff } from "./diff.js";
@@ -196,13 +196,18 @@ export async function check(opts: CheckOptions): Promise<CheckResult> {
       const file = join(dir, `${opts.baseline}.png`);
       const baseline: NonNullable<CheckResult["baseline"]> = { name: opts.baseline, status: "match" };
       result.baseline = baseline;
-      if (!existsSync(file) || opts.updateBaseline) {
+      let existing: Buffer | undefined;
+      try {
+        existing = readFileSync(file);
+      } catch {
+        existing = undefined; // no baseline yet
+      }
+      if (!existing || opts.updateBaseline) {
         mkdirSync(dirname(file), { recursive: true });
-        const had = existsSync(file);
         writeFileSync(file, shot);
-        baseline.status = had ? "updated" : "created";
+        baseline.status = existing ? "updated" : "created";
       } else {
-        const expected = decodePng(readFileSync(file));
+        const expected = decodePng(existing);
         const d = diff(expected, img, { threshold: opts.threshold ?? 16 });
         baseline.ratio = Number(d.ratio.toFixed(5));
         if (d.sizeMismatch) {

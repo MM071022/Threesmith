@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { closeSync, fstatSync, openSync, readdirSync, readFileSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 
 export interface SourceFile {
@@ -147,43 +147,60 @@ export interface Collected {
   skipped: number;
 }
 
+/** Read a file without a check-then-read gap: open it once, check its size on the handle, read from the handle. */
+function readLimited(path: string): string | undefined {
+  let fd: number | undefined;
+  try {
+    fd = openSync(path, "r");
+    if (fstatSync(fd).size > MAX_BYTES) return undefined;
+    return readFileSync(fd, "utf8");
+  } catch {
+    return undefined;
+  } finally {
+    if (fd !== undefined) closeSync(fd);
+  }
+}
+
 export function collect(root: string): Collected {
   const files: SourceFile[] = [];
   let skipped = 0;
   let packageJson: Collected["packageJson"];
-  const st = statSync(root);
-  const base = st.isDirectory() ? root : join(root, "..");
-  const visit = (p: string): void => {
-    const s = statSync(p);
-    if (s.isDirectory()) {
-      for (const name of readdirSync(p)) {
-        if (SKIP_DIR.has(name) || name.startsWith(".")) continue;
-        visit(join(p, name));
-      }
-      return;
+  const parsePackage = (text: string | undefined): Collected["packageJson"] => {
+    try {
+      return text ? (JSON.parse(text) as Collected["packageJson"]) : undefined;
+    } catch {
+      return undefined;
     }
-    const name = p.split(/[\\/]/).pop() ?? "";
-    if (name === "package.json" && p === join(base, "package.json")) {
-      try {
-        packageJson = JSON.parse(readFileSync(p, "utf8"));
-      } catch {
-        /* ignore */
-      }
-    }
-    if (!EXT.has(extname(p)) || /\.min\.|\.d\.ts$/.test(name)) return;
-    if (s.size > MAX_BYTES) {
+  };
+  const addFile = (path: string, base: string): void => {
+    const name = path.split(/[\\/]/).pop() ?? "";
+    if (!EXT.has(extname(path)) || name.includes(".min.") || name.endsWith(".d.ts")) return;
+    const text = readLimited(path);
+    if (text === undefined) {
       skipped++;
       return;
     }
-    files.push(makeSourceFile(relative(base, p).split("\\").join("/"), readFileSync(p, "utf8")));
+    files.push(makeSourceFile(relative(base, path).split("\\").join("/"), text));
   };
-  visit(root);
-  if (!packageJson) {
-    try {
-      packageJson = JSON.parse(readFileSync(join(base, "package.json"), "utf8"));
-    } catch {
-      /* none */
+  const walk = (dir: string, base: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isSymbolicLink()) continue;
+      const p = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (SKIP_DIR.has(entry.name) || entry.name.startsWith(".")) continue;
+        walk(p, base);
+      } else if (entry.isFile()) addFile(p, base);
     }
+  };
+  let base = root;
+  try {
+    walk(root, root);
+  } catch (e) {
+    // a single file was given
+    if ((e as NodeJS.ErrnoException).code !== "ENOTDIR") throw e;
+    base = join(root, "..");
+    addFile(root, base);
   }
+  packageJson = parsePackage(readLimited(join(base, "package.json")));
   return { files, ...(packageJson ? { packageJson } : {}), skipped };
 }

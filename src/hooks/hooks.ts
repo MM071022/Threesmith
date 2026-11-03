@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { findThree } from "../api/install.js";
@@ -47,8 +47,11 @@ export interface HookContext {
   stateDir?: string;
 }
 
+/** A folder only this user can use: the system temp folder is shared, so the name carries the user id. */
+const defaultStateDir = (): string => join(tmpdir(), `threesmith-hooks-${process.getuid?.() ?? "user"}`);
+
 const stateFile = (context: HookContext, session: string): string =>
-  join(context.stateDir ?? join(tmpdir(), "threesmith-hooks"), `${createHash("sha1").update(session).digest("hex").slice(0, 16)}.json`);
+  join(context.stateDir ?? defaultStateDir(), `${createHash("sha256").update(session).digest("hex").slice(0, 32)}.json`);
 
 function readState(context: HookContext, session: string | undefined): SessionState {
   if (!session) return { files: {} };
@@ -64,7 +67,10 @@ function writeState(context: HookContext, session: string | undefined, state: Se
   if (!session) return;
   try {
     const dir = dirname(stateFile(context, session));
-    mkdirSync(dir, { recursive: true });
+    mkdirSync(dir, { recursive: true, mode: 0o700 });
+    // never write into a folder someone else made (or a link to one) before we did
+    const own = lstatSync(dir);
+    if (!own.isDirectory() || (process.getuid && own.uid !== process.getuid())) return;
     const old = Date.now() - 2 * 24 * 3600 * 1000;
     for (const name of readdirSync(dir)) {
       try {
@@ -73,7 +79,7 @@ function writeState(context: HookContext, session: string | undefined, state: Se
         /* another session removed it */
       }
     }
-    writeFileSync(stateFile(context, session), JSON.stringify(state));
+    writeFileSync(stateFile(context, session), JSON.stringify(state), { mode: 0o600 });
   } catch {
     /* state only sharpens the stop hook */
   }
@@ -179,7 +185,7 @@ export function stop(input: HookInput, context: HookContext = {}): HookOutput | 
     state.files[file] = { root: s.root, errors: errors.length };
     still.push(...errors);
   }
-  const signature = createHash("sha1").update(still.map(line).join("\n")).digest("hex");
+  const signature = createHash("sha256").update(still.map(line).join("\n")).digest("hex");
   const asked = state.stopAsked === signature;
   if (still.length) state.stopAsked = signature;
   writeState(context, input.session_id, state);

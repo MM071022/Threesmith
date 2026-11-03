@@ -1,6 +1,6 @@
 import { createServer, type Server } from "node:http";
-import { existsSync, readFileSync, statSync } from "node:fs";
-import { extname, join, normalize, resolve, sep } from "node:path";
+import { readFileSync } from "node:fs";
+import { extname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 const TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -31,18 +31,38 @@ export async function serveStatic(root: string): Promise<StaticServer> {
   const server: Server = createServer((req, res) => {
     try {
       const pathname = decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/");
-      let file = normalize(join(base, pathname));
-      if (file !== base && !file.startsWith(base + sep)) {
+      if (pathname.includes("\0")) {
+        res.writeHead(400).end("bad request");
+        return;
+      }
+      // lexical containment: resolve against the root and refuse anything that leaves it
+      // (symlinks inside the folder are followed on purpose: pnpm links node_modules to a store)
+      const target = resolve(base, "." + sep + pathname.replace(/^[/\\]+/, ""));
+      const rel = relative(base, target);
+      if (rel.startsWith("..") || isAbsolute(rel)) {
         res.writeHead(403).end("forbidden");
         return;
       }
-      if (existsSync(file) && statSync(file).isDirectory()) file = join(file, "index.html");
-      if (!existsSync(file)) {
+      let body: Buffer | undefined;
+      let served = target;
+      try {
+        body = readFileSync(target);
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code === "EISDIR") {
+          served = join(target, "index.html");
+          try {
+            body = readFileSync(served);
+          } catch {
+            body = undefined;
+          }
+        }
+      }
+      if (!body) {
         res.writeHead(404).end("not found");
         return;
       }
-      res.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream", "cache-control": "no-store" });
-      res.end(readFileSync(file));
+      res.writeHead(200, { "content-type": TYPES[extname(served)] ?? "application/octet-stream", "cache-control": "no-store" });
+      res.end(body);
     } catch {
       res.writeHead(500).end("error");
     }

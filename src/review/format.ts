@@ -33,7 +33,7 @@ export function formatMarkdown(r: ReviewResult, opts: { limit?: number } = {}): 
   if (shown.length) {
     out.push("", "| | Where | Rule | Fix |", "| --- | --- | --- | --- |");
     for (const f of shown) {
-      out.push(`| ${ICON[f.severity]} | \`${f.file}:${f.line}\` | \`${f.rule}\` | ${f.fix.replace(/\|/g, "\\|")} |`);
+      out.push(`| ${ICON[f.severity]} | \`${f.file}:${f.line}\` | \`${f.rule}\` | ${f.fix.replace(/\\/g, "\\\\").replace(/\|/g, "\\|")} |`);
     }
     if (r.findings.length > shown.length) out.push("", `_…and ${r.findings.length - shown.length} more._`);
   }
