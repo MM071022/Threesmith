@@ -1,0 +1,1101 @@
+{
+ "version": 1,
+ "name": "grandfather-clock",
+ "archetype": "prop.grandfather-clock",
+ "description": "A mahogany longcase (grandfather) clock facing +Z: a plinth on bracket feet, a trunk with a hinged, glazed door, a hood with columns, a glazed square dial with a chapter ring, numerals and brass spandrels, hour and minute hands that turn about z at the dial centre (set by hour and minute), a seconds pendulum (0.994 m) whose pivot is its suspension, brass weights on chains, and a flat cornice or an arched bonnet with finials.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 2.1,
+   "min": 1.8,
+   "max": 2.5,
+   "description": "Height of the clock to the top of the cornice, in metres (a bonnet's finials rise about 0.15 m above it)."
+  },
+  {
+   "name": "width",
+   "type": "number",
+   "default": 0.5,
+   "min": 0.4,
+   "max": 0.62,
+   "description": "Width of the hood (the trunk is narrower, the plinth a little wider)."
+  },
+  {
+   "name": "depth",
+   "type": "number",
+   "default": 0.3,
+   "min": 0.24,
+   "max": 0.38,
+   "description": "Depth of the hood."
+  },
+  {
+   "name": "hoodStyle",
+   "type": "integer",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "description": "0 = flat top with a cornice, 1 = arched bonnet with a broken pediment and finials."
+  },
+  {
+   "name": "hour",
+   "type": "number",
+   "default": 10,
+   "min": 0,
+   "max": 11.99,
+   "description": "Time shown: the hour (0-12)."
+  },
+  {
+   "name": "minute",
+   "type": "number",
+   "default": 10,
+   "min": 0,
+   "max": 59.99,
+   "description": "Time shown: the minutes."
+  },
+  {
+   "name": "swing",
+   "type": "number",
+   "default": 0,
+   "min": -6,
+   "max": 6,
+   "description": "Pendulum angle in degrees (animate it with rotation.z = A * sin(pi * t))."
+  },
+  {
+   "name": "doorAngle",
+   "type": "number",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "description": "How far the trunk door is open, in degrees (hinged on its left edge)."
+  },
+  {
+   "name": "weights",
+   "type": "integer",
+   "default": 3,
+   "min": 1,
+   "max": 3,
+   "description": "Number of driving weights (1 = time only, 3 = time, strike and chime)."
+  },
+  {
+   "name": "glazedDoor",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A glass window in the trunk door to see the pendulum."
+  }
+ ],
+ "materials": {
+  "mahogany": {
+   "color": [
+    0.075,
+    0.024,
+    0.011
+   ],
+   "metallic": 0,
+   "roughness": 0.42,
+   "texture": "wood"
+  },
+  "mahogany_dark": {
+   "color": [
+    0.035,
+    0.012,
+    0.006
+   ],
+   "metallic": 0,
+   "roughness": 0.5,
+   "texture": "wood"
+  },
+  "clock_brass": {
+   "color": [
+    0.78,
+    0.56,
+    0.24
+   ],
+   "metallic": 1,
+   "roughness": 0.3
+  },
+  "dial_paint": {
+   "color": [
+    0.58,
+    0.53,
+    0.4
+   ],
+   "metallic": 0,
+   "roughness": 0.5
+  },
+  "numeral_black": {
+   "color": [
+    0.015,
+    0.015,
+    0.015
+   ],
+   "metallic": 0,
+   "roughness": 0.5
+  },
+  "clock_glass": {
+   "color": [
+    0.8,
+    0.86,
+    0.9,
+    0.16
+   ],
+   "metallic": 0,
+   "roughness": 0.03,
+   "alpha": "BLEND"
+  },
+  "hand_steel": {
+   "color": [
+    0.02,
+    0.02,
+    0.025
+   ],
+   "metallic": 0.8,
+   "roughness": 0.35
+  }
+ },
+ "nodes": [
+  {
+   "name": "GrandfatherClock",
+   "material": "mahogany",
+   "vars": {
+    "H": "$height",
+    "W": "$width",
+    "D": "$depth",
+    "hs": "$hoodStyle",
+    "ph": "0.3 * $height / 2.1",
+    "hh": "0.6 * $height / 2.1",
+    "tw": "$width * 0.74",
+    "td": "$depth * 0.84",
+    "pw": "$width * 0.92",
+    "pd": "$depth * 0.95",
+    "t0": "0.3 * $height / 2.1 + 0.05",
+    "t1": "$height - 0.6 * $height / 2.1 - 0.045",
+    "hy": "$height - 0.6 * $height / 2.1",
+    "ds": "$width * 0.66",
+    "dy": "$height - 0.6 * $height / 2.1 + 0.06 + $width * 0.33",
+    "dz": "$depth / 2 - 0.026",
+    "py": "$height - 0.6 * $height / 2.1 + 0.02",
+    "pl": "min(0.994, $height - 0.6 * $height / 2.1 + 0.02 - 0.3 * $height / 2.1 - 0.22)",
+    "wall": 0.018
+   },
+   "children": [
+    {
+     "name": "Plinth",
+     "shape": "box",
+     "size": [
+      "$pw",
+      "$ph - 0.04",
+      "$pd"
+     ],
+     "anchor": "bottom",
+     "bevel": 0.006,
+     "at": [
+      0,
+      0.04,
+      0
+     ],
+     "children": [
+      {
+       "name": "BaseMoulding",
+       "shape": "box",
+       "size": [
+        "$pw + 0.03",
+        0.03,
+        "$pd + 0.02"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.008,
+       "at": [
+        0,
+        0,
+        0.005
+       ]
+      },
+      {
+       "name": "TopMoulding",
+       "shape": "box",
+       "size": [
+        "$pw + 0.02",
+        0.035,
+        "$pd + 0.015"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.01,
+       "at": [
+        0,
+        "$ph - 0.075",
+        0.004
+       ]
+      },
+      {
+       "name": "PlinthPanel",
+       "shape": "box",
+       "material": "mahogany_dark",
+       "size": [
+        "$pw * 0.7",
+        "($ph - 0.04) * 0.55",
+        0.01
+       ],
+       "bevel": 0.004,
+       "at": [
+        0,
+        "($ph - 0.04) * 0.5",
+        "$pd / 2"
+       ]
+      },
+      {
+       "name": "FootFL",
+       "shape": "box",
+       "size": [
+        0.07,
+        0.045,
+        0.07
+       ],
+       "anchor": "bottom",
+       "bevel": 0.008,
+       "at": [
+        "-$pw / 2 + 0.03",
+        -0.04,
+        "$pd / 2 - 0.03"
+       ],
+       "mirror": "FootFR"
+      },
+      {
+       "name": "FootBL",
+       "shape": "box",
+       "size": [
+        0.07,
+        0.045,
+        0.07
+       ],
+       "anchor": "bottom",
+       "bevel": 0.008,
+       "at": [
+        "-$pw / 2 + 0.03",
+        -0.04,
+        "-$pd / 2 + 0.03"
+       ],
+       "mirror": "FootBR"
+      }
+     ]
+    },
+    {
+     "name": "Case",
+     "children": [
+      {
+       "name": "TrunkSideL",
+       "shape": "box",
+       "size": [
+        "$wall",
+        "$t1 - $t0 + 0.02",
+        "$td"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.003,
+       "at": [
+        "-$tw / 2 + $wall / 2",
+        "$t0 - 0.01",
+        0
+       ],
+       "mirror": "TrunkSideR"
+      },
+      {
+       "name": "TrunkBack",
+       "shape": "box",
+       "material": "mahogany_dark",
+       "size": [
+        "$tw",
+        "$t1 - $t0 + 0.02",
+        "$wall"
+       ],
+       "anchor": "bottom",
+       "at": [
+        0,
+        "$t0 - 0.01",
+        "-$td / 2 + $wall / 2"
+       ]
+      },
+      {
+       "name": "WaistLow",
+       "shape": "box",
+       "size": [
+        "$tw + 0.03",
+        0.06,
+        "$td + 0.02"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.012,
+       "at": [
+        0,
+        "$ph - 0.045",
+        0
+       ]
+      },
+      {
+       "name": "WaistHigh",
+       "shape": "box",
+       "size": [
+        "$tw + 0.04",
+        0.05,
+        "$td + 0.025"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.012,
+       "at": [
+        0,
+        "$t1 - 0.01",
+        0
+       ]
+      },
+      {
+       "name": "Interior",
+       "shape": "box",
+       "material": "mahogany_dark",
+       "size": [
+        "$tw - 2 * $wall",
+        "($t1 - $t0) * 0.98",
+        0.006
+       ],
+       "anchor": "bottom",
+       "at": [
+        0,
+        "$t0",
+        "-$td / 2 + $wall + 0.003"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Door",
+     "at": [
+      "-$tw / 2 + 0.004",
+      "$t0",
+      "$td / 2 - 0.004"
+     ],
+     "rotate": [
+      0,
+      "-$doorAngle",
+      0
+     ],
+     "children": [
+      {
+       "name": "StileL",
+       "shape": "box",
+       "size": [
+        0.05,
+        "$t1 - $t0",
+        0.02
+       ],
+       "anchor": "bottom",
+       "bevel": 0.004,
+       "at": [
+        0.025,
+        0,
+        0.006
+       ]
+      },
+      {
+       "name": "StileR",
+       "shape": "box",
+       "size": [
+        0.05,
+        "$t1 - $t0",
+        0.02
+       ],
+       "anchor": "bottom",
+       "bevel": 0.004,
+       "at": [
+        "$tw - 0.008 - 0.025",
+        0,
+        0.006
+       ]
+      },
+      {
+       "name": "RailLow",
+       "shape": "box",
+       "size": [
+        "$tw - 0.108",
+        "($t1 - $t0) * 0.07",
+        0.02
+       ],
+       "anchor": "bottom",
+       "bevel": 0.004,
+       "at": [
+        "($tw - 0.008) / 2",
+        0,
+        0.006
+       ]
+      },
+      {
+       "name": "RailHigh",
+       "shape": "box",
+       "size": [
+        "$tw - 0.108",
+        "($t1 - $t0) * 0.1",
+        0.02
+       ],
+       "anchor": "bottom",
+       "bevel": 0.004,
+       "at": [
+        "($tw - 0.008) / 2",
+        "($t1 - $t0) * 0.9",
+        0.006
+       ],
+       "children": [
+        {
+         "name": "RailPanel",
+         "shape": "box",
+         "material": "mahogany_dark",
+         "size": [
+          "$tw - 0.16",
+          "($t1 - $t0) * 0.06",
+          0.006
+         ],
+         "bevel": 0.003,
+         "at": [
+          0,
+          "($t1 - $t0) * 0.05",
+          0.01
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Lenticle",
+       "shape": "box",
+       "material": "clock_glass",
+       "size": [
+        "$tw - 0.11",
+        "($t1 - $t0) * 0.83",
+        0.004
+       ],
+       "anchor": "bottom",
+       "at": [
+        "($tw - 0.008) / 2",
+        "($t1 - $t0) * 0.07",
+        0.004
+       ]
+      },
+      {
+       "name": "Panel",
+       "shape": "box",
+       "size": [
+        "$tw - 0.112",
+        "($t1 - $t0) * (0.83 * (1 - $glazedDoor) + 0.04 * $glazedDoor)",
+        "0.012 - 0.004 * $glazedDoor"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.002,
+       "at": [
+        "($tw - 0.008) / 2",
+        "($t1 - $t0) * (0.07 * (1 - $glazedDoor) + 0.015 * $glazedDoor)",
+        0.006
+       ]
+      },
+      {
+       "name": "Keyhole",
+       "shape": "cylinder",
+       "material": "clock_brass",
+       "axis": "z",
+       "radius": 0.012,
+       "height": 0.006,
+       "segments": 12,
+       "at": [
+        "$tw - 0.008 - 0.025",
+        "($t1 - $t0) * 0.5",
+        0.018
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Hood",
+     "shape": "box",
+     "size": [
+      "$W - 0.04",
+      "$hh - 0.08",
+      "$D - 0.03"
+     ],
+     "anchor": "bottom",
+     "bevel": 0.006,
+     "at": [
+      0,
+      "$hy",
+      -0.015
+     ],
+     "children": [
+      {
+       "name": "HoodBase",
+       "shape": "box",
+       "size": [
+        "$W",
+        0.04,
+        "$D"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.008,
+       "at": [
+        0,
+        0,
+        0.015
+       ]
+      },
+      {
+       "name": "Cornice",
+       "shape": "box",
+       "size": [
+        "$W + 0.04",
+        0.06,
+        "$D + 0.02"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.012,
+       "at": [
+        0,
+        "$hh - 0.12",
+        0.02
+       ]
+      },
+      {
+       "name": "CorniceCap",
+       "shape": "box",
+       "size": [
+        "$W + 0.02",
+        0.03,
+        "$D"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.008,
+       "at": [
+        0,
+        "$hh - 0.06",
+        0.015
+       ]
+      },
+      {
+       "name": "ColumnL",
+       "shape": "cylinder",
+       "segments": 14,
+       "radius": 0.016,
+       "height": "$hh - 0.16",
+       "anchor": "base",
+       "at": [
+        "-$W / 2 + 0.035",
+        0.04,
+        "$D / 2 - 0.01"
+       ],
+       "mirror": "ColumnR",
+       "children": [
+        {
+         "name": "Capital",
+         "shape": "cylinder",
+         "material": "clock_brass",
+         "segments": 14,
+         "radius": 0.02,
+         "height": 0.02,
+         "at": [
+          0,
+          "$hh - 0.17",
+          0
+         ]
+        },
+        {
+         "name": "ColumnRing",
+         "shape": "cylinder",
+         "material": "clock_brass",
+         "segments": 14,
+         "radius": 0.02,
+         "height": 0.02,
+         "at": [
+          0,
+          0.01,
+          0
+         ]
+        }
+       ]
+      },
+      {
+       "name": "HoodGlass",
+       "shape": "box",
+       "material": "clock_glass",
+       "size": [
+        "$ds + 0.02",
+        "$ds + 0.02",
+        0.004
+       ],
+       "at": [
+        0,
+        "$dy - $hy",
+        "$D / 2 - 0.004"
+       ]
+      },
+      {
+       "name": "ScrollL",
+       "shape": "tube",
+       "segments": 12,
+       "radius": "0.012 + 0.02 * $hs",
+       "path": [
+        [
+         "-$W / 2 + 0.02",
+         "$hh - 0.04",
+         "$D / 2 - 0.02"
+        ],
+        [
+         "-$W * 0.38",
+         "$hh - 0.04 + 0.08 * $hs",
+         "$D / 2 - 0.02"
+        ],
+        [
+         "-$W * 0.24",
+         "$hh - 0.04 + 0.13 * $hs",
+         "$D / 2 - 0.02"
+        ],
+        [
+         "-$W * 0.11",
+         "$hh - 0.04 + 0.12 * $hs",
+         "$D / 2 - 0.02"
+        ]
+       ],
+       "mirror": "ScrollR"
+      },
+      {
+       "name": "RosetteL",
+       "shape": "cylinder",
+       "material": "clock_brass",
+       "axis": "z",
+       "segments": 14,
+       "radius": "0.006 + 0.014 * $hs",
+       "height": 0.012,
+       "at": [
+        "-$W * 0.11",
+        "$hh - 0.04 + 0.12 * $hs",
+        "$D / 2 - 0.004"
+       ],
+       "mirror": "RosetteR"
+      },
+      {
+       "name": "FinialC",
+       "shape": "lathe",
+       "material": "clock_brass",
+       "segments": 14,
+       "at": [
+        0,
+        "$hh - 0.04",
+        "$D / 2 - 0.04"
+       ],
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         0.025,
+         0
+        ],
+        [
+         0.025,
+         0.015
+        ],
+        [
+         "0.01 + 0.012 * $hs",
+         "0.02 + 0.04 * $hs"
+        ],
+        [
+         "0.003 + 0.02 * $hs",
+         "0.022 + 0.08 * $hs"
+        ],
+        [
+         "0.004 + 0.004 * $hs",
+         "0.024 + 0.12 * $hs"
+        ],
+        [
+         0,
+         "0.026 + 0.16 * $hs"
+        ]
+       ]
+      },
+      {
+       "name": "FinialL",
+       "shape": "lathe",
+       "material": "clock_brass",
+       "segments": 12,
+       "at": [
+        "-$W / 2 + 0.03",
+        "$hh - 0.04",
+        "$D / 2 - 0.03"
+       ],
+       "mirror": "FinialR",
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         0.018,
+         0
+        ],
+        [
+         0.018,
+         0.012
+        ],
+        [
+         "0.006 + 0.008 * $hs",
+         "0.016 + 0.025 * $hs"
+        ],
+        [
+         "0.002 + 0.014 * $hs",
+         "0.018 + 0.055 * $hs"
+        ],
+        [
+         0,
+         "0.02 + 0.1 * $hs"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Dial",
+     "shape": "box",
+     "material": "dial_paint",
+     "size": [
+      "$ds",
+      "$ds",
+      0.006
+     ],
+     "at": [
+      0,
+      "$dy",
+      "$dz"
+     ],
+     "children": [
+      {
+       "name": "ChapterRing",
+       "shape": "lathe",
+       "material": "numeral_black",
+       "segments": 48,
+       "caps": false,
+       "rotate": [
+        90,
+        0,
+        0
+       ],
+       "profile": [
+        [
+         "$ds * 0.37",
+         0
+        ],
+        [
+         "$ds * 0.375",
+         0
+        ],
+        [
+         "$ds * 0.375",
+         0.001
+        ],
+        [
+         "$ds * 0.37",
+         0.001
+        ],
+        [
+         "$ds * 0.37",
+         0
+        ]
+       ],
+       "at": [
+        0,
+        0,
+        0.0035
+       ]
+      },
+      {
+       "name": "ChapterRingIn",
+       "shape": "lathe",
+       "material": "numeral_black",
+       "segments": 48,
+       "caps": false,
+       "rotate": [
+        90,
+        0,
+        0
+       ],
+       "profile": [
+        [
+         "$ds * 0.3",
+         0
+        ],
+        [
+         "$ds * 0.304",
+         0
+        ],
+        [
+         "$ds * 0.304",
+         0.001
+        ],
+        [
+         "$ds * 0.3",
+         0.001
+        ],
+        [
+         "$ds * 0.3",
+         0
+        ]
+       ],
+       "at": [
+        0,
+        0,
+        0.0035
+       ]
+      },
+      {
+       "name": "Numeral{i}",
+       "shape": "box",
+       "material": "numeral_black",
+       "size": [
+        "$ds * 0.012",
+        "$ds * 0.06",
+        0.001
+       ],
+       "repeat": {
+        "count": 12,
+        "around": "z"
+       },
+       "at": [
+        0,
+        "$ds * 0.337",
+        0.0035
+       ]
+      },
+      {
+       "name": "Spandrel{i}",
+       "shape": "ellipsoid",
+       "material": "clock_brass",
+       "segments": 10,
+       "lumps": 0.2,
+       "radii": [
+        "$ds * 0.07",
+        "$ds * 0.07",
+        0.004
+       ],
+       "repeat": {
+        "count": 4,
+        "around": "z",
+        "phase": 45
+       },
+       "at": [
+        0,
+        "$ds * 0.6",
+        0.003
+       ]
+      },
+      {
+       "name": "Arbor",
+       "shape": "cylinder",
+       "material": "clock_brass",
+       "axis": "z",
+       "radius": 0.007,
+       "height": 0.012,
+       "segments": 12,
+       "at": [
+        0,
+        0,
+        0.006
+       ]
+      }
+     ]
+    },
+    {
+     "name": "HandHour",
+     "at": [
+      0,
+      "$dy",
+      "$dz + 0.009"
+     ],
+     "rotate": [
+      0,
+      0,
+      "-($hour * 30 + $minute * 0.5)"
+     ],
+     "children": [
+      {
+       "name": "HourBlade",
+       "shape": "box",
+       "material": "hand_steel",
+       "size": [
+        "$ds * 0.018",
+        "$ds * 0.24",
+        0.002
+       ],
+       "anchor": "bottom",
+       "at": [
+        0,
+        -0.012,
+        0
+       ],
+       "children": [
+        {
+         "name": "HourTip",
+         "shape": "ellipsoid",
+         "material": "hand_steel",
+         "segments": 10,
+         "radii": [
+          "$ds * 0.035",
+          "$ds * 0.045",
+          0.001
+         ],
+         "at": [
+          0,
+          "$ds * 0.19",
+          0
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "HandMinute",
+     "at": [
+      0,
+      "$dy",
+      "$dz + 0.012"
+     ],
+     "rotate": [
+      0,
+      0,
+      "-$minute * 6"
+     ],
+     "children": [
+      {
+       "name": "MinuteBlade",
+       "shape": "box",
+       "material": "hand_steel",
+       "size": [
+        "$ds * 0.012",
+        "$ds * 0.37",
+        0.002
+       ],
+       "anchor": "bottom",
+       "at": [
+        0,
+        -0.014,
+        0
+       ],
+       "children": [
+        {
+         "name": "MinuteTip",
+         "shape": "ellipsoid",
+         "material": "hand_steel",
+         "segments": 10,
+         "radii": [
+          "$ds * 0.018",
+          "$ds * 0.03",
+          0.001
+         ],
+         "at": [
+          0,
+          "$ds * 0.28",
+          0
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Pendulum",
+     "at": [
+      0,
+      "$py",
+      "-$td / 2 + 0.07"
+     ],
+     "rotate": [
+      0,
+      0,
+      "$swing"
+     ],
+     "children": [
+      {
+       "name": "Rod",
+       "shape": "box",
+       "material": "clock_brass",
+       "size": [
+        0.01,
+        "$pl",
+        0.004
+       ],
+       "anchor": "bottom",
+       "at": [
+        0,
+        "-$pl",
+        0
+       ]
+      },
+      {
+       "name": "Bob",
+       "shape": "cylinder",
+       "material": "clock_brass",
+       "axis": "z",
+       "radius": "0.07 * $width / 0.5",
+       "height": 0.022,
+       "segments": 28,
+       "bevel": 0.009,
+       "at": [
+        0,
+        "-$pl",
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Weight{i}",
+     "repeat": {
+      "count": "$weights",
+      "step": [
+       "$tw * 0.28",
+       0,
+       0
+      ]
+     },
+     "at": [
+      "-$tw * 0.28 * ($weights - 1) / 2",
+      "$py",
+      "-$td / 2 + 0.13"
+     ],
+     "children": [
+      {
+       "name": "Chain",
+       "shape": "cylinder",
+       "material": "clock_brass",
+       "radius": 0.0025,
+       "height": "0.38 + 0.06 * $i",
+       "anchor": "base",
+       "segments": 6,
+       "at": [
+        0,
+        "-0.38 - 0.06 * $i",
+        0
+       ]
+      },
+      {
+       "name": "Canister",
+       "shape": "cylinder",
+       "material": "clock_brass",
+       "radius": 0.032,
+       "height": 0.2,
+       "segments": 20,
+       "bevel": 0.006,
+       "at": [
+        0,
+        "-0.48 - 0.06 * $i",
+        0
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
