@@ -1228,5 +1228,205 @@
    "Control surfaces on a swept wing turn about their own hinge line, not about the body's x axis.",
    "A model this large needs its size checked against the reference after every build step; an offset applied twice makes it far too long."
   ]
+ },
+ {
+  "id": "aircraft.lighter-than-air",
+  "name": "lighter-than-air aircraft",
+  "description": "An aircraft that floats on lift gas or hot air: a balloon or an airship.",
+  "aliases": [
+   "lighter-than-air",
+   "lighter than air",
+   "aerostat",
+   "lichter dan lucht"
+  ],
+  "extends": "aircraft",
+  "hints": [
+   "envelope",
+   "omhulsel",
+   "gas",
+   "helium",
+   "hydrogen",
+   "waterstof",
+   "hot air",
+   "hete lucht",
+   "float",
+   "drijven"
+  ],
+  "parts": [
+   {
+    "name": "Envelope",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "envelope",
+     "omhulsel",
+     "gas bag",
+     "gasbag",
+     "hull",
+     "balloon"
+    ],
+    "note": "The big fabric or rigid body that holds the lift gas or hot air."
+   }
+  ],
+  "conventions": [
+   "The envelope is the largest part by far: its size sets the scale, the crew compartment hangs under it."
+  ],
+  "pitfalls": [
+   "An envelope modelled small, like a party balloon over a basket, reads as a toy: the envelope is 15-20 m across for 1.2 m of basket."
+  ]
+ },
+ {
+  "id": "aircraft.lighter-than-air.hot-air-balloon",
+  "name": "hot air balloon",
+  "description": "A hot air balloon: a teardrop envelope of coloured gores, a wicker basket for the crew and a propane burner on a frame between them.",
+  "aliases": [
+   "hot air balloon",
+   "hot-air balloon",
+   "balloon",
+   "luchtballon",
+   "heteluchtballon",
+   "ballon",
+   "montgolfière",
+   "montgolfiere"
+  ],
+  "extends": "aircraft.lighter-than-air",
+  "hints": [
+   "basket",
+   "mand",
+   "burner",
+   "brander",
+   "propane",
+   "propaan",
+   "gores",
+   "baan",
+   "ballooning",
+   "ballonvaart"
+  ],
+  "parts": [
+   {
+    "name": "Envelope",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "envelope",
+     "omhulsel",
+     "balloon",
+     "ballon"
+    ]
+   },
+   {
+    "name": "Basket",
+    "role": "gondola",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "basket",
+     "mand",
+     "gondola",
+     "gondel"
+    ]
+   },
+   {
+    "name": "Burner",
+    "role": "engine",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "burner",
+     "brander",
+     "heater"
+    ],
+    "note": "Sits on the load frame above the basket, under the mouth of the envelope."
+   },
+   {
+    "name": "Cable",
+    "role": "rigging",
+    "required": false,
+    "count": [
+     4,
+     32
+    ],
+    "aliases": [
+     "cable",
+     "load cable",
+     "flying wire",
+     "kabel",
+     "touw"
+    ]
+   },
+   {
+    "name": "Skirt",
+    "role": "fabric",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "skirt",
+     "scoop",
+     "rok"
+    ]
+   },
+   {
+    "name": "Tank",
+    "role": "fuel",
+    "required": false,
+    "count": [
+     1,
+     6
+    ],
+    "aliases": [
+     "tank",
+     "cylinder",
+     "propane tank",
+     "gasfles"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    12,
+    22
+   ],
+   "width": [
+    12,
+    22
+   ],
+   "height": [
+    15,
+    30
+   ],
+   "source": "manufacturer data: sport balloons of 2,000-3,000 m3 (Cameron O-90/O-105, Ultramagic M-77/M-105) are about 18-21 m high overall and 15-18 m wide; baskets are 1.0-2.0 m square and 1.1-1.2 m high",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "size",
+    "options": [
+     "1-2 person",
+     "sport (4 person)",
+     "passenger (16+ person)"
+    ]
+   },
+   {
+    "axis": "shape",
+    "options": [
+     "natural (teardrop)",
+     "special shape"
+    ]
+   }
+  ],
+  "conventions": [
+   "The basket stands on y = 0; the envelope's axis is the y axis, so the model is round about it."
+  ],
+  "anticipate": [
+   "A light at the burner for a night glow (an emissive flame node that can be switched).",
+   "A slow sway: rotate the whole balloon a few degrees about the basket, not the basket alone."
+  ],
+  "pitfalls": [
+   "A basket with no frame and burner between it and the envelope looks like it hangs from nothing."
+  ]
  }
 ]

@@ -1,0 +1,1883 @@
+{
+ "version": 1,
+ "name": "hot-air-balloon",
+ "archetype": "aircraft.lighter-than-air.hot-air-balloon",
+ "description": "A hot air balloon at rest on its basket, about 22 m high and 16 m across (a 2,500 m3 sport balloon): a natural teardrop envelope of 24 gores with every other gore in the stripe colour, an optional equator band, a crown vent and a fabric skirt at the mouth; eight load cables to a steel load frame on four rods with padded sleeves; a double propane burner with coils, valves and pilot lights; and a square wicker basket with a leather rim, handles, skids and propane tanks. Three colour schemes. Stands on y = 0, the envelope round the y axis.",
+ "params": [
+  {
+   "name": "envelopeHeight",
+   "type": "number",
+   "default": 18,
+   "min": 12,
+   "max": 26,
+   "description": "Height of the envelope from the mouth to the crown."
+  },
+  {
+   "name": "diameter",
+   "type": "number",
+   "default": 16,
+   "min": 11,
+   "max": 22,
+   "description": "Widest diameter of the envelope."
+  },
+  {
+   "name": "gores",
+   "type": "integer",
+   "default": 24,
+   "min": 16,
+   "max": 32,
+   "description": "Vertical panels (gores) around the envelope; every other one carries the stripe colour."
+  },
+  {
+   "name": "scheme",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "Colours of the envelope and its stripes: 0 red and yellow, 1 blue and white, 2 rainbow orange and purple."
+  },
+  {
+   "name": "basketWidth",
+   "type": "number",
+   "default": 1.4,
+   "min": 1.0,
+   "max": 2.2,
+   "description": "Width of the square wicker basket."
+  },
+  {
+   "name": "basketHeight",
+   "type": "number",
+   "default": 1.1,
+   "min": 0.95,
+   "max": 1.25,
+   "description": "Height of the basket wall."
+  },
+  {
+   "name": "tanks",
+   "type": "integer",
+   "default": 3,
+   "min": 1,
+   "max": 4,
+   "description": "Propane tanks standing in the basket."
+  },
+  {
+   "name": "equatorBand",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A band of the stripe colour round the widest part of the envelope."
+  }
+ ],
+ "materials": {
+  "wicker": {
+   "color": [
+    0.55,
+    0.38,
+    0.2
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "texture": "wood"
+  },
+  "leather": {
+   "color": [
+    0.2,
+    0.09,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.6
+  },
+  "burner_steel": {
+   "color": [
+    0.72,
+    0.72,
+    0.74
+   ],
+   "metallic": 1,
+   "roughness": 0.25
+  },
+  "frame_steel": {
+   "color": [
+    0.5,
+    0.5,
+    0.52
+   ],
+   "metallic": 1,
+   "roughness": 0.35
+  },
+  "hose": {
+   "color": [
+    0.03,
+    0.03,
+    0.035
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "skirt_fabric": {
+   "color": [
+    0.16,
+    0.16,
+    0.17
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "doubleSided": true
+  },
+  "cable": {
+   "color": [
+    0.12,
+    0.12,
+    0.13
+   ],
+   "metallic": 0.6,
+   "roughness": 0.5
+  },
+  "tank": {
+   "color": [
+    0.75,
+    0.76,
+    0.78
+   ],
+   "metallic": 1,
+   "roughness": 0.3
+  },
+  "pilot_flame": {
+   "color": [
+    0.3,
+    0.5,
+    1.0
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    0.2,
+    0.4,
+    1.0
+   ]
+  },
+  "vent": {
+   "color": [
+    0.05,
+    0.05,
+    0.06
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "doubleSided": true
+  },
+  "nylon_red": {
+   "color": [
+    0.62,
+    0.04,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.62,
+   "doubleSided": true
+  },
+  "stripe_red": {
+   "color": [
+    0.95,
+    0.68,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.62
+  },
+  "band_red": {
+   "color": [
+    0.95,
+    0.68,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.62,
+   "doubleSided": true
+  },
+  "nylon_blue": {
+   "color": [
+    0.03,
+    0.12,
+    0.55
+   ],
+   "metallic": 0,
+   "roughness": 0.62,
+   "doubleSided": true
+  },
+  "stripe_blue": {
+   "color": [
+    0.85,
+    0.85,
+    0.82
+   ],
+   "metallic": 0,
+   "roughness": 0.62
+  },
+  "band_blue": {
+   "color": [
+    0.85,
+    0.85,
+    0.82
+   ],
+   "metallic": 0,
+   "roughness": 0.62,
+   "doubleSided": true
+  },
+  "nylon_orange": {
+   "color": [
+    0.9,
+    0.32,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.62,
+   "doubleSided": true
+  },
+  "stripe_orange": {
+   "color": [
+    0.32,
+    0.06,
+    0.45
+   ],
+   "metallic": 0,
+   "roughness": 0.62
+  },
+  "band_orange": {
+   "color": [
+    0.32,
+    0.06,
+    0.45
+   ],
+   "metallic": 0,
+   "roughness": 0.62,
+   "doubleSided": true
+  }
+ },
+ "nodes": [
+  {
+   "name": "HotAirBalloon",
+   "vars": {
+    "R": "$diameter / 2",
+    "He": "$envelopeHeight",
+    "bw": "$basketWidth",
+    "bh": "$basketHeight",
+    "yF": "$basketHeight + 1.9",
+    "ym": "$basketHeight + 1.9 + 2.0"
+   },
+   "children": [
+    {
+     "name": "Basket",
+     "material": "wicker",
+     "children": [
+      {
+       "name": "WallFront",
+       "shape": "box",
+       "size": [
+        "$bw",
+        "$bh - 0.1",
+        0.06
+       ],
+       "at": [
+        0,
+        "$bh / 2 + 0.05",
+        "$bw / 2 - 0.03"
+       ],
+       "bevel": 0.015
+      },
+      {
+       "name": "WallBack",
+       "shape": "box",
+       "size": [
+        "$bw",
+        "$bh - 0.1",
+        0.06
+       ],
+       "at": [
+        0,
+        "$bh / 2 + 0.05",
+        "-$bw / 2 + 0.03"
+       ],
+       "bevel": 0.015
+      },
+      {
+       "name": "WallLeft",
+       "shape": "box",
+       "size": [
+        0.06,
+        "$bh - 0.1",
+        "$bw - 0.1"
+       ],
+       "at": [
+        "$bw / 2 - 0.03",
+        "$bh / 2 + 0.05",
+        0
+       ],
+       "bevel": 0.015,
+       "mirror": "WallRight"
+      },
+      {
+       "name": "Floor",
+       "shape": "box",
+       "size": [
+        "$bw - 0.02",
+        0.1,
+        "$bw - 0.02"
+       ],
+       "at": [
+        0,
+        0.05,
+        0
+       ],
+       "material": "wood",
+       "bevel": 0.015
+      },
+      {
+       "name": "Skid_{i}",
+       "shape": "box",
+       "size": [
+        0.08,
+        0.04,
+        "$bw"
+       ],
+       "at": [
+        "-$bw * 0.3",
+        0.02,
+        0
+       ],
+       "material": "leather",
+       "bevel": 0.01,
+       "repeat": {
+        "count": 2,
+        "step": [
+         "$bw * 0.6",
+         0,
+         0
+        ]
+       }
+      },
+      {
+       "name": "Rim",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw / 2 - 0.03",
+         "$bh",
+         "$bw / 2 - 0.03"
+        ],
+        [
+         "-$bw / 2 + 0.03",
+         "$bh",
+         "$bw / 2 - 0.03"
+        ],
+        [
+         "-$bw / 2 + 0.03",
+         "$bh",
+         "-$bw / 2 + 0.03"
+        ],
+        [
+         "$bw / 2 - 0.03",
+         "$bh",
+         "-$bw / 2 + 0.03"
+        ],
+        [
+         "$bw / 2 - 0.03",
+         "$bh",
+         "$bw / 2 - 0.03"
+        ]
+       ],
+       "radius": 0.055,
+       "material": "leather",
+       "segments": 10
+      },
+      {
+       "name": "Weave_{i}",
+       "shape": "box",
+       "size": [
+        "$bw + 0.004",
+        0.03,
+        "$bw + 0.004"
+       ],
+       "at": [
+        0,
+        "0.18",
+        0
+       ],
+       "material": "leather",
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         "($bh - 0.36) ",
+         0
+        ]
+       }
+      },
+      {
+       "name": "Handle_{i}",
+       "shape": "tube",
+       "path": [
+        [
+         -0.15,
+         -0.06,
+         0
+        ],
+        [
+         -0.1,
+         -0.12,
+         0
+        ],
+        [
+         0.1,
+         -0.12,
+         0
+        ],
+        [
+         0.15,
+         -0.06,
+         0
+        ]
+       ],
+       "radius": 0.012,
+       "at": [
+        "$bw / 2 + 0.01",
+        "$bh * 0.8",
+        "-$bw * 0.2"
+       ],
+       "rotate": [
+        0,
+        90,
+        0
+       ],
+       "material": "leather",
+       "segments": 6,
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         "$bw * 0.4"
+        ]
+       }
+      },
+      {
+       "name": "Tank_{i}",
+       "shape": "cylinder",
+       "radius": 0.17,
+       "height": 0.75,
+       "at": [
+        "-$bw * 0.25 + $bw * 0.5 * $i / max(1, $tanks - 1)",
+        0.475,
+        "-$bw * 0.28"
+       ],
+       "material": "tank",
+       "segments": 20,
+       "bevel": 0.06,
+       "repeat": {
+        "count": "$tanks",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Valve",
+         "shape": "cylinder",
+         "radius": 0.04,
+         "height": 0.08,
+         "at": [
+          0,
+          0.41,
+          0
+         ],
+         "material": "frame_steel",
+         "segments": 10
+        },
+        {
+         "name": "Cover",
+         "shape": "cylinder",
+         "radius": 0.172,
+         "height": 0.3,
+         "at": [
+          0,
+          0.05,
+          0
+         ],
+         "material": "leather",
+         "segments": 20
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Frame",
+     "children": [
+      {
+       "name": "Rod_1",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 1 * 0.42",
+         "$bh - 0.05",
+         "$bw * 1 * 0.42"
+        ],
+        [
+         "$bw * 1 * 0.42",
+         "$yF + 0.05",
+         "$bw * 1 * 0.42"
+        ]
+       ],
+       "radius": 0.022,
+       "material": "frame_steel",
+       "segments": 8
+      },
+      {
+       "name": "Rod_2",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * -1 * 0.42",
+         "$bh - 0.05",
+         "$bw * 1 * 0.42"
+        ],
+        [
+         "$bw * -1 * 0.42",
+         "$yF + 0.05",
+         "$bw * 1 * 0.42"
+        ]
+       ],
+       "radius": 0.022,
+       "material": "frame_steel",
+       "segments": 8
+      },
+      {
+       "name": "Rod_3",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * -1 * 0.42",
+         "$bh - 0.05",
+         "$bw * -1 * 0.42"
+        ],
+        [
+         "$bw * -1 * 0.42",
+         "$yF + 0.05",
+         "$bw * -1 * 0.42"
+        ]
+       ],
+       "radius": 0.022,
+       "material": "frame_steel",
+       "segments": 8
+      },
+      {
+       "name": "Rod_4",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 1 * 0.42",
+         "$bh - 0.05",
+         "$bw * -1 * 0.42"
+        ],
+        [
+         "$bw * 1 * 0.42",
+         "$yF + 0.05",
+         "$bw * -1 * 0.42"
+        ]
+       ],
+       "radius": 0.022,
+       "material": "frame_steel",
+       "segments": 8
+      },
+      {
+       "name": "LoadFrame",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42",
+         "$yF",
+         "$bw * 0.42"
+        ],
+        [
+         "-$bw * 0.42",
+         "$yF",
+         "$bw * 0.42"
+        ],
+        [
+         "-$bw * 0.42",
+         "$yF",
+         "-$bw * 0.42"
+        ],
+        [
+         "$bw * 0.42",
+         "$yF",
+         "-$bw * 0.42"
+        ],
+        [
+         "$bw * 0.42",
+         "$yF",
+         "$bw * 0.42"
+        ]
+       ],
+       "radius": 0.03,
+       "material": "frame_steel",
+       "segments": 8
+      },
+      {
+       "name": "FrameBar",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42",
+         "$yF",
+         0
+        ],
+        [
+         "-$bw * 0.42",
+         "$yF",
+         0
+        ]
+       ],
+       "radius": 0.025,
+       "material": "frame_steel",
+       "segments": 8
+      },
+      {
+       "name": "RodSleeve_1",
+       "shape": "cylinder",
+       "radius": 0.045,
+       "height": 1.2,
+       "at": [
+        "$bw * 1 * 0.42",
+        "$bh + 0.6",
+        "$bw * 1 * 0.42"
+       ],
+       "material": "leather",
+       "segments": 10
+      },
+      {
+       "name": "RodSleeve_2",
+       "shape": "cylinder",
+       "radius": 0.045,
+       "height": 1.2,
+       "at": [
+        "$bw * -1 * 0.42",
+        "$bh + 0.6",
+        "$bw * 1 * 0.42"
+       ],
+       "material": "leather",
+       "segments": 10
+      },
+      {
+       "name": "RodSleeve_3",
+       "shape": "cylinder",
+       "radius": 0.045,
+       "height": 1.2,
+       "at": [
+        "$bw * -1 * 0.42",
+        "$bh + 0.6",
+        "$bw * -1 * 0.42"
+       ],
+       "material": "leather",
+       "segments": 10
+      },
+      {
+       "name": "RodSleeve_4",
+       "shape": "cylinder",
+       "radius": 0.045,
+       "height": 1.2,
+       "at": [
+        "$bw * 1 * 0.42",
+        "$bh + 0.6",
+        "$bw * -1 * 0.42"
+       ],
+       "material": "leather",
+       "segments": 10
+      }
+     ]
+    },
+    {
+     "name": "Burner",
+     "children": [
+      {
+       "name": "BurnerUnit_L",
+       "at": [
+        0.24,
+        "$yF - 0.45",
+        0
+       ],
+       "children": [
+        {
+         "name": "Can",
+         "shape": "cylinder",
+         "radius": 0.19,
+         "height": 0.5,
+         "at": [
+          0,
+          0.25,
+          0
+         ],
+         "material": "burner_steel",
+         "segments": 24
+        },
+        {
+         "name": "Coil",
+         "shape": "tube",
+         "path": [
+          [
+           "0.2 * 1.0000",
+           "0.12 + 0 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 1 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * 0.0000",
+           "0.12 + 2 * 0.016",
+           "0.2 * 1.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 3 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * -1.0000",
+           "0.12 + 4 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 5 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * -0.0000",
+           "0.12 + 6 * 0.016",
+           "0.2 * -1.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 7 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * 1.0000",
+           "0.12 + 8 * 0.016",
+           "0.2 * -0.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 9 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * 0.0000",
+           "0.12 + 10 * 0.016",
+           "0.2 * 1.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 11 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * -1.0000",
+           "0.12 + 12 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 13 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * -0.0000",
+           "0.12 + 14 * 0.016",
+           "0.2 * -1.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 15 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * 1.0000",
+           "0.12 + 16 * 0.016",
+           "0.2 * -0.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 17 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * 0.0000",
+           "0.12 + 18 * 0.016",
+           "0.2 * 1.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 19 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * -1.0000",
+           "0.12 + 20 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 21 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * -0.0000",
+           "0.12 + 22 * 0.016",
+           "0.2 * -1.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 23 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * 1.0000",
+           "0.12 + 24 * 0.016",
+           "0.2 * -0.0000"
+          ]
+         ],
+         "radius": 0.018,
+         "material": "burner_steel",
+         "segments": 6
+        },
+        {
+         "name": "Jet",
+         "shape": "cylinder",
+         "radius": 0.12,
+         "height": 0.08,
+         "at": [
+          0,
+          0.54,
+          0
+         ],
+         "material": "frame_steel",
+         "segments": 16
+        },
+        {
+         "name": "PilotLight",
+         "shape": "cylinder",
+         "radius": 0.025,
+         "height": 0.04,
+         "at": [
+          0.08,
+          0.6,
+          0
+         ],
+         "material": "pilot_flame",
+         "segments": 8
+        }
+       ]
+      },
+      {
+       "name": "BurnerUnit_R",
+       "at": [
+        -0.24,
+        "$yF - 0.45",
+        0
+       ],
+       "children": [
+        {
+         "name": "Can",
+         "shape": "cylinder",
+         "radius": 0.19,
+         "height": 0.5,
+         "at": [
+          0,
+          0.25,
+          0
+         ],
+         "material": "burner_steel",
+         "segments": 24
+        },
+        {
+         "name": "Coil",
+         "shape": "tube",
+         "path": [
+          [
+           "0.2 * 1.0000",
+           "0.12 + 0 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 1 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * 0.0000",
+           "0.12 + 2 * 0.016",
+           "0.2 * 1.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 3 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * -1.0000",
+           "0.12 + 4 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 5 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * -0.0000",
+           "0.12 + 6 * 0.016",
+           "0.2 * -1.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 7 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * 1.0000",
+           "0.12 + 8 * 0.016",
+           "0.2 * -0.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 9 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * 0.0000",
+           "0.12 + 10 * 0.016",
+           "0.2 * 1.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 11 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * -1.0000",
+           "0.12 + 12 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 13 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * -0.0000",
+           "0.12 + 14 * 0.016",
+           "0.2 * -1.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 15 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * 1.0000",
+           "0.12 + 16 * 0.016",
+           "0.2 * -0.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 17 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * 0.0000",
+           "0.12 + 18 * 0.016",
+           "0.2 * 1.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 19 * 0.016",
+           "0.2 * 0.7071"
+          ],
+          [
+           "0.2 * -1.0000",
+           "0.12 + 20 * 0.016",
+           "0.2 * 0.0000"
+          ],
+          [
+           "0.2 * -0.7071",
+           "0.12 + 21 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * -0.0000",
+           "0.12 + 22 * 0.016",
+           "0.2 * -1.0000"
+          ],
+          [
+           "0.2 * 0.7071",
+           "0.12 + 23 * 0.016",
+           "0.2 * -0.7071"
+          ],
+          [
+           "0.2 * 1.0000",
+           "0.12 + 24 * 0.016",
+           "0.2 * -0.0000"
+          ]
+         ],
+         "radius": 0.018,
+         "material": "burner_steel",
+         "segments": 6
+        },
+        {
+         "name": "Jet",
+         "shape": "cylinder",
+         "radius": 0.12,
+         "height": 0.08,
+         "at": [
+          0,
+          0.54,
+          0
+         ],
+         "material": "frame_steel",
+         "segments": 16
+        },
+        {
+         "name": "PilotLight",
+         "shape": "cylinder",
+         "radius": 0.025,
+         "height": 0.04,
+         "at": [
+          0.08,
+          0.6,
+          0
+         ],
+         "material": "pilot_flame",
+         "segments": 8
+        }
+       ]
+      },
+      {
+       "name": "Manifold",
+       "shape": "box",
+       "size": [
+        0.9,
+        0.08,
+        0.14
+       ],
+       "at": [
+        0,
+        "$yF - 0.48",
+        0
+       ],
+       "material": "frame_steel",
+       "bevel": 0.02
+      },
+      {
+       "name": "Valve_{i}",
+       "shape": "box",
+       "size": [
+        0.07,
+        0.12,
+        0.07
+       ],
+       "at": [
+        -0.24,
+        "$yF - 0.55",
+        0.12
+       ],
+       "material": "hose",
+       "bevel": 0.01,
+       "repeat": {
+        "count": 2,
+        "step": [
+         0.48,
+         0,
+         0
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "Envelope",
+     "children": [
+      {
+       "name": "Shell_red",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.2 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0"
+        ],
+        [
+         "$R * 0.3 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.06"
+        ],
+        [
+         "$R * 0.45 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.15"
+        ],
+        [
+         "$R * 0.61 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.25"
+        ],
+        [
+         "$R * 0.76 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.35"
+        ],
+        [
+         "$R * 0.88 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.45"
+        ],
+        [
+         "$R * 0.96 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.55"
+        ],
+        [
+         "$R * 0.995 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.63"
+        ],
+        [
+         "$R * 1.0 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.7"
+        ],
+        [
+         "$R * 0.98 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.77"
+        ],
+        [
+         "$R * 0.92 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.84"
+        ],
+        [
+         "$R * 0.81 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.9"
+        ],
+        [
+         "$R * 0.62 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.95"
+        ],
+        [
+         "$R * 0.4 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.98"
+        ],
+        [
+         "$R * 0.12 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 1.0"
+        ]
+       ],
+       "material": "nylon_red",
+       "segments": 72,
+       "caps": false
+      },
+      {
+       "name": "Shell_blue",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.2 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0"
+        ],
+        [
+         "$R * 0.3 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.06"
+        ],
+        [
+         "$R * 0.45 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.15"
+        ],
+        [
+         "$R * 0.61 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.25"
+        ],
+        [
+         "$R * 0.76 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.35"
+        ],
+        [
+         "$R * 0.88 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.45"
+        ],
+        [
+         "$R * 0.96 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.55"
+        ],
+        [
+         "$R * 0.995 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.63"
+        ],
+        [
+         "$R * 1.0 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.7"
+        ],
+        [
+         "$R * 0.98 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.77"
+        ],
+        [
+         "$R * 0.92 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.84"
+        ],
+        [
+         "$R * 0.81 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.9"
+        ],
+        [
+         "$R * 0.62 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.95"
+        ],
+        [
+         "$R * 0.4 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.98"
+        ],
+        [
+         "$R * 0.12 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 1.0"
+        ]
+       ],
+       "material": "nylon_blue",
+       "segments": 72,
+       "caps": false
+      },
+      {
+       "name": "Shell_orange",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.2 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0"
+        ],
+        [
+         "$R * 0.3 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.06"
+        ],
+        [
+         "$R * 0.45 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.15"
+        ],
+        [
+         "$R * 0.61 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.25"
+        ],
+        [
+         "$R * 0.76 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.35"
+        ],
+        [
+         "$R * 0.88 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.45"
+        ],
+        [
+         "$R * 0.96 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.55"
+        ],
+        [
+         "$R * 0.995 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.63"
+        ],
+        [
+         "$R * 1.0 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.7"
+        ],
+        [
+         "$R * 0.98 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.77"
+        ],
+        [
+         "$R * 0.92 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.84"
+        ],
+        [
+         "$R * 0.81 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.9"
+        ],
+        [
+         "$R * 0.62 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.95"
+        ],
+        [
+         "$R * 0.4 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.98"
+        ],
+        [
+         "$R * 0.12 * (1 - 0.012 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 1.0"
+        ]
+       ],
+       "material": "nylon_orange",
+       "segments": 72,
+       "caps": false
+      },
+      {
+       "name": "Gore_red_{i}",
+       "shape": "tube",
+       "path": [
+        [
+         "$R * 0.3 - $R * 0.3 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.06",
+         0
+        ],
+        [
+         "$R * 0.45 - $R * 0.45 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.15",
+         0
+        ],
+        [
+         "$R * 0.61 - $R * 0.61 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.25",
+         0
+        ],
+        [
+         "$R * 0.76 - $R * 0.76 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.35",
+         0
+        ],
+        [
+         "$R * 0.88 - $R * 0.88 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.45",
+         0
+        ],
+        [
+         "$R * 0.96 - $R * 0.96 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.55",
+         0
+        ],
+        [
+         "$R * 0.995 - $R * 0.995 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.63",
+         0
+        ],
+        [
+         "$R * 1.0 - $R * 1.0 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.7",
+         0
+        ],
+        [
+         "$R * 0.98 - $R * 0.98 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.77",
+         0
+        ],
+        [
+         "$R * 0.92 - $R * 0.92 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.84",
+         0
+        ],
+        [
+         "$R * 0.81 - $R * 0.81 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.9",
+         0
+        ],
+        [
+         "$R * 0.62 - $R * 0.62 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.95",
+         0
+        ],
+        [
+         "$R * 0.4 - $R * 0.4 * 5.6 / $gores * 0.45 * (0.9 * max(0, 1 - abs($scheme - 0)) + 1.6 * (1 - max(0, 1 - abs($scheme - 0))))",
+         "$ym + $He * 0.98",
+         0
+        ]
+       ],
+       "radii": [
+        "$R * 0.3 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.45 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.61 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.76 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.88 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.96 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.995 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 1.0 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.98 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.92 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.81 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.62 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+        "$R * 0.4 * 5.6 / $gores * 0.45 * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))"
+       ],
+       "material": "stripe_red",
+       "segments": 12,
+       "repeat": {
+        "count": "floor($gores / 2)",
+        "around": "y"
+       }
+      },
+      {
+       "name": "Gore_blue_{i}",
+       "shape": "tube",
+       "path": [
+        [
+         "$R * 0.3 - $R * 0.3 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.06",
+         0
+        ],
+        [
+         "$R * 0.45 - $R * 0.45 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.15",
+         0
+        ],
+        [
+         "$R * 0.61 - $R * 0.61 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.25",
+         0
+        ],
+        [
+         "$R * 0.76 - $R * 0.76 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.35",
+         0
+        ],
+        [
+         "$R * 0.88 - $R * 0.88 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.45",
+         0
+        ],
+        [
+         "$R * 0.96 - $R * 0.96 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.55",
+         0
+        ],
+        [
+         "$R * 0.995 - $R * 0.995 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.63",
+         0
+        ],
+        [
+         "$R * 1.0 - $R * 1.0 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.7",
+         0
+        ],
+        [
+         "$R * 0.98 - $R * 0.98 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.77",
+         0
+        ],
+        [
+         "$R * 0.92 - $R * 0.92 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.84",
+         0
+        ],
+        [
+         "$R * 0.81 - $R * 0.81 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.9",
+         0
+        ],
+        [
+         "$R * 0.62 - $R * 0.62 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.95",
+         0
+        ],
+        [
+         "$R * 0.4 - $R * 0.4 * 5.6 / $gores * 0.45 * (0.9 * max(0, 1 - abs($scheme - 1)) + 1.6 * (1 - max(0, 1 - abs($scheme - 1))))",
+         "$ym + $He * 0.98",
+         0
+        ]
+       ],
+       "radii": [
+        "$R * 0.3 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.45 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.61 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.76 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.88 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.96 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.995 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 1.0 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.98 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.92 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.81 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.62 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+        "$R * 0.4 * 5.6 / $gores * 0.45 * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))"
+       ],
+       "material": "stripe_blue",
+       "segments": 12,
+       "repeat": {
+        "count": "floor($gores / 2)",
+        "around": "y"
+       }
+      },
+      {
+       "name": "Gore_orange_{i}",
+       "shape": "tube",
+       "path": [
+        [
+         "$R * 0.3 - $R * 0.3 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.06",
+         0
+        ],
+        [
+         "$R * 0.45 - $R * 0.45 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.15",
+         0
+        ],
+        [
+         "$R * 0.61 - $R * 0.61 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.25",
+         0
+        ],
+        [
+         "$R * 0.76 - $R * 0.76 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.35",
+         0
+        ],
+        [
+         "$R * 0.88 - $R * 0.88 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.45",
+         0
+        ],
+        [
+         "$R * 0.96 - $R * 0.96 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.55",
+         0
+        ],
+        [
+         "$R * 0.995 - $R * 0.995 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.63",
+         0
+        ],
+        [
+         "$R * 1.0 - $R * 1.0 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.7",
+         0
+        ],
+        [
+         "$R * 0.98 - $R * 0.98 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.77",
+         0
+        ],
+        [
+         "$R * 0.92 - $R * 0.92 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.84",
+         0
+        ],
+        [
+         "$R * 0.81 - $R * 0.81 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.9",
+         0
+        ],
+        [
+         "$R * 0.62 - $R * 0.62 * 5.6 / $gores * 1 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.95",
+         0
+        ],
+        [
+         "$R * 0.4 - $R * 0.4 * 5.6 / $gores * 0.45 * (0.9 * max(0, 1 - abs($scheme - 2)) + 1.6 * (1 - max(0, 1 - abs($scheme - 2))))",
+         "$ym + $He * 0.98",
+         0
+        ]
+       ],
+       "radii": [
+        "$R * 0.3 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.45 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.61 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.76 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.88 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.96 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.995 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 1.0 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.98 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.92 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.81 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.62 * 5.6 / $gores * 1 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+        "$R * 0.4 * 5.6 / $gores * 0.45 * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))"
+       ],
+       "material": "stripe_orange",
+       "segments": 12,
+       "repeat": {
+        "count": "floor($gores / 2)",
+        "around": "y"
+       }
+      },
+      {
+       "name": "Band_red",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.983 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)) * $equatorBand))",
+         "$ym + $He * 0.6"
+        ],
+        [
+         "$R * 0.995 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)) * $equatorBand))",
+         "$ym + $He * 0.63"
+        ],
+        [
+         "$R * 1.0 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)) * $equatorBand))",
+         "$ym + $He * 0.7"
+        ],
+        [
+         "$R * 0.98 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)) * $equatorBand))",
+         "$ym + $He * 0.77"
+        ],
+        [
+         "$R * 0.962 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)) * $equatorBand))",
+         "$ym + $He * 0.8"
+        ]
+       ],
+       "material": "band_red",
+       "segments": 72,
+       "caps": false
+      },
+      {
+       "name": "Band_blue",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.983 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)) * $equatorBand))",
+         "$ym + $He * 0.6"
+        ],
+        [
+         "$R * 0.995 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)) * $equatorBand))",
+         "$ym + $He * 0.63"
+        ],
+        [
+         "$R * 1.0 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)) * $equatorBand))",
+         "$ym + $He * 0.7"
+        ],
+        [
+         "$R * 0.98 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)) * $equatorBand))",
+         "$ym + $He * 0.77"
+        ],
+        [
+         "$R * 0.962 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)) * $equatorBand))",
+         "$ym + $He * 0.8"
+        ]
+       ],
+       "material": "band_blue",
+       "segments": 72,
+       "caps": false
+      },
+      {
+       "name": "Band_orange",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.983 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)) * $equatorBand))",
+         "$ym + $He * 0.6"
+        ],
+        [
+         "$R * 0.995 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)) * $equatorBand))",
+         "$ym + $He * 0.63"
+        ],
+        [
+         "$R * 1.0 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)) * $equatorBand))",
+         "$ym + $He * 0.7"
+        ],
+        [
+         "$R * 0.98 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)) * $equatorBand))",
+         "$ym + $He * 0.77"
+        ],
+        [
+         "$R * 0.962 * (1.004 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)) * $equatorBand))",
+         "$ym + $He * 0.8"
+        ]
+       ],
+       "material": "band_orange",
+       "segments": 72,
+       "caps": false
+      },
+      {
+       "name": "Vent",
+       "shape": "cylinder",
+       "radius": "$R * 0.11",
+       "height": 0.04,
+       "at": [
+        0,
+        "$ym + $He - 0.04",
+        0
+       ],
+       "material": "vent",
+       "segments": 32
+      },
+      {
+       "name": "Skirt",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.2 + 0.02",
+         "$ym + 0.15"
+        ],
+        [
+         "$R * 0.2 + 0.02",
+         "$ym - 0.05"
+        ],
+        [
+         "$R * 0.22",
+         "$ym - 1.4"
+        ]
+       ],
+       "material": "skirt_fabric",
+       "segments": 32,
+       "caps": false
+      }
+     ]
+    },
+    {
+     "name": "Rigging",
+     "children": [
+      {
+       "name": "Cable_1",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * 1",
+         "$yF + 0.1",
+         "$bw * 0.42 * 1"
+        ],
+        [
+         "$R * 0.2 * 0.8660",
+         "$ym + 0.05",
+         "$R * 0.2 * 0.5000"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      },
+      {
+       "name": "Cable_2",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * 1",
+         "$yF + 0.1",
+         "$bw * 0.42 * 1"
+        ],
+        [
+         "$R * 0.2 * 0.5000",
+         "$ym + 0.05",
+         "$R * 0.2 * 0.8660"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      },
+      {
+       "name": "Cable_3",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * -1",
+         "$yF + 0.1",
+         "$bw * 0.42 * 1"
+        ],
+        [
+         "$R * 0.2 * -0.5000",
+         "$ym + 0.05",
+         "$R * 0.2 * 0.8660"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      },
+      {
+       "name": "Cable_4",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * -1",
+         "$yF + 0.1",
+         "$bw * 0.42 * 1"
+        ],
+        [
+         "$R * 0.2 * -0.8660",
+         "$ym + 0.05",
+         "$R * 0.2 * 0.5000"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      },
+      {
+       "name": "Cable_5",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * -1",
+         "$yF + 0.1",
+         "$bw * 0.42 * -1"
+        ],
+        [
+         "$R * 0.2 * -0.8660",
+         "$ym + 0.05",
+         "$R * 0.2 * -0.5000"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      },
+      {
+       "name": "Cable_6",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * -1",
+         "$yF + 0.1",
+         "$bw * 0.42 * -1"
+        ],
+        [
+         "$R * 0.2 * -0.5000",
+         "$ym + 0.05",
+         "$R * 0.2 * -0.8660"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      },
+      {
+       "name": "Cable_7",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * 1",
+         "$yF + 0.1",
+         "$bw * 0.42 * -1"
+        ],
+        [
+         "$R * 0.2 * 0.5000",
+         "$ym + 0.05",
+         "$R * 0.2 * -0.8660"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      },
+      {
+       "name": "Cable_8",
+       "shape": "tube",
+       "path": [
+        [
+         "$bw * 0.42 * 1",
+         "$yF + 0.1",
+         "$bw * 0.42 * -1"
+        ],
+        [
+         "$R * 0.2 * 0.8660",
+         "$ym + 0.05",
+         "$R * 0.2 * -0.5000"
+        ]
+       ],
+       "radius": 0.012,
+       "material": "cable",
+       "segments": 5
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
