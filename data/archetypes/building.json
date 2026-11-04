@@ -1606,17 +1606,6 @@
     ]
    },
    {
-    "name": "Balcony",
-    "role": "gallery",
-    "required": false,
-    "aliases": [
-     "balcony",
-     "balkon",
-     "gallery",
-     "terrace"
-    ]
-   },
-   {
     "name": "Orb",
     "role": "magic",
     "required": false,
