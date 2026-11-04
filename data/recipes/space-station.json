@@ -1,0 +1,2284 @@
+{
+ "version": 1,
+ "name": "space-station",
+ "archetype": "spacecraft.station",
+ "description": "A modular space station like the ISS (109 x 73 m): a row of pressurised modules along z with ribs, end cones, handrails and windows, joined by connectors; a cross node with docking ports on both sides and a seven-window cupola; docking ports fore and aft; a long lattice truss along x on a pylon, with battens and a centre segment; solar array units at both truss ends, each with a rotary joint and a wing fore and aft (mast, two cell blankets with a grid, tip and canister), every wing a node hinged at the truss; radiator panels; and a robotic arm on a mobile base. +Y is zenith; the cupola rests on y = 0.",
+ "params": [
+  {
+   "name": "modules",
+   "type": "integer",
+   "default": 5,
+   "min": 2,
+   "max": 9,
+   "description": "Pressurised modules in a row along z."
+  },
+  {
+   "name": "moduleLength",
+   "type": "number",
+   "default": 8,
+   "min": 5,
+   "max": 12,
+   "description": "Length of each module."
+  },
+  {
+   "name": "moduleRadius",
+   "type": "number",
+   "default": 2.1,
+   "min": 1.5,
+   "max": 2.5,
+   "description": "Module radius (the ISS modules are about 4.2 m across)."
+  },
+  {
+   "name": "trussLength",
+   "type": "number",
+   "default": 70,
+   "min": 30,
+   "max": 110,
+   "description": "Length of the main truss along x (the ISS truss is 109 m)."
+  },
+  {
+   "name": "arrays",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 4,
+   "description": "Solar array units at each end of the truss; each has a wing fore and aft."
+  },
+  {
+   "name": "arraySpan",
+   "type": "number",
+   "default": 32,
+   "min": 12,
+   "max": 36,
+   "description": "Length of each solar wing from the truss."
+  },
+  {
+   "name": "arrayWidth",
+   "type": "number",
+   "default": 11,
+   "min": 5,
+   "max": 12,
+   "description": "Width of each solar wing."
+  },
+  {
+   "name": "radiators",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 3,
+   "description": "Radiator panels on each side of the truss."
+  },
+  {
+   "name": "roboticArm",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A robotic arm on a mobile base on the truss; false leaves it folded."
+  }
+ ],
+ "materials": {
+  "module_white": {
+   "color": [
+    0.82,
+    0.82,
+    0.8
+   ],
+   "metallic": 0.05,
+   "roughness": 0.6,
+   "texture": "plaster"
+  },
+  "mmod": {
+   "color": [
+    0.7,
+    0.7,
+    0.68
+   ],
+   "metallic": 0.2,
+   "roughness": 0.5
+  },
+  "truss_metal": {
+   "color": [
+    0.6,
+    0.61,
+    0.63
+   ],
+   "metallic": 0.9,
+   "roughness": 0.35
+  },
+  "joint_dark": {
+   "color": [
+    0.15,
+    0.15,
+    0.17
+   ],
+   "metallic": 0.7,
+   "roughness": 0.4
+  },
+  "solar_cells": {
+   "color": [
+    0.03,
+    0.06,
+    0.2
+   ],
+   "metallic": 0.5,
+   "roughness": 0.2
+  },
+  "cell_grid": {
+   "color": [
+    0.75,
+    0.75,
+    0.78
+   ],
+   "metallic": 1,
+   "roughness": 0.3
+  },
+  "radiator_white": {
+   "color": [
+    0.9,
+    0.9,
+    0.88
+   ],
+   "metallic": 0,
+   "roughness": 0.45
+  },
+  "gold_foil": {
+   "color": [
+    0.8,
+    0.55,
+    0.15
+   ],
+   "metallic": 1,
+   "roughness": 0.3
+  },
+  "handrail": {
+   "color": [
+    0.85,
+    0.65,
+    0.05
+   ],
+   "metallic": 0.2,
+   "roughness": 0.4
+  },
+  "port_ring": {
+   "color": [
+    0.55,
+    0.56,
+    0.58
+   ],
+   "metallic": 0.9,
+   "roughness": 0.3
+  },
+  "window_glass": {
+   "color": [
+    0.3,
+    0.45,
+    0.55,
+    0.35
+   ],
+   "metallic": 0,
+   "roughness": 0.04,
+   "alpha": "BLEND"
+  },
+  "beacon": {
+   "color": [
+    0.9,
+    0.9,
+    0.95
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    0.9,
+    0.95,
+    1.0
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "SpaceStation",
+   "vars": {
+    "R": "$moduleRadius",
+    "ml": "$moduleLength",
+    "pitch": "$moduleLength + 1.2",
+    "TL": "$trussLength",
+    "yM": "$moduleRadius + 1.6",
+    "ts": 3.2,
+    "zEnd": "($modules * ($moduleLength + 1.2)) / 2",
+    "aw": "$arrayWidth",
+    "sp": "$arraySpan",
+    "yT": "$moduleRadius + 1.6 + $moduleRadius + 3.4"
+   },
+   "children": [
+    {
+     "name": "Modules",
+     "children": [
+      {
+       "name": "Module_{i}",
+       "at": [
+        0,
+        "$yM",
+        "-$zEnd + $pitch / 2"
+       ],
+       "repeat": {
+        "count": "$modules",
+        "step": [
+         0,
+         0,
+         "$pitch"
+        ]
+       },
+       "children": [
+        {
+         "name": "Hull",
+         "shape": "cylinder",
+         "radius": "$R",
+         "height": "$ml",
+         "axis": "z",
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "module_white",
+         "segments": 32,
+         "bevel": 0.12
+        },
+        {
+         "name": "Rib_{i}",
+         "shape": "cylinder",
+         "radius": "$R + 0.06",
+         "height": 0.3,
+         "axis": "z",
+         "at": [
+          0,
+          0,
+          "-$ml * 0.22"
+         ],
+         "material": "mmod",
+         "segments": 32,
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           0,
+           "$ml * 0.44"
+          ]
+         }
+        },
+        {
+         "name": "Cone",
+         "shape": "lathe",
+         "profile": [
+          [
+           "$R * 0.98",
+           0
+          ],
+          [
+           "$R * 0.62",
+           0.6
+          ],
+          [
+           "$R * 0.6",
+           0.62
+          ]
+         ],
+         "at": [
+          0,
+          0,
+          "$ml / 2 - 0.05"
+         ],
+         "rotate": [
+          90,
+          0,
+          0
+         ],
+         "material": "mmod",
+         "segments": 32
+        },
+        {
+         "name": "ConeAft",
+         "shape": "lathe",
+         "profile": [
+          [
+           "$R * 0.98",
+           0
+          ],
+          [
+           "$R * 0.62",
+           -0.6
+          ],
+          [
+           "$R * 0.6",
+           -0.62
+          ]
+         ],
+         "at": [
+          0,
+          0,
+          "-$ml / 2 + 0.05"
+         ],
+         "rotate": [
+          90,
+          0,
+          0
+         ],
+         "material": "mmod",
+         "segments": 32
+        },
+        {
+         "name": "Handrail_L",
+         "shape": "tube",
+         "path": [
+          [
+           "$R * 0.6",
+           "$R * 0.84",
+           "-$ml * 0.42"
+          ],
+          [
+           "$R * 0.6",
+           "$R * 0.84",
+           "$ml * 0.42"
+          ]
+         ],
+         "radius": 0.035,
+         "material": "handrail",
+         "segments": 6,
+         "mirror": "Handrail_R"
+        },
+        {
+         "name": "Window",
+         "shape": "cylinder",
+         "radius": 0.22,
+         "height": 0.06,
+         "axis": "x",
+         "at": [
+          "$R * 0.7",
+          "-$R * 0.7",
+          "$ml * 0.25"
+         ],
+         "rotate": [
+          0,
+          0,
+          -45
+         ],
+         "material": "window_glass",
+         "segments": 16,
+         "children": [
+          {
+           "name": "Frame",
+           "shape": "cylinder",
+           "radius": 0.3,
+           "height": 0.05,
+           "axis": "x",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "port_ring",
+           "segments": 16
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Connector_{i}",
+       "shape": "cylinder",
+       "radius": "$R * 0.62",
+       "height": 1.4,
+       "axis": "z",
+       "at": [
+        0,
+        "$yM",
+        "-$zEnd + $pitch"
+       ],
+       "material": "port_ring",
+       "segments": 24,
+       "repeat": {
+        "count": "$modules - 1",
+        "step": [
+         0,
+         0,
+         "$pitch"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "Node",
+     "children": [
+      {
+       "name": "NodeHull",
+       "shape": "cylinder",
+       "radius": "$R * 0.92",
+       "height": "2 * $R + 2.4",
+       "axis": "x",
+       "at": [
+        0,
+        "$yM",
+        0
+       ],
+       "material": "module_white",
+       "segments": 32,
+       "bevel": 0.1
+      },
+      {
+       "name": "Cupola",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.5",
+         0
+        ],
+        [
+         "$R * 0.5",
+         -0.6
+        ],
+        [
+         "$R * 0.42",
+         -0.9
+        ],
+        [
+         "$R * 0.2",
+         -1.2
+        ],
+        [
+         0,
+         -1.25
+        ]
+       ],
+       "at": [
+        0,
+        "$yM - $R * 0.9",
+        0
+       ],
+       "material": "window_glass",
+       "segments": 7,
+       "children": [
+        {
+         "name": "CupolaFrame",
+         "shape": "lathe",
+         "profile": [
+          [
+           "$R * 0.52",
+           0.02
+          ],
+          [
+           "$R * 0.52",
+           -0.58
+          ],
+          [
+           "$R * 0.47",
+           -0.62
+          ],
+          [
+           "$R * 0.47",
+           0.02
+          ]
+         ],
+         "material": "port_ring",
+         "segments": 7
+        },
+        {
+         "name": "CupolaBase",
+         "shape": "cylinder",
+         "radius": "$R * 0.5",
+         "height": "$yM - $R * 0.9 - 1.25",
+         "at": [
+          0,
+          "-1.25 - ($yM - $R * 0.9 - 1.25) / 2",
+          0
+         ],
+         "material": "mmod",
+         "segments": 24
+        }
+       ]
+      },
+      {
+       "name": "DockingPort_L",
+       "at": [
+        "$R + 1.2",
+        "$yM",
+        0
+       ],
+       "rotate": [
+        0,
+        0,
+        -90
+       ],
+       "children": [
+        {
+         "name": "Adapter",
+         "shape": "lathe",
+         "profile": [
+          [
+           "$R * 0.62",
+           0
+          ],
+          [
+           "$R * 0.5",
+           0.9
+          ],
+          [
+           "0.85",
+           1.6
+          ],
+          [
+           "0.85",
+           1.9
+          ]
+         ],
+         "material": "module_white",
+         "segments": 28
+        },
+        {
+         "name": "DockingRing",
+         "shape": "lathe",
+         "profile": [
+          [
+           "0.8",
+           1.85
+          ],
+          [
+           "1.0",
+           1.85
+          ],
+          [
+           "1.0",
+           2.15
+          ],
+          [
+           "0.8",
+           2.15
+          ]
+         ],
+         "material": "port_ring",
+         "segments": 28
+        },
+        {
+         "name": "Guide_{i}",
+         "shape": "box",
+         "size": [
+          0.15,
+          0.4,
+          0.08
+         ],
+         "at": [
+          0,
+          2.3,
+          0.85
+         ],
+         "material": "port_ring",
+         "repeat": {
+          "count": 2,
+          "around": "y"
+         }
+        }
+       ]
+      },
+      {
+       "name": "DockingPort_R",
+       "at": [
+        "-$R - 1.2",
+        "$yM",
+        0
+       ],
+       "rotate": [
+        0,
+        0,
+        90
+       ],
+       "children": [
+        {
+         "name": "Adapter",
+         "shape": "lathe",
+         "profile": [
+          [
+           "$R * 0.62",
+           0
+          ],
+          [
+           "$R * 0.5",
+           0.9
+          ],
+          [
+           "0.85",
+           1.6
+          ],
+          [
+           "0.85",
+           1.9
+          ]
+         ],
+         "material": "module_white",
+         "segments": 28
+        },
+        {
+         "name": "DockingRing",
+         "shape": "lathe",
+         "profile": [
+          [
+           "0.8",
+           1.85
+          ],
+          [
+           "1.0",
+           1.85
+          ],
+          [
+           "1.0",
+           2.15
+          ],
+          [
+           "0.8",
+           2.15
+          ]
+         ],
+         "material": "port_ring",
+         "segments": 28
+        },
+        {
+         "name": "Guide_{i}",
+         "shape": "box",
+         "size": [
+          0.15,
+          0.4,
+          0.08
+         ],
+         "at": [
+          0,
+          2.3,
+          0.85
+         ],
+         "material": "port_ring",
+         "repeat": {
+          "count": 2,
+          "around": "y"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "DockingPort_Fwd",
+     "at": [
+      0,
+      "$yM",
+      "$zEnd - 0.6"
+     ],
+     "rotate": [
+      90,
+      0,
+      0
+     ],
+     "children": [
+      {
+       "name": "Adapter",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.62",
+         0
+        ],
+        [
+         "$R * 0.5",
+         0.9
+        ],
+        [
+         "0.85",
+         1.6
+        ],
+        [
+         "0.85",
+         1.9
+        ]
+       ],
+       "material": "module_white",
+       "segments": 28
+      },
+      {
+       "name": "DockingRing",
+       "shape": "lathe",
+       "profile": [
+        [
+         "0.8",
+         1.85
+        ],
+        [
+         "1.0",
+         1.85
+        ],
+        [
+         "1.0",
+         2.15
+        ],
+        [
+         "0.8",
+         2.15
+        ]
+       ],
+       "material": "port_ring",
+       "segments": 28
+      },
+      {
+       "name": "Guide_{i}",
+       "shape": "box",
+       "size": [
+        0.15,
+        0.4,
+        0.08
+       ],
+       "at": [
+        0,
+        2.3,
+        0.85
+       ],
+       "material": "port_ring",
+       "repeat": {
+        "count": 2,
+        "around": "y"
+       }
+      }
+     ]
+    },
+    {
+     "name": "DockingPort_Aft",
+     "at": [
+      0,
+      "$yM",
+      "-$zEnd + 0.6"
+     ],
+     "rotate": [
+      -90,
+      0,
+      0
+     ],
+     "children": [
+      {
+       "name": "Adapter",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * 0.62",
+         0
+        ],
+        [
+         "$R * 0.5",
+         0.9
+        ],
+        [
+         "0.85",
+         1.6
+        ],
+        [
+         "0.85",
+         1.9
+        ]
+       ],
+       "material": "module_white",
+       "segments": 28
+      },
+      {
+       "name": "DockingRing",
+       "shape": "lathe",
+       "profile": [
+        [
+         "0.8",
+         1.85
+        ],
+        [
+         "1.0",
+         1.85
+        ],
+        [
+         "1.0",
+         2.15
+        ],
+        [
+         "0.8",
+         2.15
+        ]
+       ],
+       "material": "port_ring",
+       "segments": 28
+      },
+      {
+       "name": "Guide_{i}",
+       "shape": "box",
+       "size": [
+        0.15,
+        0.4,
+        0.08
+       ],
+       "at": [
+        0,
+        2.3,
+        0.85
+       ],
+       "material": "port_ring",
+       "repeat": {
+        "count": 2,
+        "around": "y"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Truss",
+     "at": [
+      0,
+      "$yT",
+      0
+     ],
+     "children": [
+      {
+       "name": "Longeron_1",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2",
+         "$ts / 2 * 1",
+         "$ts / 2 * 1"
+        ],
+        [
+         "$TL / 2",
+         "$ts / 2 * 1",
+         "$ts / 2 * 1"
+        ]
+       ],
+       "radius": 0.12,
+       "material": "truss_metal",
+       "segments": 8
+      },
+      {
+       "name": "Longeron_2",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2",
+         "$ts / 2 * 1",
+         "$ts / 2 * -1"
+        ],
+        [
+         "$TL / 2",
+         "$ts / 2 * 1",
+         "$ts / 2 * -1"
+        ]
+       ],
+       "radius": 0.12,
+       "material": "truss_metal",
+       "segments": 8
+      },
+      {
+       "name": "Longeron_3",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2",
+         "$ts / 2 * -1",
+         "$ts / 2 * 1"
+        ],
+        [
+         "$TL / 2",
+         "$ts / 2 * -1",
+         "$ts / 2 * 1"
+        ]
+       ],
+       "radius": 0.12,
+       "material": "truss_metal",
+       "segments": 8
+      },
+      {
+       "name": "Longeron_4",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2",
+         "$ts / 2 * -1",
+         "$ts / 2 * -1"
+        ],
+        [
+         "$TL / 2",
+         "$ts / 2 * -1",
+         "$ts / 2 * -1"
+        ]
+       ],
+       "radius": 0.12,
+       "material": "truss_metal",
+       "segments": 8
+      },
+      {
+       "name": "Brace_front",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2 + $TL * 0.0000",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.0625",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1250",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1875",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.2500",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3125",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3750",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.4375",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5000",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5625",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6250",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6875",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.7500",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8125",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8750",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.9375",
+         "$ts / 2 * -1",
+         "$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 1.0000",
+         "$ts / 2 * 1",
+         "$ts / 2"
+        ]
+       ],
+       "radius": 0.07,
+       "material": "truss_metal",
+       "segments": 5
+      },
+      {
+       "name": "Brace_back",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2 + $TL * 0.0000",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.0625",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1250",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1875",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.2500",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3125",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3750",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.4375",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5000",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5625",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6250",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6875",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.7500",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8125",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8750",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.9375",
+         "$ts / 2 * 1",
+         "-$ts / 2"
+        ],
+        [
+         "-$TL / 2 + $TL * 1.0000",
+         "$ts / 2 * -1",
+         "-$ts / 2"
+        ]
+       ],
+       "radius": 0.07,
+       "material": "truss_metal",
+       "segments": 5
+      },
+      {
+       "name": "Brace_top",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2 + $TL * 0.0000",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.0625",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1250",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1875",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.2500",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3125",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3750",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.4375",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5000",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5625",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6250",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6875",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.7500",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8125",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8750",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.9375",
+         "$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 1.0000",
+         "$ts / 2",
+         "$ts / 2 * 1"
+        ]
+       ],
+       "radius": 0.07,
+       "material": "truss_metal",
+       "segments": 5
+      },
+      {
+       "name": "Brace_bottom",
+       "shape": "tube",
+       "path": [
+        [
+         "-$TL / 2 + $TL * 0.0000",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.0625",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1250",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.1875",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.2500",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3125",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.3750",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.4375",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5000",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.5625",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6250",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.6875",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.7500",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8125",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.8750",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ],
+        [
+         "-$TL / 2 + $TL * 0.9375",
+         "-$ts / 2",
+         "$ts / 2 * 1"
+        ],
+        [
+         "-$TL / 2 + $TL * 1.0000",
+         "-$ts / 2",
+         "$ts / 2 * -1"
+        ]
+       ],
+       "radius": 0.07,
+       "material": "truss_metal",
+       "segments": 5
+      },
+      {
+       "name": "Batten_{i}",
+       "shape": "box",
+       "size": [
+        0.18,
+        "$ts + 0.2",
+        "$ts + 0.2"
+       ],
+       "at": [
+        "-$TL / 2",
+        0,
+        0
+       ],
+       "material": "truss_metal",
+       "repeat": {
+        "count": 3,
+        "step": [
+         "$TL / 2",
+         0,
+         0
+        ]
+       }
+      },
+      {
+       "name": "CentreSegment",
+       "shape": "box",
+       "size": [
+        "min(12, $TL * 0.16)",
+        "$ts + 0.3",
+        "$ts + 0.3"
+       ],
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "material": "mmod",
+       "bevel": 0.1
+      },
+      {
+       "name": "Pylon",
+       "shape": "box",
+       "size": [
+        2.2,
+        3.6,
+        2.4
+       ],
+       "at": [
+        0,
+        "-$ts / 2 - 1.7",
+        0
+       ],
+       "material": "mmod",
+       "bevel": 0.1
+      },
+      {
+       "name": "RailTop",
+       "shape": "box",
+       "size": [
+        "$TL * 0.8",
+        0.12,
+        0.3
+       ],
+       "at": [
+        0,
+        "$ts / 2 + 0.06",
+        "$ts * 0.25"
+       ],
+       "material": "truss_metal"
+      }
+     ]
+    },
+    {
+     "name": "SolarArrays",
+     "children": [
+      {
+       "name": "ArrayUnit_S{i}",
+       "at": [
+        "1 * ($TL / 2 - $aw / 2 - 1 - $i * ($aw + 1.5))",
+        "$yT",
+        0
+       ],
+       "repeat": {
+        "count": "$arrays",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Joint",
+         "shape": "box",
+         "size": [
+          1.6,
+          "$ts + 1",
+          "$ts + 1"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "joint_dark",
+         "bevel": 0.15
+        },
+        {
+         "name": "SolarArray_Fwd",
+         "at": [
+          0,
+          0,
+          "1 * ($ts / 2 + 0.6)"
+         ],
+         "rotate": [
+          0,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Mast",
+           "shape": "box",
+           "size": [
+            0.35,
+            0.35,
+            "$sp"
+           ],
+           "at": [
+            0,
+            0,
+            "$sp / 2"
+           ],
+           "material": "truss_metal"
+          },
+          {
+           "name": "Blanket_L",
+           "shape": "box",
+           "size": [
+            "$aw / 2 - 0.3",
+            0.04,
+            "$sp - 1.6"
+           ],
+           "at": [
+            "$aw / 4 + 0.1",
+            0,
+            "$sp / 2 + 0.3"
+           ],
+           "material": "solar_cells",
+           "mirror": "Blanket_R",
+           "children": [
+            {
+             "name": "Grid",
+             "shape": "tube",
+             "path": [
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ]
+             ],
+             "radius": 0.035,
+             "material": "cell_grid",
+             "segments": 4
+            }
+           ]
+          },
+          {
+           "name": "Tip",
+           "shape": "box",
+           "size": [
+            "$aw - 0.2",
+            0.25,
+            0.4
+           ],
+           "at": [
+            0,
+            0,
+            "$sp - 0.3"
+           ],
+           "material": "joint_dark"
+          }
+         ]
+        },
+        {
+         "name": "SolarArray_Aft",
+         "at": [
+          0,
+          0,
+          "-1 * ($ts / 2 + 0.6)"
+         ],
+         "rotate": [
+          0,
+          180,
+          0
+         ],
+         "children": [
+          {
+           "name": "Mast",
+           "shape": "box",
+           "size": [
+            0.35,
+            0.35,
+            "$sp"
+           ],
+           "at": [
+            0,
+            0,
+            "$sp / 2"
+           ],
+           "material": "truss_metal"
+          },
+          {
+           "name": "Blanket_L",
+           "shape": "box",
+           "size": [
+            "$aw / 2 - 0.3",
+            0.04,
+            "$sp - 1.6"
+           ],
+           "at": [
+            "$aw / 4 + 0.1",
+            0,
+            "$sp / 2 + 0.3"
+           ],
+           "material": "solar_cells",
+           "mirror": "Blanket_R",
+           "children": [
+            {
+             "name": "Grid",
+             "shape": "tube",
+             "path": [
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ]
+             ],
+             "radius": 0.035,
+             "material": "cell_grid",
+             "segments": 4
+            }
+           ]
+          },
+          {
+           "name": "Tip",
+           "shape": "box",
+           "size": [
+            "$aw - 0.2",
+            0.25,
+            0.4
+           ],
+           "at": [
+            0,
+            0,
+            "$sp - 0.3"
+           ],
+           "material": "joint_dark"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "ArrayUnit_P{i}",
+       "at": [
+        "-1 * ($TL / 2 - $aw / 2 - 1 - $i * ($aw + 1.5))",
+        "$yT",
+        0
+       ],
+       "repeat": {
+        "count": "$arrays",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Joint",
+         "shape": "box",
+         "size": [
+          1.6,
+          "$ts + 1",
+          "$ts + 1"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "joint_dark",
+         "bevel": 0.15
+        },
+        {
+         "name": "SolarArray_Fwd",
+         "at": [
+          0,
+          0,
+          "1 * ($ts / 2 + 0.6)"
+         ],
+         "rotate": [
+          0,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Mast",
+           "shape": "box",
+           "size": [
+            0.35,
+            0.35,
+            "$sp"
+           ],
+           "at": [
+            0,
+            0,
+            "$sp / 2"
+           ],
+           "material": "truss_metal"
+          },
+          {
+           "name": "Blanket_L",
+           "shape": "box",
+           "size": [
+            "$aw / 2 - 0.3",
+            0.04,
+            "$sp - 1.6"
+           ],
+           "at": [
+            "$aw / 4 + 0.1",
+            0,
+            "$sp / 2 + 0.3"
+           ],
+           "material": "solar_cells",
+           "mirror": "Blanket_R",
+           "children": [
+            {
+             "name": "Grid",
+             "shape": "tube",
+             "path": [
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ]
+             ],
+             "radius": 0.035,
+             "material": "cell_grid",
+             "segments": 4
+            }
+           ]
+          },
+          {
+           "name": "Tip",
+           "shape": "box",
+           "size": [
+            "$aw - 0.2",
+            0.25,
+            0.4
+           ],
+           "at": [
+            0,
+            0,
+            "$sp - 0.3"
+           ],
+           "material": "joint_dark"
+          }
+         ]
+        },
+        {
+         "name": "SolarArray_Aft",
+         "at": [
+          0,
+          0,
+          "-1 * ($ts / 2 + 0.6)"
+         ],
+         "rotate": [
+          0,
+          180,
+          0
+         ],
+         "children": [
+          {
+           "name": "Mast",
+           "shape": "box",
+           "size": [
+            0.35,
+            0.35,
+            "$sp"
+           ],
+           "at": [
+            0,
+            0,
+            "$sp / 2"
+           ],
+           "material": "truss_metal"
+          },
+          {
+           "name": "Blanket_L",
+           "shape": "box",
+           "size": [
+            "$aw / 2 - 0.3",
+            0.04,
+            "$sp - 1.6"
+           ],
+           "at": [
+            "$aw / 4 + 0.1",
+            0,
+            "$sp / 2 + 0.3"
+           ],
+           "material": "solar_cells",
+           "mirror": "Blanket_R",
+           "children": [
+            {
+             "name": "Grid",
+             "shape": "tube",
+             "path": [
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.1250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.2500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.3750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.5000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.6250 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.7500 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 0.8750 - $sp / 2 - 0.3"
+              ],
+              [
+               "0.25 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ],
+              [
+               "$aw / 2 - 0.1 - $aw / 4 - 0.1",
+               0.035,
+               "0.8 + ($sp - 1.6) * 1.0000 - $sp / 2 - 0.3"
+              ]
+             ],
+             "radius": 0.035,
+             "material": "cell_grid",
+             "segments": 4
+            }
+           ]
+          },
+          {
+           "name": "Tip",
+           "shape": "box",
+           "size": [
+            "$aw - 0.2",
+            0.25,
+            0.4
+           ],
+           "at": [
+            0,
+            0,
+            "$sp - 0.3"
+           ],
+           "material": "joint_dark"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Radiators",
+     "children": [
+      {
+       "name": "Radiator_{i}",
+       "at": [
+        "$TL * 0.1 + $i * min(3.5, $TL * 0.05)",
+        "$yT",
+        "-$ts / 2"
+       ],
+       "repeat": {
+        "count": "$radiators",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "mirror": "Radiator_P{i}",
+       "children": [
+        {
+         "name": "Panel",
+         "shape": "box",
+         "size": [
+          0.15,
+          "min(3, $TL * 0.06)",
+          "min(11.5, $TL * 0.16)"
+         ],
+         "at": [
+          0,
+          0,
+          "-min(11.5, $TL * 0.16) / 2 - 0.45"
+         ],
+         "material": "radiator_white",
+         "bevel": 0.04
+        },
+        {
+         "name": "Hinge",
+         "shape": "box",
+         "size": [
+          0.6,
+          0.6,
+          0.6
+         ],
+         "at": [
+          0,
+          0,
+          -0.2
+         ],
+         "material": "joint_dark"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "RoboticArm",
+     "at": [
+      "-$TL * 0.12",
+      "$yT + $ts / 2 + 0.1",
+      "$ts * 0.25"
+     ],
+     "children": [
+      {
+       "name": "MobileBase",
+       "shape": "box",
+       "size": [
+        2.5,
+        0.6,
+        2
+       ],
+       "at": [
+        0,
+        0.3,
+        0
+       ],
+       "material": "mmod",
+       "bevel": 0.1
+      },
+      {
+       "name": "ShoulderJoint",
+       "shape": "cylinder",
+       "radius": 0.45,
+       "height": 0.9,
+       "at": [
+        0,
+        1,
+        0
+       ],
+       "material": "joint_dark",
+       "segments": 16
+      },
+      {
+       "name": "Boom1",
+       "at": [
+        0,
+        1.4,
+        0
+       ],
+       "rotate": [
+        "lerp(-80, -20, $roboticArm)",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "UpperBoom",
+         "shape": "cylinder",
+         "radius": 0.2,
+         "height": "7.5 * lerp(0.25, 1, $roboticArm)",
+         "at": [
+          0,
+          "3.75 * lerp(0.25, 1, $roboticArm)",
+          0
+         ],
+         "material": "module_white",
+         "segments": 12
+        },
+        {
+         "name": "Elbow",
+         "at": [
+          0,
+          "7.5 * lerp(0.25, 1, $roboticArm)",
+          0
+         ],
+         "rotate": [
+          "lerp(-160, -40, $roboticArm)",
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "ElbowJoint",
+           "shape": "ellipsoid",
+           "radii": [
+            0.42,
+            0.42,
+            0.42
+           ],
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "joint_dark",
+           "segments": 12
+          },
+          {
+           "name": "LowerBoom",
+           "shape": "cylinder",
+           "radius": 0.18,
+           "height": "7 * lerp(0.25, 1, $roboticArm)",
+           "axis": "z",
+           "at": [
+            0,
+            0,
+            "3.5 * lerp(0.25, 1, $roboticArm)"
+           ],
+           "material": "module_white",
+           "segments": 12
+          },
+          {
+           "name": "EndEffector",
+           "shape": "cylinder",
+           "radius": 0.35,
+           "height": 0.8,
+           "axis": "z",
+           "at": [
+            0,
+            0,
+            "7 * lerp(0.25, 1, $roboticArm) + 0.3"
+           ],
+           "material": "joint_dark",
+           "segments": 12
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Beacon",
+     "shape": "ellipsoid",
+     "radii": [
+      0.2,
+      0.2,
+      0.2
+     ],
+     "at": [
+      0,
+      "$yT + $ts / 2 + 0.15",
+      "-$ts * 0.3"
+     ],
+     "material": "beacon",
+     "segments": 10
+    }
+   ]
+  }
+ ]
+}
