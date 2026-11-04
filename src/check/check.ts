@@ -1,13 +1,11 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve, sep } from "node:path";
-import { findChromium, loadPlaywright, WEBGL_ARGS, WEBGPU_ARGS } from "./browser.js";
+import { dirname, join } from "node:path";
 import { blankness, diff } from "./diff.js";
 import { decodePng, encodePng } from "./png.js";
-import { serveStatic } from "./server.js";
-import { indexFor } from "../core.js";
-import type { ApiIndex } from "../api/index-builder.js";
-import { explain, parseShaderErrors, type Explanation } from "../explain/explain.js";
-import { locateCode } from "../explain/locate.js";
+import type { Explanation } from "../explain/explain.js";
+import { openPage } from "./page.js";
+import { runStep } from "./steps.js";
+import { formatIssues } from "./util.js";
 import { INSPECT_EVAL, INSPECT_INIT, MEMORY_EVAL, formatScene, type SceneReport } from "./inspect.js";
 
 export interface CheckOptions {
@@ -110,7 +108,8 @@ export interface CheckResult {
   baseline?: { name: string; status: "created" | "updated" | "match" | "diff" | "size" | "missing"; ratio?: number; diffImage?: string };
 }
 
-const INIT = `(() => {
+/** Counts contexts, lost contexts and animation frames. Runs before any page script. */
+export const INIT = `(() => {
   const w = window;
   w.__ts = { contexts: [], lost: 0, frames: 0 };
   const orig = HTMLCanvasElement.prototype.getContext;
@@ -127,24 +126,9 @@ const INIT = `(() => {
 })();`;
 
 export async function check(opts: CheckOptions): Promise<CheckResult> {
-  const pw = await loadPlaywright();
-  const isUrl = /^https?:\/\//.test(opts.target);
-  const folder = isUrl ? process.cwd() : resolve(opts.target);
-  const serveRoot = opts.root ? resolve(opts.root) : folder;
-  const server = isUrl ? undefined : await serveStatic(serveRoot);
-  const entryPath = relative(serveRoot, join(folder, opts.entry ?? "index.html")).split(sep).join("/");
-  const url = isUrl ? opts.target : `${server?.url}/${entryPath}`;
-  const stateDir = resolve(opts.stateDir ?? join(folder, ".threesmith"));
-  const issues: Issue[] = [];
-  const ignore = opts.ignore ?? [];
-  const skip = (text: string) => ignore.some((i) => text.includes(i));
-
-  const executablePath = findChromium();
-  const browser = await pw.chromium.launch({
-    headless: true,
-    ...(executablePath ? { executablePath } : {}),
-    args: [...WEBGL_ARGS, ...(opts.webgpu ? WEBGPU_ARGS : [])],
-  });
+  const opened = await openPage({ ...opts, init: [INIT, INSPECT_INIT] });
+  const { page, url, issues } = opened;
+  const stateDir = opened.stateDir;
   const result: CheckResult = {
     ok: false,
     url,
@@ -152,69 +136,11 @@ export async function check(opts: CheckOptions): Promise<CheckResult> {
     stats: { canvases: 0, contexts: [], frames: 0, threeRevision: null, dominantColor: 0, webgpuAdapter: null },
   };
   try {
-    const page = await browser.newPage({ viewport: { width: opts.width ?? 800, height: opts.height ?? 600 }, deviceScaleFactor: 1 });
-    await page.addInitScript(INIT);
-    await page.addInitScript(INSPECT_INIT);
-    let index: ApiIndex | undefined;
-    try {
-      index = isUrl ? undefined : indexFor(folder);
-    } catch {
-      index = undefined; // three not installed next to the page: explanations without exact names
-    }
-    const annotate = (issue: Issue, text: string): Issue => {
-      const ex = explain(text, index);
-      if (ex.length) issue.explanations = ex;
-      if (text.includes("\n")) issue.detail = text.slice(0, 4000);
-      if (ex.some((e) => e.id === "shader-error")) {
-        issue.shader = parseShaderErrors(text).map((e) => {
-          const source = !isUrl && e.code ? locateCode(serveRoot, e.code) : undefined;
-          return { ...e, ...(source ? { source } : {}) };
-        });
-      }
-      return issue;
-    };
-    page.on("pageerror", (e) => {
-      const text = String(e.message ?? e);
-      issues.push(annotate({ kind: "page-error", severity: "error", message: text.split("\n")[0] ?? "" }, text));
-    });
-    page.on("console", (m) => {
-      const text = m.text();
-      if (skip(text)) return;
-      if (m.type() === "error") {
-        // failed resource loads are reported by requestfailed/response with the URL
-        if (/Failed to load resource/.test(text)) return;
-        issues.push(annotate({ kind: "console-error", severity: "error", message: text.split("\n")[0] ?? "" }, text));
-      } else if (m.type() === "warning" && /THREE\./.test(text)) {
-        issues.push(annotate({ kind: "console-warn", severity: "warn", message: text.split("\n")[0] ?? "" }, text));
-      }
-    });
-    page.on("requestfailed", (r) => {
-      if (!skip(r.url())) issues.push({ kind: "request-failed", severity: "error", message: `${r.url()} (${r.failure()?.errorText ?? "failed"})` });
-    });
-    page.on("response", (r) => {
-      if (r.status() >= 400 && !skip(r.url())) issues.push({ kind: "request-failed", severity: "error", message: `${r.url()} -> HTTP ${r.status()}` });
-    });
-    try {
-      await page.goto(url, { waitUntil: "load", timeout: 30_000 });
-    } catch (e) {
-      issues.push({ kind: "load-failed", severity: "error", message: `Could not open ${url}: ${(e as Error).message.split("\n")[0]}` });
-      return result;
-    }
+    if (!opened.loaded) return result;
     await page.waitForTimeout(opts.wait ?? 2000);
     for (const [i, step] of (opts.steps ?? []).entries()) {
       try {
-        if (step.type === "wait") await page.waitForTimeout(Math.min(step.ms, 30_000));
-        else if (step.type === "click") {
-          if (step.selector) await page.click(step.selector, { timeout: 5000 });
-          else await page.mouse.click(step.x ?? 0, step.y ?? 0);
-        } else if (step.type === "press") await page.keyboard.press(step.key);
-        else if (step.type === "drag") {
-          await page.mouse.move(step.from[0], step.from[1]);
-          await page.mouse.down();
-          await page.mouse.move(step.to[0], step.to[1], { steps: 12 });
-          await page.mouse.up();
-        } else if (step.type === "wheel") await page.mouse.wheel(0, step.deltaY);
-        else await page.waitForSelector(step.selector, { timeout: step.timeout ?? 5000 });
+        await runStep(page, step);
       } catch (e) {
         issues.push({ kind: "step-failed", severity: "error", message: `step ${i + 1} (${step.type}) failed: ${(e as Error).message.split("\n")[0]}` });
         break;
@@ -334,8 +260,7 @@ export async function check(opts: CheckOptions): Promise<CheckResult> {
       }
     }
   } finally {
-    await browser.close();
-    await server?.close();
+    await opened.close();
   }
   result.ok = !issues.some((i) => i.severity === "error");
   return result;
@@ -345,13 +270,7 @@ export function formatCheck(r: CheckResult): string {
   const out = [`Threesmith check: ${r.ok ? "PASS" : "FAIL"} – ${r.url}`];
   const s = r.stats;
   out.push(`canvases ${s.canvases} · contexts ${s.contexts.join(",") || "none"} · frames ${s.frames} · three ${s.threeRevision ? "r" + s.threeRevision : "?"}`);
-  for (const i of r.issues) {
-    out.push(`${i.severity === "error" ? "✖" : "▲"} [${i.kind}] ${i.message}`);
-    for (const e of i.shader ?? []) {
-      out.push(`    ${e.stage} shader line ${e.line}: ${e.message}${e.code ? `\n      ${e.code}` : ""}${e.source ? `\n      in your code: ${e.source}` : ""}`);
-    }
-    for (const e of i.explanations ?? []) out.push(`    why: ${e.cause}\n    fix: ${e.fix}${e.detail ? `\n    ${e.detail}` : ""}`);
-  }
+  out.push(...formatIssues(r.issues));
   if (r.scene) out.push("", formatScene(r.scene, { maxNodes: 40 }));
   if (r.baseline) out.push(`baseline ${r.baseline.name}: ${r.baseline.status}${r.baseline.ratio !== undefined ? ` (${(r.baseline.ratio * 100).toFixed(2)}% changed)` : ""}${r.baseline.diffImage ? ` – diff: ${r.baseline.diffImage}` : ""}`);
   if (r.screenshot) out.push(`screenshot: ${r.screenshot}`);

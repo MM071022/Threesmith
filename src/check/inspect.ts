@@ -13,9 +13,11 @@ export const INSPECT_INIT = `(() => {
   w.__THREE_DEVTOOLS__.addEventListener('observe', (e) => {
     const o = e.detail;
     if (!o) return;
-    if (o.isScene) ts.scenes.push(o);
+    // WeakRefs: the hook must not keep a scene or renderer alive that the page let go (leak runs measure that)
+    const keep = (list) => { for (let i = list.length - 1; i >= 0; i--) if (!list[i].deref()) list.splice(i, 1); list.push(new WeakRef(o)); };
+    if (o.isScene) keep(ts.scenes);
     else if (o.isWebGLRenderer || o.isRenderer) {
-      ts.renderers.push(o);
+      keep(ts.renderers);
       const render = o.render;
       if (typeof render === 'function') {
         o.render = function (scene, camera) {
@@ -89,10 +91,11 @@ export const INSPECT_EVAL = `(() => {
   const report = { found: false, renderer: null, camera: null, counts: { objects: 0, meshes: 0, lights: 0, nodesShown: 0 }, nodes: [], diagnoses: [] };
   if (!ts) return report;
   const last = ts.last;
-  const scene = (last && last.scene) || ts.scenes[0];
+  const first = (list) => { for (const r of list) { const o = r.deref(); if (o) return o; } return null; };
+  const scene = (last && last.scene) || first(ts.scenes);
   if (!scene) return report;
   report.found = true;
-  const renderer = (last && last.renderer) || ts.renderers[0] || null;
+  const renderer = (last && last.renderer) || first(ts.renderers);
   let camera = last && last.camera;
   if (!camera) scene.traverse((o) => { if (!camera && o.isCamera) camera = o; });
   const diag = (severity, kind, object, message, fix) => report.diagnoses.push({ severity, kind, object, message, fix });
@@ -219,7 +222,8 @@ export const INSPECT_EVAL = `(() => {
 
 export const MEMORY_EVAL = `(() => {
   const ts = window.__tsScene;
-  const r = ts && ((ts.last && ts.last.renderer) || ts.renderers[0]);
+  const first = (list) => { for (const x of list) { const o = x.deref(); if (o) return o; } return null; };
+  const r = ts && ((ts.last && ts.last.renderer) || first(ts.renderers));
   const m = r && r.info && r.info.memory;
   return m ? { geometries: m.geometries || 0, textures: m.textures || 0 } : null;
 })()`;
