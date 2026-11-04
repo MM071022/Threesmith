@@ -30,7 +30,8 @@
     "check": "npm run typecheck && npm test && npm run build",
     "prepare": "npm run build",
     "version": "node scripts/sync-version.mjs && git add server.json plugins/threesmith gemini-extension.json",
-    "build:mcpb": "node scripts/build-mcpb.mjs"
+    "build:mcpb": "node scripts/build-mcpb.mjs",
+    "plugin:local": "node scripts/plugin-local.mjs"
   },
   "keywords": [
     "threejs",

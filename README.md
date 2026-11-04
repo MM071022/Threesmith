@@ -213,5 +213,8 @@ npm ci
 npm run check     # typecheck, tests (incl. headless Chromium), build
 ```
 
+Try the Claude Code plugin from this checkout, before a release: `npm run build && npm run plugin:local`, then start
+Claude Code with the `claude --plugin-dir ...` line it prints.
+
 See [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md). Threesmith follows the design of its sister
 project for Godot, [Godotwright](https://github.com/laaielichter/Godotwright). MIT licensed, made by laaielichter.
