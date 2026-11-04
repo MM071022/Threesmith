@@ -2,51 +2,318 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Threesmith: three.js for coding agents</title>
-<meta name="description" content="MCP server and CLI that stops AI agents from writing outdated three.js: version-pinned API lookup, a scored review, a headless WebGL check and a GitHub Action receipt.">
-<link rel="icon" href="favicon.svg">
-<style>
-:root{--bg:#fff;--fg:#1b2430;--mut:#5b6877;--card:#f3f6fa;--acc:#2f6fa3;--code:#eef2f7}
-@media (prefers-color-scheme:dark){:root{--bg:#0f141a;--fg:#e6ebf1;--mut:#9aa7b5;--card:#18202a;--acc:#6fb0e6;--code:#18202a}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}
-main{max-width:860px;margin:0 auto;padding:48px 16px 80px}
-h1{font-size:2.4rem;margin:0 0 8px}h2{margin-top:2.4rem}p.lead{font-size:1.2rem;color:var(--mut)}
-pre{background:var(--code);padding:14px 16px;border-radius:10px;overflow:auto}code{font:14px ui-monospace,monospace}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.card{background:var(--card);border-radius:12px;padding:14px 16px}.card b{display:block;margin-bottom:4px}
-a{color:var(--acc)}table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--card)}
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:var(--acc);color:#fff;text-decoration:none;font-weight:600;transition:transform .12s,box-shadow .12s}
-.btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(47,111,163,.35)}
-.btn.alt{background:var(--card);color:var(--fg)}
-@media (prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Threesmith: three.js MCP server and CLI for coding agents</title>
+<meta name="description" content="Threesmith checks the three.js code your coding agent writes and runs the page headless. MCP server, CLI and Claude Code plugin: the API of your installed three version, a 97-rule review, asset and decoder checks, the live scene read back, claims proven frame by frame, perf and leak checks, and 3D models without Blender.">
+<link rel="canonical" href="https://laaielichter.github.io/Threesmith/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0b1117">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Threesmith">
+<meta property="og:title" content="Threesmith: make any coding agent better at three.js">
+<meta property="og:description" content="The API of your installed three version, a 97-rule review, asset checks, the page run headless with the live scene read back, and 3D models without Blender. MCP server, CLI and Claude Code plugin. MIT.">
+<meta property="og:url" content="https://laaielichter.github.io/Threesmith/">
+<meta property="og:image" content="https://laaielichter.github.io/Threesmith/og.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Threesmith: make any coding agent better at three.js">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Threesmith: make any coding agent better at three.js">
+<meta name="twitter:description" content="Version-pinned three.js API and review, asset checks, headless runs with the live scene read back, 3D models without Blender.">
+<meta name="twitter:image" content="https://laaielichter.github.io/Threesmith/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Threesmith",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "description": "MCP server, CLI and Claude Code plugin that checks the three.js code coding agents write: the API of the installed three version, a scored review pinned to it, asset and decoder checks, the page run in headless Chromium with the live scene read back, behaviour proven with steps and claims, perf and leak measurements, build checks, and 3D models built without Blender.",
+  "featureList": ["three.js API lookup pinned to the installed version", "Doctor that groups problems by cause", "Scored review with 97 rules incl. shaders and React Three Fiber", "TypeScript type errors answered from the installed release", "Asset path, case and decoder checks", "Headless WebGL 2 check with screenshots and baselines", "Live scene inspector: why objects are not visible", "Play with steps and claims, regression scenarios with JUnit", "Draw-call, triangle and leak measurements", "Build output check", "100 lessons from real three.js projects", "60 ready-made 3D models (.glb) with text views and lint", "Claude Code plugin with hooks, skills and subagents", "GitHub Action receipt on pull requests"],
+  "url": "https://laaielichter.github.io/Threesmith/",
+  "codeRepository": "https://github.com/laaielichter/Threesmith",
+  "license": "https://opensource.org/licenses/MIT",
+  "programmingLanguage": "TypeScript",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Does Threesmith need a GPU or a browser window?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. doctor, scan, api, review, types, assets and the model tools read files. check, inspect, play, perf, leaks and build open the page in headless Chromium with software WebGL 2, which also runs in GitHub Actions." } },
+    { "@type": "Question", "name": "Which coding agents work with Threesmith?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Any agent that speaks MCP over stdio: Claude Code (as a plugin with hooks, skills and subagents), Codex, Cursor, VS Code, Gemini CLI, Cline and others. The CLI works from any shell." } },
+    { "@type": "Question", "name": "Does Threesmith send my code anywhere?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Everything runs locally and there is no telemetry. Lessons and false-alarm feedback stay on your machine, scrubbed of names, paths and code." } },
+    { "@type": "Question", "name": "Which three.js version does it check against?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The one installed in your project (node_modules/three). Rules know the release that removed or renamed an API, so the same code is an error on a new release and a warning on an old one." } },
+    { "@type": "Question", "name": "Does it work with React Three Fiber?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The review has rules for useFrame (state set every frame, allocations), objects created in render and render priority, and skips rules that R3F handles itself, such as dispose." } }
+  ]
+}
+</script>
+<link rel="stylesheet" href="site.css">
 </head>
-<body><main>
-<h1>Threesmith</h1>
-<p class="lead">three.js ships a release almost every month and removes old APIs. Agents write the old ones. Threesmith checks their code against <b>the three version your project has installed</b>.</p>
-<div class="btns">
-<a class="btn" href="https://vscode.dev/redirect/mcp/install?name=threesmith&amp;config=%7B%22name%22%3A%22threesmith%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22threesmith%22%2C%22mcp%22%5D%7D">Install in VS Code</a>
-<a class="btn" href="https://cursor.com/en/install-mcp?name=threesmith&amp;config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsInRocmVlc21pdGgiLCJtY3AiXX0%3D">Install in Cursor</a>
-<a class="btn alt" href="https://github.com/laaielichter/Threesmith#add-it-to-your-agent">Claude Code plugin</a>
-<a class="btn alt" href="https://github.com/laaielichter/Threesmith">GitHub</a>
-</div>
-<pre><code>claude mcp add threesmith -- npx -y threesmith mcp
-npx threesmith review        # scored review
-npx threesmith api Mesh      # exact API of your version
-npx threesmith check .       # open the page headless</code></pre>
-<div class="grid">
-<div class="card"><b>API lookup</b>Read from <code>node_modules/three</code>: signatures, deprecations, import paths. Typos get "did you mean".</div>
-<div class="card"><b>Scored review</b>39 rules. Removed APIs, wrong imports, black scenes, shadows that never draw, per-frame allocations, missing dispose.</div>
-<div class="card"><b>Headless check</b>Chromium with software WebGL 2: console errors, no canvas, lost context, blank frames, screenshot, baselines.</div>
-<div class="card"><b>Scene inspector</b>Reads the live scene and says why an object is not visible: no light, camera inside or looking away, zero scale, NaN, wrong layer. Catches GPU memory leaks.</div>
-<div class="card"><b>Error explainer</b>Cause and fix for console errors, with the right import path for your version; shader errors point at your file and line.</div>
-<div class="card"><b>CI receipt</b>A GitHub Action that posts the review and the visual check on every pull request.</div>
-</div>
-<h2>Works with</h2>
-<p>Claude Code (plugin with hooks), Claude Desktop (<code>.mcpb</code>), Codex, Cursor, Cline, Gemini CLI, or any MCP client. See <a href="https://github.com/laaielichter/Threesmith/blob/main/llms-install.md">llms-install.md</a>.</p>
-<h2>Honest limits</h2>
-<ul><li>WebGL 2 is reliable in CI; WebGPU is best effort.</li><li>The review reads text, not types. It can be wrong: report it.</li><li>No benchmark results are published yet.</li></ul>
-<p><a href="https://github.com/laaielichter/Threesmith">GitHub</a> · made by laaielichter · MIT</p>
-</main></body></html>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./"><img src="logo.svg" alt="" width="30" height="30">Threesmith</a>
+  <nav class="links">
+    <a href="#how">How it works</a>
+    <a class="opt" href="#tools">Tools</a>
+    <a class="opt" href="models.html">Models</a>
+    <a href="install.html">Install</a>
+    <a class="gh" href="https://github.com/laaielichter/Threesmith">GitHub</a>
+    <button class="theme" id="theme" aria-label="Switch light and dark">◐</button>
+  </nav>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow">MCP server · CLI · Claude Code plugin · MIT</span>
+    <h1>Your coding agent writes three.js.<br><em>Threesmith checks it.</em></h1>
+    <p class="lead">three.js ships a release almost every month and removes old APIs. Agents learned it from years of old code, and they cannot see the canvas they draw on. Threesmith gives them the API of <b>the three version you have installed</b>, a review pinned to it, the assets and decoders the code needs, and the live scene in headless Chromium.</p>
+    <div class="btns">
+      <a class="btn" href="install.html">Install in your agent</a>
+      <a class="btn alt" href="https://github.com/laaielichter/Threesmith">View on GitHub</a>
+    </div>
+    <div class="cmd"><span>$</span><code id="c1">npx -y threesmith doctor</code><button data-copy="c1">Copy</button></div>
+  </div>
+  <div class="ba">
+    <figure><img src="before.jpg" alt="A black canvas: the scene the agent wrote draws nothing" width="960" height="540"><figcaption><span class="tag bad">before</span><b>As the agent wrote it.</b> A black canvas, 3 errors in the review, 2 asset paths that 404.</figcaption></figure>
+    <figure><img src="after.jpg" alt="The same scene after the fixes: a textured crate and a character model, lit" width="960" height="540"><figcaption><span class="tag good">after</span><b>After the doctor's list.</b> Review 100/100, check passes, every asset loads.</figcaption></figure>
+  </div>
+</div></div>
+
+<section id="doctor"><div class="wrap">
+  <h2>One call says what is wrong, and in which order</h2>
+  <p class="sub">The scene above, as a coding agent wrote it (<a href="https://github.com/laaielichter/Threesmith/tree/main/examples/agent-mistakes">examples/agent-mistakes</a>). <code>three_doctor</code> reads the files, groups the problems by cause, most urgent first, and says which ones <code>three_fix</code> does by itself. Real output, unedited:</p>
+  <div class="term"><div class="bar"><i></i><i></i><i></i><b>threesmith doctor</b></div><pre><!--out:doctor--><span class="h">Threesmith doctor: 5 error(s), 8 warning(s), review 73/100 (C), three r187, none (import map / CDN)</span>
+
+<span class="e">1. ✖ Why the scene shows nothing (or nothing right) (1): nothing else can be judged while the picture is black or empty</span>
+   [add-gltf-result] main.js:27
+     GLTFLoader hands over an object holding scene, animations and cameras, not an Object3D: scene.add(gltf) logs "object not an instance of THREE.Object3D" and the model never shows. Fix: scene.add( gltf.scene );
+
+<span class="e">2. ✖ Assets that will not load (2): a missing or mis-cased file is a 404, which the loader reports as a parse error far from the cause</span>
+   [asset-missing] main.js:22
+     "/textures/crate.jpg" is not in the project (looked in public/textures/crate.jpg, textures/crate.jpg). The server answers with an HTML page, which the loader then fails to parse ("Unexpected token '&lt;'"). Fix: Add the file under public/ (served at /), or fix the path.
+   [asset-case] main.js:26
+     "/models/Robot.glb" only matches public/models/robot.glb with different capitals: it loads on macOS and Windows and is a 404 on Linux servers and most hosts. Fix: Write the path exactly as the file is named (/models/robot.glb), or rename the file.
+
+<span class="e">3. ✖ Outdated or removed three.js API (3): removed names throw or silently do nothing in the installed release</span>
+   [buffer-geometry-alias] main.js:18 (three_fix)
+     `BoxBufferGeometry` and friends were renamed; the plain name is the BufferGeometry now.
+   [addons-path] x2 index.html:8, main.js:3 (three_fix)
+     `three/examples/jsm/...` still works, but `three/addons/...` is the documented path and the one import maps use.
+
+<span class="e">4. ✖ Colours (2): wrong colour spaces make everything look washed out or too dark</span>
+   [output-encoding] main.js:7 (three_fix)
+     `outputEncoding` was replaced by `outputColorSpace`.
+   [texture-colorspace-missing] main.js:23
+     Textures loaded with TextureLoader are used as color maps but `colorSpace` is never set, so colors look washed out or too dark. Fix: texture.colorSpace = THREE.SRGBColorSpace; (not for normal/roughness/metalness data maps).
+
+<span class="w">5. ▲ Code that runs but does the wrong thing (4): these are bugs the user will see</span>
+   [controls-no-element] main.js:15
+     Controls created without a DOM element listen to nothing (since r175 they need one), so mouse and touch do nothing. Fix: new OrbitControls( camera, renderer.domElement ), or call controls.connect( element ) later.
+   [controls-damping-no-update] main.js:16
+     `enableDamping` only works when controls.update() runs every frame. Fix: Call controls.update() inside the animation loop.
+   [rotation-degrees] main.js:19
+     Rotations are in radians; 45 here is about 7 turns, not 45 degrees. Fix: Use radians: THREE.MathUtils.degToRad( 45 ) (Math.PI / 4).
+   [clip-action-unused] main.js:29
+     clipAction() only creates the action; nothing plays until .play() is called on it. Fix: mixer.clipAction( clip ).play();
+
+<span class="w">6. ▲ Performance (3): work per frame and GPU memory decide whether it runs smoothly on a phone</span>
+   [pixel-ratio-uncapped] main.js:8 (three_fix)
+     `setPixelRatio(devicePixelRatio)` renders up to 9-16x the pixels on high-density screens.
+   [alloc-in-loop] main.js:34
+     A Vector/Matrix/Quaternion/Color is created with `new` inside the per-frame loop. That produces garbage every frame and causes stutter from garbage collection. Fix: Create the object once outside the loop (const _v = new THREE.Vector3()) and reuse it with .set()/.copy().
+   [animation-loop] main.js:33
+     `renderer.setAnimationLoop` is the supported loop: it also runs in WebXR and pauses correctly. Fix: renderer.setAnimationLoop((time) =&gt; { ...; renderer.render(scene, camera); });
+
+<span class="w">7. ▲ Resize and cleanup (1): leaks and stretched views show up after the first minutes of use</span>
+   [no-resize-handling] main.js:6
+     A renderer and camera exist but nothing reacts to a resize (no resize listener or ResizeObserver). Fix: On resize: camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
+
+<span class="h">Next:</span>
+  1. Call three_fix (dry run), then three_fix write: true for the mechanical renames.
+  2. Fix the asset paths (three_assets lists every reference and where it was looked for).
+  3. Fix the 'shows nothing' group first, then confirm with three_check (screenshot) or three_inspect (why objects are not visible).
+  4. Fix the remaining 1 error(s) by hand; three_api gives the exact names for the installed release.
+  5. Call three_review with only_new: true after each change, until no errors are left.
+  6. Run three_check on the page (index.html) before you call it done.<!--/out--></pre></div>
+</div></section>
+
+<section id="check"><div class="wrap">
+  <div class="split">
+    <div>
+      <h2>Then it opens the page</h2>
+      <p class="sub">A review reads text. <code>three_check</code> runs the page in headless Chromium with software WebGL 2 (it works in CI) and reports what a user would see: page and console errors with their cause, failed requests, blank frames, and a screenshot. When the frame is blank, the scene inspector reads the live scene through three's devtools hook and says why nothing shows.</p>
+      <div class="term"><div class="bar"><i></i><i></i><i></i><b>threesmith fix</b></div><pre><!--out:fix--><span class="h">Would fix 5 place(s) in 2 file(s) (add --write to apply):</span>
+  index.html: 1 (addons-path)
+  main.js: 4 (addons-path, buffer-geometry-alias, output-encoding, pixel-ratio-uncapped)
+Run `threesmith review` again; the rest needs a decision.<!--/out--></pre></div>
+    </div>
+    <div class="term"><div class="bar"><i></i><i></i><i></i><b>threesmith check</b></div><pre><!--out:check--><span class="e">Threesmith check: FAIL – http://127.0.0.1:5173/examples/agent-mistakes/index.html</span>
+canvases 1 · contexts webgl2 · frames 0 · three r187
+<span class="e">✖ [page-error] THREE.BoxBufferGeometry is not a constructor</span>
+<span class="m">    why: The class was removed or renamed (Geometry, Face3, *BufferGeometry), or it is an addon used as THREE.X without importing it.</span>
+<span class="m">    fix: Use the current name and import addons explicitly. three_api tells whether it exists and where.</span>
+    `BoxBufferGeometry` does not exist in three r187. Did you mean `BufferGeometry`?
+<span class="e">✖ [blank] The screenshot is 100.0% one color: nothing visible was drawn (no lights, camera inside the object, or nothing added to the scene?).</span>
+<span class="e">✖ [scene] The renderer exists but render() was never called. Fix: Call renderer.render(scene, camera) every frame, for example in renderer.setAnimationLoop(...).</span>
+<span class="e">✖ [scene] No camera was found for the scene. Fix: Create a PerspectiveCamera and pass it to renderer.render(scene, camera).</span>
+<span class="e">✖ [scene] The rendered scene has no meshes, points, lines or sprites. Fix: Add your objects with scene.add(object) (for loaded models: scene.add(gltf.scene) inside the load callback).</span>
+
+Why it may not look right:
+<span class="e">✖ [never-rendered] The renderer exists but render() was never called.</span>
+<span class="m">    fix: Call renderer.render(scene, camera) every frame, for example in renderer.setAnimationLoop(...).</span>
+<span class="e">✖ [no-camera] No camera was found for the scene.</span>
+<span class="m">    fix: Create a PerspectiveCamera and pass it to renderer.render(scene, camera).</span>
+<span class="e">✖ [empty-scene] The rendered scene has no meshes, points, lines or sprites.</span>
+<span class="m">    fix: Add your objects with scene.add(object) (for loaded models: scene.add(gltf.scene) inside the load callback).</span>
+
+WebGLRenderer: canvas 800x600 @1, 0 draw calls, 0 triangles, 0 geometries, 0 textures, 0 shader programs
+
+Scene graph (1 objects, 0 meshes, 0 lights):
+Scene
+screenshot: ./examples/agent-mistakes/.threesmith/last.png<!--/out--></pre></div>
+  </div>
+</div></section>
+
+<section id="with"><div class="wrap">
+  <h2>Your agent, without and with Threesmith</h2>
+  <p class="sub">Each row is a mistake coding agents make in three.js projects, and the tool that catches it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Your agent…</th><th>On its own</th><th>With Threesmith</th></tr></thead>
+    <tbody>
+      <tr><td>writes three.js</td><td class="no"><code>Geometry</code>, <code>outputEncoding</code>, <code>examples/js</code>: old habits</td><td>97 rules pinned to the installed release, each with the fix; <code>three_fix</code> does the pure renames, undoable</td></tr>
+      <tr><td>calls an API</td><td class="no">guesses a name or import path from memory</td><td><code>three_api</code> reads <code>node_modules/three</code>: signature, deprecation, the right <code>three/addons/…</code> path</td></tr>
+      <tr><td>writes a shader</td><td class="no"><code>#include &lt;encodings_fragment&gt;</code>, a patch on a chunk that is gone</td><td>includes checked against the installed <code>ShaderChunk</code>; patches that silently do nothing found</td></tr>
+      <tr><td>loads a model</td><td class="no"><code>/models/Robot.glb</code>: works on a Mac, 404 on the server</td><td><code>three_assets</code> resolves every path like the host does; names missing Draco, meshopt and KTX2 setup</td></tr>
+      <tr><td>says "it works"</td><td class="no">never opened the page</td><td><code>three_check</code>: errors with causes, blank frames, screenshots, baselines with a diff</td></tr>
+      <tr><td>fixes a bug</td><td class="no">cannot show it was there, or that it is gone</td><td><code>three_play</code> judges claims frame by frame; <code>three_scenario</code> keeps it as a regression test</td></tr>
+      <tr><td>makes it fast</td><td class="no">changes things and hopes</td><td><code>three_perf</code>: draw calls, triangles, programs against a budget; <code>three_leaks</code>: what is never disposed</td></tr>
+      <tr><td>ships it</td><td class="no">builds, deploys, sees a 404</td><td><code>three_build</code>: copies of three, missing assets, sub-path URLs, then the built page headless</td></tr>
+      <tr><td>needs a 3D model</td><td class="no">a placeholder cube</td><td><code>three_model_build</code>: a clean <code>.glb</code> from 60 kinds, shown as text views, linted</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>Made for agents, not only for people</h2>
+  <p class="sub">Everything an agent reads costs tokens and every wrong step costs a turn. Threesmith is built around that.</p>
+  <div class="grid">
+    <div class="card"><h3><span class="ico">①</span>Cheap by default</h3><p><code>--tier cheap</code> gives capped output and numbered steps small models follow; <code>--tools core</code> loads 14 of the 31 tools. Instructions only name tools that are loaded.</p></div>
+    <div class="card"><h3><span class="ico">↻</span>Fix loops that cost less</h3><p><code>only_new</code> shows new findings in full, seen ones as one line, and how many are fixed. <code>code</code> + <code>file</code> reviews code before it is saved.</p></div>
+    <div class="card"><h3><span class="ico">≡</span>One line per finding</h3><p><code>file:line severity [rule] message Fix: …</code>, the same in the CLI, MCP and hooks, plus <code>structuredContent</code> with a schema.</p></div>
+    <div class="card"><h3><span class="ico">⟲</span>Safe writes</h3><p>Every write is one journal entry <code>three_undo</code> takes back. Protected folders, <code>--read-only</code>, dry runs first.</p></div>
+    <div class="card"><h3><span class="ico">◉</span>In Claude's loop</h3><p>The plugin's hooks review each edited file and name broken asset paths right after the edit, explain three.js errors in command output, and brief the session at the start.</p></div>
+    <div class="card"><h3><span class="ico">✦</span>It learns, locally</h3><p>100 lessons from real projects come back under the same error. A false alarm marked once stays hidden. Nothing leaves the machine.</p></div>
+  </div>
+</div></section>
+
+<section id="tools"><div class="wrap">
+  <h2>31 MCP tools, one CLI</h2>
+  <p class="sub">Load the sets you need: <code>--tools core,run</code>. Most tools are also CLI commands (<code>threesmith &lt;command&gt; --help</code>).</p>
+  <div class="tools">
+    <div><h4>core</h4><ul>
+      <li><code>three_doctor</code> what is wrong, in order</li>
+      <li><code>three_scan</code> the project map</li>
+      <li><code>three_api</code> · <code>three_search</code> installed API</li>
+      <li><code>three_review</code> 97 rules, 0-100</li>
+      <li><code>three_types</code> tsc, answered for three</li>
+      <li><code>three_fix</code> · <code>three_undo</code></li>
+      <li><code>three_explain</code> cause of a message</li>
+      <li><code>three_lessons</code> · <code>three_lesson_add</code></li>
+      <li><code>three_rules</code> · <code>three_feedback</code> · <code>three_version</code></li>
+    </ul></div>
+    <div><h4>run</h4><ul>
+      <li><code>three_check</code> headless page, screenshot</li>
+      <li><code>three_inspect</code> why objects are invisible</li>
+      <li><code>three_play</code> steps, watch, claims</li>
+      <li><code>three_scenario</code> regression tests</li>
+      <li><code>three_perf</code> draw calls, budgets</li>
+      <li><code>three_leaks</code> what grows per cycle</li>
+    </ul></div>
+    <div><h4>live</h4><ul>
+      <li><code>three_session</code> a page kept open</li>
+      <li><code>three_page</code> eval, steps, screenshots</li>
+    </ul></div>
+    <div><h4>build</h4><ul>
+      <li><code>three_assets</code> paths, case, decoders</li>
+      <li><code>three_build</code> the deployed output</li>
+    </ul></div>
+    <div><h4>model</h4><ul>
+      <li><code>three_model_brief</code> · <code>three_model_identify</code></li>
+      <li><code>three_model_spec</code> · <code>three_model_build</code></li>
+      <li><code>three_model_view</code> text views</li>
+      <li><code>three_model_lint</code> · <code>three_model_inspect</code></li>
+    </ul></div>
+  </div>
+</div></section>
+
+<section id="models"><div class="wrap">
+  <h2>It builds 3D models too, no Blender</h2>
+  <p class="sub">60 ready-made kinds or your own JSON spec, as clean, deterministic <code>.glb</code> files with a node per part. Agents that cannot see pictures check them with <code>three_model_view</code> (front, side and top views as text) and <code>three_model_lint</code>. These are rendered by three.js itself, headless. <a href="models.html">All renders</a>.</p>
+  <div class="gallery" id="gallery"></div>
+</div></section>
+
+<section id="install"><div class="wrap">
+  <div class="split">
+    <div>
+      <h2>Install</h2>
+      <p class="sub">Node.js 22.12+ and <code>three</code> in the project. The browser tools need <code>playwright-core</code> and a Chromium; <code>threesmith doctor --env</code> shows what is missing.</p>
+      <div class="cmd" style="margin-bottom:10px"><span>›</span><code id="c2">/plugin marketplace add laaielichter/Threesmith</code><button data-copy="c2">Copy</button></div>
+      <div class="cmd" style="margin-bottom:10px"><span>›</span><code id="c3">/plugin install threesmith@threesmith</code><button data-copy="c3">Copy</button></div>
+      <div class="cmd"><span>$</span><code id="c4">claude mcp add threesmith -- npx -y threesmith mcp</code><button data-copy="c4">Copy</button></div>
+      <p><a href="install.html">Codex, Cursor, VS Code, Gemini CLI, Cline, Claude Desktop, Docker →</a></p>
+    </div>
+    <div>
+      <h2>Honest limits</h2>
+      <ul class="sub">
+        <li>WebGL 2 in headless Chromium is reliable, also in CI. WebGPU is best effort.</li>
+        <li>Frame times come from software rendering: compare before and after. Draw calls and triangles are exact.</li>
+        <li>The review reads text, not types (<code>three_types</code> adds the type checker). It can be wrong; mark it with <code>three_feedback</code>.</li>
+        <li>No benchmark results are published yet; <code>bench/</code> has the tasks and the grader.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <h2>FAQ</h2>
+  <details><summary>Does it need a GPU or a browser window?</summary><p>No. Most tools read files. The browser tools use headless Chromium with software WebGL 2, which also runs in GitHub Actions.</p></details>
+  <details><summary>Which three.js version does it check against?</summary><p>The one in your <code>node_modules/three</code>. A rule knows the release that removed or renamed an API, so the same line is an error on a new release and a warning on an old one, and a rule whose replacement does not exist yet in your release stays quiet.</p></details>
+  <details><summary>Does it work with React Three Fiber?</summary><p>Yes: rules for <code>useFrame</code> (state set every frame, allocations), objects created in render and render priority, and rules R3F handles itself (dispose, colour space) are skipped.</p></details>
+  <details><summary>Does it send my code anywhere?</summary><p>No. There is no telemetry. Lessons and false-alarm feedback stay in <code>~/.threesmith</code>, scrubbed of names, paths and code.</p></details>
+  <details><summary>Is there one for Godot?</summary><p>Yes: <a href="https://github.com/laaielichter/Godotwright">Godotwright</a> is the same toolkit for Godot 4. Threesmith follows its design.</p></details>
+</div></section>
+
+<footer><div class="wrap">
+  <span>Threesmith · made by laaielichter · MIT</span>
+  <span><a href="https://github.com/laaielichter/Threesmith">GitHub</a> · <a href="install.html">Install</a> · <a href="models.html">Models</a> · <a href="https://github.com/laaielichter/Threesmith/blob/main/CHANGELOG.md">Changelog</a> · <a href="llms.txt">llms.txt</a></span>
+</div></footer>
+
+<script>
+for (const b of document.querySelectorAll("[data-copy]")) {
+  b.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); } catch { /* no clipboard */ }
+  });
+}
+const pick = ["car", "helicopter", "castle", "tree", "sailboat", "dragon", "train", "windmill", "airliner", "rocket", "tractor", "street-lamp"];
+document.getElementById("gallery").innerHTML = pick.map((k) => `<figure><img loading="lazy" src="gallery/${k}.jpg" alt="${k}, built by threesmith model build and rendered by three.js" width="640" height="480"><figcaption>${k}</figcaption></figure>`).join("");
+const root = document.documentElement, t = document.getElementById("theme");
+try { const s = localStorage.getItem("theme"); if (s) root.dataset.theme = s; } catch {}
+t.addEventListener("click", () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch {}
+});
+</script>
+</body>
+</html>

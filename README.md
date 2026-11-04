@@ -1,13 +1,28 @@
-# Threesmith
-
-[![CI](https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml/badge.svg)](https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_MCP_server-0098FF?logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=threesmith&config=%7B%22name%22%3A%22threesmith%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22threesmith%22%2C%22mcp%22%5D%7D)
-[![Install in Cursor](https://img.shields.io/badge/Cursor-Install_MCP_server-000000?logo=cursor&logoColor=white)](https://cursor.com/en/install-mcp?name=threesmith&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsInRocmVlc21pdGgiLCJtY3AiXX0%3D)
-[![Add to Claude Code](https://img.shields.io/badge/Claude_Code-Add_plugin-D97757)](#install-in-your-agent)
-
-**Checks the three.js code your coding agent writes, runs the page headless, and gives the agent the tools to fix it.**
-MCP server, CLI and Claude Code plugin. Works with Claude Code, Codex, Cursor, VS Code, Gemini CLI and any MCP client.
+<p align="center">
+  <img src="docs/logo.svg" alt="Threesmith logo" width="72" height="72">
+</p>
+<h1 align="center">Threesmith</h1>
+<p align="center"><b>Checks the three.js code your coding agent writes, runs the page headless, and gives the agent the tools to fix it.</b><br>
+MCP server, CLI and Claude Code plugin. Works with Claude Code, Codex, Cursor, VS Code, Gemini CLI and any MCP client.</p>
+<p align="center">
+  <a href="https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml"><img src="https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/three.js-r187-049ef4?logo=threedotjs&logoColor=white" alt="Tested on three.js r187">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
+  <a href="https://vscode.dev/redirect/mcp/install?name=threesmith&config=%7B%22name%22%3A%22threesmith%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22threesmith%22%2C%22mcp%22%5D%7D"><img src="https://img.shields.io/badge/VS_Code-Install_MCP_server-0098FF?logo=visualstudiocode&logoColor=white" alt="Install in VS Code"></a>
+  <a href="https://cursor.com/en/install-mcp?name=threesmith&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsInRocmVlc21pdGgiLCJtY3AiXX0%3D"><img src="https://img.shields.io/badge/Cursor-Install_MCP_server-000000?logo=cursor&logoColor=white" alt="Install in Cursor"></a>
+  <a href="#install-in-your-agent"><img src="https://img.shields.io/badge/Claude_Code-Add_plugin-D97757" alt="Add to Claude Code"></a>
+</p>
+<p align="center">
+  <a href="https://laaielichter.github.io/Threesmith/">Website</a> ·
+  <a href="https://laaielichter.github.io/Threesmith/install.html">Install in your agent</a> ·
+  <a href="https://laaielichter.github.io/Threesmith/models.html">3D models</a> ·
+  <a href="examples/agent-mistakes">Example</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
+<p align="center">
+  <img src="docs/before-after.jpg" alt="Left: the black canvas of a scene a coding agent wrote. Right: the same scene after the fixes Threesmith listed, a lit crate and a character model" width="860"><br>
+  <sub>Real run on <a href="examples/agent-mistakes">examples/agent-mistakes</a>: as the agent wrote it (3 review errors, 2 asset paths that 404, a black canvas), and after <code>threesmith fix</code> plus the fixes <code>threesmith doctor</code> listed (<a href="examples/agent-mistakes-fixed">100/100, check passes</a>).</sub>
+</p>
 
 three.js ships a release almost every month and removes old APIs. Coding agents learned it from years of code that used
 `THREE.Geometry`, `outputEncoding`, `three/examples/js` and import paths that no longer exist, and they cannot see the
@@ -30,6 +45,11 @@ safe, undoable edits. Everything runs locally; nothing leaves the machine.
 | ships it | builds once, deploys, sees a 404 | `three_build` builds, finds two copies of three, missing assets and sub-path URLs, then opens the built page |
 | needs a 3D model | needs Blender or a placeholder cube | `three_model_build` makes a clean `.glb` from one of 60 kinds, then shows it as text views and lints it |
 | does not know the project | reads twenty files | `three_scan` and `three_doctor` give the map and the order to fix things in one call |
+
+<p align="center">
+  <a href="https://laaielichter.github.io/Threesmith/models.html"><img src="docs/gallery/overview.jpg" alt="Cars, aircraft, boats, buildings, trees and a dragon built by Threesmith and rendered by three.js" width="860"></a><br>
+  <sub>3D models from code, no Blender: 60 ready-made kinds, rendered here by three.js itself. <a href="https://laaielichter.github.io/Threesmith/models.html">See all</a></sub>
+</p>
 
 ## Quickstart
 

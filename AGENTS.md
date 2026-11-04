@@ -61,6 +61,10 @@ node dist/cli.js --help
   `src/doctor/`: `threesmith doctor`.
 - `scripts/sync-version.mjs` copies the package version into the manifests (`test/manifests.test.ts` checks it);
   `scripts/build-mcpb.mjs` builds the Claude Desktop bundle.
+- `docs/`: the GitHub Pages site. `scripts/site.mjs` fills its terminal blocks with real CLI output on
+  `examples/agent-mistakes`, `scripts/gallery.mjs` renders models with three.js into `docs/gallery/`,
+  `scripts/models-page.py` writes `models.html`, `scripts/og.mjs` renders `og.png`. Keep claims in sync with the README;
+  `test/examples.test.ts` checks the numbers the site states.
 - `bench/`: tasks and a model-free grader. `plugins/threesmith/`: the Claude Code plugin (skill, reviewer agent, hooks); `.claude-plugin/` is its marketplace.
 
 ## Rules for changes

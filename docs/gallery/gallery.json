@@ -1,0 +1,146 @@
+[
+ {
+  "kind": "car",
+  "summary": "built car.glb: 995 KB, 14,302 triangles, 139 nodes, 2.22 x 1.46 x 4.43 m (x y z), lint 100/100 (checked as vehicle.wheeled.car)",
+  "score": 100,
+  "tris": 28700
+ },
+ {
+  "kind": "truck",
+  "summary": "built truck.glb: 1415 KB, 17,160 triangles, 309 nodes, 3.14 x 3.60 x 8.58 m (x y z), lint 100/100 (checked as vehicle.wheeled.truck)",
+  "score": 100,
+  "tris": 34416
+ },
+ {
+  "kind": "bus",
+  "summary": "built bus.glb: 1112 KB, 13,996 triangles, 246 nodes, 2.91 x 3.42 x 12.32 m (x y z), lint 100/100 (checked as vehicle.wheeled.bus)",
+  "score": 100,
+  "tris": 28088
+ },
+ {
+  "kind": "tractor",
+  "summary": "built tractor.glb: 1430 KB, 15,144 triangles, 325 nodes, 2.57 x 3.27 x 4.81 m (x y z), lint 100/100 (checked as vehicle.wheeled.tractor)",
+  "score": 100,
+  "tris": 30384
+ },
+ {
+  "kind": "helicopter",
+  "summary": "built helicopter.glb: 1276 KB, 19,134 triangles, 130 nodes, 14.00 x 4.22 x 16.60 m (x y z), lint 100/100 (checked as aircraft.rotorcraft.helicopter)",
+  "score": 100,
+  "tris": 38364
+ },
+ {
+  "kind": "airliner",
+  "summary": "built airliner.glb: 1521 KB, 18,142 triangles, 295 nodes, 36.07 x 11.72 x 38.05 m (x y z), lint 100/100 (checked as aircraft.fixed-wing.airliner)",
+  "score": 100,
+  "tris": 36380
+ },
+ {
+  "kind": "fighter",
+  "summary": "built fighter.glb: 760 KB, 10,898 triangles, 90 nodes, 10.97 x 4.51 x 15.68 m (x y z), lint 100/100 (checked as aircraft.fixed-wing.fighter)",
+  "score": 100,
+  "tris": 21892
+ },
+ {
+  "kind": "sailboat",
+  "summary": "built sailboat.glb: 472 KB, 5,650 triangles, 82 nodes, 3.00 x 13.81 x 9.09 m (x y z), lint 100/100 (checked as vessel.sailboat)",
+  "score": 100,
+  "tris": 11396
+ },
+ {
+  "kind": "ship",
+  "summary": "built ship.glb: 1625 KB, 12,586 triangles, 507 nodes, 32.00 x 51.20 x 200.00 m (x y z), lint 99/100 (checked as vessel.ship)",
+  "score": 99,
+  "tris": 25268
+ },
+ {
+  "kind": "train",
+  "summary": "built train.glb: 1059 KB, 14,776 triangles, 182 nodes, 2.97 x 4.45 x 20.46 m (x y z), lint 100/100 (checked as vehicle.rail.train)",
+  "score": 100,
+  "tris": 29648
+ },
+ {
+  "kind": "house",
+  "summary": "built house.glb: 645 KB, 2,088 triangles, 7 nodes, 8.80 x 8.70 x 10.80 m (x y z), lint 100/100 (checked as building.house)",
+  "score": 100,
+  "tris": 4272
+ },
+ {
+  "kind": "church",
+  "summary": "built church.glb: 1214 KB, 6,856 triangles, 364 nodes, 12.57 x 30.00 x 30.85 m (x y z), lint 100/100 (checked as building.church)",
+  "score": 100,
+  "tris": 13808
+ },
+ {
+  "kind": "castle",
+  "summary": "built castle.glb: 1821 KB, 11,476 triangles, 496 nodes, 78.20 x 30.00 x 79.10 m (x y z), lint 100/100 (checked as building.fortification)",
+  "score": 100,
+  "tris": 23048
+ },
+ {
+  "kind": "windmill",
+  "summary": "built windmill.glb: 970 KB, 5,032 triangles, 276 nodes, 16.88 x 28.09 x 10.06 m (x y z), lint 100/100 (checked as building.windmill)",
+  "score": 100,
+  "tris": 10160
+ },
+ {
+  "kind": "wind-turbine",
+  "summary": "built wind-turbine.glb: 402 KB, 4,646 triangles, 35 nodes, 90.17 x 142.00 x 20.88 m (x y z), lint 100/100 (checked as machine.wind-turbine)",
+  "score": 100,
+  "tris": 9388
+ },
+ {
+  "kind": "tree",
+  "summary": "built tree.glb: 973 KB, 8,396 triangles, 48 nodes, 6.30 x 8.81 x 6.16 m (x y z), lint 100/100 (checked as plant.tree.broadleaf)",
+  "score": 100,
+  "tris": 16888
+ },
+ {
+  "kind": "palm",
+  "summary": "built palm.glb: 726 KB, 8,578 triangles, 69 nodes, 8.48 x 11.38 x 10.06 m (x y z), lint 100/100 (checked as plant.tree.palm)",
+  "score": 100,
+  "tris": 17252
+ },
+ {
+  "kind": "conifer",
+  "summary": "built conifer.glb: 936 KB, 8,456 triangles, 87 nodes, 6.17 x 12.02 x 6.03 m (x y z), lint 100/100 (checked as plant.tree.conifer)",
+  "score": 100,
+  "tris": 17008
+ },
+ {
+  "kind": "street-lamp",
+  "summary": "built street-lamp.glb: 226 KB, 2,200 triangles, 10 nodes, 0.60 x 8.17 x 2.45 m (x y z), lint 100/100 (checked as infrastructure.street-lamp)",
+  "score": 100,
+  "tris": 4496
+ },
+ {
+  "kind": "traffic-light",
+  "summary": "built traffic-light.glb: 54 KB, 856 triangles, 7 nodes, 0.36 x 3.24 x 0.39 m (x y z), lint 100/100 (checked as infrastructure.traffic-light)",
+  "score": 100,
+  "tris": 1808
+ },
+ {
+  "kind": "dragon",
+  "summary": "built dragon.glb: 642 KB, 5,604 triangles, 113 nodes, 12.08 x 6.79 x 12.74 m (x y z), lint 100/100 (checked as creature.dragon)",
+  "score": 100,
+  "tris": 11304
+ },
+ {
+  "kind": "rocket",
+  "summary": "built rocket.glb: 411 KB, 5,118 triangles, 34 nodes, 4.46 x 45.00 x 4.46 m (x y z), lint 100/100 (checked as spacecraft.rocket)",
+  "score": 100,
+  "tris": 10332
+ },
+ {
+  "kind": "satellite",
+  "summary": "built satellite.glb: 422 KB, 3,312 triangles, 82 nodes, 15.93 x 3.24 x 5.76 m (x y z), lint 100/100 (checked as spacecraft.satellite)",
+  "score": 100,
+  "tris": 6720
+ },
+ {
+  "kind": "terrain",
+  "summary": "built terrain.glb: 1525 KB, 32,768 triangles, 2 nodes, 256.00 x 25.37 x 256.00 m (x y z), lint 100/100 (checked as world.terrain)",
+  "score": 100,
+  "tris": 65632
+ }
+]

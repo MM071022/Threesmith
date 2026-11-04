@@ -45,6 +45,12 @@ describe("review", () => {
     expect(r.counts.error).toBeGreaterThan(3);
   });
 
+  it("reports renderer.outputEncoding = sRGBEncoding once, not also as a texture encoding", () => {
+    const r = reviewFiles({ "a.js": "import * as THREE from 'three';\nrenderer.outputEncoding = THREE.sRGBEncoding;\ntex.encoding = THREE.sRGBEncoding;\n" });
+    expect(r.findings.filter((f) => f.line === 2).map((f) => f.rule)).toEqual(["output-encoding"]);
+    expect(r.findings.filter((f) => f.line === 3).map((f) => f.rule)).toEqual(["texture-encoding"]);
+  });
+
   it("explains unknown symbols with a suggestion and the right import path", () => {
     const r = reviewFiles({ "main.js": legacy });
     const msgs = r.findings.filter((f) => f.rule === "unknown-symbol").map((f) => f.message + (f.fix ?? ""));
