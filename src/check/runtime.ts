@@ -4,7 +4,7 @@
  *
  * - `window.__threesmith`: the live `scene`, `renderer`, `camera` and `info`, `$(name)` (getObjectByName over the
  *   scenes) and `$$(nameOrTest)` (all matching objects), so watch expressions and claims stay short;
- * - a frame recorder: requestAnimationFrame is wrapped, each frame's interval, script time inside the callbacks,
+ * - a frame recorder: requestAnimationFrame is wrapped, each frame's interval (wall time between frame starts), script time inside the callbacks,
  *   draw calls and triangles of its render() calls, and the program/geometry/texture counts are recorded while on;
  * - a dispose tracker: three registers a 'dispose' listener on a geometry, texture, material or render target when it
  *   first reaches the GPU. Those objects are kept by WeakRef with their type until they dispatch 'dispose', so a
@@ -12,7 +12,7 @@
  */
 export const RUN_INIT = `(() => {
   const w = window;
-  const run = (w.__tsRun = { frame: 0, lastT: -1, cpu: 0, calls: 0, tris: 0, rec: null, tick: null, tickErr: null, nextId: 1, tracked: new Map(), ids: new WeakMap(), patched: false });
+  const run = (w.__tsRun = { frame: 0, lastT: -1, lastNow: -1, cpu: 0, calls: 0, tris: 0, rec: null, tick: null, tickErr: null, nextId: 1, tracked: new Map(), ids: new WeakMap(), patched: false });
   const ts = () => w.__tsScene || { scenes: [], renderers: [], last: null };
   const deref = (list) => { for (const r of list) { const o = r && (r.deref ? r.deref() : r); if (o) return o; } return null; };
   const api = {
@@ -75,14 +75,16 @@ export const RUN_INIT = `(() => {
   };
   w.__threesmith = api;
 
-  const frameEnd = (t) => {
+  // The interval is wall time between the starts of two frames: rAF timestamps in headless Chromium stay on the
+  // 60 Hz grid even when a frame ran long, so they would hide the slow frames.
+  const frameEnd = (now) => {
     const rec = run.rec;
-    if (rec && run.lastT >= 0) {
+    if (rec && run.lastNow >= 0) {
       const r = api.renderer;
       const info = r && r.info;
       const manual = info && info.autoReset === false;
       rec.push([
-        Math.round((t - run.lastT) * 100) / 100,
+        Math.round((now - run.lastNow) * 100) / 100,
         Math.round(run.cpu * 100) / 100,
         manual ? (info.render.calls || 0) : run.calls,
         manual ? (info.render.triangles || 0) : run.tris,
@@ -96,8 +98,10 @@ export const RUN_INIT = `(() => {
   const raf = w.requestAnimationFrame.bind(w);
   w.requestAnimationFrame = (cb) => raf((t) => {
     if (t !== run.lastT) {
-      frameEnd(t);
+      const now = performance.now();
+      frameEnd(now);
       run.lastT = t;
+      run.lastNow = now;
       run.frame++;
       if (run.tick) { try { run.tick(); } catch (e) { run.tickErr = String(e); } }
     }
