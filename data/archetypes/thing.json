@@ -56,7 +56,7 @@
   "parts": [
    {
     "name": "Base",
-    "role": "body",
+    "role": "base",
     "required": true,
     "count": 1,
     "aliases": [

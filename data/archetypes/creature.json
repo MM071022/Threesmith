@@ -1006,5 +1006,105 @@
   "pitfalls": [
    "A fin built as a flat single-sided plane vanishes from behind: give it thickness or a double-sided material."
   ]
+ },
+ {
+  "id": "creature.humanoid.golem",
+  "name": "golem",
+  "description": "A golem: a huge humanoid of stone (or clay, iron, wood) made of heavy blocks, with long arms, short thick legs, a small head and often glowing eyes or runes.",
+  "aliases": [
+   "golem",
+   "stone golem",
+   "stenen golem",
+   "steengolem",
+   "rock golem",
+   "rotsgolem",
+   "clay golem",
+   "kleigolem",
+   "iron golem",
+   "stone giant",
+   "steenreus"
+  ],
+  "extends": "creature.humanoid",
+  "hints": [
+   "stone",
+   "steen",
+   "rock",
+   "rots",
+   "runes",
+   "runen",
+   "glowing eyes",
+   "gloeiende ogen",
+   "boulders",
+   "construct"
+  ],
+  "parts": [
+   {
+    "name": "Rune",
+    "role": "decoration",
+    "required": false,
+    "aliases": [
+     "rune",
+     "runes",
+     "rune glow",
+     "runen",
+     "glyph",
+     "sigil"
+    ],
+    "note": "Carved symbols, often emissive."
+   },
+   {
+    "name": "Crystal",
+    "role": "crystal",
+    "required": false,
+    "aliases": [
+     "crystal",
+     "crystals",
+     "kristal",
+     "kristallen"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    1,
+    5
+   ],
+   "height": [
+    1.5,
+    8
+   ],
+   "source": "fiction: golems have no real size; games and films show them from about 2 m to several storeys, so this wide range only catches unit mistakes",
+   "confidence": "X"
+  },
+  "variants": [
+   {
+    "axis": "material",
+    "options": [
+     "stone",
+     "clay",
+     "iron",
+     "crystal",
+     "wood"
+    ]
+   },
+   {
+    "axis": "glow",
+    "options": [
+     "dormant",
+     "awake"
+    ]
+   }
+  ],
+  "conventions": [
+   "Its arms are long enough that the fists hang near the knees; the head sits low between the shoulders."
+  ],
+  "anticipate": [
+   "A heavy, slow walk cycle: rotate the legs at the hip and the knees, sway the torso.",
+   "An emissive bloom pass so the eyes and runes read as glowing."
+  ],
+  "pitfalls": [
+   "Human proportions make it a man in armour: a golem is wider than tall in the chest, with a small head.",
+   "Floating blocks: every block must overlap its neighbour at the joints."
+  ]
  }
 ]
