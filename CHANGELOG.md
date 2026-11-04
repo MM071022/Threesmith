@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
+
+The first release on npm since 0.1.0: it holds everything below, 0.2.0 included.
 
 - **50 new ready-made 3D models, 110 in all**, each an adjustable blueprint with 5 to 12 parameters (sizes, counts,
   styles, optional parts, colours, seeds) and pivots on the parts that move, linting 100/100 against what it should be:
@@ -21,7 +23,7 @@
   `.threesmith/.gitignore`), lesson placeholders are removed until none is left, Markdown escaping in the CI receipt
   escapes backslashes too, and the import-map rule reads `</script >` in any case.
 
-## 0.2.0
+## 0.2.0 (not published on npm; ships in 0.3.0)
 
 The agent-first toolkit of Godotwright (the same project for Godot), ported to three.js and extended with what coding
 agents get wrong in three.js.
