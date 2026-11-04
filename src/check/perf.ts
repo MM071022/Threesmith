@@ -180,11 +180,15 @@ export function summarize(frames: FrameRecord[], o: { budget?: PerfBudget; previ
     return { f, i, t: Math.round(t) };
   });
   const median = summary.frame.p50;
-  const slowest: SlowFrame[] = timed
+  // The slow frames with a known cause (shader compiles, GPU uploads) always make the list, even when a busy machine
+  // makes other frames slower for no reason in the page: those are the frames a fix can change.
+  const slow = timed
     .filter((x) => x.f[0] > Math.max(median * 1.3, median + 4))
-    .sort((a, b) => b.f[0] - a.f[0])
-    .slice(0, 5)
-    .map((x) => ({ frame: x.i, t: x.t, ms: x.f[0], scriptMs: x.f[1], calls: x.f[2], triangles: x.f[3], cause: causeOf(frames, x.i, usualCalls) }));
+    .map((x) => ({ ...x, cause: causeOf(frames, x.i, usualCalls) }))
+    .sort((a, b) => b.f[0] - a.f[0]);
+  const known = slow.filter((x) => /shader program|uploaded/.test(x.cause)).slice(0, 2);
+  const picked = [...known, ...slow.filter((x) => !known.includes(x))].slice(0, 5).sort((a, b) => b.f[0] - a.f[0]);
+  const slowest: SlowFrame[] = picked.map((x) => ({ frame: x.i, t: x.t, ms: x.f[0], scriptMs: x.f[1], calls: x.f[2], triangles: x.f[3], cause: x.cause }));
   const b = o.budget ?? {};
   const actual: Record<keyof PerfBudget, number> = {
     frameMs: summary.frame.p95,
