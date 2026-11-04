@@ -756,5 +756,201 @@
   "pitfalls": [
    "A flat front without the stepped side profile reads as a fridge, not an arcade cabinet."
   ]
+ },
+ {
+  "id": "machine.mech",
+  "name": "mech walker",
+  "description": "A piloted bipedal walking machine: a cockpit in an armoured torso that turns on the pelvis, two legs with hip, knee and ankle joints, and arms or weapon mounts.",
+  "aliases": [
+   "mech",
+   "mecha",
+   "mech walker",
+   "battle mech",
+   "battlemech",
+   "bipedal mech",
+   "walking mech",
+   "loopmachine",
+   "gevechtsmech",
+   "walker"
+  ],
+  "extends": "machine",
+  "hints": [
+   "cockpit",
+   "pilot",
+   "piloot",
+   "legs",
+   "missiles",
+   "raketten",
+   "sci-fi",
+   "scifi",
+   "robot",
+   "walking",
+   "lopen",
+   "armour",
+   "pantser"
+  ],
+  "parts": [
+   {
+    "name": "Torso",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "torso",
+     "body",
+     "hull",
+     "romp"
+    ],
+    "note": "Turns on the pelvis about the vertical axis (torso twist)."
+   },
+   {
+    "name": "Cockpit",
+    "role": "cabin",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "cockpit",
+     "canopy",
+     "cabin",
+     "cabine"
+    ]
+   },
+   {
+    "name": "Pelvis",
+    "role": "hip structure",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "pelvis",
+     "bekken",
+     "waist"
+    ]
+   },
+   {
+    "name": "Leg",
+    "role": "leg",
+    "required": true,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "leg",
+     "legs",
+     "been",
+     "benen"
+    ],
+    "note": "Pivot on the hip axis; knee and ankle are nodes inside it."
+   },
+   {
+    "name": "Arm",
+    "role": "arm",
+    "required": true,
+    "count": [
+     2,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "arm",
+     "arms",
+     "armen",
+     "gun arm"
+    ],
+    "note": "Pivot on the shoulder axis."
+   },
+   {
+    "name": "Foot",
+    "role": "foot",
+    "required": false,
+    "count": 2,
+    "aliases": [
+     "foot",
+     "feet",
+     "voet",
+     "voeten"
+    ]
+   },
+   {
+    "name": "WeaponPod",
+    "role": "weapon",
+    "required": false,
+    "count": [
+     0,
+     4
+    ],
+    "aliases": [
+     "weapon pod",
+     "missile pod",
+     "missile rack",
+     "launcher",
+     "raketwerper"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    2,
+    7
+   ],
+   "width": [
+    2.5,
+    9
+   ],
+   "height": [
+    3.5,
+    16
+   ],
+   "source": "manufacturer data for real piloted walkers: Kuratas about 4 m (Suidobashi Heavy Industry), MegaBots Eagle Prime 4.6 m, Mononofu 8.5 m (Sakakibara Kikai); game and anime mechs mostly 8-18 m (the RX-78-2 statue in Odaiba is 18 m)",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "legs",
+    "options": [
+     "humanoid",
+     "digitigrade (reverse joint)"
+    ]
+   },
+   {
+    "axis": "arms",
+    "options": [
+     "hands",
+     "gun arms",
+     "none"
+    ]
+   }
+  ],
+  "conventions": [
+   "The cockpit faces +Z and the feet stand on y = 0; every joint (torso twist, shoulders, hips, knees, ankles) is a node with its pivot on the joint axis."
+  ],
+  "anticipate": [
+   "Muzzle and missile-tube markers for effects.",
+   "A walk cycle needs the knee and ankle nodes; keep the feet flat at rest."
+  ],
+  "pitfalls": [
+   "Legs modelled straight in one mesh cannot walk: the knee and ankle need their own nodes.",
+   "A torso that does not overlap the pelvis leaves a gap at the twist joint."
+  ]
  }
 ]
