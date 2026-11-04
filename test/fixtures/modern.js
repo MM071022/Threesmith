@@ -23,6 +23,11 @@ const mesh = new THREE.Mesh( geometry, material );
 mesh.castShadow = true;
 scene.add( mesh );
 
+const ground = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), material );
+ground.rotation.x = - Math.PI / 2;
+ground.receiveShadow = true;
+scene.add( ground );
+
 const timer = new THREE.Timer();
 const _v = new THREE.Vector3();
 
