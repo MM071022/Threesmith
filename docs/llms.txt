@@ -1,11 +1,17 @@
 # Threesmith
 
-> MCP server and CLI that makes coding agents better at three.js: the exact API of the installed three version, a scored review of outdated or broken code, and a headless WebGL check with screenshots.
+> MCP server, CLI and Claude Code plugin that makes coding agents better at three.js: the exact API of the installed three version, a scored review pinned to it, asset and decoder checks, the page run headless with the live scene read back, behaviour proven with steps and claims, draw-call and leak measurements, build checks, and 3D models built without Blender.
 
-- Install: `claude mcp add threesmith -- npx -y threesmith mcp` (Node 22.12+; three must be installed in the project)
-- Tools: three_api (exact API of the installed version), three_search, three_review (score 0-100, file:line findings with fixes), three_check (headless Chromium, console errors, blank frames, screenshot, baselines, interaction steps), three_inspect (live scene graph, why objects are invisible, GPU leaks), three_explain (cause and fix of runtime errors), three_fix, three_version
-- CLI: threesmith api | search | review | fix | check | inspect | explain | ci | doctor | mcp
-- GitHub Action: laaielichter/Threesmith (review receipt on pull requests, optional headless check and screenshot baseline)
+- Install: `claude mcp add threesmith -- npx -y threesmith mcp` (Node 22.12+; three must be installed in the project). Claude Code plugin: `/plugin marketplace add laaielichter/Threesmith`, then `/plugin install threesmith@threesmith`.
+- Start: three_doctor (what is wrong, in which order), three_scan (project map)
+- Code: three_api, three_search, three_review (97 rules, score 0-100, code+file for unsaved code, only_new for fix loops), three_types (tsc with three.js answers), three_fix (pure renames, undoable), three_explain, three_lessons, three_lesson_add, three_rules, three_feedback, three_undo, three_version
+- Run: three_check (headless Chromium, errors with causes, blank frames, screenshot, baselines), three_inspect (why objects are not visible), three_play (steps, watch, claims), three_scenario (regression tests), three_perf (draw calls, triangles, budgets), three_leaks (what grows per cycle)
+- Live: three_session, three_page (a page kept open between calls: eval against the live scene, steps, screenshots)
+- Build: three_assets (paths, case, decoders), three_build (bundle check and the built page headless)
+- Models: three_model_brief, three_model_identify, three_model_spec, three_model_build, three_model_view, three_model_lint, three_model_inspect
+- Options: --tier cheap|premium, --tools core,run,live,build,model, --read-only
+- CLI: threesmith doctor | scan | api | search | review | types | fix | rules | undo | lessons | assets | check | inspect | play | scenario | perf | leaks | build | model | explain | ci | mcp
+- GitHub Action: laaielichter/Threesmith (receipt on pull requests: review, headless check, scenarios)
 - Privacy: nothing leaves the machine, no telemetry
 - Source: https://github.com/laaielichter/Threesmith
 - Agent install guide: https://github.com/laaielichter/Threesmith/blob/main/llms-install.md

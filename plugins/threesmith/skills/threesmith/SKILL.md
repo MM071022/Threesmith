@@ -1,35 +1,41 @@
 ---
 name: threesmith
-description: Use when writing, changing or debugging three.js code. Looks up the exact API of the installed three version, reviews code for outdated or broken patterns, and checks the page in headless Chromium. Prevents the classic mistakes: removed APIs (Geometry, outputEncoding), wrong import paths, black scenes, shadows that never draw, per-frame allocations.
+description: Use when writing, changing, debugging or shipping three.js or react-three-fiber code. Looks up the exact API of the installed three version, reviews code against it, checks the assets and decoders the code loads, opens the page in headless Chromium and reads the live scene, proves behaviour with steps and claims, measures draw calls and leaks, and builds 3D models without Blender. Prevents the classic mistakes: removed APIs, wrong import paths, black scenes, 404 models, shaders that no longer compile, per-frame allocations.
 ---
 
 # Threesmith for three.js
 
-three.js changes every month. Do not write API calls from memory; check them against the installed version.
+three.js changes every month and your memory holds old versions of it. Check every API against the installed release,
+and look at the page before you say it works.
 
 ## Workflow
 
-1. **Before writing code that uses an API you are not sure of**, call `three_api` (CLI: `threesmith api <Name>` or
-   `<Class.member>`). It reads the installed three, so the answer is right for this project. Use `three_search` to find
-   a name. If a name is "not exported", it does not exist in this version: do not invent it.
-2. **After writing or changing three.js code**, call `three_review` (CLI: `threesmith review`). Fix every error first,
-   `three_fix` applies the pure renames (dry run unless `write`); then fix the rest by hand, then the warnings that apply. Do not silence a rule to get a better score; if a finding is wrong, say so.
-3. **Before saying a scene works**, call `three_check` on the folder with the page (CLI: `threesmith check <folder>`).
-   It reports console errors, missing canvas or WebGL context, blank frames and returns a screenshot. Look at the
-   screenshot. Use `baseline` to catch visual regressions after a change, and `steps` (click, press, drag, wheel) to reach a state that only shows after an interaction.
-
-4. **When a scene is black, empty, stretched or wrong**, call `three_inspect` before guessing. It reads the running
-   scene and says per object why it is not visible (no light, camera inside or pointed away, beyond `far`, zero scale,
-   NaN, invisible material, layers), and whether GPU memory keeps growing.
-5. **When an error appears** (console, build, test), call `three_explain` with the full message. Shader errors from
-   `three_check` already name the file and line in the project.
+1. **New project or broken scene:** `three_doctor` first (what is wrong, in which order), `three_scan` for the map
+   (stack, pages, files that use three, renderer settings, assets).
+2. **Before writing code that uses an API you are not sure of:** `three_api` (it reads `node_modules/three`), or
+   `three_search` to find a name. "Not exported" means it does not exist in this release: do not invent it.
+3. **Before saving new code:** `three_review` with `code` + `file`. **After every edit:** `three_review` with
+   `only_new: true`, and in TypeScript `three_types`. Fix errors first; `three_fix` does the pure renames (dry run,
+   then `write: true`; `three_undo` if needed). A verified false alarm goes to `three_feedback`.
+4. **Loading models or textures:** `three_assets`: every path must resolve with exact capitals, and Draco, meshopt or
+   KTX2 files need their decoder set up on the GLTFLoader. `three_model_inspect` says what a `.glb` needs.
+5. **Before saying it works:** `three_check` on the page (a folder with `index.html` or the dev server URL) and look at
+   the screenshot. Black, empty or wrong: `three_inspect` says why per object.
+6. **Proving behaviour:** `three_play` with `steps`, `watch` and `expect`; keep a passing run with `three_scenario`
+   op save. For a state that is slow to reach, `three_session` once and `three_page` to drive it.
+7. **Errors you do not understand:** `three_explain` with the message as printed, `three_lessons` with it as `error`.
+   When a fix took more than one try, `three_lesson_add`.
+8. **Speed and memory:** `three_perf` before and after a change; `three_leaks` with the steps of one cycle.
+9. **Before deploying:** `three_build`.
+10. **3D models:** `three_model_brief`, `three_model_build`, `three_model_view` (text views), `three_model_lint`.
 
 ## Rules of thumb
 
-- Import addons from `three/addons/...`, not `three/examples/jsm/...`. `OrbitControls`, `GLTFLoader` etc. are not in `three`.
-- `WebGPURenderer` and node materials come from `three/webgpu`, and need `await renderer.init()` (or `setAnimationLoop`).
-- Color textures need `texture.colorSpace = THREE.SRGBColorSpace`. `outputEncoding` and `*Encoding` are gone.
-- Shadows need `renderer.shadowMap.enabled = true`, a light with `castShadow`, and meshes with `castShadow`/`receiveShadow`.
-- Never `new` a Vector3/Matrix4/geometry/material inside the animation loop. Call `dispose()` on what you remove.
+- Import addons from `three/addons/...` (with `.js`). `OrbitControls`, `GLTFLoader` and friends are not in `three`.
+- `WebGPURenderer` and node materials come from `three/webgpu`, TSL from `three/tsl`; `ShaderMaterial` and
+  `onBeforeCompile` do not work under WebGPU.
+- Colour textures need `texture.colorSpace = THREE.SRGBColorSpace`; with EffectComposer, end with an `OutputPass`.
+- Shadows need `renderer.shadowMap.enabled = true`, a light with `castShadow`, casters and receivers.
+- Add `gltf.scene`, not `gltf`. Await the loader before using the model.
+- Never `new` a Vector3, geometry or material inside the loop; `dispose()` what you remove.
 - After changing `camera.aspect`, call `camera.updateProjectionMatrix()`.
-- WebGPU in the headless check is best effort. WebGL 2 is the reliable path.

@@ -1,7 +1,7 @@
 {
   "name": "threesmith",
   "version": "0.1.0",
-  "description": "Makes Claude Code better at three.js: the exact API of the installed three version, a scored review of outdated or broken code, and a headless WebGL check with screenshots. Reviews every three.js file Claude edits.",
+  "description": "Makes Claude Code better at three.js: the API of your installed three version, a scored review pinned to it (97 rules incl. shaders and R3F), asset and decoder checks, the page run headless with the live scene read back, play with claims, perf and leak checks, build checks, and 3D models built without Blender. Reviews every three.js file Claude edits, with skills for debugging, performance, upgrades, shipping and models.",
   "author": {
     "name": "laaielichter",
     "url": "https://github.com/laaielichter"
