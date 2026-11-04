@@ -81,7 +81,6 @@ brief of the project.
 | **Codex** | `codex mcp add threesmith -- npx -y threesmith mcp --tier premium` |
 | **Cursor, VS Code** | the buttons at the top |
 | **Gemini CLI** | `gemini extensions install https://github.com/laaielichter/Threesmith` |
-| **Claude Desktop** | `npm run build:mcpb` makes `build/threesmith.mcpb` (attached to releases) |
 | **Cline and others** | [llms-install.md](llms-install.md), or `{ "mcpServers": { "threesmith": { "command": "npx", "args": ["-y", "threesmith", "mcp"] } } }` |
 | **Docker** | `Dockerfile` |
 

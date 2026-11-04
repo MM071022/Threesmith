@@ -19,7 +19,7 @@ No bought stars, no upvote requests, no alt accounts, and "I built this" in ever
 ## Readiness gate
 
 - [x] Real demo (before/after of a real run, real terminal output on the site)
-- [x] Copy-paste quickstart and one-step installs (plugin, Cursor, VS Code, Codex, Gemini CLI, `.mcpb`)
+- [x] Copy-paste quickstart and one-step installs (npx MCP server, Claude Code plugin, Cursor, VS Code, Codex, Gemini CLI)
 - [x] Social preview image (`docs/og.png`); upload it by hand (below)
 - [ ] First release on npm (the plugin, the Gemini extension and the bundle start `threesmith@<version>`)
 - [ ] 3-5 good first issues (drafts below)
