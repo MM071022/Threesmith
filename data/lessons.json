@@ -1,0 +1,979 @@
+{
+  "version": 1,
+  "lessons": [
+    {
+      "id": "rendering/lit-material-no-light",
+      "topic": "rendering",
+      "title": "Lit materials render black without a light or an environment",
+      "symptom": "The mesh is there (it hides the background) but it is pure black.",
+      "cause": "MeshStandardMaterial, MeshPhysicalMaterial, MeshLambertMaterial and MeshPhongMaterial only reflect light. With no light and no scene.environment there is nothing to reflect.",
+      "fix": "Add a HemisphereLight plus a DirectionalLight, or set scene.environment from a RoomEnvironment through PMREMGenerator. Use MeshBasicMaterial only for things that should ignore light.",
+      "rules": ["no-lights"],
+      "test": "Swap the material for MeshNormalMaterial: if the shape shows, the scene is fine and only light is missing.",
+      "tags": ["black screen", "black mesh", "no light", "dark", "standard material", "environment"]
+    },
+    {
+      "id": "rendering/camera-inside-object",
+      "topic": "rendering",
+      "title": "A camera left at the origin sits inside the model and sees nothing",
+      "symptom": "Blank canvas, or only the background, even though the scene has a mesh at the origin.",
+      "cause": "Cameras start at position 0, 0, 0 looking down negative Z. A mesh at the origin then surrounds the camera, and its faces point away from it, so they are culled.",
+      "fix": "Move the camera back (camera.position.set(0, 1, 5)) and call camera.lookAt(0, 0, 0), or frame the model with its Box3 size.",
+      "test": "Log camera.position and the model's Box3; the camera should be outside the box, at a distance of about twice its size.",
+      "tags": ["black screen", "blank", "camera position", "lookat", "nothing visible"]
+    },
+    {
+      "id": "rendering/canvas-zero-size",
+      "topic": "rendering",
+      "title": "A container without a height gives a canvas of 0 pixels",
+      "symptom": "Nothing shows and no error is printed; the canvas element exists but has a height of 0, or a fixed 300 by 150.",
+      "cause": "renderer.setSize(container.clientWidth, container.clientHeight) ran while the container had no CSS height (a div grows only with its content), or before it was laid out.",
+      "fix": "Give html, body and the container a height (100% or 100vh), size the renderer from the container in a ResizeObserver, and call setSize again when it changes. The R3F Canvas fills its parent the same way, so that parent needs a height too.",
+      "test": "In the browser console, read renderer.domElement.width and height: both must be above 0.",
+      "tags": ["blank", "canvas size", "height", "css", "layout", "resize", "r3f canvas"]
+    },
+    {
+      "id": "rendering/canvas-not-attached",
+      "topic": "rendering",
+      "title": "The renderer draws into a canvas that is never put on the page",
+      "symptom": "No error, no picture: the page shows only its HTML.",
+      "cause": "WebGLRenderer creates its own canvas element. Unless renderer.domElement is appended to the document, or an existing canvas is passed in the options, it stays off screen.",
+      "fix": "Append renderer.domElement to the container, or pass the canvas of the page as the canvas option.",
+      "rules": ["renderer-not-attached"],
+      "tags": ["blank", "canvas", "dom element", "append", "nothing shows"]
+    },
+    {
+      "id": "rendering/render-once-before-load",
+      "topic": "rendering",
+      "title": "Rendering once before an async load leaves the old frame on screen",
+      "symptom": "The model or texture loads (the network tab shows it) but never appears until the window is resized.",
+      "cause": "The code renders one frame right away and has no animation loop. Loaders finish later, and nothing draws a frame after that.",
+      "fix": "Use renderer.setAnimationLoop, or render again in the load callback and on every control change when you render on demand.",
+      "rules": ["never-renders"],
+      "tags": ["render on demand", "not showing", "loaded but invisible", "texture black", "async"]
+    },
+    {
+      "id": "rendering/render-argument-order",
+      "topic": "rendering",
+      "title": "renderer.render takes the scene first and the camera second",
+      "symptom": "Nothing is drawn and the console says the camera is not an instance of THREE.Camera.",
+      "cause": "The arguments were swapped: renderer.render(camera, scene).",
+      "fix": "Call renderer.render(scene, camera).",
+      "tags": ["render", "arguments", "camera", "scene", "order"],
+      "errors": ["camera is not an instance of THREE.Camera"]
+    },
+    {
+      "id": "rendering/near-plane-zero",
+      "topic": "rendering",
+      "title": "A near plane of 0 breaks the depth buffer",
+      "symptom": "Flickering surfaces, objects showing through each other, or nothing at all.",
+      "cause": "Depth precision depends on the ratio of far to near. With near at 0 the ratio is infinite and every depth collapses to the same value.",
+      "fix": "Use near 0.1 (or as large as the scene allows) and a far that just fits the scene. Big worlds can turn on logarithmicDepthBuffer in the renderer options.",
+      "rules": ["camera-near-zero"],
+      "tags": ["z-fighting", "flicker", "depth", "near", "far", "camera"]
+    },
+    {
+      "id": "rendering/z-fighting",
+      "topic": "rendering",
+      "title": "Two faces at the same depth flicker against each other",
+      "symptom": "Stripes or moving patterns where a decal, a road or a floor lies on another surface, worse when the camera moves away.",
+      "cause": "Both faces write nearly the same depth, so rounding decides which one wins per pixel. A far plane much larger than the scene makes it worse.",
+      "fix": "Lift the top surface a little, or set polygonOffset with polygonOffsetFactor -1 on its material. Bring far down to what the scene needs, and raise near.",
+      "tags": ["z-fighting", "flicker", "decal", "coplanar", "polygon offset", "depth"]
+    },
+    {
+      "id": "rendering/resize-stretched",
+      "topic": "rendering",
+      "title": "After a resize the picture is stretched until the projection is updated",
+      "symptom": "Circles look like ovals, or the scene looks squashed after the window or the panel changes size.",
+      "cause": "camera.aspect changed but the projection matrix was not rebuilt, or nothing listens for the resize at all.",
+      "fix": "On resize: set camera.aspect, call camera.updateProjectionMatrix() and renderer.setSize() with the new size. Use a ResizeObserver on the container when the canvas is not full screen.",
+      "rules": ["resize-no-projection", "no-resize-handling"],
+      "tags": ["resize", "stretched", "aspect", "squashed", "projection matrix"]
+    },
+    {
+      "id": "rendering/context-lost",
+      "topic": "rendering",
+      "title": "Every new renderer takes a WebGL context, and the browser drops the oldest",
+      "symptom": "After a few route changes or hot reloads the canvas goes black, and the console shows a lost context.",
+      "cause": "Browsers allow only a handful of WebGL contexts per page (about 16 in Chrome). Creating a renderer per component or per reload and never releasing it uses them up. A GPU reset loses the context too.",
+      "fix": "Keep one renderer for the page. When a view unmounts, call renderer.setAnimationLoop(null), renderer.dispose() and renderer.forceContextLoss(). Handle webglcontextlost with event.preventDefault() if the page should recover.",
+      "tags": ["context lost", "black", "webgl context", "hot reload", "spa", "unmount"],
+      "errors": ["Context Lost", "Too many active WebGL contexts", "CONTEXT_LOST_WEBGL"]
+    },
+    {
+      "id": "rendering/context-create-failed",
+      "topic": "rendering",
+      "title": "WebGL 2 must be available: WebGLRenderer dropped WebGL 1 in r163",
+      "symptom": "The renderer throws while being created, on an old device, in a VM, or when hardware acceleration is off.",
+      "cause": "The browser cannot give a WebGL 2 context: no GPU driver, the GPU is blocklisted, or the context attributes asked for are not supported. Since r163 WebGLRenderer does not fall back to WebGL 1.",
+      "fix": "Catch the error and show a message instead of a blank page. Ask the user to turn on hardware acceleration; for headless tests start Chromium with SwiftShader (threesmith check does this).",
+      "tags": ["webgl2", "webgl1", "context", "hardware acceleration", "headless", "error creating"],
+      "errors": ["Error creating WebGL context", "A WebGL context could not be created"]
+    },
+    {
+      "id": "rendering/transparent-sorting",
+      "topic": "rendering",
+      "title": "Transparent objects hide each other in the wrong order",
+      "symptom": "Glass, particles or a see-through mesh makes the objects behind it vanish, or the order pops as the camera turns.",
+      "cause": "Transparent objects are sorted per object by distance, not per pixel, and by default they still write depth, so whatever draws first blocks what is behind it.",
+      "fix": "Set depthWrite false on transparent materials, give fixed layers a renderOrder, and split big transparent meshes into parts that sort well.",
+      "tags": ["transparent", "transparency", "sorting", "depthwrite", "render order", "glass", "particles"]
+    },
+    {
+      "id": "rendering/alpha-cutout",
+      "topic": "rendering",
+      "title": "Use alphaTest, not transparent, for leaves, fences and hair cards",
+      "symptom": "Leaves or a fence texture show dark or white boxes around the shapes, or parts of the tree vanish behind other leaves.",
+      "cause": "A cutout texture drawn as transparent blends and sorts badly; the clear parts of the texture still write depth.",
+      "fix": "Set alphaTest to 0.5 and leave transparent false. For softer edges with MSAA, use alphaToCoverage.",
+      "tags": ["alpha test", "cutout", "foliage", "leaves", "transparent", "halo"]
+    },
+    {
+      "id": "rendering/plane-faces-one-way",
+      "topic": "rendering",
+      "title": "A plane is visible from one side only, and PlaneGeometry stands upright",
+      "symptom": "The floor is missing, or it shows from below but not from above, or it stands like a wall.",
+      "cause": "PlaneGeometry lies in the XY plane facing +Z, and materials draw only front faces.",
+      "fix": "For a floor, rotate it with rotation.x set to -Math.PI / 2. Use side DoubleSide only when both sides must show.",
+      "tags": ["plane", "floor", "ground", "backface", "double side", "rotation"]
+    },
+    {
+      "id": "rendering/line-width-ignored",
+      "topic": "rendering",
+      "title": "linewidth has no effect on lines with WebGL",
+      "symptom": "Lines stay 1 pixel wide whatever linewidth is set to.",
+      "cause": "WebGL implementations draw lines at 1 pixel; LineBasicMaterial cannot change that.",
+      "fix": "Use Line2 with LineGeometry and LineMaterial from three/addons/lines/ for wide lines, or build thin meshes (tubes or ribbons).",
+      "tags": ["line", "linewidth", "thick lines", "line2", "wireframe"]
+    },
+    {
+      "id": "rendering/feedback-loop",
+      "topic": "rendering",
+      "title": "Do not sample a render target while rendering into it",
+      "symptom": "A mirror, a portal or a post effect goes black, and the console fills with feedback loop warnings.",
+      "cause": "A mesh in the scene uses the render target's texture while that same target is being drawn.",
+      "fix": "Hide the mesh that shows the texture while you render into the target, or use two render targets and swap them each frame.",
+      "tags": ["render target", "feedback loop", "mirror", "portal", "ping pong", "post processing"],
+      "errors": ["Feedback loop formed between Framebuffer and active Texture"]
+    },
+    {
+      "id": "color/srgb-color-textures",
+      "topic": "color",
+      "title": "Color textures need colorSpace set to SRGBColorSpace",
+      "symptom": "Textures look washed out and pale, or darker and more saturated than the image file.",
+      "cause": "TextureLoader gives textures NoColorSpace, so three treats the sRGB pixels of a photo or a painted map as linear values. GLTFLoader sets it for you; your own TextureLoader code does not.",
+      "fix": "Set texture.colorSpace = THREE.SRGBColorSpace on map, emissiveMap and other color maps, and on CanvasTexture and VideoTexture that show color.",
+      "rules": ["texture-colorspace-missing"],
+      "test": "Show the texture on a MeshBasicMaterial plane next to the image in an img tag: the colors must match.",
+      "tags": ["washed out", "pale", "colorspace", "srgb", "texture colors", "gamma", "faded"]
+    },
+    {
+      "id": "color/data-textures-linear",
+      "topic": "color",
+      "title": "Normal, roughness, metalness and AO maps stay linear",
+      "symptom": "Lighting on a textured model looks wrong: bumps point the wrong way, surfaces are too shiny or too rough.",
+      "cause": "Data maps hold numbers, not colors. Marking them SRGBColorSpace makes three convert them, which changes the values.",
+      "fix": "Leave normalMap, roughnessMap, metalnessMap, aoMap, displacementMap and alphaMap at NoColorSpace; only color maps get SRGBColorSpace.",
+      "tags": ["normal map", "roughness", "metalness", "colorspace", "data texture", "linear"]
+    },
+    {
+      "id": "color/output-encoding-removed",
+      "topic": "color",
+      "title": "outputEncoding and texture encoding were replaced by color spaces in r152",
+      "symptom": "Code from an old tutorial sets renderer.outputEncoding or texture.encoding, which does nothing now, and the import of sRGBEncoding fails.",
+      "cause": "r152 replaced outputEncoding with outputColorSpace and Texture.encoding with Texture.colorSpace, and turned ColorManagement on by default.",
+      "fix": "Delete renderer.outputEncoding (sRGB output is the default) and replace texture.encoding with texture.colorSpace = THREE.SRGBColorSpace.",
+      "rules": ["output-encoding", "texture-encoding", "gamma-output"],
+      "tags": ["outputencoding", "srgbencoding", "encoding", "colorspace", "old tutorial", "migration"],
+      "errors": ["export named 'sRGBEncoding'", "export named 'LinearEncoding'"]
+    },
+    {
+      "id": "color/color-management-off",
+      "topic": "color",
+      "title": "Leave ColorManagement on so hex colors match the design",
+      "symptom": "Material colors set from hex values look different from the same colors in CSS, and lighting looks harsh.",
+      "cause": "With ColorManagement turned off, three treats hex colors as linear values and skips the sRGB conversion, so colors and light falloff are wrong.",
+      "fix": "Remove ColorManagement.enabled = false. Write colors as hex or CSS strings; three converts them from sRGB.",
+      "rules": ["color-management-off"],
+      "tags": ["color management", "hex", "css colors", "colors wrong", "srgb"]
+    },
+    {
+      "id": "color/tone-mapping-dull",
+      "topic": "color",
+      "title": "Tone mapping changes flat colors, so UI and brand colors look dull",
+      "symptom": "A logo, a flat colored panel or a pure white looks greyish or shifted in hue.",
+      "cause": "ACESFilmicToneMapping and AgXToneMapping compress bright values and shift hues. That suits lit scenes, not colors that must be exact.",
+      "fix": "Set toneMapped false on materials that must keep their color, or use NeutralToneMapping, or NoToneMapping when nothing is lit.",
+      "tags": ["tone mapping", "aces", "agx", "neutral", "dull", "white looks grey", "brand color"]
+    },
+    {
+      "id": "color/double-gamma-postprocessing",
+      "topic": "color",
+      "title": "With EffectComposer, OutputPass does the color space and tone mapping, once",
+      "symptom": "With post processing the scene is too dark, or too bright and washed out.",
+      "cause": "The composer renders into linear render targets, so the conversion to sRGB and tone mapping have to happen in a final pass. Old code adds a gamma correction pass as well, which converts twice.",
+      "fix": "Add OutputPass from three/addons/postprocessing/OutputPass.js as the last pass and remove any gamma correction pass.",
+      "tags": ["post processing", "effect composer", "output pass", "gamma", "too dark", "washed out", "bloom"]
+    },
+    {
+      "id": "color/color-assign-number",
+      "topic": "color",
+      "title": "Set a material color with color.set(), not by assigning a number",
+      "symptom": "Changing a color at runtime does nothing or throws.",
+      "cause": "material.color is a Color object. Assigning 0xff0000 to it replaces the object with a number that the renderer cannot read.",
+      "fix": "Call material.color.set(0xff0000) (or setHex, or setStyle for a CSS string). Pass color in the constructor options when creating.",
+      "tags": ["color", "hex", "set color", "change color", "material color"]
+    },
+    {
+      "id": "color/shader-material-output",
+      "topic": "color",
+      "title": "A ShaderMaterial does no color space conversion unless you include it",
+      "symptom": "A custom shader looks darker or with different colors than the built in materials next to it.",
+      "cause": "The built in materials end with the tone mapping and color space chunks. A ShaderMaterial writes its color as is.",
+      "fix": "End the fragment shader with the chunks tonemapping_fragment and colorspace_fragment (as include lines), or convert colors yourself.",
+      "tags": ["shader material", "custom shader", "colorspace", "too dark", "glsl"]
+    },
+    {
+      "id": "lighting/physical-light-units",
+      "topic": "lighting",
+      "title": "PointLight and SpotLight use physical units since r155, so old intensities are far too dark",
+      "symptom": "After an upgrade, or with code from an older tutorial, point and spot lights barely light anything.",
+      "cause": "r155 made physical lighting the default: decay is 2 and intensity is in candela, so light falls off with the square of distance. The old useLegacyLights switch was deprecated then and removed later.",
+      "fix": "Raise PointLight and SpotLight intensity a lot (tens to thousands, depending on distance), keep decay 2, and remove useLegacyLights. Tune with a slider while looking at the scene.",
+      "rules": ["legacy-lights"],
+      "tags": ["light too dark", "intensity", "physical lights", "candela", "decay", "point light", "spot light", "uselegacylights"]
+    },
+    {
+      "id": "lighting/metal-needs-environment",
+      "topic": "lighting",
+      "title": "Metallic materials look black without an environment map",
+      "symptom": "A chrome or gold model looks black or flat dark grey, even with bright lights.",
+      "cause": "A fully metallic surface has no diffuse color; it only reflects its surroundings. Without scene.environment there is nothing to reflect but tiny light highlights.",
+      "fix": "Set scene.environment to a PMREM of RoomEnvironment (pmrem.fromScene(new RoomEnvironment()).texture) or of an HDR loaded with HDRLoader.",
+      "tags": ["metal", "metalness", "black", "environment map", "reflection", "pbr", "hdr"]
+    },
+    {
+      "id": "lighting/hdr-loader-renamed",
+      "topic": "lighting",
+      "title": "RGBELoader was renamed HDRLoader in r180",
+      "symptom": "The console warns that RGBELoader is deprecated, or an import of HDRLoader fails on an older three.",
+      "cause": "r180 renamed the loader for .hdr files.",
+      "fix": "Import HDRLoader from three/addons/loaders/HDRLoader.js on r180 and later; keep RGBELoader only for older versions.",
+      "tags": ["rgbeloader", "hdrloader", "hdr", "environment", "rename"],
+      "errors": ["RGBELoader has been deprecated"]
+    },
+    {
+      "id": "lighting/directional-light-target",
+      "topic": "lighting",
+      "title": "A DirectionalLight points at its target, which must be in the scene to move",
+      "symptom": "Moving light.target does not change the light direction, or the shadow does not follow the player.",
+      "cause": "The light shines from its position toward target.position, using the target's world matrix. A target that is not in the scene never gets its matrix updated.",
+      "fix": "Add light.target to the scene (or to the object it should follow) and move both the light and the target together.",
+      "tags": ["directional light", "target", "light direction", "sun", "shadow follows"]
+    },
+    {
+      "id": "shadows/renderer-shadows-off",
+      "topic": "shadows",
+      "title": "No shadow draws until renderer.shadowMap.enabled is true",
+      "symptom": "castShadow and receiveShadow are set, but there is no shadow.",
+      "cause": "Shadows need three switches: the renderer's shadow map, castShadow on the light, and castShadow or receiveShadow on the meshes.",
+      "fix": "Set renderer.shadowMap.enabled = true, light.castShadow = true, mesh.castShadow on casters and mesh.receiveShadow on the ground.",
+      "rules": ["shadows-not-enabled"],
+      "tags": ["no shadows", "shadow map", "cast shadow", "receive shadow"]
+    },
+    {
+      "id": "shadows/gltf-meshes-cast",
+      "topic": "shadows",
+      "title": "Set castShadow on each mesh of a loaded model, not on the root",
+      "symptom": "A loaded model throws no shadow, although the ground receives shadows from other objects.",
+      "cause": "castShadow is read per mesh; setting it on gltf.scene, a Group, does not reach the meshes inside.",
+      "fix": "Traverse the model and set castShadow and receiveShadow on every child where isMesh is true.",
+      "tags": ["gltf", "model", "no shadow", "cast shadow", "traverse"]
+    },
+    {
+      "id": "shadows/directional-shadow-frustum",
+      "topic": "shadows",
+      "title": "A DirectionalLight casts shadows only inside its shadow camera box",
+      "symptom": "Shadows are cut off, missing beyond a few units, or appear only near the center of the scene.",
+      "cause": "The shadow camera of a DirectionalLight is orthographic, 10 units wide by default. Anything outside left, right, top, bottom, near and far gets no shadow.",
+      "fix": "Set light.shadow.camera left, right, top, bottom, near and far to fit the area that needs shadows, call updateProjectionMatrix() on it, and check it with a CameraHelper.",
+      "test": "Add a CameraHelper for light.shadow.camera and make sure the box covers the casters and the receivers.",
+      "tags": ["shadow cut off", "shadow camera", "directional light", "frustum", "camera helper", "missing shadow"]
+    },
+    {
+      "id": "shadows/acne-and-bias",
+      "topic": "shadows",
+      "title": "Stripes on lit surfaces are shadow acne, fixed with bias",
+      "symptom": "Moire stripes or dark bands on surfaces that face the light, or shadows that float off the ground.",
+      "cause": "The surface shadows itself because of limited depth precision in the shadow map. Too much bias then detaches shadows from their casters.",
+      "fix": "Set a small light.shadow.bias (about -0.0005) or a normalBias (0.02 to 0.05), and tighten the shadow camera so the precision goes where it is needed.",
+      "tags": ["shadow acne", "stripes", "bias", "normal bias", "peter panning", "moire"]
+    },
+    {
+      "id": "shadows/blurry-shadows",
+      "topic": "shadows",
+      "title": "Blurry shadows come from a shadow camera that is too big, not from a small map",
+      "symptom": "Shadows are soft and blocky, and raising mapSize to 8192 costs a lot of memory and speed.",
+      "cause": "The shadow map is spread over the whole shadow camera box. A box far larger than the scene leaves few texels per unit.",
+      "fix": "Shrink the shadow camera to the visible area (or move it with the player) before raising mapSize; 2048 is usually enough.",
+      "rules": ["shadow-map-huge"],
+      "tags": ["blurry shadows", "shadow resolution", "map size", "pixelated shadow"]
+    },
+    {
+      "id": "shadows/pcf-soft-removed",
+      "topic": "shadows",
+      "title": "PCFSoftShadowMap is deprecated since r182; PCFShadowMap is soft now",
+      "symptom": "The console warns about PCFSoftShadowMap and shadows look different after an upgrade.",
+      "cause": "r182 deprecated PCFSoftShadowMap in WebGLRenderer and made PCFShadowMap soft; in r187 the renderer falls back to PCFShadowMap.",
+      "fix": "Set renderer.shadowMap.type to THREE.PCFShadowMap and tune light.shadow.radius if needed.",
+      "tags": ["pcfsoftshadowmap", "shadow type", "soft shadows", "upgrade"],
+      "errors": ["PCFSoftShadowMap has been removed"]
+    },
+    {
+      "id": "loading/html-instead-of-asset",
+      "topic": "loading",
+      "title": "Unexpected token '<' means the server sent an HTML page instead of the model",
+      "symptom": "GLTFLoader or FileLoader fails with: Unexpected token '<', or a message that the response is not valid JSON.",
+      "cause": "The URL is wrong. A dev server or an SPA host answers unknown paths with index.html, so the loader parses HTML.",
+      "fix": "Open the model URL in the browser and fix the path until it downloads the file. Put static files in the folder the server serves (public in Vite).",
+      "test": "Open the URL in a new tab, or read the content type in the network panel: it must not be text/html.",
+      "tags": ["unexpected token", "404", "wrong path", "model not loading", "json", "index.html"],
+      "errors": ["Unexpected token '<'", "is not valid JSON", "Unexpected token <", "JSON.parse: unexpected character"]
+    },
+    {
+      "id": "loading/draco-loader-missing",
+      "topic": "loading",
+      "title": "A Draco compressed glTF needs a DRACOLoader on the GLTFLoader",
+      "symptom": "Loading fails with: No DRACOLoader instance provided.",
+      "cause": "The file uses KHR_draco_mesh_compression, and GLTFLoader has no decoder of its own.",
+      "fix": "Create a DRACOLoader, call setDecoderPath with a folder that holds the decoder files, and hand it to the GLTFLoader with setDRACOLoader.",
+      "tags": ["draco", "compressed", "gltf", "decoder", "dracoloader"],
+      "errors": ["No DRACOLoader instance provided"]
+    },
+    {
+      "id": "loading/decoder-path-wrong",
+      "topic": "loading",
+      "title": "Decoder files must be served from the path you give the loader",
+      "symptom": "Draco or Basis loading hangs or fails with a WebAssembly error about a magic word or a MIME type.",
+      "cause": "setDecoderPath or setTranscoderPath points to a folder the server does not have, so the browser gets an HTML page instead of the wasm file.",
+      "fix": "Copy the files from three/examples/jsm/libs/draco/ (or libs/basis/) into the public folder and point the loader there, with a trailing slash. Serve wasm as application/wasm.",
+      "test": "Open the decoder path plus draco_decoder.wasm in the browser: it must download a binary file.",
+      "tags": ["draco", "basis", "ktx2", "wasm", "decoder path", "transcoder", "mime"],
+      "errors": ["expected magic word 00 61 73 6d", "Incorrect response MIME type"]
+    },
+    {
+      "id": "loading/ktx2-loader-setup",
+      "topic": "loading",
+      "title": "KTX2 textures need a KTX2Loader that knows the renderer",
+      "symptom": "A glTF with KTX2 textures fails to load, or a KTX2Loader throws about missing initialization.",
+      "cause": "GLTFLoader needs a KTX2Loader for KHR_texture_basisu, and the KTX2Loader must know which compressed formats the GPU supports.",
+      "fix": "Create a KTX2Loader, call setTranscoderPath and detectSupport(renderer), then hand it to the GLTFLoader with setKTX2Loader. With WebGPURenderer, await renderer.init() first; detectSupportAsync is deprecated since r181.",
+      "tags": ["ktx2", "basis", "compressed textures", "transcoder", "detect support"],
+      "errors": ["setKTX2Loader must be called before loading KTX2 textures", "Missing initialization with"]
+    },
+    {
+      "id": "loading/meshopt-decoder",
+      "topic": "loading",
+      "title": "A meshopt compressed glTF needs setMeshoptDecoder",
+      "symptom": "Loading fails with setMeshoptDecoder must be called before loading compressed files.",
+      "cause": "The file was compressed with gltfpack or gltf-transform using EXT_meshopt_compression.",
+      "fix": "Import MeshoptDecoder from three/addons/libs/meshopt_decoder.module.js and pass it to setMeshoptDecoder on the GLTFLoader.",
+      "tags": ["meshopt", "gltfpack", "compressed", "decoder", "gltf transform"],
+      "errors": ["setMeshoptDecoder must be called before loading compressed files"]
+    },
+    {
+      "id": "loading/file-protocol",
+      "topic": "loading",
+      "title": "Open the page through a local server, not as a file",
+      "symptom": "The page opened by double clicking index.html shows nothing; modules, models and textures are blocked.",
+      "cause": "Browsers block ES modules and fetch for file URLs: the origin is null, so every request fails the CORS check.",
+      "fix": "Serve the folder, for example with npx vite or npx serve, and open the localhost address it prints.",
+      "tags": ["file protocol", "cors", "local server", "double click", "origin null", "modules blocked"],
+      "errors": ["origin 'null' has been blocked", "URL scheme \"file\" is not supported", "HTTP Status 0 received", "ERR_FILE_NOT_FOUND"]
+    },
+    {
+      "id": "loading/cross-origin-texture",
+      "topic": "loading",
+      "title": "Textures from another domain need CORS headers",
+      "symptom": "A texture from a CDN or an image host does not load, or WebGL refuses to upload it.",
+      "cause": "WebGL may only use cross origin images when the server sends Access-Control-Allow-Origin. Without it the image is tainted.",
+      "fix": "Host the image next to the page, or serve it with Access-Control-Allow-Origin and keep the loader crossOrigin at anonymous (the default).",
+      "tags": ["cors", "cross origin", "texture", "cdn", "tainted", "image host"],
+      "errors": ["has been blocked by CORS policy", "contains cross-origin data", "No 'Access-Control-Allow-Origin' header", "Tainted canvases"]
+    },
+    {
+      "id": "loading/vite-public-folder",
+      "topic": "loading",
+      "title": "In Vite, files in public are served from the root, without public in the URL",
+      "symptom": "A model or texture loads in one setup and gives a 404 or an unexpected token error in another.",
+      "cause": "Vite serves the public folder at the site root, so a file in public/models is at /models. A path with public in it, or a path relative to the source file, does not exist on the server.",
+      "fix": "Load files from public with a root URL such as /models/scene.glb, or import a file from src with the ?url suffix and pass that URL to the loader.",
+      "tags": ["vite", "public folder", "asset path", "404", "static files"]
+    },
+    {
+      "id": "loading/deployed-base-path",
+      "topic": "loading",
+      "title": "Root paths break when the site is deployed under a subpath",
+      "symptom": "Everything works on localhost, but on GitHub Pages or another subpath host the models and textures give 404.",
+      "cause": "The site lives under a subpath, while paths like /models/scene.glb point to the domain root. Vite's base option only rewrites paths it bundles.",
+      "fix": "Set base in the Vite config to the subpath and build asset URLs from import.meta.env.BASE_URL, or use relative paths.",
+      "tags": ["deploy", "github pages", "base path", "404", "subpath", "production"]
+    },
+    {
+      "id": "loading/model-used-before-loaded",
+      "topic": "loading",
+      "title": "A model can only be used inside the load callback or after await",
+      "symptom": "Cannot read properties of undefined when code touches the model right after calling load().",
+      "cause": "Loaders are asynchronous. The variable is still undefined when the next line runs, and in the animation loop until loading finishes.",
+      "fix": "Use await loader.loadAsync(url) in an async function, or do the work in the onLoad callback, and guard the loop until the model exists.",
+      "tags": ["async", "load callback", "undefined", "loadasync", "await", "model not ready"],
+      "errors": ["Cannot read properties of undefined (reading 'scene')", "Cannot read properties of undefined (reading 'position')", "Cannot read properties of undefined (reading 'traverse')"]
+    },
+    {
+      "id": "loading/gltf-texture-flipy",
+      "topic": "loading",
+      "title": "A texture put on a glTF mesh needs flipY false",
+      "symptom": "A texture loaded with TextureLoader and assigned to a mesh from a glTF shows upside down or scrambled.",
+      "cause": "glTF UVs have their origin at the top left, and GLTFLoader loads its own textures with flipY false. TextureLoader defaults to flipY true.",
+      "fix": "Set texture.flipY = false (and colorSpace for color maps) before you assign it to a glTF material.",
+      "tags": ["flipy", "upside down", "texture", "gltf", "uv", "swap texture"]
+    },
+    {
+      "id": "loading/prefer-gltf",
+      "topic": "loading",
+      "title": "Convert FBX and OBJ to glTF for the web",
+      "symptom": "An FBX model is 100 times too big, lies on its side, has shiny Phong materials or missing textures.",
+      "cause": "FBX and OBJ have no fixed units, axes or PBR materials; their loaders guess. glTF is the format three supports best.",
+      "fix": "Export glTF (.glb) from Blender, or convert with a tool such as gltf-transform, and load it with GLTFLoader.",
+      "tags": ["fbx", "obj", "gltf", "convert", "scale", "z up", "blender"],
+      "errors": ["You are loading an asset with a Z-UP coordinate system"]
+    },
+    {
+      "id": "loading/texture-load-error",
+      "topic": "loading",
+      "title": "A glTF that references outside textures needs them next to it",
+      "symptom": "The model loads but is white or grey, and the console says a texture could not be loaded.",
+      "cause": "A .gltf file points to image files by relative path; they were not copied, were renamed, or the case of the name differs on a Linux server.",
+      "fix": "Export a single .glb with the textures inside, or copy the images with the exact names the .gltf uses.",
+      "tags": ["gltf", "texture missing", "white model", "grey", "relative path", "glb"],
+      "errors": ["Couldn't load texture"]
+    },
+    {
+      "id": "models/add-gltf-not-scene",
+      "topic": "models",
+      "title": "Add gltf.scene to the scene, not the gltf result",
+      "symptom": "Nothing shows, and the console says the object is not an instance of THREE.Object3D.",
+      "cause": "GLTFLoader returns an object with scene, scenes, animations and cameras. The result itself is not an Object3D.",
+      "fix": "Call scene.add(gltf.scene).",
+      "tags": ["gltf", "add", "object3d", "model not showing", "gltf scene"],
+      "errors": ["object not an instance of THREE.Object3D"]
+    },
+    {
+      "id": "models/wrong-scale",
+      "topic": "models",
+      "title": "Frame a model from its bounding box instead of guessing its size",
+      "symptom": "The model loaded without errors but is invisible: far too small, far too big, or behind the camera.",
+      "cause": "Models come in any unit (centimeters, meters, inches) and at any offset. A fixed camera position fits only one size.",
+      "fix": "Compute new THREE.Box3().setFromObject(model), take its size and center, then scale the model or move the camera to a distance of about 1.5 times the largest side, and set near and far from that size. To fix a pivot that is off center, subtract the box center from model.position and move a parent Group instead.",
+      "test": "Log the box size; a size of thousands or of 0.01 means the units are off.",
+      "tags": ["model too small", "too big", "invisible model", "scale", "bounding box", "fit camera", "units"]
+    },
+    {
+      "id": "models/one-parent",
+      "topic": "models",
+      "title": "An object has one parent: adding it twice moves it",
+      "symptom": "Placing the same model in several spots shows only the last one.",
+      "cause": "add() removes the object from its old parent first. One Object3D cannot be in two places.",
+      "fix": "Use model.clone() for each copy (geometry and materials are shared), or an InstancedMesh for many copies of one mesh.",
+      "tags": ["clone", "copies", "only one shows", "parent", "duplicate model"]
+    },
+    {
+      "id": "models/skinned-clone",
+      "topic": "models",
+      "title": "Clone a skinned character with SkeletonUtils.clone",
+      "symptom": "Cloned characters stand in the bind pose, are stretched, or all move with the first one.",
+      "cause": "Object3D.clone() copies the meshes but they stay bound to the bones of the original.",
+      "fix": "Import clone from three/addons/utils/SkeletonUtils.js and clone with it; give each clone its own AnimationMixer.",
+      "tags": ["skinned mesh", "clone", "skeleton", "character", "bones", "t pose"]
+    },
+    {
+      "id": "models/skinned-frustum-culled",
+      "topic": "models",
+      "title": "Animated characters can vanish near the screen edge because of their bounding sphere",
+      "symptom": "A skinned or morphing character pops out of view near the edges or while it moves far from its origin.",
+      "cause": "Frustum culling uses a bounding sphere computed once. When animation moves the vertices away from that pose, the sphere no longer covers them.",
+      "fix": "Call computeBoundingSphere() on the SkinnedMesh after the animation moves it, make the sphere larger, or set frustumCulled false on that mesh.",
+      "tags": ["frustum culling", "disappears", "skinned mesh", "animation", "bounding sphere", "pops"]
+    },
+    {
+      "id": "models/shared-material",
+      "topic": "models",
+      "title": "Meshes share materials, so changing one changes them all",
+      "symptom": "Highlighting one selected object changes the color of other objects as well.",
+      "cause": "Loaders and clone() reuse material objects between meshes.",
+      "fix": "Clone the material before changing it on one mesh (mesh.material = mesh.material.clone()), and dispose the clone when done.",
+      "tags": ["material", "shared", "highlight", "color changes all", "clone material", "hover"]
+    },
+    {
+      "id": "models/nan-positions",
+      "topic": "models",
+      "title": "NaN in vertex positions breaks culling and picking",
+      "symptom": "The mesh never shows or flickers, and the console says the computed radius is NaN.",
+      "cause": "A position attribute holds NaN, usually from dividing by zero or from reading past the end of an array when building geometry.",
+      "fix": "Check the numbers you write into the Float32Array, guard divisions, and recompute the bounding sphere after the fix.",
+      "tags": ["nan", "bounding sphere", "geometry", "buffer geometry", "invisible"],
+      "errors": ["Computed radius is NaN", "Computed min/max have NaN values"]
+    },
+    {
+      "id": "models/node-names-sanitized",
+      "topic": "models",
+      "title": "GLTFLoader removes dots and spaces from node names",
+      "symptom": "getObjectByName with the name from Blender returns undefined when the name has a dot or a space in it.",
+      "cause": "Names are passed through PropertyBinding.sanitizeNodeName: spaces become underscores and the characters [ ] . : and slash are removed.",
+      "fix": "Look the name up after sanitizing it the same way, or log the names with traverse to see what the loader made of them.",
+      "tags": ["getobjectbyname", "node name", "blender", "undefined", "find mesh"]
+    },
+    {
+      "id": "imports/addons-not-in-core",
+      "topic": "imports",
+      "title": "OrbitControls, GLTFLoader and other addons are not exported by three",
+      "symptom": "The browser says the module three does not provide an export named OrbitControls, or THREE.OrbitControls is not a constructor.",
+      "cause": "Controls, loaders, post processing and utils live in the addons, not in the core build.",
+      "fix": "Import them from their file, such as three/addons/controls/OrbitControls.js and three/addons/loaders/GLTFLoader.js.",
+      "rules": ["unknown-symbol"],
+      "tags": ["orbitcontrols", "gltfloader", "addons", "import", "not a constructor", "export"],
+      "errors": ["export named 'OrbitControls'", "export named 'GLTFLoader'", "OrbitControls is not a constructor", "GLTFLoader is not a constructor", "OrbitControls is not defined"]
+    },
+    {
+      "id": "imports/import-map-missing",
+      "topic": "imports",
+      "title": "Without a bundler, the bare name three needs an import map",
+      "symptom": "Failed to resolve module specifier three, and nothing runs.",
+      "cause": "Browsers only load modules by URL. The bare specifier three means something only to a bundler, or through an import map.",
+      "fix": "Add an importmap script before the module script that maps three to the build/three.module.js URL and three/addons/ to the examples/jsm/ URL, both at the same pinned version.",
+      "tags": ["import map", "cdn", "module specifier", "no bundler", "importmap"],
+      "errors": ["Failed to resolve module specifier \"three", "Relative references must start with"]
+    },
+    {
+      "id": "imports/script-not-module",
+      "topic": "imports",
+      "title": "Import statements need a module script",
+      "symptom": "Cannot use import statement outside a module.",
+      "cause": "The script tag has no type module, or the file runs as CommonJS in Node or in a server render.",
+      "fix": "Use a script tag with type module. In Node, set type module in package.json. In Next.js, add three to transpilePackages in the Next config.",
+      "tags": ["module", "script tag", "import", "syntax error", "type module"],
+      "errors": ["Cannot use import statement outside a module"]
+    },
+    {
+      "id": "imports/examples-js-removed",
+      "topic": "imports",
+      "title": "The global THREE scripts from old tutorials were removed",
+      "symptom": "THREE.OrbitControls is not a constructor, or the examples/js script returns 404, with code copied from an old answer.",
+      "cause": "r148 removed the examples/js folder and r161 removed build/three.js and build/three.min.js. Only ES modules remain.",
+      "fix": "Switch to ES modules: an import map (or a bundler), then import three and the addons from their module files.",
+      "rules": ["examples-js"],
+      "tags": ["three.min.js", "examples js", "global three", "old tutorial", "not a constructor", "script tag"],
+      "errors": ["THREE.OrbitControls is not a constructor", "THREE.GLTFLoader is not a constructor", "THREE is not defined"]
+    },
+    {
+      "id": "imports/missing-js-extension",
+      "topic": "imports",
+      "title": "Addon imports need the .js extension",
+      "symptom": "The bundler or Node says the subpath is missing or not exported by three.",
+      "cause": "The exports map of three maps three/addons/* to files, so the path must name the file with its extension.",
+      "fix": "Write three/addons/controls/OrbitControls.js, not three/addons/controls/OrbitControls.",
+      "tags": ["extension", "exports", "subpath", "vite", "node", "import path"],
+      "errors": ["specifier in \"three\" package", "is not defined by \"exports\"", "ERR_PACKAGE_PATH_NOT_EXPORTED"]
+    },
+    {
+      "id": "imports/two-copies-of-three",
+      "topic": "imports",
+      "title": "Two copies of three break instanceof checks and shared state",
+      "symptom": "The console warns that multiple instances of Three.js are being imported; objects from a library do not render or controls do nothing.",
+      "cause": "Two different copies of three are loaded: a CDN and npm mixed, a library that bundles its own three, or packages that need different versions.",
+      "fix": "Run npm ls three and make it resolve once (npm dedupe, overrides in package.json, or resolve.dedupe in Vite). Load three from one place only.",
+      "test": "npm ls three must show a single version, and the warning must be gone from the console.",
+      "tags": ["multiple instances", "duplicate three", "npm ls", "dedupe", "version clash", "drei"],
+      "errors": ["Multiple instances of Three.js being imported"]
+    },
+    {
+      "id": "imports/pin-cdn-version",
+      "topic": "imports",
+      "title": "Pin the three version in CDN URLs, and use the same one for the addons",
+      "symptom": "A page that worked breaks one day, or addons fail because they are newer than the core.",
+      "cause": "An unpinned CDN URL follows the latest release, and three changes its API between releases.",
+      "fix": "Put an exact version in every URL (three@0.187.0), the same for three and three/addons/.",
+      "rules": ["cdn-unpinned"],
+      "tags": ["cdn", "version", "pin", "unpkg", "jsdelivr", "import map"]
+    },
+    {
+      "id": "imports/removed-geometry",
+      "topic": "imports",
+      "title": "THREE.Geometry is gone since r125 and the BufferGeometry aliases since r144",
+      "symptom": "Geometry is not a constructor, BoxBufferGeometry is not exported, or geometry.vertices is undefined.",
+      "cause": "r125 removed Geometry and Face3 from the core; r144 deprecated the names ending in BufferGeometry (BoxBufferGeometry), which were removed later.",
+      "fix": "Use BoxGeometry, PlaneGeometry and friends, and read or write vertices through geometry.attributes.position.",
+      "rules": ["geometry-class", "face3", "geometry-vertices", "buffer-geometry-alias"],
+      "tags": ["geometry", "buffer geometry", "vertices", "faces", "old tutorial", "migration"],
+      "errors": ["Geometry is not a constructor", "BufferGeometry is not a constructor", "Face3 is not a constructor"]
+    },
+    {
+      "id": "imports/text-geometry-addon",
+      "topic": "imports",
+      "title": "TextGeometry and FontLoader moved to the addons in r133",
+      "symptom": "THREE.TextGeometry is not a constructor, or FontLoader is not exported by three.",
+      "cause": "r133 moved TextGeometry and FontLoader out of the core.",
+      "fix": "Import TextGeometry from three/addons/geometries/TextGeometry.js and FontLoader from three/addons/loaders/FontLoader.js; load a typeface JSON font.",
+      "tags": ["text", "textgeometry", "fontloader", "font", "3d text"],
+      "errors": ["TextGeometry is not a constructor", "FontLoader is not a constructor", "export named 'TextGeometry'", "export named 'FontLoader'"]
+    },
+    {
+      "id": "build/ssr-window",
+      "topic": "build",
+      "title": "three runs only in the browser; keep it out of server rendering",
+      "symptom": "window is not defined, document is not defined or self is not defined during next build or a server render.",
+      "cause": "Next.js, Nuxt and others run components on the server first, where there is no DOM, canvas or WebGL.",
+      "fix": "Mark the component as a client component and load the 3D view with next/dynamic with ssr set to false (or a client only wrapper); create the renderer in an effect, not at import time.",
+      "tags": ["ssr", "next.js", "window is not defined", "server render", "nuxt", "client component"],
+      "errors": ["window is not defined", "document is not defined", "self is not defined"]
+    },
+    {
+      "id": "performance/pixel-ratio",
+      "topic": "performance",
+      "title": "Cap the pixel ratio at 2",
+      "symptom": "Low frame rate and hot phones on high density screens, while the scene is simple.",
+      "cause": "setPixelRatio(window.devicePixelRatio) renders 9 to 16 times the pixels on screens with a ratio of 3 or 4.",
+      "fix": "Use renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)).",
+      "rules": ["pixel-ratio-uncapped"],
+      "tags": ["pixel ratio", "slow", "mobile", "retina", "fps", "fill rate"]
+    },
+    {
+      "id": "performance/instancing",
+      "topic": "performance",
+      "title": "Use InstancedMesh for many copies of one mesh",
+      "symptom": "A forest, a crowd or a particle field of separate meshes runs slowly; renderer.info.render.calls is in the thousands.",
+      "cause": "Every Mesh is its own draw call with its own matrix update.",
+      "fix": "Draw the copies with one InstancedMesh and setMatrixAt, or merge static meshes with mergeGeometries from BufferGeometryUtils. BatchedMesh fits different shapes that share a material.",
+      "rules": ["many-meshes-no-instancing"],
+      "test": "Read renderer.info.render.calls before and after; it should drop to a handful.",
+      "tags": ["draw calls", "instancing", "instanced mesh", "slow", "many objects", "merge geometries", "batched mesh"]
+    },
+    {
+      "id": "performance/instance-matrix-update",
+      "topic": "performance",
+      "title": "After setMatrixAt, flag instanceMatrix and recompute the bounding sphere",
+      "symptom": "Instances do not move, or all instances vanish when the camera turns.",
+      "cause": "setMatrixAt writes into the array only; the GPU copy updates when instanceMatrix.needsUpdate is true. Since r151 InstancedMesh is frustum culled with a bounding sphere computed once, which no longer fits moved instances.",
+      "fix": "Set mesh.instanceMatrix.needsUpdate = true (and instanceColor.needsUpdate after setColorAt), then call mesh.computeBoundingSphere() when instances moved, or set frustumCulled false for fields that move every frame.",
+      "tags": ["instanced mesh", "setmatrixat", "needsupdate", "frustum culling", "disappears", "bounding sphere"]
+    },
+    {
+      "id": "performance/attribute-needs-update",
+      "topic": "performance",
+      "title": "Edited BufferAttributes need needsUpdate, and they cannot grow",
+      "symptom": "Changing vertex positions does nothing, or new points beyond the first count never appear.",
+      "cause": "The GPU buffer is uploaded once. Changes need attribute.needsUpdate = true, and a buffer keeps its first size.",
+      "fix": "Set needsUpdate after each edit. Allocate the largest size up front and show part of it with geometry.setDrawRange, or dispose the geometry and create a new one. Recompute bounding volumes when the shape changes.",
+      "tags": ["buffer attribute", "needsupdate", "dynamic geometry", "vertices", "draw range", "points"],
+      "errors": ["Buffer size too small for points data"]
+    },
+    {
+      "id": "performance/alloc-in-loop",
+      "topic": "performance",
+      "title": "Do not create vectors or matrices every frame",
+      "symptom": "Regular small stutters, and the memory graph saw-tooths in the performance panel.",
+      "cause": "new Vector3() and friends in the loop create garbage that the browser has to collect.",
+      "fix": "Create the helper objects once outside the loop and reuse them with set(), copy() and the target arguments of methods such as getWorldPosition(target).",
+      "rules": ["alloc-in-loop"],
+      "tags": ["garbage collection", "stutter", "allocation", "vector3", "animation loop"]
+    },
+    {
+      "id": "performance/create-in-loop",
+      "topic": "performance",
+      "title": "Never create geometries, materials or loaders in the render loop",
+      "symptom": "The frame rate falls over time and GPU memory keeps rising.",
+      "cause": "Each new geometry or material allocates GPU memory and can compile a new shader; nothing disposes the old ones.",
+      "fix": "Create them once and change their properties or uniforms in the loop.",
+      "rules": ["create-heavy-in-loop"],
+      "tags": ["memory leak", "slow", "geometry in loop", "material in loop", "shader compile"]
+    },
+    {
+      "id": "performance/shader-compile-hitch",
+      "topic": "performance",
+      "title": "Compile shaders before a new material first shows",
+      "symptom": "The scene freezes for a moment the first time an object, a light or an effect appears.",
+      "cause": "The shader program is built on first use. Adding a light or turning on shadows changes the programs of every lit material.",
+      "fix": "Keep the number of lights fixed, and call renderer.compileAsync(scene, camera) while loading so the programs are ready before they are needed.",
+      "tags": ["hitch", "freeze", "shader compile", "first frame", "stutter", "compile async"]
+    },
+    {
+      "id": "memory/dispose",
+      "topic": "memory",
+      "title": "Removing an object from the scene does not free GPU memory",
+      "symptom": "Memory and renderer.info.memory counts grow each time objects are replaced, until the tab slows or crashes.",
+      "cause": "Geometries, materials, textures and render targets keep their GPU buffers until dispose() is called.",
+      "fix": "When an object is gone for good, call dispose() on its geometry, its materials, every texture map of those materials (material.dispose() leaves them) and any render target.",
+      "rules": ["no-dispose"],
+      "test": "Log renderer.info.memory before and after replacing the objects a few times; the counts must not keep rising.",
+      "tags": ["memory leak", "dispose", "gpu memory", "renderer info", "remove object"]
+    },
+    {
+      "id": "memory/unmount-renderer",
+      "topic": "memory",
+      "title": "Tear down the renderer when a view goes away",
+      "symptom": "Each visit to the 3D page in a single page app adds memory, more event listeners and finally a lost context.",
+      "cause": "The animation loop, event listeners, controls and the renderer stay alive after the component is gone.",
+      "fix": "On unmount: renderer.setAnimationLoop(null), controls.dispose(), remove your listeners, dispose the scene contents, renderer.dispose(), and remove the canvas.",
+      "tags": ["spa", "unmount", "react", "vue", "cleanup", "memory leak", "event listeners"]
+    },
+    {
+      "id": "interaction/raycast-canvas-rect",
+      "topic": "interaction",
+      "title": "Compute mouse coordinates from the canvas rectangle, not the window",
+      "symptom": "Clicking picks the wrong object or nothing, and the offset grows away from the top left.",
+      "cause": "Normalized device coordinates must be relative to the canvas. Using the window size is wrong as soon as the canvas is not full screen or the page scrolls.",
+      "fix": "Take rect = renderer.domElement.getBoundingClientRect(), then x = ((event.clientX - rect.left) / rect.width) * 2 - 1 and y = -((event.clientY - rect.top) / rect.height) * 2 + 1.",
+      "tags": ["raycaster", "mouse", "picking", "click", "offset", "pointer", "ndc"]
+    },
+    {
+      "id": "interaction/raycast-hits-child",
+      "topic": "interaction",
+      "title": "A raycast hit is the inner mesh, not the model you added",
+      "symptom": "Clicking a loaded model returns a mesh you never named, and its userData is empty.",
+      "cause": "intersectObjects returns the deepest meshes that were hit; the Group you added is a parent of them.",
+      "fix": "Walk up hit.object.parent until you reach the object you tagged (in userData), or raycast against a short list of the objects you care about.",
+      "tags": ["raycaster", "picking", "child mesh", "userdata", "parent", "group"]
+    },
+    {
+      "id": "interaction/orbit-target",
+      "topic": "interaction",
+      "title": "OrbitControls turns around controls.target, not around the model",
+      "symptom": "The camera orbits around an empty point and the model swings out of view.",
+      "cause": "The target defaults to the origin, and camera.lookAt is overwritten by the controls.",
+      "fix": "Set controls.target to the model center and call controls.update(); do not call camera.lookAt while controls are active.",
+      "tags": ["orbit controls", "target", "pivot", "lookat", "rotate around"]
+    },
+    {
+      "id": "interaction/damping-update",
+      "topic": "interaction",
+      "title": "Damping needs controls.update() every frame",
+      "symptom": "With enableDamping on, the camera stops dead, or moves only on the next interaction.",
+      "cause": "Damping is applied in update(), so it must run in the loop.",
+      "fix": "Call controls.update() in the animation loop.",
+      "rules": ["controls-damping-no-update"],
+      "tags": ["orbit controls", "damping", "update", "smooth"]
+    },
+    {
+      "id": "interaction/controls-dom-element",
+      "topic": "interaction",
+      "title": "Controls need the canvas element to listen to",
+      "symptom": "OrbitControls exist but dragging does nothing, or keys do nothing.",
+      "cause": "Without renderer.domElement as the second argument the controls have nowhere to listen. Since r124 OrbitControls listen to keys only after listenToKeyEvents.",
+      "fix": "Create them with new OrbitControls(camera, renderer.domElement), and call controls.listenToKeyEvents(window) for arrow keys.",
+      "tags": ["orbit controls", "no input", "drag", "keyboard", "dom element"]
+    },
+    {
+      "id": "animation/mixer-update",
+      "topic": "animation",
+      "title": "An AnimationMixer moves nothing unless update runs every frame",
+      "symptom": "The glTF animation never plays; the character stays in its rest pose.",
+      "cause": "action.play() only marks the action as active. The mixer moves time forward only in mixer.update(delta).",
+      "fix": "Create the mixer on gltf.scene, play an action from gltf.animations, and call mixer.update(delta) in the loop with the time since the last frame.",
+      "tags": ["animation", "mixer", "gltf animation", "t pose", "not playing", "clip"]
+    },
+    {
+      "id": "animation/frame-rate-speed",
+      "topic": "animation",
+      "title": "Move by delta time, not by a fixed step per frame",
+      "symptom": "Things move twice as fast on a 120 Hz screen, and slow down when the frame rate drops.",
+      "cause": "A fixed increment per frame ties speed to the refresh rate.",
+      "fix": "Multiply speeds by the delta from a Timer (timer.update() then timer.getDelta()) and clamp large deltas after the tab was hidden.",
+      "tags": ["delta time", "frame rate", "speed", "120hz", "timer", "movement"]
+    },
+    {
+      "id": "animation/clock-delta-zero",
+      "topic": "animation",
+      "title": "getElapsedTime() resets the delta of the same Clock",
+      "symptom": "mixer.update(clock.getDelta()) plays nothing or very slowly, while elapsed time looks fine.",
+      "cause": "Clock.getElapsedTime calls getDelta inside, so a second call in the same frame returns almost 0.",
+      "fix": "Read the delta once per frame and add it up yourself, or use THREE.Timer (Clock is deprecated since r183).",
+      "rules": ["clock-deprecated"],
+      "tags": ["clock", "getdelta", "elapsed time", "timer", "animation slow"]
+    },
+    {
+      "id": "webgpu/init-before-render",
+      "topic": "webgpu",
+      "title": "WebGPURenderer has to finish init before the first render",
+      "symptom": "An error says render() was called before the backend is initialized.",
+      "cause": "WebGPURenderer starts asynchronously. render(), clear() and PMREMGenerator calls before that throw.",
+      "fix": "await renderer.init() before rendering, or start drawing with renderer.setAnimationLoop, which waits for init.",
+      "rules": ["webgpu-no-init"],
+      "tags": ["webgpu", "init", "async", "backend", "await"],
+      "errors": ["called before the backend is initialized"]
+    },
+    {
+      "id": "webgpu/import-path",
+      "topic": "webgpu",
+      "title": "Import WebGPURenderer from three/webgpu and TSL from three/tsl",
+      "symptom": "three does not export WebGPURenderer, or node materials and TSL functions are missing.",
+      "cause": "Since r171 the WebGPU renderer, the node materials and TSL are built into separate entries: three/webgpu and three/tsl.",
+      "fix": "Import everything for a WebGPU app from three/webgpu (it also holds the core classes) and TSL from three/tsl; with an import map, map both.",
+      "tags": ["webgpu", "tsl", "import", "node material", "three webgpu"],
+      "errors": ["export named 'WebGPURenderer'", "WebGPURenderer is not a constructor"]
+    },
+    {
+      "id": "webgpu/no-shader-material",
+      "topic": "webgpu",
+      "title": "ShaderMaterial and onBeforeCompile do not work with WebGPURenderer",
+      "symptom": "A custom GLSL material shows nothing or errors under WebGPURenderer.",
+      "cause": "WebGPURenderer builds shaders from node materials. GLSL strings and onBeforeCompile hooks are WebGL only.",
+      "fix": "Port the shader to TSL with a node material (colorNode, positionNode), or stay on WebGLRenderer for that material.",
+      "tags": ["webgpu", "shader material", "glsl", "tsl", "node material", "onbeforecompile"],
+      "errors": ["NodeBuilder: Material"]
+    },
+    {
+      "id": "webgpu/postprocessing",
+      "topic": "webgpu",
+      "title": "EffectComposer is for WebGLRenderer; WebGPU uses RenderPipeline",
+      "symptom": "Post processing passes do nothing or fail with WebGPURenderer.",
+      "cause": "EffectComposer and its passes are built on WebGL render targets and GLSL. WebGPU has its own pipeline; PostProcessing was renamed RenderPipeline in r183.",
+      "fix": "Use RenderPipeline from three/webgpu with pass() and the effect nodes from three/addons/tsl/, or keep WebGLRenderer when you need EffectComposer.",
+      "tags": ["webgpu", "post processing", "effect composer", "render pipeline", "bloom"],
+      "errors": ["\"PostProcessing\" has been renamed to \"RenderPipeline\""]
+    },
+    {
+      "id": "webgpu/fallback-webgl",
+      "topic": "webgpu",
+      "title": "WebGPURenderer falls back to WebGL 2 where WebGPU is missing",
+      "symptom": "Features differ between browsers, or code that checks for WebGPU fails on Safari or Linux.",
+      "cause": "When navigator.gpu is missing, WebGPURenderer uses its WebGL 2 backend. Some features (compute shaders, some texture formats) are limited there.",
+      "fix": "Test with both backends (forceWebGL true in the options), and read renderer.backend.isWebGPUBackend before using WebGPU only features.",
+      "tags": ["webgpu", "fallback", "webgl backend", "safari", "compatibility"],
+      "errors": ["WebGPU is not available", "No available adapters"]
+    },
+    {
+      "id": "r3f/hooks-outside-canvas",
+      "topic": "r3f",
+      "title": "useFrame and useThree work only inside the Canvas",
+      "symptom": "R3F says hooks can only be used within the Canvas component.",
+      "cause": "These hooks read the R3F store that the Canvas creates. A component that uses them but renders outside the Canvas has no store.",
+      "fix": "Move the component (or the hook) into a child of the Canvas, and pass data out through a state store or callbacks.",
+      "tags": ["r3f", "react three fiber", "hooks", "useframe", "usethree", "canvas"],
+      "errors": ["Hooks can only be used within the Canvas component"]
+    },
+    {
+      "id": "r3f/dom-in-canvas",
+      "topic": "r3f",
+      "title": "HTML elements cannot go inside the Canvas",
+      "symptom": "R3F says Div is not part of the THREE namespace.",
+      "cause": "Everything inside the Canvas is turned into three objects; a div or a button has no three class. The same message shows for a removed class such as BoxBufferGeometry.",
+      "fix": "Put HTML outside the Canvas in a positioned overlay, or use the Html component of drei to place it in the scene. Rename removed classes (boxGeometry).",
+      "tags": ["r3f", "html", "div", "namespace", "drei html", "extend"],
+      "errors": ["is not part of the THREE namespace"]
+    },
+    {
+      "id": "r3f/react-version",
+      "topic": "r3f",
+      "title": "Match the R3F major version to React: fiber 8 with React 18, fiber 9 with React 19",
+      "symptom": "Cannot read properties of undefined (reading ReactCurrentOwner) on start, often in a new Next.js 15 project.",
+      "cause": "R3F 8 uses React 18 internals that React 19 removed.",
+      "fix": "With React 19 install fiber 9 and drei 10; with React 18 keep fiber 8 and drei 9. Check with npm ls react.",
+      "tags": ["r3f", "react 19", "version", "next.js", "drei", "upgrade"],
+      "errors": ["ReactCurrentOwner"]
+    },
+    {
+      "id": "r3f/setstate-in-useframe",
+      "topic": "r3f",
+      "title": "Do not set React state in useFrame; change the object through a ref",
+      "symptom": "The scene stutters and React re-renders the component every frame.",
+      "cause": "useFrame runs 60 or more times per second. A state update there re-renders the component tree each time.",
+      "fix": "Keep a ref to the mesh and change ref.current.position or rotation directly in useFrame. Keep state for changes that the UI shows.",
+      "tags": ["r3f", "useframe", "setstate", "re-render", "performance", "ref"]
+    },
+    {
+      "id": "r3f/objects-in-render",
+      "topic": "r3f",
+      "title": "Objects created in the component body are rebuilt on every render",
+      "symptom": "GPU memory grows and the scene hitches whenever the component re-renders.",
+      "cause": "new THREE.MeshStandardMaterial() or a geometry made in the function body is a new object on each render, and the old one is never disposed.",
+      "fix": "Declare geometry and materials as JSX children, or create them with useMemo; for loaded data use the loader hooks, which cache.",
+      "tags": ["r3f", "usememo", "re-render", "memory", "material", "geometry"]
+    },
+    {
+      "id": "r3f/suspense-for-loaders",
+      "topic": "r3f",
+      "title": "Wrap loading components in Suspense inside the Canvas",
+      "symptom": "The whole canvas stays empty until everything loads, or React complains that a component suspended.",
+      "cause": "useLoader and useGLTF suspend until the file is loaded. Without a Suspense boundary close to them, React suspends a larger part of the tree.",
+      "fix": "Put a Suspense with a fallback around each loading part, inside the Canvas, so the rest of the scene renders right away.",
+      "tags": ["r3f", "suspense", "useloader", "usegltf", "loading", "fallback"],
+      "errors": ["A component suspended while responding to synchronous input"]
+    },
+    {
+      "id": "r3f/usegltf-shared-scene",
+      "topic": "r3f",
+      "title": "useGLTF returns the same scene for the same URL, so clone it for each copy",
+      "symptom": "Rendering a model component twice shows the model only once.",
+      "cause": "useGLTF caches by URL, so every component gets the same Object3D, and an object can have only one parent.",
+      "fix": "Use the Clone component of drei, or scene.clone() in useMemo (SkeletonUtils clone for skinned models).",
+      "tags": ["r3f", "usegltf", "clone", "drei", "cache", "only one shows", "primitive"]
+    },
+    {
+      "id": "r3f/color-defaults",
+      "topic": "r3f",
+      "title": "The R3F Canvas turns on ACES tone mapping and sRGB output by default",
+      "symptom": "Colors in an R3F scene look different from the same code in plain three, or from the design.",
+      "cause": "R3F sets ACESFilmicToneMapping on the renderer unless told otherwise.",
+      "fix": "Add the flat prop to the Canvas for NoToneMapping, or set toneMapped false on single materials; set the tone mapping you want through the gl prop.",
+      "tags": ["r3f", "tone mapping", "colors", "flat", "aces", "colors wrong"]
+    },
+    {
+      "id": "r3f/frameloop-demand",
+      "topic": "r3f",
+      "title": "With frameloop demand, call invalidate after a change",
+      "symptom": "Changing a prop or an object in a handler has no effect until the mouse moves the controls.",
+      "cause": "In demand mode R3F renders only when it knows something changed; a direct change through a ref does not tell it.",
+      "fix": "Call invalidate() from useThree after changing objects directly.",
+      "tags": ["r3f", "frameloop", "demand", "invalidate", "not updating"]
+    },
+    {
+      "id": "shaders/compile-error",
+      "topic": "shaders",
+      "title": "A shader compile error names the line in the generated source",
+      "symptom": "The material is invisible or the screen is black, and the console shows a shader error with a long listing.",
+      "cause": "three adds its own lines before your GLSL, so the line number points into the full program. Common slips: a float written as 1 instead of 1.0, a missing semicolon, or texture2D in GLSL 3.",
+      "fix": "Read the line marked in the listing, compare it with your shader, and write floats with a decimal point. Run threesmith explain on the message to map it back to your file.",
+      "tags": ["shader error", "glsl", "compile", "black", "shader material"],
+      "errors": ["THREE.WebGLProgram: Shader Error", "ERROR: 0:", "VALIDATE_STATUS false"]
+    },
+    {
+      "id": "shaders/uniform-value",
+      "topic": "shaders",
+      "title": "Uniforms are objects with a value field, and you change the value",
+      "symptom": "A uniform such as time never changes in the shader, or the material throws while rendering.",
+      "cause": "ShaderMaterial expects each uniform as an object holding value. Replacing the whole uniform object, or passing a bare number, breaks the link to the program.",
+      "fix": "Declare uTime with a value of 0 and update material.uniforms.uTime.value each frame.",
+      "tags": ["uniforms", "shader material", "value", "time", "not updating"]
+    },
+    {
+      "id": "tooling/verify-in-browser",
+      "topic": "tooling",
+      "title": "A green build does not mean the scene renders",
+      "symptom": "The code compiles and the tests pass, but the page shows a black canvas.",
+      "cause": "Most three.js failures happen at runtime: lights, colors, camera, paths and shaders only show in a browser.",
+      "fix": "Run threesmith check (or open the page) and look at the console messages and the screenshot before calling the work done.",
+      "tags": ["verify", "screenshot", "headless", "black screen", "check", "agent"]
+    },
+    {
+      "id": "tooling/old-api-from-memory",
+      "topic": "tooling",
+      "title": "Check names against the installed three, not against memory",
+      "symptom": "Generated code uses classes, options or paths that no longer exist, or that never existed.",
+      "cause": "three changes its API in many releases, and examples on the web span ten years of versions.",
+      "fix": "Look names up with threesmith api for the installed version, and run threesmith review to catch removed and renamed APIs.",
+      "rules": ["unknown-symbol"],
+      "tags": ["outdated", "hallucinated api", "version", "old tutorial", "api lookup"]
+    }
+  ]
+}
