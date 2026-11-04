@@ -1,0 +1,1328 @@
+{
+ "version": 1,
+ "name": "cow",
+ "archetype": "creature.quadruped",
+ "description": "A dairy cow in Holstein proportions: a deep lofted barrel with hooks and pins, a thick neck with a dewlap, a long head carried low with a broad pink muzzle, nostrils, eyes and sideways ears, irregular black (or red) patches on a white coat that follow the body, an udder with four teats, legs with knees, hocks that bend backwards and hooves, and a long tail with a switch. Horns are an option (most dairy cows are dehorned). Legs, knees, hocks, head and tail are nodes with their pivot at the joint. Head towards +Z, hooves on y = 0.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 1.45,
+   "min": 1.1,
+   "max": 1.6,
+   "description": "Height at the withers in metres (a Holstein is about 1.45-1.5, a Jersey about 1.2)."
+  },
+  {
+   "name": "length",
+   "type": "number",
+   "default": 1,
+   "min": 0.85,
+   "max": 1.2,
+   "description": "Body length relative to a Holstein."
+  },
+  {
+   "name": "build",
+   "type": "number",
+   "default": 1,
+   "min": 0.8,
+   "max": 1.25,
+   "description": "Width of the body (0.8 a lean dairy cow, 1.25 a beef breed)."
+  },
+  {
+   "name": "legs",
+   "type": "number",
+   "default": 1,
+   "min": 0.8,
+   "max": 1.2,
+   "description": "Leg length relative to a Holstein."
+  },
+  {
+   "name": "patches",
+   "type": "number",
+   "default": 1,
+   "min": 0,
+   "max": 1.5,
+   "description": "Size of the coloured patches (0 an all-white cow, 1.5 mostly coloured)."
+  },
+  {
+   "name": "colour",
+   "type": "integer",
+   "default": 1,
+   "min": 1,
+   "max": 2,
+   "description": "1 black and white, 2 red and white."
+  },
+  {
+   "name": "horns",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "Horns (most dairy cows are dehorned as calves)."
+  },
+  {
+   "name": "udder",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "The udder of a milking cow."
+  },
+  {
+   "name": "seed",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 999,
+   "description": "Seed for the shape of the patches."
+  }
+ ],
+ "materials": {
+  "coat": {
+   "color": [
+    0.62,
+    0.6,
+    0.56,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  },
+  "patch_black": {
+   "color": [
+    0.018,
+    0.017,
+    0.017,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "patch_red": {
+   "color": [
+    0.2,
+    0.05,
+    0.02,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "muzzle": {
+   "color": [
+    0.55,
+    0.3,
+    0.27,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.45
+  },
+  "udder": {
+   "color": [
+    0.6,
+    0.36,
+    0.32,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.5
+  },
+  "hoof": {
+   "color": [
+    0.05,
+    0.045,
+    0.04,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.5
+  },
+  "horn": {
+   "color": [
+    0.55,
+    0.5,
+    0.4,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.4
+  },
+  "switch": {
+   "color": [
+    0.05,
+    0.045,
+    0.04,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  },
+  "eye": {
+   "color": [
+    0.015,
+    0.012,
+    0.01,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.1
+  }
+ },
+ "nodes": [
+  {
+   "name": "Cow",
+   "material": "coat",
+   "vars": {
+    "s": "$height / 1.45",
+    "sz": "$height / 1.45 * $length",
+    "sx": "$height / 1.45 * $build",
+    "lift": "$height / 1.45 * 0.9 * ($legs - 1)",
+    "kf": "$height / 1.45 + $height / 1.45 * 0.9 * ($legs - 1) / 1.0",
+    "kb": "$height / 1.45 + $height / 1.45 * 0.9 * ($legs - 1) / 1.1",
+    "hk": "max(0.12, $horns)",
+    "uk": "max(0.4, $udder)",
+    "ud": "$udder"
+   },
+   "children": [
+    {
+     "name": "Body",
+     "shape": "loft",
+     "sections": [
+      {
+       "z": "$sz * -0.88",
+       "superellipse": {
+        "width": "$sx * 0.22",
+        "height": "$s * 0.24",
+        "n": 2.0,
+        "count": 32,
+        "cy": "$s * 1.26 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.82",
+       "superellipse": {
+        "width": "$sx * 0.44",
+        "height": "$s * 0.5",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.2 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.68",
+       "superellipse": {
+        "width": "$sx * 0.57",
+        "height": "$s * 0.67",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.135 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.45",
+       "superellipse": {
+        "width": "$sx * 0.6",
+        "height": "$s * 0.785",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.0625 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.15",
+       "superellipse": {
+        "width": "$sx * 0.68",
+        "height": "$s * 0.84",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.02 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.15",
+       "superellipse": {
+        "width": "$sx * 0.66",
+        "height": "$s * 0.82",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.04 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.42",
+       "superellipse": {
+        "width": "$sx * 0.57",
+        "height": "$s * 0.78",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.08 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.62",
+       "superellipse": {
+        "width": "$sx * 0.47",
+        "height": "$s * 0.7",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.11 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.74",
+       "superellipse": {
+        "width": "$sx * 0.35",
+        "height": "$s * 0.55",
+        "n": 2.3,
+        "count": 32,
+        "cy": "$s * 1.135 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.8",
+       "superellipse": {
+        "width": "$sx * 0.17",
+        "height": "$s * 0.3",
+        "n": 2.0,
+        "count": 32,
+        "cy": "$s * 1.15 + $lift"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Neck",
+     "shape": "loft",
+     "sections": [
+      {
+       "z": "$sz * 0.5",
+       "superellipse": {
+        "width": "$sx * 0.4",
+        "height": "$s * 0.65",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 1.125 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.72",
+       "superellipse": {
+        "width": "$sx * 0.34",
+        "height": "$s * 0.62",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 1.13 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.88",
+       "superellipse": {
+        "width": "$sx * 0.3",
+        "height": "$s * 0.54",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 1.15 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.99",
+       "superellipse": {
+        "width": "$sx * 0.25",
+        "height": "$s * 0.44",
+        "n": 2.0,
+        "count": 28,
+        "cy": "$s * 1.18 + $lift"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Dewlap",
+     "shape": "loft",
+     "sections": [
+      {
+       "z": "$sz * 0.6",
+       "superellipse": {
+        "width": "$sx * 0.06",
+        "height": "$s * 0.18",
+        "n": 2.0,
+        "count": 12,
+        "cy": "$s * 0.83 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.72",
+       "superellipse": {
+        "width": "$sx * 0.08",
+        "height": "$s * 0.17",
+        "n": 2.3,
+        "count": 12,
+        "cy": "$s * 0.815 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.84",
+       "superellipse": {
+        "width": "$sx * 0.06",
+        "height": "$s * 0.13",
+        "n": 2.3,
+        "count": 12,
+        "cy": "$s * 0.885 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.9",
+       "superellipse": {
+        "width": "$sx * 0.03",
+        "height": "$s * 0.08",
+        "n": 2.0,
+        "count": 12,
+        "cy": "$s * 0.96 + $lift"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Patches",
+     "children": [
+      {
+       "name": "Patch_1L",
+       "mirror": "Patch_1R",
+       "at": [
+        "$sx * 0.2524 * 0.93969 * 0 + $sx * 0.2524 - $s * 0.07987 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$s * 1.2758 + $lift - $s * 0.02907 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$sz * -0.72"
+       ],
+       "rotate": [
+        0,
+        0,
+        20
+       ],
+       "children": [
+        {
+         "name": "Black",
+         "shape": "ellipsoid",
+         "material": "patch_black",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 1",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 1))",
+          "$s * 0.2 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 1 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))",
+          "$sz * 0.26 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 1 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))"
+         ]
+        },
+        {
+         "name": "Red",
+         "shape": "ellipsoid",
+         "material": "patch_red",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 1",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 2))",
+          "$s * 0.2 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 1 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))",
+          "$sz * 0.26 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 1 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Patch_2L",
+       "mirror": "Patch_2R",
+       "at": [
+        "$sx * 0.29052 * 0.93969 * 0 + $sx * 0.29052 - $s * 0.07987 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$s * 0.89921 + $lift - $s * -0.02907 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$sz * -0.4"
+       ],
+       "rotate": [
+        0,
+        0,
+        -20
+       ],
+       "children": [
+        {
+         "name": "Black",
+         "shape": "ellipsoid",
+         "material": "patch_black",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 14",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 1))",
+          "$s * 0.24 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 2 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))",
+          "$sz * 0.3 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 2 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))"
+         ]
+        },
+        {
+         "name": "Red",
+         "shape": "ellipsoid",
+         "material": "patch_red",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 14",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 2))",
+          "$s * 0.24 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 2 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))",
+          "$sz * 0.3 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 2 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Patch_3L",
+       "mirror": "Patch_3R",
+       "at": [
+        "$sx * 0.2962 * 0.86603 * 0 + $sx * 0.2962 - $s * 0.07361 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$s * 1.25617 + $lift - $s * 0.0425 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$sz * -0.02"
+       ],
+       "rotate": [
+        0,
+        0,
+        30
+       ],
+       "children": [
+        {
+         "name": "Black",
+         "shape": "ellipsoid",
+         "material": "patch_black",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 27",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 1))",
+          "$s * 0.22 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 3 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))",
+          "$sz * 0.28 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 3 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))"
+         ]
+        },
+        {
+         "name": "Red",
+         "shape": "ellipsoid",
+         "material": "patch_red",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 27",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 2))",
+          "$s * 0.22 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 3 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))",
+          "$sz * 0.28 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 3 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Patch_4L",
+       "mirror": "Patch_4R",
+       "at": [
+        "$sx * 0.27999 * 0.90631 * 0 + $sx * 0.27999 - $s * 0.07704 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$s * 0.8736 + $lift - $s * -0.03592 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$sz * 0.3"
+       ],
+       "rotate": [
+        0,
+        0,
+        -25
+       ],
+       "children": [
+        {
+         "name": "Black",
+         "shape": "ellipsoid",
+         "material": "patch_black",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 40",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 1))",
+          "$s * 0.2 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 4 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))",
+          "$sz * 0.24 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 4 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))"
+         ]
+        },
+        {
+         "name": "Red",
+         "shape": "ellipsoid",
+         "material": "patch_red",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 40",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 2))",
+          "$s * 0.2 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 4 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))",
+          "$sz * 0.24 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 4 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Patch_5L",
+       "mirror": "Patch_5R",
+       "at": [
+        "$sx * 0.2295 * 0.90631 * 0 + $sx * 0.2295 - $s * 0.07704 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$s * 1.27218 + $lift - $s * 0.03592 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$sz * 0.56"
+       ],
+       "rotate": [
+        0,
+        0,
+        25
+       ],
+       "children": [
+        {
+         "name": "Black",
+         "shape": "ellipsoid",
+         "material": "patch_black",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 53",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 1))",
+          "$s * 0.17 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 5 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))",
+          "$sz * 0.2 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 5 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))"
+         ]
+        },
+        {
+         "name": "Red",
+         "shape": "ellipsoid",
+         "material": "patch_red",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 53",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 2))",
+          "$s * 0.17 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 5 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))",
+          "$sz * 0.2 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 5 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Patch_6L",
+       "mirror": "Patch_6R",
+       "at": [
+        "$sx * 0.10085 * 0.25882 * 0 + $sx * 0.10085 - $s * 0.022 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$s * 1.4328 + $lift - $s * 0.0821 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$sz * -0.25"
+       ],
+       "rotate": [
+        0,
+        0,
+        75
+       ],
+       "children": [
+        {
+         "name": "Black",
+         "shape": "ellipsoid",
+         "material": "patch_black",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 66",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 1))",
+          "$s * 0.15 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 6 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))",
+          "$sz * 0.17 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 6 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))"
+         ]
+        },
+        {
+         "name": "Red",
+         "shape": "ellipsoid",
+         "material": "patch_red",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 66",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 2))",
+          "$s * 0.15 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 6 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))",
+          "$sz * 0.17 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 6 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Patch_7L",
+       "mirror": "Patch_7R",
+       "at": [
+        "$sx * 0.16667 * 0.46947 * 0 + $sx * 0.16667 - $s * 0.03991 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$s * 1.41202 + $lift - $s * 0.07505 * (1 + (1 - min(1, $patches)) * 0.1 * 4)",
+        "$sz * 0.2"
+       ],
+       "rotate": [
+        0,
+        0,
+        62
+       ],
+       "children": [
+        {
+         "name": "Black",
+         "shape": "ellipsoid",
+         "material": "patch_black",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 79",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 1))",
+          "$s * 0.12 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 7 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))",
+          "$sz * 0.14 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 7 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 1))"
+         ]
+        },
+        {
+         "name": "Red",
+         "shape": "ellipsoid",
+         "material": "patch_red",
+         "segments": 20,
+         "lumps": 0.22,
+         "seed": "$seed * 7 + 79",
+         "radii": [
+          "$s * 0.11 * max(0.3, 1 - abs($colour - 2))",
+          "$s * 0.12 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 7 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))",
+          "$sz * 0.14 * max(0.25, $patches) * (0.85 + 0.3 * (abs(sin($seed * 12.9898 + 7 * 78.233) * 43758.5453) % 1)) * max(0.3, 1 - abs($colour - 2))"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Head",
+     "at": [
+      0,
+      "$s * 1.38 + $lift",
+      "$sz * 0.97"
+     ],
+     "children": [
+      {
+       "name": "Skull",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "$s * 0",
+         "superellipse": {
+          "width": "$s * 0.2",
+          "height": "$s * 0.22",
+          "n": 2.0,
+          "count": 28,
+          "cy": "$s * -0.11"
+         }
+        },
+        {
+         "z": "$s * 0.04",
+         "superellipse": {
+          "width": "$s * 0.29",
+          "height": "$s * 0.275",
+          "n": 2.3,
+          "count": 28,
+          "cy": "$s * -0.1425"
+         }
+        },
+        {
+         "z": "$s * 0.12",
+         "superellipse": {
+          "width": "$s * 0.3",
+          "height": "$s * 0.305",
+          "n": 2.3,
+          "count": 28,
+          "cy": "$s * -0.1875"
+         }
+        },
+        {
+         "z": "$s * 0.2",
+         "superellipse": {
+          "width": "$s * 0.25",
+          "height": "$s * 0.29",
+          "n": 2.3,
+          "count": 28,
+          "cy": "$s * -0.225"
+         }
+        },
+        {
+         "z": "$s * 0.28",
+         "superellipse": {
+          "width": "$s * 0.2",
+          "height": "$s * 0.27",
+          "n": 2.3,
+          "count": 28,
+          "cy": "$s * -0.265"
+         }
+        },
+        {
+         "z": "$s * 0.35",
+         "superellipse": {
+          "width": "$s * 0.19",
+          "height": "$s * 0.25",
+          "n": 2.3,
+          "count": 28,
+          "cy": "$s * -0.305"
+         }
+        },
+        {
+         "z": "$s * 0.41",
+         "superellipse": {
+          "width": "$s * 0.22",
+          "height": "$s * 0.24",
+          "n": 2.3,
+          "count": 28,
+          "cy": "$s * -0.34"
+         }
+        },
+        {
+         "z": "$s * 0.45",
+         "superellipse": {
+          "width": "$s * 0.2",
+          "height": "$s * 0.215",
+          "n": 2.3,
+          "count": 28,
+          "cy": "$s * -0.3575"
+         }
+        },
+        {
+         "z": "$s * 0.47",
+         "superellipse": {
+          "width": "$s * 0.12",
+          "height": "$s * 0.17",
+          "n": 2.0,
+          "count": 28,
+          "cy": "$s * -0.365"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Muzzle",
+       "shape": "ellipsoid",
+       "material": "muzzle",
+       "segments": 18,
+       "at": [
+        0,
+        "-$s * 0.37",
+        "$s * 0.44"
+       ],
+       "radii": [
+        "$s * 0.11",
+        "$s * 0.08",
+        "$s * 0.045"
+       ]
+      },
+      {
+       "name": "Nostril_L",
+       "shape": "ellipsoid",
+       "material": "eye",
+       "segments": 10,
+       "mirror": "Nostril_R",
+       "at": [
+        "$s * 0.045",
+        "-$s * 0.35",
+        "$s * 0.475"
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.01",
+        "$s * 0.008"
+       ]
+      },
+      {
+       "name": "Eye_L",
+       "shape": "ellipsoid",
+       "material": "eye",
+       "segments": 12,
+       "mirror": "Eye_R",
+       "at": [
+        "$s * 0.135",
+        "-$s * 0.12",
+        "$s * 0.13"
+       ],
+       "radii": [
+        "$s * 0.02",
+        "$s * 0.022",
+        "$s * 0.026"
+       ]
+      },
+      {
+       "name": "Mask_L",
+       "shape": "ellipsoid",
+       "material": "patch_black",
+       "segments": 14,
+       "lumps": 0.3,
+       "seed": "$seed + 3",
+       "mirror": "Mask_R",
+       "at": [
+        "$s * 0.095",
+        "-$s * 0.11",
+        "$s * 0.11"
+       ],
+       "radii": [
+        "$s * 0.06 * max(0.3, min(1, $patches)) * max(0.3, 1 - abs($colour - 1))",
+        "$s * 0.12 * max(0.3, min(1, $patches)) * max(0.3, 1 - abs($colour - 1))",
+        "$s * 0.12 * max(0.3, min(1, $patches)) * max(0.3, 1 - abs($colour - 1))"
+       ]
+      },
+      {
+       "name": "MaskRed_L",
+       "shape": "ellipsoid",
+       "material": "patch_red",
+       "segments": 14,
+       "lumps": 0.3,
+       "seed": "$seed + 3",
+       "mirror": "MaskRed_R",
+       "at": [
+        "$s * 0.095",
+        "-$s * 0.11",
+        "$s * 0.11"
+       ],
+       "radii": [
+        "$s * 0.06 * max(0.3, min(1, $patches)) * max(0.3, 1 - abs($colour - 2))",
+        "$s * 0.12 * max(0.3, min(1, $patches)) * max(0.3, 1 - abs($colour - 2))",
+        "$s * 0.12 * max(0.3, min(1, $patches)) * max(0.3, 1 - abs($colour - 2))"
+       ]
+      },
+      {
+       "name": "Ear_L",
+       "mirror": "Ear_R",
+       "at": [
+        "$s * 0.12",
+        "-$s * 0.075",
+        "$s * 0.06"
+       ],
+       "rotate": [
+        0,
+        10,
+        -12
+       ],
+       "children": [
+        {
+         "name": "Flap",
+         "shape": "ellipsoid",
+         "segments": 14,
+         "offset": [
+          "$s * 0.1",
+          0,
+          0
+         ],
+         "radii": [
+          "$s * 0.11",
+          "$s * 0.025",
+          "$s * 0.055"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Horn_L",
+       "mirror": "Horn_R",
+       "material": "horn",
+       "at": [
+        "$s * (0.1 - 0.05 * (1 - $horns))",
+        "-$s * 0.035",
+        "$s * 0.06"
+       ],
+       "children": [
+        {
+         "name": "Spike",
+         "shape": "tube",
+         "segments": 10,
+         "path": [
+          [
+           0,
+           0,
+           0
+          ],
+          [
+           "$s * 0.08 * $hk",
+           "$s * 0.005 * $hk",
+           "$s * 0.01 * $hk"
+          ],
+          [
+           "$s * 0.15 * $hk",
+           "$s * 0.012 * $hk",
+           "$s * 0.05 * $hk"
+          ],
+          [
+           "$s * 0.185 * $hk",
+           "$s * 0.015 * $hk",
+           "$s * 0.11 * $hk"
+          ]
+         ],
+         "radii": [
+          "$s * 0.032",
+          "$s * 0.025 * $hk",
+          "$s * 0.016 * $hk",
+          "$s * 0.005"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_FL",
+     "mirror": "Leg_FR",
+     "at": [
+      "$sx * 0.19",
+      "$s * 1 + $lift",
+      "$sz * 0.56"
+     ],
+     "children": [
+      {
+       "name": "Upper",
+       "shape": "tube",
+       "segments": 12,
+       "path": [
+        [
+         "$s * -0.11",
+         0,
+         0
+        ],
+        [
+         "$s * -0.11",
+         "$kf * -0.05",
+         0
+        ],
+        [
+         "$s * -0.11",
+         "$kf * -0.25",
+         "$s * -0.03"
+        ],
+        [
+         "$s * -0.11",
+         "$kf * -0.5",
+         "$s * -0.01"
+        ]
+       ],
+       "radii": [
+        "$s * 0.11",
+        "$s * 0.11",
+        "$s * 0.09",
+        "$s * 0.065"
+       ]
+      },
+      {
+       "name": "Knee",
+       "at": [
+        "$s * -0.11",
+        "$kf * -0.5",
+        "$s * -0.01"
+       ],
+       "children": [
+        {
+         "name": "Lower",
+         "shape": "tube",
+         "segments": 12,
+         "path": [
+          [
+           0,
+           "$kf * 0.02",
+           0
+          ],
+          [
+           0,
+           "$kf * -0.12",
+           0
+          ],
+          [
+           0,
+           "$kf * -0.3",
+           "$s * 0.005"
+          ],
+          [
+           0,
+           "$kf * -0.4",
+           "$s * 0.02"
+          ]
+         ],
+         "radii": [
+          "$s * 0.06",
+          "$s * 0.05",
+          "$s * 0.048",
+          "$s * 0.052"
+         ]
+        },
+        {
+         "name": "Hoof",
+         "shape": "lathe",
+         "material": "hoof",
+         "segments": 14,
+         "at": [
+          0,
+          "-$kf * 0.5",
+          "$s * 0.02"
+         ],
+         "profile": [
+          [
+           "$s * 0.052",
+           "$s * 0.08"
+          ],
+          [
+           "$s * 0.062",
+           "$s * 0.04"
+          ],
+          [
+           "$s * 0.072",
+           0
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_BL",
+     "mirror": "Leg_BR",
+     "at": [
+      "$sx * 0.21",
+      "$s * 1.1 + $lift",
+      "$sz * -0.62"
+     ],
+     "children": [
+      {
+       "name": "Upper",
+       "shape": "tube",
+       "segments": 12,
+       "path": [
+        [
+         "$s * -0.14",
+         0,
+         0
+        ],
+        [
+         "$s * -0.14",
+         "$kb * -0.06",
+         0
+        ],
+        [
+         "$s * -0.14",
+         "$kb * -0.25",
+         "$s * 0.08"
+        ],
+        [
+         "$s * -0.14",
+         "$kb * -0.45",
+         "$s * -0.02"
+        ],
+        [
+         "$s * -0.14",
+         "$kb * -0.56",
+         "$s * -0.12"
+        ]
+       ],
+       "radii": [
+        "$s * 0.14",
+        "$s * 0.14",
+        "$s * 0.12",
+        "$s * 0.08",
+        "$s * 0.06"
+       ]
+      },
+      {
+       "name": "Hock",
+       "at": [
+        "$s * -0.14",
+        "$kb * -0.57",
+        "$s * -0.12"
+       ],
+       "children": [
+        {
+         "name": "Lower",
+         "shape": "tube",
+         "segments": 12,
+         "path": [
+          [
+           0,
+           "$kb * 0.03",
+           "$s * -0.005"
+          ],
+          [
+           0,
+           "$kb * -0.15",
+           "$s * 0.03"
+          ],
+          [
+           0,
+           "$kb * -0.4",
+           "$s * 0.05"
+          ],
+          [
+           0,
+           "$kb * -0.5",
+           "$s * 0.07"
+          ]
+         ],
+         "radii": [
+          "$s * 0.058",
+          "$s * 0.048",
+          "$s * 0.048",
+          "$s * 0.052"
+         ]
+        },
+        {
+         "name": "Hoof",
+         "shape": "lathe",
+         "material": "hoof",
+         "segments": 14,
+         "at": [
+          "0",
+          "-$kb * 0.53",
+          "$s * 0.08"
+         ],
+         "profile": [
+          [
+           "$s * 0.052",
+           "$s * 0.08"
+          ],
+          [
+           "$s * 0.062",
+           "$s * 0.04"
+          ],
+          [
+           "$s * 0.072",
+           0
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Udder",
+     "material": "udder",
+     "at": [
+      0,
+      "$s * 0.66 + $lift",
+      "-$sz * 0.4"
+     ],
+     "children": [
+      {
+       "name": "Bag",
+       "shape": "ellipsoid",
+       "segments": 20,
+       "at": [
+        0,
+        "-$s * 0.06 * $ud",
+        0
+       ],
+       "radii": [
+        "$s * 0.17 * $uk",
+        "$s * 0.12 * $uk",
+        "$s * 0.2 * $uk"
+       ]
+      },
+      {
+       "name": "Teat_{i}",
+       "shape": "cylinder",
+       "segments": 10,
+       "repeat": {
+        "count": 4,
+        "around": "y",
+        "phase": 45
+       },
+       "anchor": "base",
+       "rotate": [
+        180,
+        0,
+        0
+       ],
+       "at": [
+        "$s * 0.09 * $uk",
+        "-$s * (0.06 * $ud + 0.09 * $uk)",
+        0
+       ],
+       "radius": "$s * 0.017 * $uk",
+       "height": "$s * 0.07 * $uk",
+       "bevel": "$s * 0.008 * $uk"
+      }
+     ]
+    },
+    {
+     "name": "Tail",
+     "at": [
+      0,
+      "$s * 1.37 + $lift",
+      "-$sz * 0.87"
+     ],
+     "children": [
+      {
+       "name": "Dock",
+       "shape": "tube",
+       "segments": 10,
+       "path": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         0,
+         "-$s * 0.03",
+         "-$s * 0.06"
+        ],
+        [
+         0,
+         "-$s * 0.2",
+         "-$s * 0.1"
+        ],
+        [
+         0,
+         "-$s * 0.5",
+         "-$s * 0.11"
+        ],
+        [
+         0,
+         "-$s * 0.75",
+         "-$s * 0.1"
+        ]
+       ],
+       "radii": [
+        "min($s * 0.025, 0.035)",
+        "$s * 0.035",
+        "$s * 0.025",
+        "$s * 0.018",
+        "$s * 0.015"
+       ]
+      },
+      {
+       "name": "Switch",
+       "shape": "lathe",
+       "material": "switch",
+       "segments": 12,
+       "at": [
+        0,
+        "-$s * 0.72",
+        "-$s * 0.1"
+       ],
+       "profile": [
+        [
+         "$s * 0.02",
+         0
+        ],
+        [
+         "$s * 0.04",
+         "-$s * 0.05"
+        ],
+        [
+         "$s * 0.05",
+         "-$s * 0.14"
+        ],
+        [
+         "$s * 0.035",
+         "-$s * 0.22"
+        ],
+        [
+         0,
+         "-$s * 0.26"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

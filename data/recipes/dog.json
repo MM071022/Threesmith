@@ -1,0 +1,913 @@
+{
+ "version": 1,
+ "name": "dog",
+ "archetype": "creature.quadruped",
+ "description": "A medium dog in the proportions of a labrador (a golden coat, darker ears and muzzle): a lofted body with a deep chest and a tucked-up belly, an arched neck with a collar and tag, a head with a stop, a muzzle, a black nose, eyes and ears that range from pricked to floppy, four legs with elbows, hocks that bend backwards and paws, and a tail that hangs or curls over the back. Legs, knees, hocks, head, ears and tail are nodes with their pivot at the joint, so it can be animated. Breed-like proportions (length, build, leg length, snout) are parameters. Head towards +Z, paws on y = 0.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 0.57,
+   "min": 0.25,
+   "max": 0.9,
+   "description": "Height at the withers in metres (a labrador is 0.55-0.62, a beagle 0.36, a great dane 0.8)."
+  },
+  {
+   "name": "length",
+   "type": "number",
+   "default": 1,
+   "min": 0.8,
+   "max": 1.35,
+   "description": "Body length relative to a labrador (1.3 is a dachshund-like long back)."
+  },
+  {
+   "name": "build",
+   "type": "number",
+   "default": 1,
+   "min": 0.7,
+   "max": 1.4,
+   "description": "Width of the body and legs (0.7 a greyhound, 1.4 a bulldog)."
+  },
+  {
+   "name": "legs",
+   "type": "number",
+   "default": 1,
+   "min": 0.55,
+   "max": 1.3,
+   "description": "Leg length relative to a labrador (0.55 a corgi or dachshund, 1.3 a greyhound)."
+  },
+  {
+   "name": "snout",
+   "type": "number",
+   "default": 1,
+   "min": 0.4,
+   "max": 1.7,
+   "description": "Muzzle length (0.4 a pug or bulldog, 1.7 a collie or greyhound)."
+  },
+  {
+   "name": "earDroop",
+   "type": "number",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "description": "0 pricked ears (a shepherd or husky), 1 floppy ears (a labrador or beagle)."
+  },
+  {
+   "name": "tailStyle",
+   "type": "integer",
+   "default": 1,
+   "min": 1,
+   "max": 2,
+   "description": "1 a hanging tail (a labrador), 2 curled up over the back (a husky or spitz)."
+  },
+  {
+   "name": "collar",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A collar with a tag."
+  }
+ ],
+ "materials": {
+  "coat": {
+   "color": [
+    0.3,
+    0.16,
+    0.055,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.75
+  },
+  "coat_dark": {
+   "color": [
+    0.2,
+    0.1,
+    0.035,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.75
+  },
+  "nose": {
+   "color": [
+    0.015,
+    0.012,
+    0.012,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.35
+  },
+  "eye": {
+   "color": [
+    0.03,
+    0.015,
+    0.008,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.08
+  },
+  "collar": {
+   "color": [
+    0.45,
+    0.02,
+    0.02,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.55
+  }
+ },
+ "nodes": [
+  {
+   "name": "Dog",
+   "material": "coat",
+   "vars": {
+    "s": "$height / 0.57",
+    "sz": "$height / 0.57 * $length",
+    "sx": "$height / 0.57 * $build",
+    "lift": "$height / 0.57 * 0.4 * ($legs - 1)",
+    "kf": "$height / 0.57 + $height / 0.57 * 0.4 * ($legs - 1) / 0.44",
+    "kb": "$height / 0.57 + $height / 0.57 * 0.4 * ($legs - 1) / 0.47"
+   },
+   "children": [
+    {
+     "name": "Body",
+     "shape": "loft",
+     "sections": [
+      {
+       "z": "$sz * -0.4",
+       "superellipse": {
+        "width": "$sx * 0.08",
+        "height": "$s * 0.08",
+        "n": 2.0,
+        "count": 28,
+        "cy": "$s * 0.49 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.37",
+       "superellipse": {
+        "width": "$sx * 0.19",
+        "height": "$s * 0.17",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.475 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.29",
+       "superellipse": {
+        "width": "$sx * 0.25",
+        "height": "$s * 0.21",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.465 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.15",
+       "superellipse": {
+        "width": "$sx * 0.235",
+        "height": "$s * 0.175",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.4725 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0",
+       "superellipse": {
+        "width": "$sx * 0.26",
+        "height": "$s * 0.225",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.4525 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.14",
+       "superellipse": {
+        "width": "$sx * 0.29",
+        "height": "$s * 0.285",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.4375 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.25",
+       "superellipse": {
+        "width": "$sx * 0.28",
+        "height": "$s * 0.29",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.445 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.32",
+       "superellipse": {
+        "width": "$sx * 0.22",
+        "height": "$s * 0.235",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.4575 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.36",
+       "superellipse": {
+        "width": "$sx * 0.11",
+        "height": "$s * 0.13",
+        "n": 2.0,
+        "count": 28,
+        "cy": "$s * 0.475 + $lift"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Neck",
+     "shape": "loft",
+     "sections": [
+      {
+       "z": "$sz * 0.12",
+       "superellipse": {
+        "width": "$sx * 0.19",
+        "height": "$s * 0.19",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 0.465 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.2",
+       "superellipse": {
+        "width": "$sx * 0.175",
+        "height": "$s * 0.19",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 0.515 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.28",
+       "superellipse": {
+        "width": "$sx * 0.155",
+        "height": "$s * 0.19",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 0.565 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.36",
+       "superellipse": {
+        "width": "$sx * 0.135",
+        "height": "$s * 0.175",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 0.6375 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.42",
+       "superellipse": {
+        "width": "$sx * 0.12",
+        "height": "$s * 0.16",
+        "n": 2.0,
+        "count": 24,
+        "cy": "$s * 0.68 + $lift"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Collar",
+     "material": "collar",
+     "children": [
+      {
+       "name": "Band",
+       "shape": "tube",
+       "segments": 8,
+       "vars": {
+        "cr": "$s * (0.062 + 0.012 * $collar)"
+       },
+       "path": [
+        [
+         "$cr * 1 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0",
+         "$sz * 0.345 - $s * 0.035 * 0"
+        ],
+        [
+         "$cr * 0.96593 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.25882",
+         "$sz * 0.345 - $s * 0.035 * 0.25882"
+        ],
+        [
+         "$cr * 0.86602 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.5",
+         "$sz * 0.345 - $s * 0.035 * 0.5"
+        ],
+        [
+         "$cr * 0.70711 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.70711",
+         "$sz * 0.345 - $s * 0.035 * 0.70711"
+        ],
+        [
+         "$cr * 0.5 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.86603",
+         "$sz * 0.345 - $s * 0.035 * 0.86603"
+        ],
+        [
+         "$cr * 0.25882 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.96593",
+         "$sz * 0.345 - $s * 0.035 * 0.96593"
+        ],
+        [
+         "$cr * 0 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 1",
+         "$sz * 0.345 - $s * 0.035 * 1"
+        ],
+        [
+         "$cr * -0.25882 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.96592",
+         "$sz * 0.345 - $s * 0.035 * 0.96592"
+        ],
+        [
+         "$cr * -0.5 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.86602",
+         "$sz * 0.345 - $s * 0.035 * 0.86602"
+        ],
+        [
+         "$cr * -0.70711 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.7071",
+         "$sz * 0.345 - $s * 0.035 * 0.7071"
+        ],
+        [
+         "$cr * -0.86603 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.49999",
+         "$sz * 0.345 - $s * 0.035 * 0.49999"
+        ],
+        [
+         "$cr * -0.96593 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 0.25881",
+         "$sz * 0.345 - $s * 0.035 * 0.25881"
+        ],
+        [
+         "$cr * -1 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -1e-05",
+         "$sz * 0.345 - $s * 0.035 * -1e-05"
+        ],
+        [
+         "$cr * -0.96592 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.25883",
+         "$sz * 0.345 - $s * 0.035 * -0.25883"
+        ],
+        [
+         "$cr * -0.86602 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.50001",
+         "$sz * 0.345 - $s * 0.035 * -0.50001"
+        ],
+        [
+         "$cr * -0.7071 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.70711",
+         "$sz * 0.345 - $s * 0.035 * -0.70711"
+        ],
+        [
+         "$cr * -0.49999 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.86603",
+         "$sz * 0.345 - $s * 0.035 * -0.86603"
+        ],
+        [
+         "$cr * -0.25881 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.96593",
+         "$sz * 0.345 - $s * 0.035 * -0.96593"
+        ],
+        [
+         "$cr * 1e-05 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -1",
+         "$sz * 0.345 - $s * 0.035 * -1"
+        ],
+        [
+         "$cr * 0.25883 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.96592",
+         "$sz * 0.345 - $s * 0.035 * -0.96592"
+        ],
+        [
+         "$cr * 0.50001 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.86602",
+         "$sz * 0.345 - $s * 0.035 * -0.86602"
+        ],
+        [
+         "$cr * 0.70712 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.7071",
+         "$sz * 0.345 - $s * 0.035 * -0.7071"
+        ],
+        [
+         "$cr * 0.86603 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.49999",
+         "$sz * 0.345 - $s * 0.035 * -0.49999"
+        ],
+        [
+         "$cr * 0.96593 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * -0.25881",
+         "$sz * 0.345 - $s * 0.035 * -0.25881"
+        ],
+        [
+         "$cr * 1 * $sx / $s",
+         "$s * 0.625 + $lift + $cr * 1.2 * 1e-05",
+         "$sz * 0.345 - $s * 0.035 * 1e-05"
+        ]
+       ],
+       "radius": "$s * 0.012"
+      },
+      {
+       "name": "Tag",
+       "shape": "cylinder",
+       "material": "brass",
+       "axis": "z",
+       "radius": "$s * 0.014 * max(0.3, $collar)",
+       "height": "$s * 0.004",
+       "at": [
+        0,
+        "$s * 0.625 + $lift - $s * (0.062 + 0.012 * $collar) * 1.2 - $s * 0.016 * $collar",
+        "$sz * 0.345 + $s * 0.045"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Head",
+     "at": [
+      0,
+      "$s * 0.6 + $lift",
+      "$sz * 0.36 + $s * 0.03"
+     ],
+     "children": [
+      {
+       "name": "Skull",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "$s * 0",
+         "superellipse": {
+          "width": "$s * 0.07",
+          "height": "$s * 0.1",
+          "n": 2.0,
+          "count": 24,
+          "cy": "$s * 0.08"
+         }
+        },
+        {
+         "z": "$s * 0.03",
+         "superellipse": {
+          "width": "$s * 0.135",
+          "height": "$s * 0.17",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.085"
+         }
+        },
+        {
+         "z": "$s * 0.08",
+         "superellipse": {
+          "width": "$s * 0.15",
+          "height": "$s * 0.185",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.0925"
+         }
+        },
+        {
+         "z": "$s * 0.125",
+         "superellipse": {
+          "width": "$s * 0.13",
+          "height": "$s * 0.155",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.0875"
+         }
+        },
+        {
+         "z": "$s * (0.13 + 0.02 * $snout)",
+         "superellipse": {
+          "width": "$s * 0.09",
+          "height": "$s * 0.113",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.0685"
+         }
+        },
+        {
+         "z": "$s * (0.13 + 0.08 * $snout)",
+         "superellipse": {
+          "width": "$s * 0.08",
+          "height": "$s * 0.093",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.0615"
+         }
+        },
+        {
+         "z": "$s * (0.13 + 0.12 * $snout)",
+         "superellipse": {
+          "width": "$s * 0.07",
+          "height": "$s * 0.078",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.059"
+         }
+        },
+        {
+         "z": "$s * (0.13 + 0.14 * $snout)",
+         "superellipse": {
+          "width": "$s * 0.045",
+          "height": "$s * 0.055",
+          "n": 2.0,
+          "count": 24,
+          "cy": "$s * 0.0575"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Jaw",
+       "shape": "loft",
+       "material": "coat_dark",
+       "sections": [
+        {
+         "z": "$s * 0.1",
+         "superellipse": {
+          "width": "$s * 0.06",
+          "height": "$s * 0.02",
+          "n": 2.2,
+          "count": 16,
+          "cy": "$s * 0.02"
+         }
+        },
+        {
+         "z": "$s * (0.13 + 0.03 * $snout)",
+         "superellipse": {
+          "width": "$s * 0.07",
+          "height": "$s * 0.03",
+          "n": 2.2,
+          "count": 16,
+          "cy": "$s * 0.025"
+         }
+        },
+        {
+         "z": "$s * (0.13 + 0.09 * $snout)",
+         "superellipse": {
+          "width": "$s * 0.06",
+          "height": "$s * 0.028",
+          "n": 2.2,
+          "count": 16,
+          "cy": "$s * 0.03"
+         }
+        },
+        {
+         "z": "$s * (0.13 + 0.125 * $snout)",
+         "superellipse": {
+          "width": "$s * 0.04",
+          "height": "$s * 0.02",
+          "n": 2.2,
+          "count": 16,
+          "cy": "$s * 0.035"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Nose",
+       "shape": "ellipsoid",
+       "material": "nose",
+       "segments": 14,
+       "at": [
+        0,
+        "$s * 0.086",
+        "$s * (0.13 + 0.14 * $snout)"
+       ],
+       "radii": [
+        "$s * 0.026",
+        "$s * 0.02",
+        "$s * 0.016"
+       ]
+      },
+      {
+       "name": "Eye_L",
+       "shape": "ellipsoid",
+       "material": "eye",
+       "segments": 12,
+       "mirror": "Eye_R",
+       "at": [
+        "$s * 0.048",
+        "$s * 0.138",
+        "$s * 0.118"
+       ],
+       "radii": [
+        "$s * 0.011",
+        "$s * 0.012",
+        "$s * 0.012"
+       ]
+      },
+      {
+       "name": "Ear_L",
+       "mirror": "Ear_R",
+       "at": [
+        "$s * 0.058",
+        "$s * 0.165",
+        "$s * 0.055"
+       ],
+       "rotate": [
+        0,
+        0,
+        "-(18 + 128 * $earDroop)"
+       ],
+       "children": [
+        {
+         "name": "Flap",
+         "shape": "ellipsoid",
+         "material": "coat_dark",
+         "segments": 14,
+         "offset": [
+          0,
+          "$s * 0.05",
+          0
+         ],
+         "rotate": [
+          0,
+          "-10 + 30 * $earDroop",
+          0
+         ],
+         "radii": [
+          "$s * (0.03 + 0.012 * $earDroop)",
+          "$s * 0.058",
+          "$s * 0.011"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_FL",
+     "mirror": "Leg_FR",
+     "at": [
+      "$sx * 0.1",
+      "$s * 0.44 + $lift",
+      "$sz * 0.22"
+     ],
+     "children": [
+      {
+       "name": "Upper",
+       "shape": "tube",
+       "segments": 12,
+       "path": [
+        [
+         "$s * -0.065",
+         0,
+         0
+        ],
+        [
+         "$s * -0.065",
+         "$kf * -0.03",
+         0
+        ],
+        [
+         "$s * -0.065",
+         "$kf * -0.09",
+         "$s * -0.02"
+        ],
+        [
+         "$s * -0.065",
+         "$kf * -0.15",
+         "$s * -0.03"
+        ]
+       ],
+       "radii": [
+        "$s * 0.065",
+        "$s * 0.064",
+        "$s * 0.055",
+        "$s * 0.043"
+       ]
+      },
+      {
+       "name": "Knee",
+       "at": [
+        "$s * -0.065",
+        "$kf * -0.15",
+        "$s * -0.03"
+       ],
+       "children": [
+        {
+         "name": "Lower",
+         "shape": "tube",
+         "segments": 12,
+         "path": [
+          [
+           0,
+           "$kf * 0.01",
+           0
+          ],
+          [
+           0,
+           "$kf * -0.12",
+           "$s * 0.005"
+          ],
+          [
+           0,
+           "$kf * -0.21",
+           0
+          ],
+          [
+           0,
+           "$kf * -0.265",
+           "$s * 0.012"
+          ]
+         ],
+         "radii": [
+          "$s * 0.04",
+          "$s * 0.029",
+          "$s * 0.022",
+          "$s * 0.021"
+         ]
+        },
+        {
+         "name": "Paw",
+         "shape": "ellipsoid",
+         "segments": 14,
+         "at": [
+          0,
+          "-$kf * 0.29 + $s * 0.021",
+          "$s * 0.03"
+         ],
+         "radii": [
+          "$s * 0.03",
+          "$s * 0.021",
+          "$s * 0.045"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_BL",
+     "mirror": "Leg_BR",
+     "at": [
+      "$sx * 0.1",
+      "$s * 0.47 + $lift",
+      "$sz * -0.29"
+     ],
+     "children": [
+      {
+       "name": "Upper",
+       "shape": "tube",
+       "segments": 12,
+       "path": [
+        [
+         "$s * -0.085",
+         0,
+         0
+        ],
+        [
+         "$s * -0.085",
+         "$kb * -0.04",
+         0
+        ],
+        [
+         "$s * -0.085",
+         "$kb * -0.11",
+         "$s * 0.04"
+        ],
+        [
+         "$s * -0.085",
+         "$kb * -0.18",
+         "$s * 0.035"
+        ],
+        [
+         "$s * -0.085",
+         "$kb * -0.25",
+         "$s * -0.03"
+        ]
+       ],
+       "radii": [
+        "$s * 0.085",
+        "$s * 0.084",
+        "$s * 0.07",
+        "$s * 0.05",
+        "$s * 0.035"
+       ]
+      },
+      {
+       "name": "Hock",
+       "at": [
+        "$s * -0.085",
+        "$kb * -0.26",
+        "$s * -0.04"
+       ],
+       "children": [
+        {
+         "name": "Lower",
+         "shape": "tube",
+         "segments": 12,
+         "path": [
+          [
+           0,
+           "$kb * 0.015",
+           "$s * 0.005"
+          ],
+          [
+           0,
+           "$kb * -0.1",
+           "$s * 0.02"
+          ],
+          [
+           0,
+           "$kb * -0.19",
+           "$s * 0.025"
+          ]
+         ],
+         "radii": [
+          "$s * 0.032",
+          "$s * 0.025",
+          "$s * 0.022"
+         ]
+        },
+        {
+         "name": "Paw",
+         "shape": "ellipsoid",
+         "segments": 14,
+         "at": [
+          0,
+          "-$kb * 0.21 + $s * 0.021",
+          "$s * 0.045"
+         ],
+         "radii": [
+          "$s * 0.03",
+          "$s * 0.021",
+          "$s * 0.045"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Tail",
+     "at": [
+      0,
+      "$s * 0.535 + $lift",
+      "-$sz * 0.385"
+     ],
+     "children": [
+      {
+       "name": "Brush",
+       "shape": "tube",
+       "segments": 12,
+       "path": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         0,
+         "$s * lerp(-0.035, 0.05, $tailStyle - 1)",
+         "$s * lerp(-0.07, -0.06, $tailStyle - 1)"
+        ],
+        [
+         0,
+         "$s * lerp(-0.12, 0.15, $tailStyle - 1)",
+         "$s * lerp(-0.14, -0.07, $tailStyle - 1)"
+        ],
+        [
+         0,
+         "$s * lerp(-0.23, 0.24, $tailStyle - 1)",
+         "$s * lerp(-0.18, -0.04, $tailStyle - 1)"
+        ],
+        [
+         0,
+         "$s * lerp(-0.32, 0.29, $tailStyle - 1)",
+         "$s * lerp(-0.2, 0, $tailStyle - 1)"
+        ]
+       ],
+       "radii": [
+        "min($s * 0.018, 0.019)",
+        "$s * 0.032",
+        "$s * 0.028",
+        "$s * 0.02",
+        "$s * 0.01"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

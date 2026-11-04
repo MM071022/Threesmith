@@ -1,0 +1,564 @@
+{
+ "version": 1,
+ "name": "birch",
+ "archetype": "plant.tree.broadleaf",
+ "description": "A silver birch: a slender, slightly leaning white trunk with dark horizontal lenticel marks and a dark, fissured foot, ascending limbs that end in hanging twigs, and a light, open, oval crown of small clusters in two fresh greens. The seed sets the marks and the branch layout; how much the twigs weep is a parameter.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 14,
+   "min": 4,
+   "max": 25,
+   "description": "Total height in metres (a silver birch is usually 15-25 m)."
+  },
+  {
+   "name": "crownWidth",
+   "type": "number",
+   "default": 5,
+   "min": 2,
+   "max": 10,
+   "description": "Width of the crown in metres."
+  },
+  {
+   "name": "trunkRadius",
+   "type": "number",
+   "default": 0.15,
+   "min": 0.06,
+   "max": 0.4,
+   "description": "Trunk radius at head height."
+  },
+  {
+   "name": "branches",
+   "type": "integer",
+   "default": 7,
+   "min": 4,
+   "max": 12,
+   "description": "Number of main limbs."
+  },
+  {
+   "name": "weeping",
+   "type": "number",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "description": "How far the twigs hang (silver birch weeps, downy birch hardly)."
+  },
+  {
+   "name": "lean",
+   "type": "number",
+   "default": 0.3,
+   "min": -1,
+   "max": 1,
+   "description": "Sideways lean of the trunk top in metres."
+  },
+  {
+   "name": "marks",
+   "type": "integer",
+   "default": 22,
+   "min": 6,
+   "max": 40,
+   "description": "Number of dark marks on the trunk."
+  },
+  {
+   "name": "seed",
+   "type": "integer",
+   "default": 4,
+   "min": 1,
+   "max": 999,
+   "description": "Seed for the marks and the limbs."
+  }
+ ],
+ "materials": {
+  "birch_bark": {
+   "color": [
+    0.6,
+    0.58,
+    0.54,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.7,
+   "texture": "plaster"
+  },
+  "birch_base": {
+   "color": [
+    0.06,
+    0.05,
+    0.045,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.95,
+   "texture": "bark"
+  },
+  "birch_mark": {
+   "color": [
+    0.03,
+    0.028,
+    0.026,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "twig": {
+   "color": [
+    0.09,
+    0.05,
+    0.035,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "birch_leaf": {
+   "color": [
+    0.022,
+    0.06,
+    0.008,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8,
+   "texture": "leaf"
+  },
+  "birch_leaf_light": {
+   "color": [
+    0.04,
+    0.095,
+    0.012,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.78,
+   "texture": "leaf"
+  }
+ },
+ "nodes": [
+  {
+   "name": "Birch",
+   "vars": {
+    "cw": "$crownWidth",
+    "tr": "$trunkRadius",
+    "top": "max($height * 0.55, $height - $crownWidth * 0.4)"
+   },
+   "children": [
+    {
+     "name": "Trunk",
+     "shape": "tube",
+     "material": "birch_bark",
+     "segments": 18,
+     "path": [
+      [
+       "$lean * 0",
+       "$top * 0",
+       0
+      ],
+      [
+       "$lean * 0.0009",
+       "$top * 0.03",
+       0
+      ],
+      [
+       "$lean * 0.01",
+       "$top * 0.1",
+       0
+      ],
+      [
+       "$lean * 0.09",
+       "$top * 0.3",
+       0
+      ],
+      [
+       "$lean * 0.25",
+       "$top * 0.5",
+       0
+      ],
+      [
+       "$lean * 0.49",
+       "$top * 0.7",
+       0
+      ],
+      [
+       "$lean * 0.7225",
+       "$top * 0.85",
+       0
+      ],
+      [
+       "$lean * 1",
+       "$top * 1",
+       0
+      ]
+     ],
+     "radii": [
+      "$tr * 1.55",
+      "$tr * 1.4",
+      "($tr * (1.3 - 1.05 * clamp(($top * 0.1) / $top, 0, 1)))",
+      "($tr * (1.3 - 1.05 * clamp(($top * 0.3) / $top, 0, 1)))",
+      "($tr * (1.3 - 1.05 * clamp(($top * 0.5) / $top, 0, 1)))",
+      "($tr * (1.3 - 1.05 * clamp(($top * 0.7) / $top, 0, 1)))",
+      "($tr * (1.3 - 1.05 * clamp(($top * 0.85) / $top, 0, 1)))",
+      "($tr * (1.3 - 1.05 * clamp(($top * 1) / $top, 0, 1)))"
+     ],
+     "children": [
+      {
+       "name": "Foot",
+       "shape": "tube",
+       "material": "birch_base",
+       "segments": 18,
+       "path": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         0,
+         "$top * 0.03",
+         0
+        ],
+        [
+         "$lean * 0.0036",
+         "$top * 0.06",
+         0
+        ],
+        [
+         "$lean * 0.01",
+         "$top * 0.1",
+         0
+        ]
+       ],
+       "radii": [
+        "$tr * 1.6",
+        "$tr * 1.42",
+        "$tr * 1.3",
+        "$tr * 1.22"
+       ]
+      },
+      {
+       "name": "Mark_{i}",
+       "repeat": {
+        "count": "$marks",
+        "around": "y",
+        "phase": "$seed * 53"
+       },
+       "rotate": [
+        0,
+        "140 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 1 * 78.233) * 43758.5453) % 1)",
+        0
+       ],
+       "at": [
+        0,
+        "$top * (0.1 + 0.68 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 2 * 78.233) * 43758.5453) % 1)) / $n)",
+        0
+       ],
+       "children": [
+        {
+         "name": "Unturn",
+         "rotate": [
+          0,
+          "-($seed * 53 + $i * 360 / $n + 140 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 1 * 78.233) * 43758.5453) % 1))",
+          0
+         ],
+         "children": [
+          {
+           "name": "Shift",
+           "at": [
+            "$lean * pow(0.1 + 0.68 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 2 * 78.233) * 43758.5453) % 1)) / $n, 2)",
+            0,
+            0
+           ],
+           "rotate": [
+            0,
+            "$seed * 53 + $i * 360 / $n + 140 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 1 * 78.233) * 43758.5453) % 1)",
+            0
+           ],
+           "children": [
+            {
+             "name": "Lenticel",
+             "shape": "ellipsoid",
+             "material": "birch_mark",
+             "segments": 12,
+             "vars": {
+              "rr": "($tr * (1.3 - 1.05 * clamp(($top * (0.1 + 0.68 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 2 * 78.233) * 43758.5453) % 1)) / $n)) / $top, 0, 1)))"
+             },
+             "at": [
+              0,
+              0,
+              "$rr * 0.86"
+             ],
+             "radii": [
+              "$rr * (0.55 + 0.45 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 3 * 78.233) * 43758.5453) % 1))",
+              "$rr * (0.07 + 0.1 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 4 * 78.233) * 43758.5453) % 1))",
+              "$rr * 0.28"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Branch_{i}",
+     "repeat": {
+      "count": "$branches",
+      "around": "y",
+      "phase": "$seed * 41"
+     },
+     "rotate": [
+      0,
+      "30 * ((abs(sin($seed * 12.9898 + $i * 4.1414 + 5 * 78.233) * 43758.5453) % 1) - 0.5)",
+      0
+     ],
+     "at": [
+      "$lean * pow(0.3 + 0.62 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 6 * 78.233) * 43758.5453) % 1)) / $n, 2) * 0",
+      "$top * (0.3 + 0.62 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 6 * 78.233) * 43758.5453) % 1)) / $n)",
+      0
+     ],
+     "children": [
+      {
+       "name": "Unturn",
+       "rotate": [
+        0,
+        "-($seed * 41 + $i * 360 / $n + 30 * ((abs(sin($seed * 12.9898 + $i * 4.1414 + 5 * 78.233) * 43758.5453) % 1) - 0.5))",
+        0
+       ],
+       "children": [
+        {
+         "name": "Shift",
+         "at": [
+          "$lean * pow(0.3 + 0.62 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 6 * 78.233) * 43758.5453) % 1)) / $n, 2)",
+          0,
+          0
+         ],
+         "rotate": [
+          0,
+          "$seed * 41 + $i * 360 / $n + 30 * ((abs(sin($seed * 12.9898 + $i * 4.1414 + 5 * 78.233) * 43758.5453) % 1) - 0.5)",
+          0
+         ],
+         "children": [
+          {
+           "name": "Bough",
+           "vars": {
+            "t": "0.3 + 0.62 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 6 * 78.233) * 43758.5453) % 1)) / $n",
+            "reach": "$cw * 0.5 * (0.72 + 0.28 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 7 * 78.233) * 43758.5453) % 1)) * (1.25 - 0.75 * (0.3 + 0.62 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 6 * 78.233) * 43758.5453) % 1)) / $n))",
+            "lift": "$top * (0.12 + 0.1 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 8 * 78.233) * 43758.5453) % 1))",
+            "br": "$tr * (0.42 - 0.2 * (0.3 + 0.62 * ($i + (abs(sin($seed * 12.9898 + $i * 4.1414 + 6 * 78.233) * 43758.5453) % 1)) / $n))",
+            "droop": "$top * 0.12 * $weeping",
+            "ls": "$cw * (0.11 + 0.04 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 9 * 78.233) * 43758.5453) % 1))"
+           },
+           "children": [
+            {
+             "name": "Limb",
+             "shape": "tube",
+             "material": "birch_bark",
+             "segments": 9,
+             "path": [
+              [
+               0,
+               0,
+               0
+              ],
+              [
+               "$reach * 0.35",
+               "$lift * 0.55",
+               0
+              ],
+              [
+               "$reach * 0.75",
+               "$lift * 0.95",
+               0
+              ],
+              [
+               "$reach",
+               "$lift - $droop * 0.4",
+               0
+              ]
+             ],
+             "radii": [
+              "$br",
+              "$br * 0.7",
+              "$br * 0.45",
+              "$br * 0.25"
+             ]
+            },
+            {
+             "name": "Twigs",
+             "shape": "tube",
+             "material": "twig",
+             "segments": 6,
+             "path": [
+              [
+               "$reach * 0.97",
+               "$lift - $droop * 0.35",
+               0
+              ],
+              [
+               "$reach * 1.1",
+               "$lift - $droop * 0.6 - $ls * 0.3",
+               "$ls * 0.1"
+              ],
+              [
+               "$reach * 1.15",
+               "$lift - $droop - $ls * 0.9",
+               "$ls * 0.15"
+              ]
+             ],
+             "radii": [
+              "$br * 0.24",
+              "$br * 0.15",
+              "$br * 0.08"
+             ]
+            },
+            {
+             "name": "Leaves",
+             "shape": "ellipsoid",
+             "material": "birch_leaf",
+             "segments": 16,
+             "lumps": 0.35,
+             "seed": "$seed + $i * 7 + 1",
+             "at": [
+              "$reach * 0.95",
+              "$lift - $droop * 0.5",
+              0
+             ],
+             "radii": [
+              "$ls * 1.05",
+              "$ls * (1.1 + 0.5 * $weeping)",
+              "$ls"
+             ]
+            },
+            {
+             "name": "LeavesHang",
+             "shape": "ellipsoid",
+             "material": "birch_leaf_light",
+             "segments": 16,
+             "lumps": 0.35,
+             "seed": "$seed + $i * 11 + 5",
+             "at": [
+              "$reach * 1.1",
+              "$lift - $droop - $ls * 0.7",
+              "$ls * 0.15"
+             ],
+             "radii": [
+              "$ls * 0.75",
+              "$ls * (0.9 + 0.6 * $weeping)",
+              "$ls * 0.75"
+             ]
+            },
+            {
+             "name": "LeavesOuter",
+             "shape": "ellipsoid",
+             "material": "birch_leaf",
+             "segments": 16,
+             "lumps": 0.35,
+             "seed": "$seed + $i * 17 + 2",
+             "at": [
+              "$reach * 0.8",
+              "$lift * 0.9 + $ls * 0.5",
+              "$ls * 0.5"
+             ],
+             "radii": [
+              "$ls * 0.7",
+              "$ls * 0.8",
+              "$ls * 0.7"
+             ]
+            },
+            {
+             "name": "LeavesInner",
+             "shape": "ellipsoid",
+             "material": "birch_leaf_light",
+             "segments": 16,
+             "lumps": 0.35,
+             "seed": "$seed + $i * 13 + 9",
+             "at": [
+              "$reach * 0.55",
+              "$lift * 0.75 + $ls * 0.3",
+              "-$ls * 0.2"
+             ],
+             "radii": [
+              "$ls * 0.8",
+              "$ls * 0.85",
+              "$ls * 0.8"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Crown",
+     "at": [
+      "$lean",
+      "$top",
+      0
+     ],
+     "children": [
+      {
+       "name": "Top",
+       "shape": "ellipsoid",
+       "material": "birch_leaf_light",
+       "segments": 16,
+       "lumps": 0.35,
+       "seed": "$seed + 3",
+       "at": [
+        0,
+        "$cw * 0.1",
+        0
+       ],
+       "radii": [
+        "$cw * 0.13",
+        "$cw * 0.26",
+        "$cw * 0.13"
+       ]
+      },
+      {
+       "name": "Heart",
+       "shape": "ellipsoid",
+       "material": "birch_leaf",
+       "segments": 16,
+       "lumps": 0.35,
+       "seed": "$seed + 17",
+       "at": [
+        "$cw * 0.05",
+        "-$cw * 0.2",
+        0
+       ],
+       "radii": [
+        "$cw * 0.17",
+        "$cw * 0.26",
+        "$cw * 0.17"
+       ]
+      },
+      {
+       "name": "Side",
+       "shape": "ellipsoid",
+       "material": "birch_leaf_light",
+       "segments": 16,
+       "lumps": 0.35,
+       "seed": "$seed + 29",
+       "at": [
+        "-$cw * 0.1",
+        "-$cw * 0.45",
+        "$cw * 0.06"
+       ],
+       "radii": [
+        "$cw * 0.15",
+        "$cw * 0.2",
+        "$cw * 0.15"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

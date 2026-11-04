@@ -28,5 +28,201 @@
    "A model that is 100 times too big or small (a unit mistake) is the most common error: check the size against the typical range.",
    "A moving part baked into the body mesh cannot be animated later."
   ]
+ },
+ {
+  "id": "prop.snowman",
+  "name": "snowman",
+  "description": "A snowman: two or three stacked snowballs with a face of coal and a carrot nose, stick arms, and often a hat and a scarf.",
+  "aliases": [
+   "snowman",
+   "sneeuwpop",
+   "snow man",
+   "sneeuwman",
+   "snowwoman",
+   "snow figure"
+  ],
+  "extends": "prop",
+  "hints": [
+   "winter",
+   "snow",
+   "sneeuw",
+   "christmas",
+   "kerst",
+   "carrot",
+   "wortel",
+   "coal",
+   "kolen"
+  ],
+  "parts": [
+   {
+    "name": "Base",
+    "role": "base",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "base",
+     "bottom",
+     "onderste bal"
+    ],
+    "note": "The biggest ball, flattened where it stands in the snow."
+   },
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "body",
+     "torso",
+     "middle",
+     "romp",
+     "lijf"
+    ]
+   },
+   {
+    "name": "Head",
+    "role": "head",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "head",
+     "hoofd",
+     "kop"
+    ],
+    "note": "Its node sits at the bottom of the head ball, so the head can turn."
+   },
+   {
+    "name": "Nose",
+    "role": "nose",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "nose",
+     "neus",
+     "carrot",
+     "wortel"
+    ]
+   },
+   {
+    "name": "Hat",
+    "role": "hat",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "hat",
+     "hoed",
+     "muts",
+     "bucket",
+     "emmer",
+     "beanie"
+    ]
+   },
+   {
+    "name": "Scarf",
+    "role": "scarf",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "scarf",
+     "sjaal",
+     "das"
+    ]
+   },
+   {
+    "name": "Arm",
+    "role": "arm",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "arm",
+     "arms",
+     "armen",
+     "stick",
+     "tak"
+    ],
+    "note": "A stick pushed into the body; its node sits where it goes in."
+   },
+   {
+    "name": "Button",
+    "role": "button",
+    "required": false,
+    "aliases": [
+     "button",
+     "buttons",
+     "knoop",
+     "knopen"
+    ]
+   }
+  ],
+  "scale": {
+   "height": [
+    0.3,
+    3
+   ],
+   "width": [
+    0.2,
+    2.5
+   ],
+   "length": [
+    0.2,
+    2.5
+   ],
+   "source": "general knowledge: a garden snowman is about 0.5-2 m tall; the record snowwoman (Bethel, Maine, 2008) was 37 m, far outside this range",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "hat",
+    "options": [
+     "top hat",
+     "bucket",
+     "beanie",
+     "none"
+    ]
+   },
+   {
+    "axis": "state",
+    "options": [
+     "fresh",
+     "melting"
+    ]
+   }
+  ],
+  "conventions": [
+   "Stands on y = 0 with the face towards +Z."
+  ],
+  "anticipate": [
+   "A melting animation: scale the balls down in y over time and lower the head and hat with them."
+  ],
+  "pitfalls": [
+   "Balls that only touch at a point look stacked like marbles: let them sink into each other.",
+   "A perfectly smooth sphere reads as plastic: snowballs are slightly lumpy and matte."
+  ]
  }
 ]

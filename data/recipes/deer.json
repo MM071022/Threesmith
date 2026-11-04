@@ -1,0 +1,1397 @@
+{
+ "version": 1,
+ "name": "deer",
+ "archetype": "creature.quadruped",
+ "description": "A deer in the proportions of a red deer stag: a slender lofted body with a white rump patch, a long upright neck, a narrow head with big ears, eyes, a dark nose and a white chin, a pale belly, branched antlers whose beam sweeps up and out with a row of forward-pointing tines (count and size are parameters, or none for a hind), long thin legs with knees, hocks that bend backwards and small hooves, a short tail, and optional white spots like a sika or fallow deer. Legs, knees, hocks, head, ears and tail are nodes with their pivot at the joint. Head towards +Z, hooves on y = 0.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 1.15,
+   "min": 0.6,
+   "max": 1.5,
+   "description": "Height at the shoulder in metres (roe deer 0.7, white-tailed 0.9, red deer stag 1.2, wapiti 1.5)."
+  },
+  {
+   "name": "length",
+   "type": "number",
+   "default": 1,
+   "min": 0.85,
+   "max": 1.2,
+   "description": "Body length relative to a red deer."
+  },
+  {
+   "name": "build",
+   "type": "number",
+   "default": 1,
+   "min": 0.8,
+   "max": 1.25,
+   "description": "Width of the body."
+  },
+  {
+   "name": "legs",
+   "type": "number",
+   "default": 1,
+   "min": 0.85,
+   "max": 1.2,
+   "description": "Leg length relative to a red deer."
+  },
+  {
+   "name": "antlers",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "Antlers (a stag); without them it is a hind."
+  },
+  {
+   "name": "antlerSize",
+   "type": "number",
+   "default": 1,
+   "min": 0.35,
+   "max": 1.5,
+   "description": "Size of the antlers (0.35 a young stag or a roe buck, 1.5 a big wapiti)."
+  },
+  {
+   "name": "tines",
+   "type": "integer",
+   "default": 4,
+   "min": 2,
+   "max": 6,
+   "description": "Tines (points) along each beam."
+  },
+  {
+   "name": "earSize",
+   "type": "number",
+   "default": 1,
+   "min": 0.7,
+   "max": 1.5,
+   "description": "Ear size (1.5 a mule deer)."
+  },
+  {
+   "name": "spots",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "White spots on the back and flanks (a sika or fallow deer, or a fawn)."
+  }
+ ],
+ "materials": {
+  "coat": {
+   "color": [
+    0.14,
+    0.062,
+    0.026,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  },
+  "pale": {
+   "color": [
+    0.3,
+    0.2,
+    0.12,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  },
+  "white": {
+   "color": [
+    0.7,
+    0.67,
+    0.6,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  },
+  "nose": {
+   "color": [
+    0.015,
+    0.012,
+    0.012,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.35
+  },
+  "eye": {
+   "color": [
+    0.012,
+    0.01,
+    0.008,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.08
+  },
+  "hoof": {
+   "color": [
+    0.035,
+    0.03,
+    0.028,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.5
+  },
+  "antler": {
+   "color": [
+    0.32,
+    0.25,
+    0.16,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.7,
+   "texture": "bark"
+  }
+ },
+ "nodes": [
+  {
+   "name": "Deer",
+   "material": "coat",
+   "vars": {
+    "s": "$height / 1.15",
+    "sz": "$height / 1.15 * $length",
+    "sx": "$height / 1.15 * $build",
+    "lift": "$height / 1.15 * 0.7 * ($legs - 1)",
+    "kf": "$height / 1.15 + $height / 1.15 * 0.7 * ($legs - 1) / 0.8",
+    "kb": "$height / 1.15 + $height / 1.15 * 0.7 * ($legs - 1) / 0.86",
+    "ak": "$height / 1.15 * $antlerSize * max(0.06, $antlers)"
+   },
+   "children": [
+    {
+     "name": "Body",
+     "shape": "loft",
+     "sections": [
+      {
+       "z": "$sz * -0.55",
+       "superellipse": {
+        "width": "$sx * 0.12",
+        "height": "$s * 0.14",
+        "n": 2.0,
+        "count": 28,
+        "cy": "$s * 1 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.51",
+       "superellipse": {
+        "width": "$sx * 0.29",
+        "height": "$s * 0.33",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.955 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.39",
+       "superellipse": {
+        "width": "$sx * 0.35",
+        "height": "$s * 0.42",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.92 + $lift"
+       }
+      },
+      {
+       "z": "$sz * -0.18",
+       "superellipse": {
+        "width": "$sx * 0.35",
+        "height": "$s * 0.42",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.9 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.05",
+       "superellipse": {
+        "width": "$sx * 0.37",
+        "height": "$s * 0.46",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.89 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.25",
+       "superellipse": {
+        "width": "$sx * 0.36",
+        "height": "$s * 0.48",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.91 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.4",
+       "superellipse": {
+        "width": "$sx * 0.31",
+        "height": "$s * 0.43",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.945 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.5",
+       "superellipse": {
+        "width": "$sx * 0.22",
+        "height": "$s * 0.3",
+        "n": 2.3,
+        "count": 28,
+        "cy": "$s * 0.97 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.55",
+       "superellipse": {
+        "width": "$sx * 0.1",
+        "height": "$s * 0.13",
+        "n": 2.0,
+        "count": 28,
+        "cy": "$s * 0.985 + $lift"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Neck",
+     "shape": "loft",
+     "sections": [
+      {
+       "z": "$sz * 0.3",
+       "superellipse": {
+        "width": "$sx * 0.25",
+        "height": "$s * 0.37",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 0.985 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.44",
+       "superellipse": {
+        "width": "$sx * 0.21",
+        "height": "$s * 0.4",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 1.1 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.54",
+       "superellipse": {
+        "width": "$sx * 0.17",
+        "height": "$s * 0.39",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 1.255 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.61",
+       "superellipse": {
+        "width": "$sx * 0.145",
+        "height": "$s * 0.34",
+        "n": 2.3,
+        "count": 24,
+        "cy": "$s * 1.41 + $lift"
+       }
+      },
+      {
+       "z": "$sz * 0.66",
+       "superellipse": {
+        "width": "$sx * 0.12",
+        "height": "$s * 0.28",
+        "n": 2.0,
+        "count": 24,
+        "cy": "$s * 1.52 + $lift"
+       }
+      }
+     ]
+    },
+    {
+     "name": "Rump",
+     "shape": "ellipsoid",
+     "material": "white",
+     "segments": 18,
+     "at": [
+      0,
+      "$s * 0.99 + $lift",
+      "-$sz * 0.5"
+     ],
+     "radii": [
+      "$sx * 0.13",
+      "$s * 0.13",
+      "$s * 0.06"
+     ]
+    },
+    {
+     "name": "Belly",
+     "shape": "ellipsoid",
+     "material": "pale",
+     "segments": 18,
+     "at": [
+      0,
+      "$s * 0.72 + $lift",
+      "$sz * 0.02"
+     ],
+     "radii": [
+      "$sx * 0.12",
+      "$s * 0.05",
+      "$sz * 0.35"
+     ]
+    },
+    {
+     "name": "Spots",
+     "children": [
+      {
+       "name": "Spot_1L",
+       "mirror": "Spot_1R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.14082 - $s * 0.00983 * (1 + 4 * (1 - $spots))",
+        "$s * 1.05132 + $lift - $s * 0.00688 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.42"
+       ],
+       "rotate": [
+        0,
+        0,
+        35
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_2L",
+       "mirror": "Spot_2R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.10074 - $s * 0.00636 * (1 + 4 * (1 - $spots))",
+        "$s * 1.10006 + $lift - $s * 0.01018 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.37"
+       ],
+       "rotate": [
+        0,
+        0,
+        58
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_3L",
+       "mirror": "Spot_3R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.04274 - $s * 0.00249 * (1 + 4 * (1 - $spots))",
+        "$s * 1.12372 + $lift - $s * 0.01174 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.42"
+       ],
+       "rotate": [
+        0,
+        0,
+        78
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_4L",
+       "mirror": "Spot_4R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.14713 - $s * 0.00983 * (1 + 4 * (1 - $spots))",
+        "$s * 1.04094 + $lift - $s * 0.00688 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.3"
+       ],
+       "rotate": [
+        0,
+        0,
+        35
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_5L",
+       "mirror": "Spot_5R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.10074 - $s * 0.00636 * (1 + 4 * (1 - $spots))",
+        "$s * 1.08863 + $lift - $s * 0.01018 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.25"
+       ],
+       "rotate": [
+        0,
+        0,
+        58
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_6L",
+       "mirror": "Spot_6R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.04466 - $s * 0.00249 * (1 + 4 * (1 - $spots))",
+        "$s * 1.11743 + $lift - $s * 0.01174 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.3"
+       ],
+       "rotate": [
+        0,
+        0,
+        78
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_7L",
+       "mirror": "Spot_7R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.14713 - $s * 0.00983 * (1 + 4 * (1 - $spots))",
+        "$s * 1.02951 + $lift - $s * 0.00688 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.18"
+       ],
+       "rotate": [
+        0,
+        0,
+        35
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_8L",
+       "mirror": "Spot_8R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.102 - $s * 0.00636 * (1 + 4 * (1 - $spots))",
+        "$s * 1.08355 + $lift - $s * 0.01018 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.13"
+       ],
+       "rotate": [
+        0,
+        0,
+        58
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_9L",
+       "mirror": "Spot_9R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.04466 - $s * 0.00249 * (1 + 4 * (1 - $spots))",
+        "$s * 1.106 + $lift - $s * 0.01174 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.18"
+       ],
+       "rotate": [
+        0,
+        0,
+        78
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_10L",
+       "mirror": "Spot_10R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.15152 - $s * 0.00983 * (1 + 4 * (1 - $spots))",
+        "$s * 1.03073 + $lift - $s * 0.00688 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.06"
+       ],
+       "rotate": [
+        0,
+        0,
+        35
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_11L",
+       "mirror": "Spot_11R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.105 - $s * 0.00636 * (1 + 4 * (1 - $spots))",
+        "$s * 1.08738 + $lift - $s * 0.01018 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.01"
+       ],
+       "rotate": [
+        0,
+        0,
+        58
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_12L",
+       "mirror": "Spot_12R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.04599 - $s * 0.00249 * (1 + 4 * (1 - $spots))",
+        "$s * 1.11102 + $lift - $s * 0.01174 * (1 + 4 * (1 - $spots))",
+        "$sz * -0.06"
+       ],
+       "rotate": [
+        0,
+        0,
+        78
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_13L",
+       "mirror": "Spot_13R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.15533 - $s * 0.00983 * (1 + 4 * (1 - $spots))",
+        "$s * 1.03315 + $lift - $s * 0.00688 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.06"
+       ],
+       "rotate": [
+        0,
+        0,
+        35
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_14L",
+       "mirror": "Spot_14R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.10564 - $s * 0.00636 * (1 + 4 * (1 - $spots))",
+        "$s * 1.09789 + $lift - $s * 0.01018 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.11"
+       ],
+       "rotate": [
+        0,
+        0,
+        58
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_15L",
+       "mirror": "Spot_15R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.04715 - $s * 0.00249 * (1 + 4 * (1 - $spots))",
+        "$s * 1.11711 + $lift - $s * 0.01174 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.06"
+       ],
+       "rotate": [
+        0,
+        0,
+        78
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_16L",
+       "mirror": "Spot_16R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.15281 - $s * 0.00983 * (1 + 4 * (1 - $spots))",
+        "$s * 1.04885 + $lift - $s * 0.00688 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.18"
+       ],
+       "rotate": [
+        0,
+        0,
+        35
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_17L",
+       "mirror": "Spot_17R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.10391 - $s * 0.00636 * (1 + 4 * (1 - $spots))",
+        "$s * 1.11509 + $lift - $s * 0.01018 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.23"
+       ],
+       "rotate": [
+        0,
+        0,
+        58
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_18L",
+       "mirror": "Spot_18R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.04638 - $s * 0.00249 * (1 + 4 * (1 - $spots))",
+        "$s * 1.135 + $lift - $s * 0.01174 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.18"
+       ],
+       "rotate": [
+        0,
+        0,
+        78
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_19L",
+       "mirror": "Spot_19R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.14433 - $s * 0.00983 * (1 + 4 * (1 - $spots))",
+        "$s * 1.06454 + $lift - $s * 0.00688 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.3"
+       ],
+       "rotate": [
+        0,
+        0,
+        35
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_20L",
+       "mirror": "Spot_20R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.09403 - $s * 0.00636 * (1 + 4 * (1 - $spots))",
+        "$s * 1.12685 + $lift - $s * 0.01018 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.35"
+       ],
+       "rotate": [
+        0,
+        0,
+        58
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      },
+      {
+       "name": "Spot_21L",
+       "mirror": "Spot_21R",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 10,
+       "at": [
+        "$sx * 0.04381 - $s * 0.00249 * (1 + 4 * (1 - $spots))",
+        "$s * 1.14892 + $lift - $s * 0.01174 * (1 + 4 * (1 - $spots))",
+        "$sz * 0.3"
+       ],
+       "rotate": [
+        0,
+        0,
+        78
+       ],
+       "radii": [
+        "$s * 0.016",
+        "$s * 0.026 * max(0.4, $spots)",
+        "$s * 0.03 * max(0.4, $spots)"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Head",
+     "at": [
+      0,
+      "$s * 1.41 + $lift",
+      "$sz * 0.59"
+     ],
+     "children": [
+      {
+       "name": "Skull",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "$s * 0",
+         "superellipse": {
+          "width": "$s * 0.1",
+          "height": "$s * 0.14",
+          "n": 2.0,
+          "count": 24,
+          "cy": "$s * 0.1"
+         }
+        },
+        {
+         "z": "$s * 0.04",
+         "superellipse": {
+          "width": "$s * 0.15",
+          "height": "$s * 0.2",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.1"
+         }
+        },
+        {
+         "z": "$s * 0.1",
+         "superellipse": {
+          "width": "$s * 0.16",
+          "height": "$s * 0.21",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.105"
+         }
+        },
+        {
+         "z": "$s * 0.16",
+         "superellipse": {
+          "width": "$s * 0.13",
+          "height": "$s * 0.175",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.0925"
+         }
+        },
+        {
+         "z": "$s * 0.24",
+         "superellipse": {
+          "width": "$s * 0.1",
+          "height": "$s * 0.13",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.075"
+         }
+        },
+        {
+         "z": "$s * 0.31",
+         "superellipse": {
+          "width": "$s * 0.085",
+          "height": "$s * 0.097",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.0635"
+         }
+        },
+        {
+         "z": "$s * 0.35",
+         "superellipse": {
+          "width": "$s * 0.07",
+          "height": "$s * 0.072",
+          "n": 2.3,
+          "count": 24,
+          "cy": "$s * 0.056"
+         }
+        },
+        {
+         "z": "$s * 0.37",
+         "superellipse": {
+          "width": "$s * 0.042",
+          "height": "$s * 0.042",
+          "n": 2.0,
+          "count": 24,
+          "cy": "$s * 0.051"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Nose",
+       "shape": "ellipsoid",
+       "material": "nose",
+       "segments": 12,
+       "at": [
+        0,
+        "$s * 0.065",
+        "$s * 0.36"
+       ],
+       "radii": [
+        "$s * 0.03",
+        "$s * 0.022",
+        "$s * 0.014"
+       ]
+      },
+      {
+       "name": "Chin",
+       "shape": "ellipsoid",
+       "material": "white",
+       "segments": 12,
+       "at": [
+        0,
+        "$s * 0.03",
+        "$s * 0.3"
+       ],
+       "radii": [
+        "$s * 0.032",
+        "$s * 0.02",
+        "$s * 0.05"
+       ]
+      },
+      {
+       "name": "Eye_L",
+       "shape": "ellipsoid",
+       "material": "eye",
+       "segments": 12,
+       "mirror": "Eye_R",
+       "at": [
+        "$s * 0.072",
+        "$s * 0.155",
+        "$s * 0.13"
+       ],
+       "radii": [
+        "$s * 0.014",
+        "$s * 0.016",
+        "$s * 0.02"
+       ]
+      },
+      {
+       "name": "Ear_L",
+       "mirror": "Ear_R",
+       "at": [
+        "$s * 0.06",
+        "$s * 0.19",
+        "$s * 0.04"
+       ],
+       "rotate": [
+        -10,
+        0,
+        -48
+       ],
+       "children": [
+        {
+         "name": "Flap",
+         "shape": "ellipsoid",
+         "segments": 14,
+         "offset": [
+          0,
+          "$s * 0.085 * $earSize",
+          0
+         ],
+         "radii": [
+          "$s * 0.045 * $earSize",
+          "$s * 0.09 * $earSize",
+          "$s * 0.014"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Antler_L",
+       "mirror": "Antler_R",
+       "material": "antler",
+       "at": [
+        "$s * 0.045",
+        "$s * (0.205 - 0.1 * (1 - $antlers))",
+        "$s * 0.075"
+       ],
+       "children": [
+        {
+         "name": "Pedicle",
+         "shape": "cylinder",
+         "radius": "$s * 0.024",
+         "height": "$s * 0.03",
+         "anchor": "base",
+         "at": [
+          0,
+          "-$s * 0.02",
+          0
+         ]
+        },
+        {
+         "name": "Beam",
+         "shape": "tube",
+         "segments": 10,
+         "path": [
+          [
+           "$ak * 0.03",
+           "$ak * 0",
+           "$ak * 0"
+          ],
+          [
+           "$ak * 0.07082",
+           "$ak * 0.072",
+           "$ak * -0.02094"
+          ],
+          [
+           "$ak * 0.15896",
+           "$ak * 0.18",
+           "$ak * -0.04134"
+          ],
+          [
+           "$ak * 0.25942",
+           "$ak * 0.3",
+           "$ak * -0.04"
+          ],
+          [
+           "$ak * 0.33985",
+           "$ak * 0.42",
+           "$ak * -0.00934"
+          ],
+          [
+           "$ak * 0.38173",
+           "$ak * 0.528",
+           "$ak * 0.03986"
+          ],
+          [
+           "$ak * 0.39",
+           "$ak * 0.6",
+           "$ak * 0.08"
+          ]
+         ],
+         "radii": [
+          "$s * 0.03 * max(0.5, $ak)",
+          "$s * max(0.3, $antlerSize * max(0.12, $antlers)) * 0.0276",
+          "$s * max(0.3, $antlerSize * max(0.12, $antlers)) * 0.024",
+          "$s * max(0.3, $antlerSize * max(0.12, $antlers)) * 0.02",
+          "$s * max(0.3, $antlerSize * max(0.12, $antlers)) * 0.016",
+          "$s * max(0.3, $antlerSize * max(0.12, $antlers)) * 0.0124",
+          "$s * max(0.3, $antlerSize * max(0.12, $antlers)) * 0.01"
+         ]
+        },
+        {
+         "name": "Tine_{i}",
+         "repeat": {
+          "count": "$tines",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "at": [
+          "$ak * (0.03 + 0.36 * pow(sin(pi * ((0.1 + 0.78 * $i / max(1, $n - 1))) / 2), 1.3))",
+          "$ak * 0.6 * ((0.1 + 0.78 * $i / max(1, $n - 1)))",
+          "$ak * (-0.06 * sin(pi * ((0.1 + 0.78 * $i / max(1, $n - 1)))) + 0.08 * ((0.1 + 0.78 * $i / max(1, $n - 1))) * ((0.1 + 0.78 * $i / max(1, $n - 1))))"
+         ],
+         "rotate": [
+          "-(62 - 30 * (0.1 + 0.78 * $i / max(1, $n - 1)))",
+          "-12 + 25 * (0.1 + 0.78 * $i / max(1, $n - 1))",
+          0
+         ],
+         "children": [
+          {
+           "name": "Point",
+           "shape": "tube",
+           "segments": 8,
+           "path": [
+            [
+             0,
+             0,
+             0
+            ],
+            [
+             0,
+             0,
+             "$ak * (0.2 - 0.07 * (0.1 + 0.78 * $i / max(1, $n - 1)) + 0.05 * max(0, 1 - $i))"
+            ]
+           ],
+           "radii": [
+            "$ak * 0.017",
+            "$ak * 0.005"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_FL",
+     "mirror": "Leg_FR",
+     "at": [
+      "$sx * 0.12",
+      "$s * 0.8 + $lift",
+      "$sz * 0.33"
+     ],
+     "children": [
+      {
+       "name": "Upper",
+       "shape": "tube",
+       "segments": 12,
+       "path": [
+        [
+         "$s * -0.07",
+         0,
+         0
+        ],
+        [
+         "$s * -0.07",
+         "$kf * -0.04",
+         0
+        ],
+        [
+         "$s * -0.07",
+         "$kf * -0.2",
+         "$s * -0.02"
+        ],
+        [
+         "$s * -0.07",
+         "$kf * -0.4",
+         0
+        ]
+       ],
+       "radii": [
+        "$s * 0.07",
+        "$s * 0.068",
+        "$s * 0.05",
+        "$s * 0.034"
+       ]
+      },
+      {
+       "name": "Knee",
+       "at": [
+        "$s * -0.07",
+        "$kf * -0.4",
+        0
+       ],
+       "children": [
+        {
+         "name": "Lower",
+         "shape": "tube",
+         "segments": 12,
+         "path": [
+          [
+           0,
+           "$kf * 0.02",
+           0
+          ],
+          [
+           0,
+           "$kf * -0.1",
+           "$s * 0.002"
+          ],
+          [
+           0,
+           "$kf * -0.3",
+           "$s * 0.005"
+          ],
+          [
+           0,
+           "$kf * -0.36",
+           "$s * 0.015"
+          ]
+         ],
+         "radii": [
+          "$s * 0.032",
+          "$s * 0.024",
+          "$s * 0.022",
+          "$s * 0.026"
+         ]
+        },
+        {
+         "name": "Hoof",
+         "shape": "lathe",
+         "material": "hoof",
+         "segments": 12,
+         "at": [
+          0,
+          "-$kf * 0.4",
+          "$s * 0.015"
+         ],
+         "profile": [
+          [
+           "$s * 0.026",
+           "$s * 0.05"
+          ],
+          [
+           "$s * 0.032",
+           "$s * 0.025"
+          ],
+          [
+           "$s * 0.038",
+           0
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_BL",
+     "mirror": "Leg_BR",
+     "at": [
+      "$sx * 0.13",
+      "$s * 0.86 + $lift",
+      "$sz * -0.4"
+     ],
+     "children": [
+      {
+       "name": "Upper",
+       "shape": "tube",
+       "segments": 12,
+       "path": [
+        [
+         "$s * -0.095",
+         0,
+         0
+        ],
+        [
+         "$s * -0.095",
+         "$kb * -0.05",
+         0
+        ],
+        [
+         "$s * -0.095",
+         "$kb * -0.2",
+         "$s * 0.06"
+        ],
+        [
+         "$s * -0.095",
+         "$kb * -0.34",
+         0
+        ],
+        [
+         "$s * -0.095",
+         "$kb * -0.43",
+         "$s * -0.09"
+        ]
+       ],
+       "radii": [
+        "$s * 0.095",
+        "$s * 0.094",
+        "$s * 0.075",
+        "$s * 0.045",
+        "$s * 0.03"
+       ]
+      },
+      {
+       "name": "Hock",
+       "at": [
+        "$s * -0.095",
+        "$kb * -0.43",
+        "$s * -0.09"
+       ],
+       "children": [
+        {
+         "name": "Lower",
+         "shape": "tube",
+         "segments": 12,
+         "path": [
+          [
+           0,
+           "$kb * 0.02",
+           "$s * -0.005"
+          ],
+          [
+           0,
+           "$kb * -0.12",
+           "$s * 0.02"
+          ],
+          [
+           0,
+           "$kb * -0.35",
+           "$s * 0.04"
+          ],
+          [
+           0,
+           "$kb * -0.4",
+           "$s * 0.05"
+          ]
+         ],
+         "radii": [
+          "$s * 0.03",
+          "$s * 0.024",
+          "$s * 0.022",
+          "$s * 0.026"
+         ]
+        },
+        {
+         "name": "Hoof",
+         "shape": "lathe",
+         "material": "hoof",
+         "segments": 12,
+         "at": [
+          0,
+          "-$kb * 0.43",
+          "$s * 0.065"
+         ],
+         "profile": [
+          [
+           "$s * 0.026",
+           "$s * 0.05"
+          ],
+          [
+           "$s * 0.032",
+           "$s * 0.025"
+          ],
+          [
+           "$s * 0.038",
+           0
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Tail",
+     "at": [
+      0,
+      "$s * 1.07 + $lift",
+      "-$sz * 0.54"
+     ],
+     "children": [
+      {
+       "name": "Dock",
+       "shape": "tube",
+       "segments": 10,
+       "path": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         0,
+         "-$s * 0.02",
+         "-$s * 0.035"
+        ],
+        [
+         0,
+         "-$s * 0.09",
+         "-$s * 0.06"
+        ],
+        [
+         0,
+         "-$s * 0.16",
+         "-$s * 0.055"
+        ]
+       ],
+       "radii": [
+        "min($s * 0.018, 0.019)",
+        "$s * 0.035",
+        "$s * 0.032",
+        "$s * 0.015"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
