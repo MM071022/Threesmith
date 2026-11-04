@@ -1611,5 +1611,101 @@
    "A cigar of uniform thickness reads as a sausage: the nose is blunt and the tail tapers long.",
    "A gondola that does not touch the envelope floats."
   ]
+ },
+ {
+  "id": "aircraft.fixed-wing.seaplane",
+  "name": "seaplane",
+  "description": "A floatplane: a light propeller aeroplane on two floats instead of wheels, so it takes off from and lands on water.",
+  "aliases": [
+   "seaplane",
+   "floatplane",
+   "float plane",
+   "watervliegtuig",
+   "drijvervliegtuig",
+   "bush plane on floats",
+   "pontoon plane"
+  ],
+  "extends": "aircraft.fixed-wing.light-aircraft",
+  "hints": [
+   "floats",
+   "drijvers",
+   "pontoons",
+   "lake",
+   "meer",
+   "water landing",
+   "beaver",
+   "otter",
+   "bush plane"
+  ],
+  "parts": [
+   {
+    "name": "Float",
+    "role": "float",
+    "required": true,
+    "count": 2,
+    "aliases": [
+     "float",
+     "floats",
+     "pontoon",
+     "pontoons",
+     "drijver",
+     "drijvers"
+    ],
+    "note": "Two floats under the wing, joined to the fuselage by struts and spreader bars."
+   },
+   {
+    "name": "WaterRudder",
+    "role": "control surface",
+    "required": false,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "water rudder",
+     "waterroer"
+    ],
+    "note": "At the stern of each float, steered with the air rudder."
+   }
+  ],
+  "scale": {
+   "length": [
+    7,
+    13
+   ],
+   "width": [
+    9,
+    16
+   ],
+   "height": [
+    3,
+    5
+   ],
+   "source": "manufacturer data: Cessna 172 on EDO floats about 8.3 m long with an 11 m span; DHC-2 Beaver 9.2 m long with a 14.6 m span; floats add about 1 m of height",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "floats",
+    "options": [
+     "straight floats",
+     "amphibious floats (with wheels)"
+    ]
+   }
+  ],
+  "conventions": [
+   "The model stands on the keels of its floats at y = 0; in the water the floats sink to roughly a third of their depth."
+  ],
+  "anticipate": [
+   "Water rudders hinged at the float sterns, linked to the rudder.",
+   "A waterline: put the model about a third of the float depth into the water plane."
+  ],
+  "pitfalls": [
+   "Floats as plain cylinders read as fuel tanks: they need a flat deck, a V bottom and a step."
+  ]
  }
 ]
