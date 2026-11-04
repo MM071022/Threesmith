@@ -2,76 +2,13 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { suggest } from "../api/lookup.js";
 import { blockAt } from "./source.js";
+import { buildExports, each, inLoops, legacy, loopBodies, ns } from "./parse.js";
+import { SCENE_RULES } from "./scene-rules.js";
+import { SHADER_RULES } from "./shader-rules.js";
 import type { SourceFile } from "./source.js";
 import type { Ctx, Report, Rule } from "./types.js";
 
-function each(ctx: Ctx, re: RegExp, report: Report, pick: (m: RegExpExecArray, f: SourceFile) => boolean = () => true): void {
-  const flags = re.flags.includes("g") ? re.flags : re.flags + "g";
-  for (const f of ctx.three) {
-    for (const m of f.text.matchAll(new RegExp(re.source, flags))) {
-      if (pick(m as RegExpExecArray, f)) report(f, m.index ?? 0);
-    }
-  }
-}
-
-/** Regex source that matches a three class via namespace (THREE.X) or a bare import. */
-function ns(f: SourceFile): string {
-  return f.namespaces.size ? `(?:(?:${[...f.namespaces].join("|")})\\.)` : "(?:THREE\\.)";
-}
-
-const LOOP_NAMES = "animate|render|update|tick|loop|frame|draw|onFrame|renderLoop|mainLoop|gameLoop|animation";
-
-/** Bodies of functions that run every frame. */
-export function loopBodies(f: SourceFile): { start: number; end: number }[] {
-  const out: { start: number; end: number }[] = [];
-  const res = [
-    new RegExp(String.raw`function\s+(?:${LOOP_NAMES})\w*\s*\([^)]*\)\s*\{`, "g"),
-    new RegExp(String.raw`(?:const|let|var)\s+(?:${LOOP_NAMES})\w*\s*=\s*(?:async\s*)?(?:function\s*\w*\s*)?\([^)]*\)\s*(?:=>\s*)?\{`, "g"),
-    new RegExp(String.raw`^\s*(?:async\s+)?(?:${LOOP_NAMES})\w*\s*\([^)]*\)\s*\{`, "gm"),
-    /setAnimationLoop\(\s*(?:async\s*)?(?:function\s*\w*\s*)?\([^)]*\)\s*(?:=>\s*)?\{/g,
-    /requestAnimationFrame\(\s*(?:async\s*)?(?:function\s*\w*\s*)?\([^)]*\)\s*(?:=>\s*)?\{/g,
-  ];
-  for (const re of res) {
-    for (const m of f.text.matchAll(re)) {
-      const b = blockAt(f.text, (m.index ?? 0) + m[0].length - 1);
-      if (b) out.push(b);
-    }
-  }
-  return out;
-}
-
-function inLoops(ctx: Ctx, re: RegExp, report: Report, pick: (name: string, f: SourceFile) => boolean = () => true): void {
-  for (const f of ctx.three) {
-    for (const b of loopBodies(f)) {
-      const body = f.text.slice(b.start, b.end);
-      for (const m of body.matchAll(new RegExp(re.source, "g"))) {
-        if (pick(m[1] ?? "", f)) report(f, b.start + (m.index ?? 0));
-      }
-    }
-  }
-}
-
-function legacy(
-  id: string,
-  title: string,
-  re: RegExp,
-  message: string,
-  fix: string,
-  extra: Partial<Rule> = {},
-): Rule {
-  return {
-    id,
-    category: "api",
-    severity: "warn",
-    title,
-    message,
-    fix,
-    check(ctx, report) {
-      each(ctx, re, report);
-    },
-    ...extra,
-  };
-}
+export { loopBodies };
 
 const ALLOC = "Vector2|Vector3|Vector4|Quaternion|Matrix3|Matrix4|Euler|Color|Box3|Sphere|Raycaster|Plane|Ray|Spherical";
 const HEAVY = "BufferGeometry|BoxGeometry|SphereGeometry|PlaneGeometry|CylinderGeometry|TorusGeometry|ExtrudeGeometry|TextGeometry|TextureLoader|GLTFLoader|WebGLRenderer|WebGLRenderTarget|CanvasTexture|MeshStandardMaterial|MeshBasicMaterial|MeshPhysicalMaterial|MeshPhongMaterial|MeshLambertMaterial|ShaderMaterial|SpriteMaterial|LineBasicMaterial|PointsMaterial";
@@ -133,9 +70,11 @@ export const RULES: Rule[] = [
       if (!index) return;
       const known = new Set(["Geometry", "Face3", "ImageUtils", "Math", "sRGBEncoding", "LinearEncoding", "GammaEncoding", "RGBEEncoding", "LogLuvEncoding"]);
       const isLegacy = (n: string) => known.has(n) || /BufferGeometry$/.test(n);
+      const builds = buildExports(index.install.root);
       for (const f of ctx.three) {
         const sourceOf = (n: string, mod: string) => {
           if (isLegacy(n)) return;
+          if (builds?.tsl.has(n) && !index.exports.has(n)) return; // tsl-import-path explains it
           const ref = index.exports.get(n);
           if (!ref) {
             if (!/^[A-Z]/.test(n) || /^(?:[A-Z][A-Z0-9_]+)$/.test(n) && !index.exports.has(n) && n.length < 3) return;
@@ -171,7 +110,7 @@ export const RULES: Rule[] = [
         // addon file imports: does the file exist in this version?
         for (const m of f.text.matchAll(/from\s+['"]three\/(?:addons|examples\/jsm)\/([^'"]+)['"]/g)) {
           const rel = m[1] ?? "";
-          const exists = [...index.exports.values()].some((r) => r.importPath === `three/addons/${rel}`) || addonFileExists(index.install.root, rel);
+          const exists = [...index.exports.values()].some((r) => r.importPath === `three/addons/${rel}`) || addonFileExists(index.install.root, rel) || missingExtension(index.install.root, rel);
           if (!exists) report(f, m.index ?? 0, { message: `\`three/addons/${rel}\` does not exist in three r${index.install.release}.`, fix: "Look the class up with `threesmith api <Name>` for its current path." });
         }
       }
@@ -205,7 +144,7 @@ export const RULES: Rule[] = [
       const lit = /\b(?:MeshStandardMaterial|MeshPhysicalMaterial|MeshLambertMaterial|MeshPhongMaterial|MeshToonMaterial)\b/;
       const f = ctx.three.find((x) => lit.test(x.text));
       if (!f) return;
-      if (/\b\w*Light\s*\(|\.environment\s*=|environment\s*:|RoomEnvironment|RGBELoader|HDRLoader|EXRLoader|PMREMGenerator|LightProbe/.test(ctx.all)) return;
+      if (/\b\w*Light\s*\(|\.environment\s*=|environment\s*:|RoomEnvironment|RGBELoader|HDRLoader|EXRLoader|PMREMGenerator|LightProbe|<(?:ambient|directional|point|spot|hemisphere|rectArea)Light\b|<(?:Environment|Stage|Lightformer)\b/.test(ctx.all)) return;
       // a model loader may bring its own lights via KHR_lights_punctual, so only warn without loaders
       if (/GLTFLoader|FBXLoader|ColladaLoader|OBJLoader/.test(ctx.all)) return;
       report(f, f.text.search(lit));
@@ -428,6 +367,7 @@ export const RULES: Rule[] = [
     check(ctx, report) {
       if (/\.dispose\s*\(/.test(ctx.all)) return;
       for (const f of ctx.three) {
+        if (f.r3f) continue; // R3F disposes what it unmounts
         const m = /\b(?:scene|group|\w*[gG]roup|\w*[sS]cene)\.(?:remove|clear)\s*\(/.exec(f.text);
         if (m) {
           report(f, m.index);
@@ -445,7 +385,7 @@ export const RULES: Rule[] = [
     fix: "texture.colorSpace = THREE.SRGBColorSpace; (not for normal/roughness/metalness data maps).",
     introducedIn: 152,
     check(ctx, report) {
-      if (/colorSpace/.test(ctx.all)) return;
+      if (/colorSpace/.test(ctx.all) || ctx.three.some((f) => f.r3f)) return; // R3F sets sRGB on color textures itself
       for (const f of ctx.three) {
         if (!/TextureLoader/.test(f.text)) continue;
         const m = /\bmap\s*:|\.map\s*=(?!=)|\bemissiveMap\b/.exec(f.text);
@@ -467,8 +407,15 @@ export const RULES: Rule[] = [
       each(ctx, /ColorManagement\.enabled\s*=\s*false/, report);
     },
   },
+  ...SHADER_RULES,
+  ...SCENE_RULES,
 ];
 
 function addonFileExists(root: string, rel: string): boolean {
   return existsSync(join(root, "examples", "jsm", rel));
+}
+
+/** An addon path written without `.js` whose `.js` file exists (addon-path-extension reports it). */
+function missingExtension(root: string, rel: string): boolean {
+  return !/\.\w+$/.test(rel) && addonFileExists(root, rel + ".js");
 }
