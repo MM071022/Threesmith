@@ -19,6 +19,7 @@ export const TOOLSETS = {
     "three_version",
   ],
   run: ["three_check", "three_inspect"],
+  live: ["three_session", "three_page"],
   build: ["three_assets"],
 } as const satisfies Record<string, readonly string[]>;
 

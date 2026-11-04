@@ -20,6 +20,7 @@ import { checkAssets, formatAssets } from "../scan/assets.js";
 import { collect } from "../review/source.js";
 import { formatJournal, formatUndo, readJournal, undoJournal, writeFiles } from "../project/journal.js";
 import { checkTypes, formatTypes } from "../types/types.js";
+import { formatErrors, listSessions, pageOp, startSession, stopSession, type PageOp } from "../session/session.js";
 import { VERSION } from "../version.js";
 import { renderInstructions, type Tier } from "./instructions.js";
 import { CheckOutput, DoctorOutput, ReviewOutput, checkData, doctorData, reviewData } from "./structured.js";
@@ -434,6 +435,93 @@ export function createServer(options: ServerOptions = {}): McpServer {
         const content: Content[] = [{ type: "text", text: parts.join("\n") }];
         if (r.screenshot) content.push({ type: "image", data: readFileSync(r.screenshot).toString("base64"), mimeType: "image/png" });
         return { content };
+      }),
+  );
+
+  tool(
+    "three_session",
+    {
+      title: "Keep a three.js page running between calls",
+      description:
+        "Start a headless page that stays open between tool calls (op start), so a scene that takes long to load or a state that is hard to reach is loaded once; three_page then looks at it and drives it. op status lists the open pages, op stop closes one. It stops by itself after 10 minutes without calls. Several pages can run side by side under different names (default main).",
+      inputSchema: {
+        op: z.enum(["start", "stop", "status"]),
+        name: z.string().optional().describe("name of the page (default main)"),
+        target: targetParam.optional(),
+        entry: z.string().optional(),
+        root: z.string().optional().describe("folder to serve when the page needs files above its own folder"),
+        width: z.number().int().optional(),
+        height: z.number().int().optional(),
+        wait: z.number().int().min(0).max(30000).optional().describe("ms to let the scene run after load (default 1500)"),
+        webgpu: z.boolean().optional(),
+      },
+      annotations: { ...WRITES, openWorldHint: true },
+    },
+    async (a) =>
+      guard(async () => {
+        const name = a.name ?? "main";
+        if (a.op === "status") {
+          const list = listSessions();
+          return text(list.length ? list.map((s) => `${s.name}: ${s.url} (${s.minutes} min)`).join("\n") : "No live pages. Start one with op start.");
+        }
+        if (a.op === "stop") return text((await stopSession(name)) ? `stopped ${name}` : `no live page named ${name}`);
+        if (!a.target) return failure("op start needs target (a folder with index.html or a dev server URL).");
+        const r = await startSession(
+          {
+            target: /^https?:/.test(a.target) ? a.target : where(a.target),
+            ...(a.entry ? { entry: a.entry } : {}),
+            ...(a.root ? { root: where(a.root) } : {}),
+            ...(a.width ? { width: a.width } : {}),
+            ...(a.height ? { height: a.height } : {}),
+            ...(a.wait !== undefined ? { wait: a.wait } : {}),
+            ...(a.webgpu ? { webgpu: true } : {}),
+          },
+          name,
+        );
+        const lines = [
+          `${r.replaced ? "restarted" : "started"} ${r.name}: ${r.url}, three ${r.threeRevision ? `r${r.threeRevision}` : "not seen"}, ${r.canvases} canvas, ${r.frames} render call(s), ${r.objects} object(s) in the scene`,
+          "Next: three_page op eval (js with scene, camera, renderer, $('name')), op steps, op frames, op until, op screenshot, op inspect.",
+        ];
+        const errors = formatErrors(r.errors);
+        if (errors) lines.push(errors);
+        return text(lines.join("\n"), r.errors.some((e) => e.kind !== "console-warn"));
+      }),
+  );
+
+  tool(
+    "three_page",
+    {
+      title: "Look at and drive the live page",
+      description:
+        "Work with the page three_session started, without reloading it. op eval runs JS in the page and returns the value as compact JSON (vectors as [x,y,z], colours as hex, objects as type/name/position), with `scene`, `camera`, `renderer` (the last ones rendered), `$('name')` (getObjectByName), `$$('Type')` and `THREE` (when global) in scope; a single expression is returned, statements need `return`. op steps runs interactions (click, press, drag, wheel, wait, wait-for); op frames waits n animation frames; op until waits until a JS expression is true; op screenshot returns the picture; op inspect reads the scene graph and why objects are not visible; op reload loads edited files (state starts over); op errors lists the errors so far. Every answer ends with the new console and page errors.",
+      inputSchema: {
+        op: z.enum(["eval", "steps", "frames", "until", "screenshot", "inspect", "reload", "errors"]),
+        name: z.string().optional(),
+        js: z.string().optional().describe("for eval and until, e.g. $('player').position or scene.children.length"),
+        steps: stepSchema,
+        n: z.number().int().min(1).max(600).optional().describe("frames to wait"),
+        timeout: z.number().int().min(0).max(60000).optional().describe("ms for until (default 5000)"),
+        max_nodes: z.number().int().min(1).max(400).optional(),
+      },
+      annotations: { ...WRITES, openWorldHint: true },
+    },
+    async (a) =>
+      guard(async () => {
+        let op: PageOp;
+        if (a.op === "eval" || a.op === "until") {
+          if (!a.js) return failure(`op ${a.op} needs js.`);
+          op = a.op === "eval" ? { op: "eval", js: a.js } : { op: "until", js: a.js, ...(a.timeout !== undefined ? { timeout: a.timeout } : {}) };
+        } else if (a.op === "steps") {
+          if (!a.steps?.length) return failure("op steps needs steps.");
+          op = { op: "steps", steps: parseSteps(JSON.stringify(a.steps)) };
+        } else if (a.op === "frames") op = { op: "frames", n: a.n ?? 1 };
+        else if (a.op === "inspect") op = { op: "inspect", ...(a.max_nodes ? { maxNodes: a.max_nodes } : {}) };
+        else op = { op: a.op };
+        const r = await pageOp(op, a.name ?? "main");
+        const errors = formatErrors(r.errors);
+        const content: Content[] = [{ type: "text", text: errors ? `${r.text}\n${errors}` : r.text }];
+        if (r.image) content.push({ type: "image", data: r.image.toString("base64"), mimeType: "image/png" });
+        return { content, ...(r.ok ? {} : { isError: true }) };
       }),
   );
 
