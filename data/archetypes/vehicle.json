@@ -1803,17 +1803,17 @@
     "count": 1,
     "moves": [
      {
-      "kind": "hinge",
+      "kind": "pitch",
       "axis": "x"
      }
     ],
-    "pivot": "hinge",
+    "pivot": "mount",
     "aliases": [
      "mast",
      "upright",
      "hefmast"
     ],
-    "note": "Tilts a few degrees about x at its foot; the inner channels and the carriage slide up inside it."
+    "note": "Tilts about x on the pins at its foot (about 6 degrees forward, 6-12 back); the inner channels and the carriage slide up inside it."
    },
    {
     "name": "Carriage",
@@ -2040,7 +2040,7 @@
       "axis": "y"
      }
     ],
-    "pivot": "base",
+    "pivot": "mount",
     "aliases": [
      "house",
      "upper structure",
@@ -2050,7 +2050,7 @@
      "turntable",
      "upper"
     ],
-    "note": "Slews about the vertical axis through the centre of the slewing ring."
+    "note": "Slews about the vertical axis through the centre of the slewing ring, on top of the undercarriage; the arm is its child."
    },
    {
     "name": "Cab",
@@ -2111,18 +2111,18 @@
     "count": 1,
     "moves": [
      {
-      "kind": "hinge",
+      "kind": "pitch",
       "axis": "x"
      }
     ],
-    "pivot": "hinge",
+    "pivot": "mount",
     "aliases": [
      "bucket",
      "graafbak",
      "bak",
      "shovel"
     ],
-    "note": "Pivots about x at the stick tip; teeth on the cutting edge."
+    "note": "Pivots about x on its pin at the stick tip; teeth on the cutting edge."
    },
    {
     "name": "Counterweight",
