@@ -33,6 +33,35 @@ describe("explain", () => {
     expect(ids("hello world")).toEqual([]);
     expect(formatExplanations([])).toContain("No known");
   });
+  it("recognises shader, loader, module and R3F messages", () => {
+    const one = (msg: string) => explain(msg, index);
+    const inc = one("Uncaught Error: THREE.WebGLProgram: Can not resolve #include <encodings_fragment>");
+    expect(inc.map((e) => e.id)).toContain("include-not-resolved");
+    expect(inc.find((e) => e.id === "include-not-resolved")?.detail).toContain("colorspace_fragment");
+    expect(one("THREE.WebGLProgram: Can not resolve #include <colorspace_fragmnt>").find((e) => e.id === "include-not-resolved")?.detail).toContain("colorspace_fragment");
+    expect(ids('THREE.NodeBuilder: Material "ShaderMaterial" is not compatible.')).toContain("glsl-material-webgpu");
+    const prop = one("THREE.Material: 'emisive' is not a property of THREE.MeshStandardMaterial.").find((e) => e.id === "not-a-property");
+    expect(prop?.detail).toContain("emissive");
+    expect(ids("THREE.Object3D.add: object not an instance of THREE.Object3D.")).toEqual(["add-not-object3d"]);
+    expect(ids("Error: THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.")).toEqual(["ktx2-detect-support"]);
+    expect(ids("TypeError: Cannot set properties of undefined (setting 'needsUpdate')")).toEqual(["needs-update-undefined"]);
+    expect(ids("TypeError: Cannot set properties of undefined (setting 'touchAction')")).toEqual(["controls-element"]);
+    expect(ids("Error: R3F: Hooks can only be used within the Canvas component!")).toEqual(["r3f-outside-canvas"]);
+    const div = one("Error: R3F: Div is not part of the THREE namespace! Did you forget to extend?");
+    expect(div[0]?.id).toBe("r3f-not-in-namespace");
+    expect(div[0]?.detail).toContain("<div>");
+    expect(one("R3F: LineMaterial is not part of the THREE namespace!")[0]?.detail).toContain("extend({ LineMaterial })");
+    expect(ids("SyntaxError: Cannot use import statement outside a module")).toEqual(["import-outside-module"]);
+    expect(ids("[.WebGL-0x1]GL_INVALID_OPERATION: Feedback loop formed between Framebuffer and active Texture.")).toContain("feedback-loop");
+    expect(ids("[.WebGL-0x1]GL_INVALID_FRAMEBUFFER_OPERATION: Framebuffer is incomplete: Attachment has zero size.")).toEqual(["framebuffer-incomplete"]);
+    expect(ids("WebGL: INVALID_OPERATION: texImage2D: type FLOAT but ArrayBufferView not Float32Array")).toEqual(["invalid-operation"]);
+    expect(ids("THREE.WebGLRenderer: Texture has been resized from (8192x8192) to (4096x4096).")).toEqual(["texture-resized"]);
+    expect(ids("THREE.PropertyBinding: No target node found for track: Armature.position.")).toEqual(["no-target-node"]);
+    expect(ids("THREE.WebGLRenderer: A WebGL context could not be created. Reason: ")).toEqual(["webgl-unavailable"]);
+    const rgbe = one("RGBELoader has been deprecated. Please use HDRLoader instead.");
+    expect(rgbe.map((e) => e.id)).toEqual(["addon-deprecated"]);
+    expect(rgbe[0]?.detail).toContain("three/addons/loaders/HDRLoader.js");
+  });
   it("reads shader errors and their failing line", () => {
     const msg = `THREE.WebGLProgram: Shader Error 1282 - VALIDATE_STATUS false
 
