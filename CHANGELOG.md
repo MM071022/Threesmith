@@ -16,6 +16,10 @@
 - **Blueprints are easier to adapt:** `"visible"` leaves a part out, enum params work in expressions (`$style`,
   `$style_military`), `"material": "paint_{colour}"` picks a material by param, and `repeat` takes a count of 0.
 - "lighthouse", "water tower" and "tram" now name their own archetypes instead of the generic tower and train.
+- Security and robustness fixes from code scanning: step and watch code reaches the page as data instead of being
+  pasted into a script, files are read and created without a check-then-use gap (undo journal, review memory,
+  `.threesmith/.gitignore`), lesson placeholders are removed until none is left, Markdown escaping in the CI receipt
+  escapes backslashes too, and the import-map rule reads `</script >` in any case.
 
 ## 0.2.0
 

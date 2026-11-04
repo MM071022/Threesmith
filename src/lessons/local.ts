@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { isKnownName, placeholderShare, scrubText, type ScrubContext } from "./anonymize.js";
+import { isKnownName, placeholderShare, scrubText, withoutPlaceholders, type ScrubContext } from "./anonymize.js";
 import { isTopic, LESSON_ID, lessonFrom } from "./library.js";
 import { findLesson } from "./search.js";
 import type { LessonStats, LessonTopic, LocalData, LocalLesson } from "./types.js";
@@ -102,7 +102,7 @@ const LIMITS = { title: 160, symptom: 600, cause: 600, fix: 600, test: 400 } as 
 function slug(text: string): string {
   return (
     text
-      .replace(/<\w+>/g, " ")
+      .replace(/[\s\S]*/, (t) => withoutPlaceholders(t, " "))
       .normalize("NFD")
       .replace(/[̀-ͯ]/g, "")
       .toLowerCase()
@@ -146,7 +146,7 @@ export function prepareLesson(input: LessonInput, options: ScrubContext & { now?
     const out = scrubText(value, options);
     for (const [k, n] of Object.entries(out.replaced)) replaced[k] = (replaced[k] ?? 0) + n;
     const text = out.text.slice(0, LIMITS[field]).trim();
-    const words = text.replace(/<\w+>/g, " ").match(/\p{L}{2,}/gu) ?? [];
+    const words = withoutPlaceholders(text, " ").match(/\p{L}{2,}/gu) ?? [];
     if (words.length < (field === "title" ? 2 : 3) || placeholderShare(text) > 0.4) {
       throw new LessonError(
         `too little is left of ${field} once names, paths and code are taken out ("${text}"). Write it as a general lesson in plain words, without names of the project, files or code.`,
@@ -174,7 +174,7 @@ export function prepareLesson(input: LessonInput, options: ScrubContext & { now?
   let errors: string[] | undefined;
   if (input.error?.trim()) {
     const template = errorTemplate(input.error, options);
-    if (template.replace(/<\w+>/g, "").replace(/[^\p{L}]+/gu, "").length < 8) {
+    if (withoutPlaceholders(template).replace(/[^\p{L}]+/gu, "").length < 8) {
       throw new LessonError("too little of the message is left once names and paths are taken out; pass the message text itself");
     }
     errors = [template];

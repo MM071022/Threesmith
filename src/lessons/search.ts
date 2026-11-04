@@ -1,3 +1,4 @@
+import { withoutPlaceholders } from "./anonymize.js";
 import { bundledLessons } from "./library.js";
 import type { Lesson, LessonStats, LessonTopic, LocalData } from "./types.js";
 
@@ -110,9 +111,9 @@ function fragmentMatcher(fragment: string): RegExp {
 function matchLength(message: string, errors: string[]): number {
   let best = 0;
   for (const e of errors) {
-    if (!e.replace(/<\w+>/g, "").trim()) continue;
+    if (!withoutPlaceholders(e).trim()) continue;
     const m = fragmentMatcher(e).exec(message);
-    if (m) best = Math.max(best, e.replace(/<\w+>/g, "").length);
+    if (m) best = Math.max(best, withoutPlaceholders(e).length);
   }
   return best;
 }

@@ -176,9 +176,11 @@ export function claimSubject(js: string): string | undefined {
 }
 
 /** Installs the sampler in the page: watch values and claims, read at every frame and after every step. */
-const SAMPLER = (cfg: { watch: string[]; claims: { js: string; at: ClaimAt; subject?: string }[]; sampleMs: number }) => `(() => {
+type SamplerConfig = { watch: string[]; claims: { js: string; at: ClaimAt; subject?: string }[]; sampleMs: number };
+// The watch and claim code reaches the page as data (window.__tsPlayCfg, set by an evaluate argument), never pasted into this script.
+const SAMPLER = `(() => {
   const api = window.__threesmith, run = window.__tsRun;
-  const cfg = ${JSON.stringify(cfg)};
+  const cfg = window.__tsPlayCfg;
   const t0 = performance.now(), f0 = run.frame;
   const p = window.__tsPlay = {
     series: cfg.watch.map(() => []), last: cfg.watch.map(() => null), count: 0, lastSample: -1e9,
@@ -286,7 +288,11 @@ export async function play(opts: PlayOptions): Promise<PlayResult> {
   try {
     if (!o.loaded) return finish(result, claims);
     await o.page.waitForTimeout(opts.wait ?? 1000);
-    await o.page.evaluate(SAMPLER({ watch, claims: claims.map(({ js, at, subject }) => ({ js, at, ...(subject ? { subject } : {}) })), sampleMs: opts.sampleMs ?? 100 }));
+    const cfg: SamplerConfig = { watch, claims: claims.map(({ js, at, subject }) => ({ js, at, ...(subject ? { subject } : {}) })), sampleMs: opts.sampleMs ?? 100 };
+    await o.page.evaluate((c: SamplerConfig) => {
+      (globalThis as unknown as { __tsPlayCfg: SamplerConfig }).__tsPlayCfg = c;
+    }, cfg);
+    await o.page.evaluate(SAMPLER);
     const clock = async (n: number) => (await o.page.evaluate(`window.__tsPlay.begin(${n})`)) as { t: number; frame: number };
     result.steps = await runSteps(o, opts.steps ?? [], { clock, after: async (n) => void (await o.page.evaluate(`window.__tsPlay.tick(${n})`)) });
     const end = (await o.page.evaluate(`(() => { const p = window.__tsPlay; window.__tsRun.tick = null; p.cur = 0; p.tick(undefined, true);

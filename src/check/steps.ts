@@ -6,6 +6,13 @@ import type { Step } from "./check.js";
  * `frames` (wait n animation frames), `hold` (keep a key down for ms), `eval` (run code in the page, with
  * scene/renderer/camera/$/$$ in scope) and `until` (wait until an expression is true).
  */
+/** What RUN_INIT puts on window.__threesmith, as far as the steps use it. */
+interface PageRuntime {
+  call(js: string): unknown;
+  value(v: unknown): unknown;
+  read(js: string): { v?: unknown; e?: string };
+}
+
 export type PlayStep =
   | Step
   | { type: "frames"; n: number }
@@ -116,18 +123,43 @@ export async function runStep(page: Page, step: PlayStep): Promise<unknown> {
       }
       return undefined;
     case "eval": {
-      const r = (await page.evaluate(
-        `(async () => { try { return { v: window.__threesmith.value(await window.__threesmith.call(${JSON.stringify(step.js)})) }; } catch (e) { return { e: String((e && e.stack) || e).split('\\n').slice(0, 3).join(' | ') }; } })()`,
-      )) as { v?: unknown; e?: string };
+      // The code goes to the page as an argument, never pasted into a script: __threesmith.call compiles it there.
+      const r = (await page.evaluate(async (js: string) => {
+        const t = (globalThis as unknown as { __threesmith: PageRuntime }).__threesmith;
+        try {
+          return { v: t.value(await t.call(js)) };
+        } catch (e) {
+          return { e: String((e as Error)?.stack ?? e).split("\n").slice(0, 3).join(" | ") };
+        }
+      }, step.js)) as { v?: unknown; e?: string };
       if (r.e !== undefined) throw new Error(`threw ${r.e}`);
       return r.v;
     }
     case "until": {
       const timeout = Math.min(step.timeout ?? 5000, MAX_MS);
       const r = (await page.evaluate(
-        `new Promise((ok) => { const t = window.__threesmith; const end = performance.now() + ${timeout}; let last;
-          const test = () => { const x = t.read(${JSON.stringify(step.js)}); last = x; if (x.v !== undefined && x.v !== false && x.v !== null && x.v !== 0 && x.v !== '' && x.v !== 'undefined') return ok({ ok: true }); if (performance.now() > end) return ok({ ok: false, last }); let done = false; const once = () => { if (!done) { done = true; test(); } }; requestAnimationFrame(once); setTimeout(once, 50); };
-          test(); })`,
+        ([js, ms]: [string, number]) =>
+          new Promise<{ ok: boolean; last?: { v?: unknown; e?: string } }>((ok) => {
+            const g = globalThis as unknown as { __threesmith: PageRuntime; performance: { now(): number }; requestAnimationFrame(f: () => void): void; setTimeout(f: () => void, ms: number): void };
+            const t = g.__threesmith;
+            const end = g.performance.now() + ms;
+            const test = (): void => {
+              const x = t.read(js);
+              if (x.v !== undefined && x.v !== false && x.v !== null && x.v !== 0 && x.v !== "" && x.v !== "undefined") return ok({ ok: true });
+              if (g.performance.now() > end) return ok({ ok: false, last: x });
+              let done = false;
+              const once = (): void => {
+                if (!done) {
+                  done = true;
+                  test();
+                }
+              };
+              g.requestAnimationFrame(once);
+              g.setTimeout(once, 50);
+            };
+            test();
+          }),
+        [step.js, timeout] as [string, number],
       )) as { ok: boolean; last?: { v?: unknown; e?: string } };
       if (!r.ok) {
         const last = r.last?.e !== undefined ? `threw ${r.last.e}` : `last value ${JSON.stringify(r.last?.v)}`;
