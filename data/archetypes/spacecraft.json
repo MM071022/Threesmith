@@ -663,5 +663,409 @@
   "pitfalls": [
    "Modules and solar arrays fused into one static mesh prevents solar tracking or adding modules."
   ]
+ },
+ {
+  "id": "spacecraft.lander",
+  "name": "lunar lander",
+  "description": "A spacecraft that lands on the Moon or a planet on legs: a descent stage with a rocket engine and landing legs, and on a crewed lander an ascent stage with the cabin on top.",
+  "aliases": [
+   "lunar lander",
+   "lander",
+   "moon lander",
+   "maanlander",
+   "lunar module",
+   "lem",
+   "landingsmodule",
+   "landing module",
+   "mars lander",
+   "planetary lander"
+  ],
+  "extends": "spacecraft",
+  "hints": [
+   "moon",
+   "maan",
+   "apollo",
+   "eagle",
+   "landing legs",
+   "landingspoten",
+   "footpad",
+   "descent stage",
+   "ascent stage",
+   "regolith"
+  ],
+  "parts": [
+   {
+    "name": "DescentStage",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "descent stage",
+     "daaltrap",
+     "descent module",
+     "base"
+    ],
+    "replaces": [
+     "Hull"
+    ]
+   },
+   {
+    "name": "AscentStage",
+    "role": "cabin",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "ascent stage",
+     "stijgtrap",
+     "ascent module",
+     "crew module"
+    ],
+    "note": "A crewed lander has a cabin on top that lifts off and leaves the descent stage behind."
+   },
+   {
+    "name": "Leg",
+    "role": "landing leg",
+    "required": true,
+    "count": [
+     3,
+     6
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "leg",
+     "legs",
+     "landing leg",
+     "landingspoot",
+     "poot"
+    ],
+    "note": "Folds out about a hinge at the top of the main strut."
+   },
+   {
+    "name": "Footpad",
+    "role": "foot",
+    "required": true,
+    "count": [
+     3,
+     6
+    ],
+    "aliases": [
+     "footpad",
+     "foot pad",
+     "pad",
+     "voet"
+    ]
+   },
+   {
+    "name": "Engine",
+    "role": "engine",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "engine",
+     "descent engine",
+     "nozzle",
+     "engine bell",
+     "motor",
+     "straalpijp"
+    ],
+    "note": "Under the descent stage, pointing down."
+   },
+   {
+    "name": "Thruster",
+    "role": "rcs thruster",
+    "required": false,
+    "count": [
+     2,
+     16
+    ],
+    "aliases": [
+     "thruster",
+     "rcs",
+     "rcs quad",
+     "stuurraket"
+    ]
+   },
+   {
+    "name": "Ladder",
+    "role": "ladder",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "ladder",
+     "ladder rungs",
+     "trap"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    3.5,
+    10
+   ],
+   "width": [
+    3.5,
+    10
+   ],
+   "height": [
+    3,
+    9
+   ],
+   "source": "official NASA data: the Apollo Lunar Module is 7.04 m high and 9.4 m across the landing gear; robotic landers such as Intuitive Machines Nova-C (4.3 m high) are smaller",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "crew",
+    "options": [
+     "crewed (two stages)",
+     "robotic (one stage)"
+    ]
+   },
+   {
+    "axis": "legs",
+    "options": [
+     "3",
+     "4",
+     "6"
+    ]
+   }
+  ],
+  "conventions": [
+   "The lander stands on its footpads at y = 0 with the hatch and ladder facing +Z."
+  ],
+  "anticipate": [
+   "A separate ascent stage node that can lift off.",
+   "Engine nodes with their pivot at the throat, for a plume effect."
+  ],
+  "pitfalls": [
+   "Footpads that sink into y = 0 or legs that stop short of the ground: the pads rest on y = 0."
+  ]
+ },
+ {
+  "id": "spacecraft.rover",
+  "name": "planetary rover",
+  "description": "A robotic rover that drives on the Moon or Mars: a body on six wheels with rocker-bogie suspension, a camera mast, a robotic arm and its own power source.",
+  "aliases": [
+   "mars rover",
+   "rover",
+   "planetary rover",
+   "marsrover",
+   "maanrover",
+   "lunar rover",
+   "curiosity rover",
+   "perseverance rover",
+   "planeetverkenner"
+  ],
+  "extends": "spacecraft",
+  "hints": [
+   "mars",
+   "curiosity",
+   "perseverance",
+   "opportunity",
+   "spirit",
+   "rocker-bogie",
+   "rocker bogie",
+   "mast camera",
+   "sample",
+   "regolith",
+   "rtg"
+  ],
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "body",
+     "chassis",
+     "warm electronics box",
+     "romp",
+     "chassis box"
+    ],
+    "replaces": [
+     "Hull"
+    ]
+   },
+   {
+    "name": "Wheel",
+    "role": "wheel",
+    "required": true,
+    "count": 6,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "wheel",
+     "wheels",
+     "wiel",
+     "wielen"
+    ],
+    "note": "Six wheels; the four corner wheels also steer about a vertical axis above the wheel."
+   },
+   {
+    "name": "Rocker",
+    "role": "suspension",
+    "required": true,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "rocker",
+     "rocker arm",
+     "tuimelaar"
+    ],
+    "note": "Pivots on the side of the body; a differential bar links the two rockers."
+   },
+   {
+    "name": "Bogie",
+    "role": "suspension",
+    "required": true,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "bogie",
+     "draaistel"
+    ],
+    "note": "Pivots on the rear end of the rocker and carries the middle and rear wheels."
+   },
+   {
+    "name": "Mast",
+    "role": "sensor mast",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "mast",
+     "camera mast",
+     "remote sensing mast",
+     "camerapaal"
+    ]
+   },
+   {
+    "name": "Arm",
+    "role": "robotic arm",
+    "required": false,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "arm",
+     "robotic arm",
+     "robotarm"
+    ]
+   },
+   {
+    "name": "Antenna",
+    "role": "antenna",
+    "required": false,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "antenna",
+     "high gain antenna",
+     "dish",
+     "antenne",
+     "schotel"
+    ]
+   },
+   {
+    "name": "PowerSource",
+    "role": "power",
+    "required": false,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "rtg",
+     "mmrtg",
+     "solar panel",
+     "solar panels",
+     "zonnepaneel",
+     "power source"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    1.4,
+    3.5
+   ],
+   "width": [
+    1.2,
+    3.0
+   ],
+   "height": [
+    1.0,
+    2.5
+   ],
+   "source": "official NASA/JPL data: Curiosity 3.0 m long, 2.8 m wide and 2.2 m high with 0.5 m wheels; Perseverance 2.9 x 2.7 x 2.2 m; Spirit and Opportunity 1.6 m long and 1.5 m high",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "power",
+    "options": [
+     "RTG (radioisotope)",
+     "solar panels"
+    ]
+   },
+   {
+    "axis": "size",
+    "options": [
+     "small (Sojourner)",
+     "medium (MER)",
+     "large (Curiosity, Perseverance)"
+    ]
+   }
+  ],
+  "conventions": [
+   "The front (with the arm) faces +Z and the wheels stand on y = 0; the mast camera looks along +Z."
+  ],
+  "anticipate": [
+   "Rocker and bogie nodes that rotate, so the wheels can follow uneven ground.",
+   "A mast head that pans and tilts, and corner-wheel steering nodes."
+  ],
+  "pitfalls": [
+   "Six wheels on one rigid axle line cannot climb rocks: the wheels hang from the rockers and bogies, not from the body."
+  ]
  }
 ]

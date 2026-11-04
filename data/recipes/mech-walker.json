@@ -1,0 +1,1403 @@
+{
+ "version": 1,
+ "name": "mech-walker",
+ "archetype": "machine.mech",
+ "description": "A sci-fi bipedal battle mech, 9 m tall by default (real piloted walkers are 4-8.5 m, game mechs 8-14 m): an armoured torso with a tinted cockpit canopy, searchlights, heat-sink fins, exhausts and an antenna, which turns on a twist ring on the pelvis; gun arms with a rotary or single cannon and a magazine; shoulder missile pods with a grid of tubes; and digitigrade (reverse-joint) or humanoid legs with hip actuators, knee guards, pistons, ankles and three-toed feet. Torso (twist), Arm_L/R (shoulder), Elbow, Leg_L/R (hip), Knee, Ankle and Foot are nodes with their pivot on the joint axis. Faces +Z, feet on y = 0.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 9,
+   "min": 4,
+   "max": 16,
+   "description": "Height to the top of the torso in metres (a Kuratas is 4 m, a game mech 8-14 m)."
+  },
+  {
+   "name": "bulk",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.8,
+   "max": 1.3,
+   "description": "Width and armour thickness relative to the height."
+  },
+  {
+   "name": "legStyle",
+   "type": "integer",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "description": "0 humanoid legs (knees forward), 1 digitigrade reverse-joint legs."
+  },
+  {
+   "name": "legLength",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.85,
+   "max": 1.2,
+   "description": "Leg length relative to the height of the torso."
+  },
+  {
+   "name": "armLength",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.8,
+   "max": 1.3,
+   "description": "Length of the gun arms."
+  },
+  {
+   "name": "barrels",
+   "type": "integer",
+   "default": 3,
+   "min": 1,
+   "max": 6,
+   "description": "Barrels on each gun arm: 1 is a single cannon, more make a rotary cannon."
+  },
+  {
+   "name": "missileRows",
+   "type": "integer",
+   "default": 3,
+   "min": 2,
+   "max": 5,
+   "description": "Rows (and columns) of missile tubes in each shoulder pod."
+  },
+  {
+   "name": "weaponPods",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "Missile pods on the shoulders; false leaves low armour covers on the mounts."
+  }
+ ],
+ "materials": {
+  "armour": {
+   "color": [
+    0.2,
+    0.22,
+    0.14
+   ],
+   "metallic": 0.35,
+   "roughness": 0.55,
+   "texture": "concrete"
+  },
+  "armour_dark": {
+   "color": [
+    0.1,
+    0.11,
+    0.08
+   ],
+   "metallic": 0.4,
+   "roughness": 0.5
+  },
+  "frame": {
+   "color": [
+    0.08,
+    0.085,
+    0.09
+   ],
+   "metallic": 0.8,
+   "roughness": 0.45
+  },
+  "joint": {
+   "color": [
+    0.3,
+    0.31,
+    0.33
+   ],
+   "metallic": 0.9,
+   "roughness": 0.35
+  },
+  "piston": {
+   "color": [
+    0.75,
+    0.76,
+    0.78
+   ],
+   "metallic": 1,
+   "roughness": 0.15
+  },
+  "barrel": {
+   "color": [
+    0.05,
+    0.05,
+    0.055
+   ],
+   "metallic": 0.9,
+   "roughness": 0.4
+  },
+  "tube_hole": {
+   "color": [
+    0.01,
+    0.01,
+    0.01
+   ],
+   "metallic": 0,
+   "roughness": 0.95
+  },
+  "canopy_glass": {
+   "color": [
+    0.08,
+    0.3,
+    0.32,
+    0.78
+   ],
+   "metallic": 0.6,
+   "roughness": 0.05,
+   "alpha": "BLEND"
+  },
+  "hazard": {
+   "color": [
+    0.85,
+    0.6,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.5
+  },
+  "warning_red": {
+   "color": [
+    0.6,
+    0.03,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.4
+  },
+  "searchlight": {
+   "color": [
+    0.95,
+    0.95,
+    0.9
+   ],
+   "metallic": 0,
+   "roughness": 0.1,
+   "emissive": [
+    1,
+    0.95,
+    0.8
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "Mech",
+   "vars": {
+    "s": "$height / 9",
+    "bk": "$bulk",
+    "st": "$legStyle",
+    "a1": "lerp(14, 30, $legStyle)",
+    "a2": "lerp(-12, -46, $legStyle)",
+    "a3": "lerp(0, 16, $legStyle)",
+    "Lt": "2.5 * $s * $legLength",
+    "Ls": "2.6 * $s * $legLength",
+    "Lm": "lerp(0.45, 1.6, $legStyle) * $s * $legLength",
+    "fh": "0.55 * $s",
+    "hipY": "0.55 * $s + 2.5 * $s * $legLength * cos(rad(lerp(14, 30, $legStyle))) + 2.6 * $s * $legLength * cos(rad(lerp(-12, -46, $legStyle))) + lerp(0.45, 1.6, $legStyle) * $s * $legLength * cos(rad(lerp(0, 16, $legStyle)))",
+    "hx": "1.05 * $s * $bulk",
+    "tb": "$hipY + 0.55 * $s"
+   },
+   "children": [
+    {
+     "name": "Pelvis",
+     "children": [
+      {
+       "name": "HipBlock",
+       "shape": "box",
+       "size": [
+        "2.2 * $s * $bulk",
+        "1.0 * $s",
+        "1.5 * $s * $bulk"
+       ],
+       "at": [
+        0,
+        "$hipY + 0.05 * $s",
+        0
+       ],
+       "material": "frame",
+       "bevel": "0.12 * $s"
+      },
+      {
+       "name": "HipActuator_L",
+       "shape": "cylinder",
+       "radius": "0.55 * $s * $bulk",
+       "height": "0.6 * $s",
+       "axis": "x",
+       "at": [
+        "$hx + 0.05 * $s",
+        "$hipY - 0.15 * $s",
+        0
+       ],
+       "material": "joint",
+       "segments": 24,
+       "bevel": "0.06 * $s",
+       "mirror": "HipActuator_R"
+      },
+      {
+       "name": "HipSkirt_L",
+       "shape": "box",
+       "size": [
+        "0.12 * $s",
+        "1.0 * $s",
+        "1.2 * $s * $bulk"
+       ],
+       "at": [
+        "$hx + 0.6 * $s",
+        "$hipY + 0.05 * $s",
+        0
+       ],
+       "material": "armour",
+       "bevel": "0.04 * $s",
+       "mirror": "HipSkirt_R"
+      },
+      {
+       "name": "TwistRing",
+       "shape": "cylinder",
+       "radius": "0.95 * $s * $bulk",
+       "height": "0.5 * $s",
+       "at": [
+        0,
+        "$hipY + 0.5 * $s",
+        0
+       ],
+       "material": "joint",
+       "segments": 32,
+       "bevel": "0.05 * $s"
+      }
+     ]
+    },
+    {
+     "name": "Torso",
+     "at": [
+      0,
+      "$tb",
+      0
+     ],
+     "children": [
+      {
+       "name": "Hull",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "-1.5 * $s",
+         "points": [
+          [
+           "2.3 * $s * $bulk / 2",
+           "0.7 * $s"
+          ],
+          [
+           "2.3 * $s * $bulk / 2",
+           "2.05 * $s"
+          ],
+          [
+           "2.3 * $s * $bulk * 0.3",
+           "2.4 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk * 0.3",
+           "2.4 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk / 2",
+           "2.05 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk / 2",
+           "0.7 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk * 0.35",
+           "0.35 * $s"
+          ],
+          [
+           "2.3 * $s * $bulk * 0.35",
+           "0.35 * $s"
+          ]
+         ]
+        },
+        {
+         "z": "-0.6 * $s",
+         "points": [
+          [
+           "2.8 * $s * $bulk / 2",
+           "0.35 * $s"
+          ],
+          [
+           "2.8 * $s * $bulk / 2",
+           "2.4 * $s"
+          ],
+          [
+           "2.8 * $s * $bulk * 0.3",
+           "2.75 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk * 0.3",
+           "2.75 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk / 2",
+           "2.4 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk / 2",
+           "0.35 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk * 0.35",
+           "0.0 * $s"
+          ],
+          [
+           "2.8 * $s * $bulk * 0.35",
+           "0.0 * $s"
+          ]
+         ]
+        },
+        {
+         "z": "0.5 * $s",
+         "points": [
+          [
+           "2.8 * $s * $bulk / 2",
+           "0.35 * $s"
+          ],
+          [
+           "2.8 * $s * $bulk / 2",
+           "2.35 * $s"
+          ],
+          [
+           "2.8 * $s * $bulk * 0.3",
+           "2.7 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk * 0.3",
+           "2.7 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk / 2",
+           "2.35 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk / 2",
+           "0.35 * $s"
+          ],
+          [
+           "-2.8 * $s * $bulk * 0.35",
+           "0.0 * $s"
+          ],
+          [
+           "2.8 * $s * $bulk * 0.35",
+           "0.0 * $s"
+          ]
+         ]
+        },
+        {
+         "z": "1.35 * $s",
+         "points": [
+          [
+           "2.3 * $s * $bulk / 2",
+           "0.6 * $s"
+          ],
+          [
+           "2.3 * $s * $bulk / 2",
+           "1.65 * $s"
+          ],
+          [
+           "2.3 * $s * $bulk * 0.3",
+           "2.0 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk * 0.3",
+           "2.0 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk / 2",
+           "1.65 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk / 2",
+           "0.6 * $s"
+          ],
+          [
+           "-2.3 * $s * $bulk * 0.35",
+           "0.25 * $s"
+          ],
+          [
+           "2.3 * $s * $bulk * 0.35",
+           "0.25 * $s"
+          ]
+         ]
+        },
+        {
+         "z": "2.05 * $s",
+         "points": [
+          [
+           "1.4 * $s * $bulk / 2",
+           "1.0499999999999998 * $s"
+          ],
+          [
+           "1.4 * $s * $bulk / 2",
+           "1.2000000000000002 * $s"
+          ],
+          [
+           "1.4 * $s * $bulk * 0.3",
+           "1.55 * $s"
+          ],
+          [
+           "-1.4 * $s * $bulk * 0.3",
+           "1.55 * $s"
+          ],
+          [
+           "-1.4 * $s * $bulk / 2",
+           "1.2000000000000002 * $s"
+          ],
+          [
+           "-1.4 * $s * $bulk / 2",
+           "1.0499999999999998 * $s"
+          ],
+          [
+           "-1.4 * $s * $bulk * 0.35",
+           "0.7 * $s"
+          ],
+          [
+           "1.4 * $s * $bulk * 0.35",
+           "0.7 * $s"
+          ]
+         ]
+        }
+       ],
+       "material": "armour"
+      },
+      {
+       "name": "SidePlate_L",
+       "shape": "box",
+       "size": [
+        "0.14 * $s",
+        "1.6 * $s",
+        "2.2 * $s"
+       ],
+       "at": [
+        "1.42 * $s * $bulk",
+        "1.35 * $s",
+        "0.1 * $s"
+       ],
+       "material": "armour_dark",
+       "bevel": "0.05 * $s",
+       "mirror": "SidePlate_R",
+       "children": [
+        {
+         "name": "Vent_{i}",
+         "shape": "box",
+         "size": [
+          "0.04 * $s",
+          "0.08 * $s",
+          "1.4 * $s"
+         ],
+         "at": [
+          "0.07 * $s",
+          "-0.5 * $s",
+          0
+         ],
+         "material": "tube_hole",
+         "repeat": {
+          "count": 4,
+          "step": [
+           0,
+           "0.18 * $s",
+           0
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "name": "ChestPlate",
+       "shape": "box",
+       "size": [
+        "1.6 * $s * $bulk",
+        "0.7 * $s",
+        "0.3 * $s"
+       ],
+       "at": [
+        0,
+        "0.75 * $s",
+        "1.5 * $s"
+       ],
+       "material": "armour",
+       "bevel": "0.1 * $s",
+       "rotate": [
+        -30,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "ChestStripe_{i}",
+         "shape": "box",
+         "size": [
+          "0.18 * $s",
+          "0.5 * $s",
+          "0.04 * $s"
+         ],
+         "at": [
+          "-0.6 * $s * $bulk",
+          0,
+          "0.15 * $s"
+         ],
+         "material": "hazard",
+         "rotate": [
+          0,
+          0,
+          30
+         ],
+         "repeat": {
+          "count": 5,
+          "step": [
+           "0.3 * $s * $bulk",
+           0,
+           0
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "name": "Cockpit",
+       "children": [
+        {
+         "name": "Canopy",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": "0.4 * $s",
+           "superellipse": {
+            "width": "0.9 * $s * $bulk",
+            "height": "0.2 * $s",
+            "n": 2.5,
+            "count": 20,
+            "cy": "2.72 * $s"
+           }
+          },
+          {
+           "z": "0.7 * $s",
+           "superellipse": {
+            "width": "1.3 * $s * $bulk",
+            "height": "0.5 * $s",
+            "n": 2.5,
+            "count": 20,
+            "cy": "2.5 * $s"
+           }
+          },
+          {
+           "z": "1.3 * $s",
+           "superellipse": {
+            "width": "1.4 * $s * $bulk",
+            "height": "0.55 * $s",
+            "n": 2.5,
+            "count": 20,
+            "cy": "2.08 * $s"
+           }
+          },
+          {
+           "z": "1.85 * $s",
+           "superellipse": {
+            "width": "1.0 * $s * $bulk",
+            "height": "0.4 * $s",
+            "n": 2.5,
+            "count": 20,
+            "cy": "1.68 * $s"
+           }
+          },
+          {
+           "z": "2.08 * $s",
+           "superellipse": {
+            "width": "0.5 * $s * $bulk",
+            "height": "0.16 * $s",
+            "n": 2.5,
+            "count": 20,
+            "cy": "1.5 * $s"
+           }
+          }
+         ],
+         "material": "canopy_glass"
+        },
+        {
+         "name": "CanopyFrame",
+         "shape": "box",
+         "size": [
+          "0.1 * $s",
+          "0.1 * $s",
+          "1.9 * $s"
+         ],
+         "at": [
+          0,
+          "2.33 * $s",
+          "1.2 * $s"
+         ],
+         "material": "frame",
+         "rotate": [
+          40,
+          0,
+          0
+         ]
+        },
+        {
+         "name": "Seat",
+         "shape": "box",
+         "size": [
+          "0.5 * $s",
+          "0.7 * $s",
+          "0.5 * $s"
+         ],
+         "at": [
+          0,
+          "1.7 * $s",
+          "0.6 * $s"
+         ],
+         "material": "armour_dark",
+         "bevel": "0.05 * $s"
+        }
+       ]
+      },
+      {
+       "name": "ChinGuard",
+       "shape": "box",
+       "size": [
+        "1.3 * $s * $bulk",
+        "0.35 * $s",
+        "0.5 * $s"
+       ],
+       "at": [
+        0,
+        "0.75 * $s",
+        "1.95 * $s"
+       ],
+       "material": "armour_dark",
+       "bevel": "0.08 * $s"
+      },
+      {
+       "name": "Searchlight_L",
+       "shape": "box",
+       "size": [
+        "0.32 * $s",
+        "0.22 * $s",
+        "0.2 * $s"
+       ],
+       "at": [
+        "0.5 * $s * $bulk",
+        "0.98 * $s",
+        "2.02 * $s"
+       ],
+       "material": "searchlight",
+       "bevel": "0.03 * $s",
+       "mirror": "Searchlight_R"
+      },
+      {
+       "name": "ShoulderMount_L",
+       "shape": "box",
+       "size": [
+        "0.7 * $s * $bulk",
+        "0.9 * $s",
+        "1.4 * $s"
+       ],
+       "at": [
+        "1.25 * $s * $bulk",
+        "2.2 * $s",
+        0
+       ],
+       "material": "frame",
+       "bevel": "0.08 * $s",
+       "mirror": "ShoulderMount_R"
+      },
+      {
+       "name": "PodMount_L",
+       "shape": "box",
+       "size": [
+        "0.9 * $s * $bulk",
+        "0.2 * $s",
+        "1.3 * $s"
+       ],
+       "at": [
+        "1.15 * $s * $bulk",
+        "2.65 * $s",
+        "-0.15 * $s"
+       ],
+       "material": "joint",
+       "bevel": "0.04 * $s",
+       "mirror": "PodMount_R"
+      },
+      {
+       "name": "HeatSink",
+       "children": [
+        {
+         "name": "Fin_{i}",
+         "shape": "box",
+         "size": [
+          "0.06 * $s",
+          "1.1 * $s",
+          "0.5 * $s"
+         ],
+         "at": [
+          "-0.6 * $s * $bulk",
+          "1.4 * $s",
+          "-1.65 * $s"
+         ],
+         "material": "frame",
+         "repeat": {
+          "count": 9,
+          "step": [
+           "0.15 * $s * $bulk",
+           0,
+           0
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "name": "Exhaust_L",
+       "shape": "cylinder",
+       "radius": "0.22 * $s",
+       "height": "0.5 * $s",
+       "at": [
+        "0.75 * $s * $bulk",
+        "2.15 * $s",
+        "-1.55 * $s"
+       ],
+       "material": "frame",
+       "segments": 16,
+       "mirror": "Exhaust_R",
+       "children": [
+        {
+         "name": "Soot",
+         "shape": "cylinder",
+         "radius": "0.15 * $s",
+         "height": "0.02 * $s",
+         "at": [
+          0,
+          "0.25 * $s",
+          0
+         ],
+         "material": "tube_hole",
+         "segments": 16
+        }
+       ]
+      },
+      {
+       "name": "Antenna",
+       "shape": "cylinder",
+       "radius": "0.03 * $s",
+       "height": "1.4 * $s",
+       "at": [
+        "-0.8 * $s * $bulk",
+        "3.2 * $s",
+        "-0.9 * $s"
+       ],
+       "material": "piston",
+       "segments": 8,
+       "children": [
+        {
+         "name": "AntennaTip",
+         "shape": "ellipsoid",
+         "radii": [
+          "0.06 * $s",
+          "0.06 * $s",
+          "0.06 * $s"
+         ],
+         "at": [
+          0,
+          "0.7 * $s",
+          0
+         ],
+         "material": "warning_red",
+         "segments": 10
+        }
+       ]
+      },
+      {
+       "name": "TopArmour",
+       "shape": "box",
+       "size": [
+        "1.4 * $s * $bulk",
+        "0.2 * $s",
+        "1.8 * $s"
+       ],
+       "at": [
+        0,
+        "2.75 * $s",
+        "-0.5 * $s"
+       ],
+       "material": "armour_dark",
+       "bevel": "0.06 * $s"
+      },
+      {
+       "name": "WeaponPod_L",
+       "at": [
+        "1.15 * $s * $bulk",
+        "2.75 * $s + lerp(0.18, 1.15, $weaponPods) * $s / 2",
+        "-0.15 * $s"
+       ],
+       "mirror": "WeaponPod_R",
+       "children": [
+        {
+         "name": "PodHousing",
+         "shape": "box",
+         "size": [
+          "1.0 * $s * $bulk",
+          "lerp(0.18, 1.15, $weaponPods) * $s",
+          "1.5 * $s"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "armour",
+         "bevel": "min(0.1 * $s, lerp(0.18, 1.15, $weaponPods) * $s * 0.3)"
+        },
+        {
+         "name": "PodCap",
+         "shape": "box",
+         "size": [
+          "1.05 * $s * $bulk",
+          "0.08 * $s",
+          "1.55 * $s"
+         ],
+         "at": [
+          0,
+          "lerp(0.18, 1.15, $weaponPods) * $s / 2",
+          0
+         ],
+         "material": "armour_dark",
+         "bevel": "0.03 * $s"
+        },
+        {
+         "name": "TubeRow_{i}",
+         "at": [
+          0,
+          "-lerp(0.18, 1.15, $weaponPods) * $s / 2 + lerp(0.18, 1.15, $weaponPods) * $s * ($i + 0.5) / $missileRows",
+          "0.75 * $s"
+         ],
+         "repeat": {
+          "count": "$missileRows",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "children": [
+          {
+           "name": "Tube_{i}",
+           "shape": "cylinder",
+           "radius": "lerp(0.18, 1.15, $weaponPods) * $s / $missileRows * 0.32",
+           "height": "0.04 * $s",
+           "axis": "z",
+           "at": [
+            "-0.4 * $s * $bulk + 0.8 * $s * $bulk * ($i + 0.5) / $missileRows",
+            0,
+            0
+           ],
+           "material": "tube_hole",
+           "segments": 12,
+           "repeat": {
+            "count": "$missileRows",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           }
+          }
+         ]
+        },
+        {
+         "name": "PodStripe",
+         "shape": "box",
+         "size": [
+          "0.08 * $s",
+          "lerp(0.18, 1.15, $weaponPods) * $s * 0.7",
+          "1.3 * $s"
+         ],
+         "at": [
+          "0.5 * $s * $bulk + 0.02 * $s",
+          0,
+          0
+         ],
+         "material": "hazard"
+        }
+       ]
+      },
+      {
+       "name": "Arm_L",
+       "at": [
+        "1.4 * $s * $bulk",
+        "2.35 * $s",
+        "0.15 * $s"
+       ],
+       "mirror": "Arm_R",
+       "children": [
+        {
+         "name": "ShoulderArmour",
+         "shape": "box",
+         "size": [
+          "0.85 * $s * $bulk",
+          "1.25 * $s",
+          "1.1 * $s"
+         ],
+         "at": [
+          "0.425 * $s * $bulk",
+          "-0.62 * $s",
+          0
+         ],
+         "material": "armour",
+         "bevel": "0.12 * $s"
+        },
+        {
+         "name": "UpperArm",
+         "shape": "box",
+         "size": [
+          "0.55 * $s * $bulk",
+          "0.8 * $s",
+          "0.6 * $s"
+         ],
+         "at": [
+          "0.45 * $s * $bulk",
+          "-1.15 * $s",
+          0
+         ],
+         "material": "frame",
+         "bevel": "0.06 * $s"
+        },
+        {
+         "name": "Elbow",
+         "at": [
+          "0.45 * $s * $bulk",
+          "-1.6 * $s",
+          0
+         ],
+         "children": [
+          {
+           "name": "ElbowJoint",
+           "shape": "cylinder",
+           "radius": "0.3 * $s",
+           "height": "0.6 * $s * $bulk",
+           "axis": "x",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "joint",
+           "segments": 18
+          },
+          {
+           "name": "GunHousing",
+           "shape": "box",
+           "size": [
+            "1.0 * $s * $bulk",
+            "1.0 * $s",
+            "3.0 * $s * $armLength * 0.6"
+           ],
+           "at": [
+            0,
+            "0.1 * $s",
+            "3.0 * $s * $armLength * 0.2"
+           ],
+           "material": "armour",
+           "bevel": "0.1 * $s"
+          },
+          {
+           "name": "Muzzle",
+           "shape": "box",
+           "size": [
+            "0.7 * $s",
+            "0.7 * $s",
+            "0.3 * $s"
+           ],
+           "at": [
+            0,
+            "0.1 * $s",
+            "3.0 * $s * $armLength * 0.52"
+           ],
+           "material": "frame",
+           "bevel": "0.04 * $s",
+           "children": [
+            {
+             "name": "Barrel_{i}",
+             "shape": "cylinder",
+             "radius": "0.1 * $s",
+             "height": "3.0 * $s * $armLength * 0.5",
+             "axis": "z",
+             "at": [
+              "0.2 * $s * min(1, $barrels - 1)",
+              0,
+              "3.0 * $s * $armLength * 0.25"
+             ],
+             "material": "barrel",
+             "segments": 12,
+             "repeat": {
+              "count": "$barrels",
+              "around": "z"
+             }
+            },
+            {
+             "name": "BarrelCollar",
+             "shape": "cylinder",
+             "radius": "0.36 * $s",
+             "height": "0.14 * $s",
+             "axis": "z",
+             "at": [
+              0,
+              0,
+              "3.0 * $s * $armLength * 0.4"
+             ],
+             "material": "joint",
+             "segments": 20
+            }
+           ]
+          },
+          {
+           "name": "Magazine",
+           "shape": "box",
+           "size": [
+            "0.35 * $s * $bulk",
+            "0.65 * $s",
+            "0.9 * $s"
+           ],
+           "at": [
+            "0.65 * $s * $bulk",
+            "-0.05 * $s",
+            "3.0 * $s * $armLength * 0.05"
+           ],
+           "material": "armour_dark",
+           "bevel": "0.06 * $s"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_L",
+     "at": [
+      "$hx - 0.3 * $s",
+      "$hipY",
+      0
+     ],
+     "mirror": "Leg_R",
+     "children": [
+      {
+       "name": "Thigh",
+       "rotate": [
+        "-$a1",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "ThighArmour",
+         "shape": "box",
+         "size": [
+          "0.75 * $s * $bulk",
+          "$Lt - 0.15 * $s",
+          "1.0 * $s * $bulk"
+         ],
+         "at": [
+          "0.75 * $s * $bulk / 2",
+          "-$Lt / 2 - 0.1 * $s",
+          0
+         ],
+         "material": "armour",
+         "bevel": "0.12 * $s"
+        },
+        {
+         "name": "ThighPlate",
+         "shape": "box",
+         "size": [
+          "0.75 * $s * $bulk * 0.4",
+          "$Lt * 0.6",
+          "0.8 * $s * $bulk"
+         ],
+         "at": [
+          "0.75 * $s * $bulk + 0.05 * $s",
+          "-$Lt / 2",
+          0
+         ],
+         "material": "armour_dark",
+         "bevel": "0.06 * $s"
+        },
+        {
+         "name": "Knee",
+         "at": [
+          "0.75 * $s * $bulk / 2",
+          "-$Lt",
+          0
+         ],
+         "rotate": [
+          "$a1 - $a2",
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "KneeJoint",
+           "shape": "cylinder",
+           "radius": "0.42 * $s * $bulk",
+           "height": "0.75 * $s * $bulk * 0.92",
+           "axis": "x",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "joint",
+           "segments": 20,
+           "bevel": "0.05 * $s"
+          },
+          {
+           "name": "KneeGuard",
+           "shape": "box",
+           "size": [
+            "0.75 * $s * $bulk * 0.8",
+            "0.7 * $s",
+            "0.25 * $s"
+           ],
+           "at": [
+            0,
+            "0.05 * $s",
+            "0.42 * $s * $bulk"
+           ],
+           "material": "armour",
+           "bevel": "0.08 * $s",
+           "rotate": [
+            "-$a2",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "Shin",
+           "shape": "box",
+           "size": [
+            "0.75 * $s * $bulk * 0.85",
+            "$Ls - 0.1 * $s",
+            "0.75 * $s * $bulk"
+           ],
+           "at": [
+            0,
+            "-$Ls / 2",
+            "0.05 * $s"
+           ],
+           "material": "armour",
+           "bevel": "0.1 * $s"
+          },
+          {
+           "name": "ShinFrame",
+           "shape": "box",
+           "size": [
+            "0.75 * $s * $bulk * 0.6",
+            "$Ls * 0.8",
+            "0.5 * $s * $bulk"
+           ],
+           "at": [
+            0,
+            "-$Ls / 2",
+            "-0.4 * $s * $bulk"
+           ],
+           "material": "frame",
+           "bevel": "0.05 * $s"
+          },
+          {
+           "name": "Piston",
+           "shape": "tube",
+           "path": [
+            [
+             0,
+             "-0.35 * $s",
+             "-0.55 * $s * $bulk"
+            ],
+            [
+             0,
+             "-$Ls + 0.4 * $s",
+             "-0.55 * $s * $bulk"
+            ]
+           ],
+           "radius": "0.07 * $s",
+           "material": "piston",
+           "segments": 10
+          },
+          {
+           "name": "Stripe",
+           "shape": "box",
+           "size": [
+            "0.75 * $s * $bulk * 0.86",
+            "0.12 * $s",
+            "0.06 * $s"
+           ],
+           "at": [
+            0,
+            "-$Ls * 0.22",
+            "0.05 * $s + 0.375 * $s * $bulk + 0.01 * $s"
+           ],
+           "material": "hazard"
+          },
+          {
+           "name": "Ankle",
+           "at": [
+            0,
+            "-$Ls",
+            0
+           ],
+           "rotate": [
+            "$a2 - $a3",
+            0,
+            0
+           ],
+           "children": [
+            {
+             "name": "AnkleJoint",
+             "shape": "cylinder",
+             "radius": "0.32 * $s * $bulk",
+             "height": "0.75 * $s * $bulk * 0.8",
+             "axis": "x",
+             "at": [
+              0,
+              0,
+              0
+             ],
+             "material": "joint",
+             "segments": 18
+            },
+            {
+             "name": "Metatarsal",
+             "shape": "box",
+             "size": [
+              "0.75 * $s * $bulk * 0.6",
+              "$Lm",
+              "0.42 * $s * $bulk"
+             ],
+             "at": [
+              0,
+              "-$Lm / 2",
+              0
+             ],
+             "material": "frame",
+             "bevel": "0.06 * $s"
+            },
+            {
+             "name": "Foot_L",
+             "at": [
+              0,
+              "-$Lm",
+              0
+             ],
+             "rotate": [
+              "$a3",
+              0,
+              0
+             ],
+             "children": [
+              {
+               "name": "FootJoint",
+               "shape": "cylinder",
+               "radius": "0.26 * $s * $bulk",
+               "height": "0.75 * $s * $bulk * 0.7",
+               "axis": "x",
+               "at": [
+                0,
+                0,
+                0
+               ],
+               "material": "joint",
+               "segments": 16
+              },
+              {
+               "name": "Sole",
+               "shape": "box",
+               "size": [
+                "0.75 * $s * $bulk * 1.3",
+                "0.3 * $s",
+                "1.4 * $s"
+               ],
+               "at": [
+                0,
+                "-$fh + 0.15 * $s",
+                "0.2 * $s"
+               ],
+               "material": "armour_dark",
+               "bevel": "0.06 * $s"
+              },
+              {
+               "name": "Toe_{i}",
+               "shape": "box",
+               "size": [
+                "0.75 * $s * $bulk * 0.4",
+                "0.34 * $s",
+                "1.2 * $s"
+               ],
+               "at": [
+                "-0.75 * $s * $bulk * 0.45",
+                "-$fh + 0.17 * $s",
+                "1.2 * $s"
+               ],
+               "material": "armour",
+               "bevel": "0.08 * $s",
+               "rotate": [
+                0,
+                0,
+                0
+               ],
+               "repeat": {
+                "count": 3,
+                "step": [
+                 "0.75 * $s * $bulk * 0.45",
+                 0,
+                 0
+                ]
+               }
+              },
+              {
+               "name": "Heel",
+               "shape": "box",
+               "size": [
+                "0.75 * $s * $bulk * 0.45",
+                "0.3 * $s",
+                "0.9 * $s"
+               ],
+               "at": [
+                0,
+                "-$fh + 0.15 * $s",
+                "-0.75 * $s"
+               ],
+               "material": "armour",
+               "bevel": "0.08 * $s"
+              },
+              {
+               "name": "AnkleGuard",
+               "shape": "box",
+               "size": [
+                "0.75 * $s * $bulk * 0.9",
+                "0.35 * $s",
+                "0.6 * $s"
+               ],
+               "at": [
+                0,
+                "-$fh + 0.45 * $s",
+                "0.1 * $s"
+               ],
+               "material": "armour",
+               "bevel": "0.08 * $s"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

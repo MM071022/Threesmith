@@ -1228,5 +1228,484 @@
    "Control surfaces on a swept wing turn about their own hinge line, not about the body's x axis.",
    "A model this large needs its size checked against the reference after every build step; an offset applied twice makes it far too long."
   ]
+ },
+ {
+  "id": "aircraft.lighter-than-air",
+  "name": "lighter-than-air aircraft",
+  "description": "An aircraft that floats on lift gas or hot air: a balloon or an airship.",
+  "aliases": [
+   "lighter-than-air",
+   "lighter than air",
+   "aerostat",
+   "lichter dan lucht"
+  ],
+  "extends": "aircraft",
+  "hints": [
+   "envelope",
+   "omhulsel",
+   "gas",
+   "helium",
+   "hydrogen",
+   "waterstof",
+   "hot air",
+   "hete lucht",
+   "float",
+   "drijven"
+  ],
+  "parts": [
+   {
+    "name": "Envelope",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "envelope",
+     "omhulsel",
+     "gas bag",
+     "gasbag",
+     "hull",
+     "balloon"
+    ],
+    "note": "The big fabric or rigid body that holds the lift gas or hot air."
+   }
+  ],
+  "conventions": [
+   "The envelope is the largest part by far: its size sets the scale, the crew compartment hangs under it."
+  ],
+  "pitfalls": [
+   "An envelope modelled small, like a party balloon over a basket, reads as a toy: the envelope is 15-20 m across for 1.2 m of basket."
+  ]
+ },
+ {
+  "id": "aircraft.lighter-than-air.hot-air-balloon",
+  "name": "hot air balloon",
+  "description": "A hot air balloon: a teardrop envelope of coloured gores, a wicker basket for the crew and a propane burner on a frame between them.",
+  "aliases": [
+   "hot air balloon",
+   "hot-air balloon",
+   "balloon",
+   "luchtballon",
+   "heteluchtballon",
+   "ballon",
+   "montgolfière",
+   "montgolfiere"
+  ],
+  "extends": "aircraft.lighter-than-air",
+  "hints": [
+   "basket",
+   "mand",
+   "burner",
+   "brander",
+   "propane",
+   "propaan",
+   "gores",
+   "baan",
+   "ballooning",
+   "ballonvaart"
+  ],
+  "parts": [
+   {
+    "name": "Envelope",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "envelope",
+     "omhulsel",
+     "balloon",
+     "ballon"
+    ]
+   },
+   {
+    "name": "Basket",
+    "role": "gondola",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "basket",
+     "mand",
+     "gondola",
+     "gondel"
+    ]
+   },
+   {
+    "name": "Burner",
+    "role": "engine",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "burner",
+     "brander",
+     "heater"
+    ],
+    "note": "Sits on the load frame above the basket, under the mouth of the envelope."
+   },
+   {
+    "name": "Cable",
+    "role": "rigging",
+    "required": false,
+    "count": [
+     4,
+     32
+    ],
+    "aliases": [
+     "cable",
+     "load cable",
+     "flying wire",
+     "kabel",
+     "touw"
+    ]
+   },
+   {
+    "name": "Skirt",
+    "role": "fabric",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "skirt",
+     "scoop",
+     "rok"
+    ]
+   },
+   {
+    "name": "Tank",
+    "role": "fuel",
+    "required": false,
+    "count": [
+     1,
+     6
+    ],
+    "aliases": [
+     "tank",
+     "cylinder",
+     "propane tank",
+     "gasfles"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    12,
+    22
+   ],
+   "width": [
+    12,
+    22
+   ],
+   "height": [
+    15,
+    30
+   ],
+   "source": "manufacturer data: sport balloons of 2,000-3,000 m3 (Cameron O-90/O-105, Ultramagic M-77/M-105) are about 18-21 m high overall and 15-18 m wide; baskets are 1.0-2.0 m square and 1.1-1.2 m high",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "size",
+    "options": [
+     "1-2 person",
+     "sport (4 person)",
+     "passenger (16+ person)"
+    ]
+   },
+   {
+    "axis": "shape",
+    "options": [
+     "natural (teardrop)",
+     "special shape"
+    ]
+   }
+  ],
+  "conventions": [
+   "The basket stands on y = 0; the envelope's axis is the y axis, so the model is round about it."
+  ],
+  "anticipate": [
+   "A light at the burner for a night glow (an emissive flame node that can be switched).",
+   "A slow sway: rotate the whole balloon a few degrees about the basket, not the basket alone."
+  ],
+  "pitfalls": [
+   "A basket with no frame and burner between it and the envelope looks like it hangs from nothing."
+  ]
+ },
+ {
+  "id": "aircraft.lighter-than-air.airship",
+  "name": "airship",
+  "description": "A powered, steerable lighter-than-air craft: a long streamlined envelope with tail fins, a gondola (control car) underneath and propellers.",
+  "aliases": [
+   "airship",
+   "zeppelin",
+   "blimp",
+   "dirigible",
+   "luchtschip",
+   "zeppelin airship",
+   "steampunk airship",
+   "rigid airship",
+   "starr luchtschip"
+  ],
+  "extends": "aircraft.lighter-than-air",
+  "hints": [
+   "gondola",
+   "gondel",
+   "control car",
+   "helium",
+   "hydrogen",
+   "mooring mast",
+   "steampunk",
+   "hindenburg",
+   "goodyear"
+  ],
+  "parts": [
+   {
+    "name": "Envelope",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "envelope",
+     "hull",
+     "gas bag",
+     "omhulsel",
+     "romp"
+    ]
+   },
+   {
+    "name": "Gondola",
+    "role": "cabin",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "gondola",
+     "control car",
+     "gondel",
+     "cabin",
+     "car",
+     "cabine"
+    ]
+   },
+   {
+    "name": "Fin",
+    "role": "stabiliser",
+    "required": true,
+    "count": [
+     3,
+     4
+    ],
+    "aliases": [
+     "fin",
+     "fins",
+     "tail fin",
+     "stabilizer",
+     "stabiliser",
+     "vin",
+     "staartvin"
+    ]
+   },
+   {
+    "name": "ControlSurface",
+    "role": "control surface",
+    "required": false,
+    "count": [
+     2,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "rudder",
+     "elevator",
+     "ruddervator",
+     "roer"
+    ],
+    "note": "Hinged on the trailing edge of each fin."
+   },
+   {
+    "name": "Propeller",
+    "role": "propeller",
+    "required": true,
+    "count": [
+     1,
+     12
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "propeller",
+     "prop",
+     "schroef",
+     "airscrew"
+    ]
+   },
+   {
+    "name": "EngineCar",
+    "role": "engine",
+    "required": false,
+    "count": [
+     1,
+     12
+    ],
+    "aliases": [
+     "engine car",
+     "engine pod",
+     "engine",
+     "motorgondel"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    40,
+    250
+   ],
+   "width": [
+    10,
+    45
+   ],
+   "height": [
+    12,
+    50
+   ],
+   "source": "manufacturer and historic data: Zeppelin NT 75 m long and 17.5 m high, Goodyear GZ-20 blimp 58 m long, LZ 129 Hindenburg 245 m long and 41 m in diameter",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "construction",
+    "options": [
+     "blimp (non-rigid)",
+     "semi-rigid",
+     "rigid zeppelin"
+    ]
+   },
+   {
+    "axis": "style",
+    "options": [
+     "modern",
+     "classic zeppelin",
+     "steampunk"
+    ]
+   }
+  ],
+  "conventions": [
+   "The nose points to +Z and the length runs along z; moored on the ground the gondola rests on y = 0 and the lower fins stay clear of it."
+  ],
+  "anticipate": [
+   "A mooring point at the nose.",
+   "Propellers that spin (and swivel on vectored-thrust ships) as separate nodes."
+  ],
+  "pitfalls": [
+   "A cigar of uniform thickness reads as a sausage: the nose is blunt and the tail tapers long.",
+   "A gondola that does not touch the envelope floats."
+  ]
+ },
+ {
+  "id": "aircraft.fixed-wing.seaplane",
+  "name": "seaplane",
+  "description": "A floatplane: a light propeller aeroplane on two floats instead of wheels, so it takes off from and lands on water.",
+  "aliases": [
+   "seaplane",
+   "floatplane",
+   "float plane",
+   "watervliegtuig",
+   "drijvervliegtuig",
+   "bush plane on floats",
+   "pontoon plane"
+  ],
+  "extends": "aircraft.fixed-wing.light-aircraft",
+  "hints": [
+   "floats",
+   "drijvers",
+   "pontoons",
+   "lake",
+   "meer",
+   "water landing",
+   "beaver",
+   "otter",
+   "bush plane"
+  ],
+  "parts": [
+   {
+    "name": "Float",
+    "role": "float",
+    "required": true,
+    "count": 2,
+    "aliases": [
+     "float",
+     "floats",
+     "pontoon",
+     "pontoons",
+     "drijver",
+     "drijvers"
+    ],
+    "note": "Two floats under the wing, joined to the fuselage by struts and spreader bars."
+   },
+   {
+    "name": "WaterRudder",
+    "role": "control surface",
+    "required": false,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "water rudder",
+     "waterroer"
+    ],
+    "note": "At the stern of each float, steered with the air rudder."
+   }
+  ],
+  "scale": {
+   "length": [
+    7,
+    13
+   ],
+   "width": [
+    9,
+    16
+   ],
+   "height": [
+    3,
+    5
+   ],
+   "source": "manufacturer data: Cessna 172 on EDO floats about 8.3 m long with an 11 m span; DHC-2 Beaver 9.2 m long with a 14.6 m span; floats add about 1 m of height",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "floats",
+    "options": [
+     "straight floats",
+     "amphibious floats (with wheels)"
+    ]
+   }
+  ],
+  "conventions": [
+   "The model stands on the keels of its floats at y = 0; in the water the floats sink to roughly a third of their depth."
+  ],
+  "anticipate": [
+   "Water rudders hinged at the float sterns, linked to the rudder.",
+   "A waterline: put the model about a third of the float depth into the water plane."
+  ],
+  "pitfalls": [
+   "Floats as plain cylinders read as fuel tanks: they need a flat deck, a V bottom and a step."
+  ]
  }
 ]
