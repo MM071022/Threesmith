@@ -259,6 +259,23 @@
    },
    "children": [
     {
+     "name": "Pavement",
+     "shape": "box",
+     "material": "concrete",
+     "size": [
+      "$width + 1.1",
+      0.03,
+      "$depth + 0.9"
+     ],
+     "anchor": "bottom",
+     "at": [
+      0.25,
+      0,
+      0.25
+     ],
+     "bevel": 0.005
+    },
+    {
      "name": "Shelter",
      "children": [
       {
