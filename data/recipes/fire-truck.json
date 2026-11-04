@@ -2224,58 +2224,6 @@
        ]
       },
       {
-       "name": "Steering",
-       "at": [
-        "$c2 - 0.5",
-        2,
-        "$zf - 0.62"
-       ],
-       "rotate": [
-        -55,
-        0,
-        0
-       ],
-       "children": [
-        {
-         "name": "Ring",
-         "shape": "lathe",
-         "material": "trim_black",
-         "profile": [
-          [
-           0.2,
-           -0.017
-          ],
-          [
-           0.22,
-           0
-          ],
-          [
-           0.2,
-           0.017
-          ],
-          [
-           0.18,
-           0
-          ],
-          [
-           0.2,
-           -0.017
-          ]
-         ],
-         "segments": 24,
-         "caps": false
-        },
-        {
-         "name": "Boss",
-         "shape": "cylinder",
-         "material": "trim_black",
-         "radius": 0.05,
-         "height": 0.05,
-         "segments": 12
-        }
-       ]
-      },
-      {
        "name": "Hatch",
        "shape": "box",
        "material": "trim_black",
@@ -2597,23 +2545,31 @@
        ]
       },
       {
-       "name": "RearSteps",
+       "name": "RearSteps_L",
        "at": [
-        "-$W2 + 0.3",
+        "$W2 - 0.2",
         0,
         "$zbr - 0.06"
        ],
+       "mirror": "RearSteps_R",
        "children": [
         {
-         "name": "Rail_L",
+         "name": "Rail{i}",
          "shape": "box",
          "material": "ladder_alu",
          "at": [
-          0.2,
+          -0.12,
           "($H + $yb) / 2 + 0.1",
           0
          ],
-         "mirror": "Rail_R",
+         "repeat": {
+          "count": 2,
+          "step": [
+           0.24,
+           0,
+           0
+          ]
+         },
          "size": [
           0.04,
           "$H - $yb + 0.2",
@@ -2638,7 +2594,7 @@
           ]
          },
          "size": [
-          0.4,
+          0.24,
           0.03,
           0.03
          ]
@@ -2740,14 +2696,15 @@
        ]
       },
       {
-       "name": "RoofBox",
+       "name": "RoofBox_L",
        "shape": "box",
        "material": "shutter",
        "at": [
-        "-$W2 + 0.55",
+        "$W2 - 0.55",
         "$H + 0.04",
         "$zbr + 1.6"
        ],
+       "mirror": "RoofBox_R",
        "size": [
         0.9,
         0.35,
@@ -2907,14 +2864,15 @@
        "segments": 14
       },
       {
-       "name": "Tank",
+       "name": "Tank_L",
        "shape": "box",
        "material": "steel",
        "at": [
-        -0.75,
+        0.75,
         0.75,
         "$zRA + $r + 0.9"
        ],
+       "mirror": "Tank_R",
        "size": [
         0.5,
         0.5,
@@ -2944,19 +2902,19 @@
        "material": "steel",
        "path": [
         [
-         0.3,
-         0.6,
+         0,
+         0.62,
          "$zFA - 0.5"
         ],
         [
-         0.68,
-         0.55,
-         "$zFA - 1.2"
+         0,
+         0.6,
+         "$zRA + $r + 0.3"
         ],
         [
-         0.75,
-         0.55,
-         "$zRA + $r + 0.25"
+         0,
+         0.45,
+         "$zRA + $r + 0.1"
         ]
        ],
        "radius": 0.05,
@@ -2999,7 +2957,7 @@
        "anchor": "bottom"
       },
       {
-       "name": "Console",
+       "name": "Console_L",
        "shape": "box",
        "material": "shutter",
        "at": [
@@ -3007,6 +2965,7 @@
         "0.15 * $kAer",
         "-0.2 * $kAer"
        ],
+       "mirror": "Console_R",
        "size": [
         "0.4 * $kAer",
         "0.5 * $kAer",
