@@ -1,0 +1,1717 @@
+{
+ "version": 1,
+ "name": "submarine",
+ "archetype": "vessel.submarine",
+ "description": "A submarine surfaced at the waterline (y = 0): a lathe-turned pressure hull with an elliptic bow and a long tapered stern, a deck casing with hatches, a foil-shaped sail with a bridge and five masts (two periscopes, radar, snorkel, comms) that slide up, diving planes on the bow or on the sail, four stern rudders in a cross or X layout hinged at their leading edges, and a seven-blade bronze propeller or a shrouded pump-jet. Military style adds anechoic tiling, flank sonar arrays, torpedo doors and limber holes; exploration style is yellow and white with viewports, floodlights and manipulator arms.",
+ "params": [
+  {
+   "name": "length",
+   "type": "number",
+   "default": 68,
+   "min": 50,
+   "max": 120,
+   "description": "Hull length in metres (a diesel-electric boat is about 55-80 m, a nuclear attack boat 100-115 m)."
+  },
+  {
+   "name": "diameter",
+   "type": "number",
+   "default": 7.0,
+   "min": 6.0,
+   "max": 12.0,
+   "description": "Pressure hull diameter."
+  },
+  {
+   "name": "style",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 = military: black, sonar arrays and torpedo doors; 1 = exploration: yellow and white, viewports in the bow and sail, floodlights."
+  },
+  {
+   "name": "sailPosition",
+   "type": "number",
+   "default": 0.32,
+   "min": 0.22,
+   "max": 0.45,
+   "description": "Where the sail stands, as a part of the length from the bow."
+  },
+  {
+   "name": "rudderLayout",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 = cross-shaped stern rudders, 1 = X-shaped."
+  },
+  {
+   "name": "sailPlanes",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "Diving planes on the sail (older and US boats) instead of on the bow."
+  },
+  {
+   "name": "pumpJet",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "A shrouded pump-jet instead of an open seven-blade propeller."
+  },
+  {
+   "name": "masts",
+   "type": "number",
+   "default": 0.0,
+   "min": 0.0,
+   "max": 1.0,
+   "description": "How far the periscopes and masts are raised out of the sail."
+  }
+ ],
+ "materials": {
+  "hull_black": {
+   "color": [
+    0.018,
+    0.019,
+    0.021
+   ],
+   "metallic": 0.2,
+   "roughness": 0.6,
+   "texture": "roof_slate"
+  },
+  "hull_yellow": {
+   "color": [
+    0.85,
+    0.5,
+    0.0
+   ],
+   "metallic": 0.2,
+   "roughness": 0.4
+  },
+  "hull_white": {
+   "color": [
+    0.8,
+    0.8,
+    0.78
+   ],
+   "metallic": 0.2,
+   "roughness": 0.4
+  },
+  "boot_red": {
+   "color": [
+    0.3,
+    0.03,
+    0.02
+   ],
+   "metallic": 0.1,
+   "roughness": 0.6
+  },
+  "deck_dark": {
+   "color": [
+    0.03,
+    0.032,
+    0.035
+   ],
+   "metallic": 0.2,
+   "roughness": 0.7
+  },
+  "array_dark": {
+   "color": [
+    0.008,
+    0.008,
+    0.009
+   ],
+   "metallic": 0.1,
+   "roughness": 0.5
+  },
+  "mast_grey": {
+   "color": [
+    0.1,
+    0.1,
+    0.11
+   ],
+   "metallic": 0.5,
+   "roughness": 0.5
+  },
+  "bronze": {
+   "color": [
+    0.6,
+    0.42,
+    0.22
+   ],
+   "metallic": 1.0,
+   "roughness": 0.3
+  },
+  "viewport": {
+   "color": [
+    0.2,
+    0.45,
+    0.55,
+    0.5
+   ],
+   "metallic": 0.0,
+   "roughness": 0.03,
+   "alpha": "BLEND"
+  },
+  "lamp": {
+   "color": [
+    0.95,
+    0.95,
+    0.85
+   ],
+   "metallic": 0.0,
+   "roughness": 0.1,
+   "emissive": [
+    1.0,
+    0.95,
+    0.8
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "Submarine",
+   "material": "hull_black",
+   "vars": {
+    "L": "$length",
+    "L2": "$length / 2",
+    "R": "$diameter / 2",
+    "yc": "1.0 - $diameter / 2",
+    "zs": "$length / 2 - $sailPosition * $length",
+    "sl": "max(7, $length * 0.12)",
+    "sw": "max(1.4, $diameter * 0.22)",
+    "sh": "max(3.8, $diameter * 0.6)",
+    "mil": "1 - $style",
+    "kMil": "(0.02 + 0.98 * (1 - $style))",
+    "kExp": "(0.02 + 0.98 * ($style))",
+    "kSP": "(0.02 + 0.98 * ($sailPlanes))",
+    "kBP": "(0.02 + 0.98 * (1 - $sailPlanes))",
+    "kJet": "(0.02 + 0.98 * ($pumpJet))",
+    "kProp": "(0.02 + 0.98 * (1 - $pumpJet))",
+    "ra": "45 * $rudderLayout"
+   },
+   "children": [
+    {
+     "name": "Hull",
+     "at": [
+      0,
+      "$yc",
+      0
+     ],
+     "children": [
+      {
+       "name": "Military",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Body",
+         "shape": "lathe",
+         "material": "hull_black",
+         "rotate": [
+          90,
+          0,
+          0
+         ],
+         "profile": [
+          [
+           "($R * 0.0) * $kMil",
+           "(-$L2) * $kMil"
+          ],
+          [
+           "($R * 0.1) * $kMil",
+           "(-$L2 + 0 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.2568) * $kMil",
+           "(-$L2 + 0.21667 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.39738) * $kMil",
+           "(-$L2 + 0.43333 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.52206) * $kMil",
+           "(-$L2 + 0.65 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.63116) * $kMil",
+           "(-$L2 + 0.86667 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.72505) * $kMil",
+           "(-$L2 + 1.08333 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.80413) * $kMil",
+           "(-$L2 + 1.3 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.86885) * $kMil",
+           "(-$L2 + 1.51667 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.91973) * $kMil",
+           "(-$L2 + 1.73333 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.95737) * $kMil",
+           "(-$L2 + 1.95 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.98253) * $kMil",
+           "(-$L2 + 2.16667 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.9962) * $kMil",
+           "(-$L2 + 2.38333 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 1) * $kMil",
+           "(-$L2 + 2.6 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.99652) * $kMil",
+           "($L2 - 1.00833 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.98601) * $kMil",
+           "($L2 - 0.91667 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.96825) * $kMil",
+           "($L2 - 0.825 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.94281) * $kMil",
+           "($L2 - 0.73333 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.90906) * $kMil",
+           "($L2 - 0.64167 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.86603) * $kMil",
+           "($L2 - 0.55 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.81223) * $kMil",
+           "($L2 - 0.45833 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.74536) * $kMil",
+           "($L2 - 0.36667 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.66144) * $kMil",
+           "($L2 - 0.275 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.55277) * $kMil",
+           "($L2 - 0.18333 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0.39965) * $kMil",
+           "($L2 - 0.09167 * $diameter) * $kMil"
+          ],
+          [
+           "($R * 0) * $kMil",
+           "($L2 - 0 * $diameter) * $kMil"
+          ]
+         ],
+         "segments": 40
+        }
+       ]
+      },
+      {
+       "name": "Research",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Body",
+         "shape": "lathe",
+         "material": "hull_yellow",
+         "rotate": [
+          90,
+          0,
+          0
+         ],
+         "profile": [
+          [
+           "($R * 0.0) * $kExp",
+           "(-$L2) * $kExp"
+          ],
+          [
+           "($R * 0.1) * $kExp",
+           "(-$L2 + 0 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.2568) * $kExp",
+           "(-$L2 + 0.21667 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.39738) * $kExp",
+           "(-$L2 + 0.43333 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.52206) * $kExp",
+           "(-$L2 + 0.65 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.63116) * $kExp",
+           "(-$L2 + 0.86667 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.72505) * $kExp",
+           "(-$L2 + 1.08333 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.80413) * $kExp",
+           "(-$L2 + 1.3 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.86885) * $kExp",
+           "(-$L2 + 1.51667 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.91973) * $kExp",
+           "(-$L2 + 1.73333 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.95737) * $kExp",
+           "(-$L2 + 1.95 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.98253) * $kExp",
+           "(-$L2 + 2.16667 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.9962) * $kExp",
+           "(-$L2 + 2.38333 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 1) * $kExp",
+           "(-$L2 + 2.6 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.99652) * $kExp",
+           "($L2 - 1.00833 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.98601) * $kExp",
+           "($L2 - 0.91667 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.96825) * $kExp",
+           "($L2 - 0.825 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.94281) * $kExp",
+           "($L2 - 0.73333 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.90906) * $kExp",
+           "($L2 - 0.64167 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.86603) * $kExp",
+           "($L2 - 0.55 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.81223) * $kExp",
+           "($L2 - 0.45833 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.74536) * $kExp",
+           "($L2 - 0.36667 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.66144) * $kExp",
+           "($L2 - 0.275 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.55277) * $kExp",
+           "($L2 - 0.18333 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0.39965) * $kExp",
+           "($L2 - 0.09167 * $diameter) * $kExp"
+          ],
+          [
+           "($R * 0) * $kExp",
+           "($L2 - 0 * $diameter) * $kExp"
+          ]
+         ],
+         "segments": 40
+        }
+       ]
+      },
+      {
+       "name": "Casing",
+       "children": [
+        {
+         "name": "Deck",
+         "shape": "box",
+         "material": "deck_dark",
+         "at": [
+          0,
+          "$R - 0.18",
+          "$zs - $L * 0.08"
+         ],
+         "size": [
+          "max(1.6, $diameter * 0.28)",
+          0.5,
+          "$L * 0.5"
+         ],
+         "bevel": 0.15
+        },
+        {
+         "name": "Hatch{i}",
+         "shape": "box",
+         "material": "deck_dark",
+         "at": [
+          0,
+          "$R + 0.1",
+          "$zs + $sl * 0.7"
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           0,
+           "-$sl * 1.6 - $L * 0.12"
+          ]
+         },
+         "size": [
+          0.9,
+          0.12,
+          0.9
+         ],
+         "bevel": 0.05
+        },
+        {
+         "name": "Bollard{i}",
+         "shape": "box",
+         "material": "mast_grey",
+         "at": [
+          0.45,
+          "$R + 0.2",
+          "$zs + $sl * 1.2"
+         ],
+         "repeat": {
+          "count": 3,
+          "step": [
+           0,
+           0,
+           "-$L * 0.12"
+          ]
+         },
+         "size": [
+          0.3,
+          0.3,
+          0.3
+         ]
+        }
+       ]
+      },
+      {
+       "name": "MilitaryKit",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Array_L",
+         "shape": "box",
+         "material": "array_dark",
+         "at": [
+          "($R * 0.985) * $kMil",
+          0,
+          "($L * 0.02) * $kMil"
+         ],
+         "mirror": "Array_R",
+         "size": [
+          "0.1 * $kMil",
+          "($R * 0.5) * $kMil",
+          "($L * 0.4) * $kMil"
+         ]
+        },
+        {
+         "name": "TubeDoor{i}_L",
+         "at": [
+          "($R * 0.42) * $kMil",
+          "($R * 0.0) * $kMil",
+          "($L2 - 0.75 * $diameter) * $kMil"
+         ],
+         "rotate": [
+          0,
+          40,
+          0
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           "(-$R * 0.32) * $kMil",
+           0
+          ]
+         },
+         "mirror": "TubeDoor{i}_R",
+         "children": [
+          {
+           "name": "Door",
+           "shape": "cylinder",
+           "material": "array_dark",
+           "radius": "0.35 * $kMil",
+           "height": "0.08 * $kMil",
+           "axis": "z",
+           "segments": 16
+          }
+         ]
+        },
+        {
+         "name": "Limber{i}_L",
+         "shape": "box",
+         "material": "array_dark",
+         "at": [
+          "($R * 0.55) * $kMil",
+          "($R * 0.84) * $kMil",
+          "($zs + $L * 0.12) * $kMil"
+         ],
+         "repeat": {
+          "count": 8,
+          "step": [
+           0,
+           0,
+           "(-$L * 0.04) * $kMil"
+          ]
+         },
+         "mirror": "Limber{i}_R",
+         "size": [
+          "0.08 * $kMil",
+          "0.25 * $kMil",
+          "0.7 * $kMil"
+         ]
+        },
+        {
+         "name": "Waterline_L",
+         "shape": "box",
+         "material": "boot_red",
+         "at": [
+          "($R * 0.92) * $kMil",
+          "($R * 0.37) * $kMil",
+          "($L * 0.03) * $kMil"
+         ],
+         "rotate": [
+          0,
+          0,
+          0
+         ],
+         "mirror": "Waterline_R",
+         "size": [
+          "0.04 * $kMil",
+          "0.06 * $kMil",
+          "($L * 0.6) * $kMil"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "ResearchKit",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Band_L",
+         "shape": "loft",
+         "material": "hull_white",
+         "mirror": "Band_R",
+         "sections": [
+          {
+           "z": "($L2 - 1.2 * $diameter) * $kExp",
+           "superellipse": {
+            "width": "0.2 * $kExp",
+            "height": "($R * 1.0) * $kExp",
+            "n": 2,
+            "count": 16,
+            "cx": "($R * 0.95) * $kExp",
+            "cy": "(-$R * 0.1) * $kExp"
+           }
+          },
+          {
+           "z": "(-$L2 + 2.8 * $diameter) * $kExp",
+           "superellipse": {
+            "width": "0.2 * $kExp",
+            "height": "($R * 1.0) * $kExp",
+            "n": 2,
+            "count": 16,
+            "cx": "($R * 0.95) * $kExp",
+            "cy": "(-$R * 0.1) * $kExp"
+           }
+          }
+         ]
+        },
+        {
+         "name": "Viewport{i}_L",
+         "at": [
+          "($R * 0.93) * $kExp",
+          "($R * 0.22) * $kExp",
+          "($L2 - 0.8 * $diameter) * $kExp"
+         ],
+         "rotate": [
+          0,
+          90,
+          0
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           "(-$R * 0.4) * $kExp",
+           0
+          ]
+         },
+         "mirror": "Viewport{i}_R",
+         "children": [
+          {
+           "name": "Glass",
+           "shape": "ellipsoid",
+           "material": "viewport",
+           "radii": [
+            "($R * 0.11) * $kExp",
+            "($R * 0.11) * $kExp",
+            "($R * 0.05) * $kExp"
+           ],
+           "segments": 16
+          },
+          {
+           "name": "Rim",
+           "shape": "lathe",
+           "material": "hull_white",
+           "rotate": [
+            90,
+            0,
+            0
+           ],
+           "profile": [
+            [
+             "($R * 0.11) * $kExp",
+             "-0.05 * $kExp"
+            ],
+            [
+             "($R * 0.14) * $kExp",
+             0
+            ],
+            [
+             "($R * 0.11) * $kExp",
+             "0.05 * $kExp"
+            ],
+            [
+             "($R * 0.1) * $kExp",
+             0
+            ],
+            [
+             "($R * 0.11) * $kExp",
+             "-0.05 * $kExp"
+            ]
+           ],
+           "segments": 16,
+           "caps": false
+          }
+         ]
+        },
+        {
+         "name": "Dome",
+         "at": [
+          0,
+          0,
+          "($L2 - 0.18 * $diameter) * $kExp"
+         ],
+         "children": [
+          {
+           "name": "Glass",
+           "shape": "ellipsoid",
+           "material": "viewport",
+           "radii": [
+            "($R * 0.42) * $kExp",
+            "($R * 0.42) * $kExp",
+            "($R * 0.42) * $kExp"
+           ],
+           "segments": 24
+          },
+          {
+           "name": "Ring",
+           "shape": "lathe",
+           "material": "hull_white",
+           "rotate": [
+            90,
+            0,
+            0
+           ],
+           "profile": [
+            [
+             "($R * 0.4) * $kExp",
+             "-0.15 * $kExp"
+            ],
+            [
+             "($R * 0.48) * $kExp",
+             0
+            ],
+            [
+             "($R * 0.4) * $kExp",
+             "0.15 * $kExp"
+            ],
+            [
+             "($R * 0.38) * $kExp",
+             0
+            ],
+            [
+             "($R * 0.4) * $kExp",
+             "-0.15 * $kExp"
+            ]
+           ],
+           "segments": 24,
+           "caps": false
+          }
+         ]
+        },
+        {
+         "name": "Flood{i}_L",
+         "at": [
+          "($R * 0.78) * $kExp",
+          "(-$R * 0.62) * $kExp",
+          "($L2 - 1.0 * $diameter) * $kExp"
+         ],
+         "rotate": [
+          0,
+          25,
+          0
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           0,
+           "(-$L * 0.2) * $kExp"
+          ]
+         },
+         "mirror": "Flood{i}_R",
+         "children": [
+          {
+           "name": "Housing",
+           "shape": "cylinder",
+           "material": "mast_grey",
+           "radius": "0.35 * $kExp",
+           "height": "0.4 * $kExp",
+           "axis": "z",
+           "segments": 14
+          },
+          {
+           "name": "Lens",
+           "shape": "cylinder",
+           "material": "lamp",
+           "at": [
+            0,
+            0,
+            "0.21 * $kExp"
+           ],
+           "radius": "0.28 * $kExp",
+           "height": "0.05 * $kExp",
+           "axis": "z",
+           "segments": 14
+          }
+         ]
+        },
+        {
+         "name": "Arm_L",
+         "at": [
+          "($R * 0.35) * $kExp",
+          "(-$R * 0.92) * $kExp",
+          "($L2 - 1.0 * $diameter) * $kExp"
+         ],
+         "mirror": "Arm_R",
+         "children": [
+          {
+           "name": "Link",
+           "shape": "tube",
+           "material": "mast_grey",
+           "path": [
+            [
+             0,
+             0,
+             0
+            ],
+            [
+             "0.4 * $kExp",
+             "-0.6 * $kExp",
+             "0.6 * $kExp"
+            ],
+            [
+             "0.5 * $kExp",
+             "-0.4 * $kExp",
+             "1.6 * $kExp"
+            ]
+           ],
+           "radius": "0.14 * $kExp",
+           "segments": 8
+          },
+          {
+           "name": "Claw",
+           "shape": "box",
+           "material": "mast_grey",
+           "at": [
+            "0.5 * $kExp",
+            "-0.4 * $kExp",
+            "1.8 * $kExp"
+           ],
+           "size": [
+            "0.3 * $kExp",
+            "0.3 * $kExp",
+            "0.5 * $kExp"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Sail",
+     "at": [
+      0,
+      "1.0 - 0.15",
+      "$zs"
+     ],
+     "children": [
+      {
+       "name": "Military",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Shell",
+         "shape": "extrude",
+         "material": "hull_black",
+         "plan": [
+          [
+           "($sw * 0.005) * $kMil",
+           "($sl * -0.5) * $kMil"
+          ],
+          [
+           "($sw * 0.11676) * $kMil",
+           "($sl * -0.4) * $kMil"
+          ],
+          [
+           "($sw * 0.21597) * $kMil",
+           "($sl * -0.3) * $kMil"
+          ],
+          [
+           "($sw * 0.30365) * $kMil",
+           "($sl * -0.2) * $kMil"
+          ],
+          [
+           "($sw * 0.3793) * $kMil",
+           "($sl * -0.1) * $kMil"
+          ],
+          [
+           "($sw * 0.44068) * $kMil",
+           "($sl * 0) * $kMil"
+          ],
+          [
+           "($sw * 0.48342) * $kMil",
+           "($sl * 0.1) * $kMil"
+          ],
+          [
+           "($sw * 0.50018) * $kMil",
+           "($sl * 0.2) * $kMil"
+          ],
+          [
+           "($sw * 0.47826) * $kMil",
+           "($sl * 0.3) * $kMil"
+          ],
+          [
+           "($sw * 0.39037) * $kMil",
+           "($sl * 0.4) * $kMil"
+          ],
+          [
+           "($sw * 0) * $kMil",
+           "($sl * 0.5) * $kMil"
+          ],
+          [
+           "($sw * -0.39037) * $kMil",
+           "($sl * 0.4) * $kMil"
+          ],
+          [
+           "($sw * -0.47826) * $kMil",
+           "($sl * 0.3) * $kMil"
+          ],
+          [
+           "($sw * -0.50018) * $kMil",
+           "($sl * 0.2) * $kMil"
+          ],
+          [
+           "($sw * -0.48342) * $kMil",
+           "($sl * 0.1) * $kMil"
+          ],
+          [
+           "($sw * -0.44068) * $kMil",
+           "($sl * 0) * $kMil"
+          ],
+          [
+           "($sw * -0.3793) * $kMil",
+           "($sl * -0.1) * $kMil"
+          ],
+          [
+           "($sw * -0.30365) * $kMil",
+           "($sl * -0.2) * $kMil"
+          ],
+          [
+           "($sw * -0.21597) * $kMil",
+           "($sl * -0.3) * $kMil"
+          ],
+          [
+           "($sw * -0.11676) * $kMil",
+           "($sl * -0.4) * $kMil"
+          ]
+         ],
+         "y0": 0,
+         "y1": "($sh) * $kMil"
+        }
+       ]
+      },
+      {
+       "name": "Research",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Shell",
+         "shape": "extrude",
+         "material": "hull_white",
+         "plan": [
+          [
+           "($sw * 0.005) * $kExp",
+           "($sl * -0.5) * $kExp"
+          ],
+          [
+           "($sw * 0.11676) * $kExp",
+           "($sl * -0.4) * $kExp"
+          ],
+          [
+           "($sw * 0.21597) * $kExp",
+           "($sl * -0.3) * $kExp"
+          ],
+          [
+           "($sw * 0.30365) * $kExp",
+           "($sl * -0.2) * $kExp"
+          ],
+          [
+           "($sw * 0.3793) * $kExp",
+           "($sl * -0.1) * $kExp"
+          ],
+          [
+           "($sw * 0.44068) * $kExp",
+           "($sl * 0) * $kExp"
+          ],
+          [
+           "($sw * 0.48342) * $kExp",
+           "($sl * 0.1) * $kExp"
+          ],
+          [
+           "($sw * 0.50018) * $kExp",
+           "($sl * 0.2) * $kExp"
+          ],
+          [
+           "($sw * 0.47826) * $kExp",
+           "($sl * 0.3) * $kExp"
+          ],
+          [
+           "($sw * 0.39037) * $kExp",
+           "($sl * 0.4) * $kExp"
+          ],
+          [
+           "($sw * 0) * $kExp",
+           "($sl * 0.5) * $kExp"
+          ],
+          [
+           "($sw * -0.39037) * $kExp",
+           "($sl * 0.4) * $kExp"
+          ],
+          [
+           "($sw * -0.47826) * $kExp",
+           "($sl * 0.3) * $kExp"
+          ],
+          [
+           "($sw * -0.50018) * $kExp",
+           "($sl * 0.2) * $kExp"
+          ],
+          [
+           "($sw * -0.48342) * $kExp",
+           "($sl * 0.1) * $kExp"
+          ],
+          [
+           "($sw * -0.44068) * $kExp",
+           "($sl * 0) * $kExp"
+          ],
+          [
+           "($sw * -0.3793) * $kExp",
+           "($sl * -0.1) * $kExp"
+          ],
+          [
+           "($sw * -0.30365) * $kExp",
+           "($sl * -0.2) * $kExp"
+          ],
+          [
+           "($sw * -0.21597) * $kExp",
+           "($sl * -0.3) * $kExp"
+          ],
+          [
+           "($sw * -0.11676) * $kExp",
+           "($sl * -0.4) * $kExp"
+          ]
+         ],
+         "y0": 0,
+         "y1": "($sh) * $kExp"
+        }
+       ]
+      },
+      {
+       "name": "Bridge",
+       "shape": "box",
+       "material": "deck_dark",
+       "at": [
+        0,
+        "$sh",
+        "$sl * 0.28"
+       ],
+       "size": [
+        "$sw * 0.45",
+        0.15,
+        "$sl * 0.22"
+       ]
+      },
+      {
+       "name": "Rim",
+       "shape": "box",
+       "material": "deck_dark",
+       "at": [
+        0,
+        "$sh + 0.0",
+        "$sl * 0.1"
+       ],
+       "size": [
+        "$sw * 0.6",
+        0.12,
+        "$sl * 0.5"
+       ]
+      },
+      {
+       "name": "Portholes",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Pane{i}_L",
+         "shape": "box",
+         "material": "viewport",
+         "at": [
+          "($sw * 0.475) * $kExp",
+          "($sh - 0.6) * $kExp",
+          "($sl * 0.3) * $kExp"
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           0,
+           "-0.9 * $kExp"
+          ]
+         },
+         "mirror": "Pane{i}_R",
+         "size": [
+          "0.03 * $kExp",
+          "0.5 * $kExp",
+          "0.7 * $kExp"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Mast1",
+       "at": [
+        0,
+        "$sh - 4.5 + 0.05 + $masts * 4.5 * 0.8",
+        "$sl * 0.22"
+       ],
+       "children": [
+        {
+         "name": "Tube",
+         "shape": "cylinder",
+         "material": "mast_grey",
+         "radius": 0.18,
+         "height": 4.5,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Head",
+         "shape": "cylinder",
+         "material": "mast_grey",
+         "at": [
+          0,
+          4.5,
+          0
+         ],
+         "radius": 0.225,
+         "height": 0.5,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Window",
+         "shape": "box",
+         "material": "viewport",
+         "at": [
+          0,
+          4.8,
+          0.216
+         ],
+         "size": [
+          0.252,
+          0.18,
+          0.05
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Mast2",
+       "at": [
+        0,
+        "$sh - 4.2 + 0.05 + $masts * 4.2 * 0.8",
+        "$sl * 0.05"
+       ],
+       "children": [
+        {
+         "name": "Tube",
+         "shape": "cylinder",
+         "material": "mast_grey",
+         "radius": 0.2,
+         "height": 4.2,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Head",
+         "shape": "cylinder",
+         "material": "mast_grey",
+         "at": [
+          0,
+          4.2,
+          0
+         ],
+         "radius": 0.25,
+         "height": 0.5,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Window",
+         "shape": "box",
+         "material": "viewport",
+         "at": [
+          0,
+          4.5,
+          0.24
+         ],
+         "size": [
+          0.28,
+          0.18,
+          0.05
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Mast3",
+       "at": [
+        0,
+        "$sh - 3.8 + 0.05 + $masts * 3.8 * 0.8",
+        "-$sl * 0.08"
+       ],
+       "children": [
+        {
+         "name": "Tube",
+         "shape": "cylinder",
+         "material": "mast_grey",
+         "radius": 0.22,
+         "height": 3.8,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Antenna",
+         "shape": "box",
+         "material": "mast_grey",
+         "at": [
+          0,
+          3.9,
+          0
+         ],
+         "size": [
+          1.2,
+          0.25,
+          0.3
+         ],
+         "bevel": 0.05
+        }
+       ]
+      },
+      {
+       "name": "Mast4",
+       "at": [
+        0,
+        "$sh - 3.5 + 0.05 + $masts * 3.5 * 0.8",
+        "-$sl * 0.22"
+       ],
+       "children": [
+        {
+         "name": "Tube",
+         "shape": "cylinder",
+         "material": "mast_grey",
+         "radius": 0.3,
+         "height": 3.5,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Head",
+         "shape": "box",
+         "material": "mast_grey",
+         "at": [
+          0,
+          3.75,
+          -0.2
+         ],
+         "size": [
+          0.6,
+          0.6,
+          0.9
+         ],
+         "bevel": 0.08
+        }
+       ]
+      },
+      {
+       "name": "Mast5",
+       "at": [
+        0,
+        "$sh - 2.8 + 0.05 + $masts * 2.8 * 0.8",
+        "-$sl * 0.34"
+       ],
+       "children": [
+        {
+         "name": "Tube",
+         "shape": "cylinder",
+         "material": "mast_grey",
+         "radius": 0.15,
+         "height": 2.8,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Dome",
+         "shape": "ellipsoid",
+         "material": "mast_grey",
+         "at": [
+          0,
+          2.8,
+          0
+         ],
+         "radii": [
+          0.225,
+          0.35,
+          0.225
+         ],
+         "segments": 12
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "BowPlanes",
+     "at": [
+      0,
+      "$yc",
+      "lerp($zs, $L2 - 1.5 * $diameter, 1 - $sailPlanes)"
+     ],
+     "children": [
+      {
+       "name": "DivePlane_L",
+       "at": [
+        "($R * 0.92) * $kBP",
+        "($R * 0.3) * $kBP",
+        0
+       ],
+       "mirror": "DivePlane_R",
+       "children": [
+        {
+         "name": "Blade",
+         "shape": "box",
+         "material": "hull_black",
+         "at": [
+          "($R * 0.25) * $kBP",
+          0,
+          "(-$R * 0.16) * $kBP"
+         ],
+         "size": [
+          "($R * 0.5) * $kBP",
+          "0.3 * $kBP",
+          "($R * 0.32) * $kBP"
+         ],
+         "bevel": "0.1 * $kBP"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "FairwaterPlanes",
+     "at": [
+      0,
+      "lerp(1.0, 1.0 + $sh * 0.55, $sailPlanes)",
+      "$zs + $sl * 0.18"
+     ],
+     "children": [
+      {
+       "name": "DivePlane_L",
+       "at": [
+        "($sw * 0.3) * $kSP",
+        0,
+        0
+       ],
+       "mirror": "DivePlane_R",
+       "children": [
+        {
+         "name": "Blade",
+         "shape": "box",
+         "material": "hull_black",
+         "at": [
+          "($sw * 0.7) * $kSP",
+          0,
+          "(-$sl * 0.11) * $kSP"
+         ],
+         "size": [
+          "($sw * 1.4) * $kSP",
+          "0.25 * $kSP",
+          "($sl * 0.22) * $kSP"
+         ],
+         "bevel": "0.08 * $kSP"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Stern",
+     "at": [
+      0,
+      "$yc",
+      "-$L2 + 1.15 * $diameter"
+     ],
+     "children": [
+      {
+       "name": "Rudder_Top",
+       "at": [
+        "-$R * 0.3 * sin(rad((0 - $ra)))",
+        "$R * 0.3 * cos(rad((0 - $ra)))",
+        0
+       ],
+       "rotate": [
+        0,
+        0,
+        "(0 - $ra)"
+       ],
+       "children": [
+        {
+         "name": "Blade",
+         "shape": "box",
+         "material": "hull_black",
+         "at": [
+          0,
+          "$R * 0.4",
+          "-$diameter * 0.275"
+         ],
+         "size": [
+          0.3,
+          "$R * 0.8",
+          "$diameter * 0.55"
+         ],
+         "bevel": 0.1
+        }
+       ]
+      },
+      {
+       "name": "Rudder_Left",
+       "at": [
+        "-$R * 0.3 * sin(rad((-90 - $ra)))",
+        "$R * 0.3 * cos(rad((-90 - $ra)))",
+        0
+       ],
+       "rotate": [
+        0,
+        0,
+        "(-90 - $ra)"
+       ],
+       "children": [
+        {
+         "name": "Blade",
+         "shape": "box",
+         "material": "hull_black",
+         "at": [
+          0,
+          "$R * 0.4",
+          "-$diameter * 0.275"
+         ],
+         "size": [
+          0.3,
+          "$R * 0.8",
+          "$diameter * 0.55"
+         ],
+         "bevel": 0.1
+        }
+       ]
+      },
+      {
+       "name": "Rudder_Bottom",
+       "at": [
+        "-$R * 0.3 * sin(rad((-180 - $ra)))",
+        "$R * 0.3 * cos(rad((-180 - $ra)))",
+        0
+       ],
+       "rotate": [
+        0,
+        0,
+        "(-180 - $ra)"
+       ],
+       "children": [
+        {
+         "name": "Blade",
+         "shape": "box",
+         "material": "hull_black",
+         "at": [
+          0,
+          "$R * 0.4",
+          "-$diameter * 0.275"
+         ],
+         "size": [
+          0.3,
+          "$R * 0.8",
+          "$diameter * 0.55"
+         ],
+         "bevel": 0.1
+        }
+       ]
+      },
+      {
+       "name": "Rudder_Right",
+       "at": [
+        "-$R * 0.3 * sin(rad((-270 - $ra)))",
+        "$R * 0.3 * cos(rad((-270 - $ra)))",
+        0
+       ],
+       "rotate": [
+        0,
+        0,
+        "(-270 - $ra)"
+       ],
+       "children": [
+        {
+         "name": "Blade",
+         "shape": "box",
+         "material": "hull_black",
+         "at": [
+          0,
+          "$R * 0.4",
+          "-$diameter * 0.275"
+         ],
+         "size": [
+          0.3,
+          "$R * 0.8",
+          "$diameter * 0.55"
+         ],
+         "bevel": 0.1
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Propeller",
+     "at": [
+      0,
+      "$yc",
+      "-$L2 + 0.35"
+     ],
+     "children": [
+      {
+       "name": "Hub",
+       "shape": "cylinder",
+       "material": "bronze",
+       "radius": "$R * 0.14",
+       "height": 1.2,
+       "axis": "z",
+       "segments": 16
+      },
+      {
+       "name": "Cone",
+       "shape": "ellipsoid",
+       "material": "bronze",
+       "at": [
+        0,
+        0,
+        -0.6
+       ],
+       "radii": [
+        "$R * 0.14",
+        "$R * 0.14",
+        0.6
+       ],
+       "segments": 16
+      },
+      {
+       "name": "Blades",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Blade{i}",
+         "shape": "box",
+         "material": "bronze",
+         "at": [
+          0,
+          "($R * 0.34) * $kProp",
+          0
+         ],
+         "rotate": [
+          0,
+          40,
+          0
+         ],
+         "repeat": {
+          "count": 7,
+          "around": "z"
+         },
+         "size": [
+          "($R * 0.26) * $kProp",
+          "($R * 0.42) * $kProp",
+          "0.07 * $kProp"
+         ],
+         "bevel": "0.03 * $kProp"
+        }
+       ]
+      },
+      {
+       "name": "PumpJet",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Shroud",
+         "shape": "lathe",
+         "material": "hull_black",
+         "rotate": [
+          90,
+          0,
+          0
+         ],
+         "profile": [
+          [
+           "($R * 0.5) * $kJet",
+           "-1 * $kJet"
+          ],
+          [
+           "($R * 0.56) * $kJet",
+           "-0.4 * $kJet"
+          ],
+          [
+           "($R * 0.54) * $kJet",
+           "0.8 * $kJet"
+          ],
+          [
+           "($R * 0.47) * $kJet",
+           "1.2 * $kJet"
+          ],
+          [
+           "($R * 0.45) * $kJet",
+           "0.4 * $kJet"
+          ],
+          [
+           "($R * 0.46) * $kJet",
+           "-0.8 * $kJet"
+          ],
+          [
+           "($R * 0.5) * $kJet",
+           "-1 * $kJet"
+          ]
+         ],
+         "segments": 32,
+         "caps": false
+        },
+        {
+         "name": "Vane{i}",
+         "shape": "box",
+         "material": "hull_black",
+         "at": [
+          0,
+          "($R * 0.3) * $kJet",
+          "0.3 * $kJet"
+         ],
+         "repeat": {
+          "count": 9,
+          "around": "z"
+         },
+         "size": [
+          "0.15 * $kJet",
+          "($R * 0.32) * $kJet",
+          "0.6 * $kJet"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
