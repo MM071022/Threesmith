@@ -1428,5 +1428,188 @@
   "pitfalls": [
    "A basket with no frame and burner between it and the envelope looks like it hangs from nothing."
   ]
+ },
+ {
+  "id": "aircraft.lighter-than-air.airship",
+  "name": "airship",
+  "description": "A powered, steerable lighter-than-air craft: a long streamlined envelope with tail fins, a gondola (control car) underneath and propellers.",
+  "aliases": [
+   "airship",
+   "zeppelin",
+   "blimp",
+   "dirigible",
+   "luchtschip",
+   "zeppelin airship",
+   "steampunk airship",
+   "rigid airship",
+   "starr luchtschip"
+  ],
+  "extends": "aircraft.lighter-than-air",
+  "hints": [
+   "gondola",
+   "gondel",
+   "control car",
+   "helium",
+   "hydrogen",
+   "mooring mast",
+   "steampunk",
+   "hindenburg",
+   "goodyear"
+  ],
+  "parts": [
+   {
+    "name": "Envelope",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "envelope",
+     "hull",
+     "gas bag",
+     "omhulsel",
+     "romp"
+    ]
+   },
+   {
+    "name": "Gondola",
+    "role": "cabin",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "gondola",
+     "control car",
+     "gondel",
+     "cabin",
+     "car",
+     "cabine"
+    ]
+   },
+   {
+    "name": "Fin",
+    "role": "stabiliser",
+    "required": true,
+    "count": [
+     3,
+     4
+    ],
+    "aliases": [
+     "fin",
+     "fins",
+     "tail fin",
+     "stabilizer",
+     "stabiliser",
+     "vin",
+     "staartvin"
+    ]
+   },
+   {
+    "name": "ControlSurface",
+    "role": "control surface",
+    "required": false,
+    "count": [
+     2,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "rudder",
+     "elevator",
+     "ruddervator",
+     "roer"
+    ],
+    "note": "Hinged on the trailing edge of each fin."
+   },
+   {
+    "name": "Propeller",
+    "role": "propeller",
+    "required": true,
+    "count": [
+     1,
+     12
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "propeller",
+     "prop",
+     "schroef",
+     "airscrew"
+    ]
+   },
+   {
+    "name": "EngineCar",
+    "role": "engine",
+    "required": false,
+    "count": [
+     1,
+     12
+    ],
+    "aliases": [
+     "engine car",
+     "engine pod",
+     "engine",
+     "motorgondel"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    40,
+    250
+   ],
+   "width": [
+    10,
+    45
+   ],
+   "height": [
+    12,
+    50
+   ],
+   "source": "manufacturer and historic data: Zeppelin NT 75 m long and 17.5 m high, Goodyear GZ-20 blimp 58 m long, LZ 129 Hindenburg 245 m long and 41 m in diameter",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "construction",
+    "options": [
+     "blimp (non-rigid)",
+     "semi-rigid",
+     "rigid zeppelin"
+    ]
+   },
+   {
+    "axis": "style",
+    "options": [
+     "modern",
+     "classic zeppelin",
+     "steampunk"
+    ]
+   }
+  ],
+  "conventions": [
+   "The nose points to +Z and the length runs along z; moored on the ground the gondola rests on y = 0 and the lower fins stay clear of it."
+  ],
+  "anticipate": [
+   "A mooring point at the nose.",
+   "Propellers that spin (and swivel on vectored-thrust ships) as separate nodes."
+  ],
+  "pitfalls": [
+   "A cigar of uniform thickness reads as a sausage: the nose is blunt and the tail tapers long.",
+   "A gondola that does not touch the envelope floats."
+  ]
  }
 ]

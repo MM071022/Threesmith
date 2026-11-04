@@ -1,0 +1,1702 @@
+{
+ "version": 1,
+ "name": "airship",
+ "archetype": "aircraft.lighter-than-air.airship",
+ "description": "An airship moored on the ground, 75 m long and 15 m across by default (a Zeppelin NT is 75 m): a streamlined envelope with a blunt nose, a long tapering tail, a mooring cone and four X-tail fins with hinged ruddervators. Style 0 is a classic silver zeppelin with a streamlined control car (window bands, windscreen, landing wheel) and engine cars on struts with pusher propellers; style 1 is steampunk: a canvas envelope with brass bands and a wooden boat gondola on ropes with a cabin, portholes, a funnel, brass rails and outrigger engines with wooden propellers. Nose +Z, resting on y = 0.",
+ "params": [
+  {
+   "name": "length",
+   "type": "number",
+   "default": 75,
+   "min": 30,
+   "max": 150,
+   "description": "Envelope length in metres (a Zeppelin NT is 75 m)."
+  },
+  {
+   "name": "diameter",
+   "type": "number",
+   "default": 15,
+   "min": 7,
+   "max": 30,
+   "description": "Largest envelope diameter."
+  },
+  {
+   "name": "style",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 classic silver zeppelin with a streamlined control car and engine cars, 1 steampunk: canvas envelope with brass bands, a wooden boat gondola on ropes and wooden propellers."
+  },
+  {
+   "name": "engines",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 3,
+   "description": "Engines (each with a propeller) on each side."
+  },
+  {
+   "name": "finSize",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.7,
+   "max": 1.4,
+   "description": "Size of the four tail fins relative to the diameter."
+  },
+  {
+   "name": "gondolaLength",
+   "type": "number",
+   "default": 0.17,
+   "min": 0.1,
+   "max": 0.25,
+   "description": "Gondola length as a share of the envelope length."
+  },
+  {
+   "name": "bands",
+   "type": "integer",
+   "default": 9,
+   "min": 5,
+   "max": 16,
+   "description": "Brass bands round the steampunk envelope."
+  }
+ ],
+ "materials": {
+  "skin_silver": {
+   "color": [
+    0.42,
+    0.43,
+    0.45
+   ],
+   "metallic": 0.75,
+   "roughness": 0.38
+  },
+  "skin_canvas": {
+   "color": [
+    0.3,
+    0.2,
+    0.11
+   ],
+   "metallic": 0,
+   "roughness": 0.88,
+   "texture": "plaster"
+  },
+  "fin_canvas": {
+   "color": [
+    0.22,
+    0.14,
+    0.08
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "texture": "plaster"
+  },
+  "car_paint": {
+   "color": [
+    0.08,
+    0.1,
+    0.14
+   ],
+   "metallic": 0.4,
+   "roughness": 0.35
+  },
+  "brass_band": {
+   "color": [
+    0.75,
+    0.52,
+    0.2
+   ],
+   "metallic": 1,
+   "roughness": 0.32
+  },
+  "hull_wood": {
+   "color": [
+    0.32,
+    0.17,
+    0.07
+   ],
+   "metallic": 0,
+   "roughness": 0.6,
+   "texture": "wood"
+  },
+  "deck_wood": {
+   "color": [
+    0.55,
+    0.38,
+    0.2
+   ],
+   "metallic": 0,
+   "roughness": 0.7,
+   "texture": "wood"
+  },
+  "prop_wood": {
+   "color": [
+    0.42,
+    0.24,
+    0.1
+   ],
+   "metallic": 0,
+   "roughness": 0.45,
+   "texture": "wood"
+  },
+  "rope": {
+   "color": [
+    0.5,
+    0.42,
+    0.28
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "smoke": {
+   "color": [
+    0.06,
+    0.05,
+    0.05
+   ],
+   "metallic": 0.3,
+   "roughness": 0.7
+  },
+  "window_glass": {
+   "color": [
+    0.5,
+    0.65,
+    0.75,
+    0.3
+   ],
+   "metallic": 0,
+   "roughness": 0.05,
+   "alpha": "BLEND"
+  },
+  "porthole_glass": {
+   "color": [
+    0.6,
+    0.75,
+    0.7,
+    0.35
+   ],
+   "metallic": 0,
+   "roughness": 0.05,
+   "alpha": "BLEND"
+  },
+  "lamp": {
+   "color": [
+    1,
+    0.8,
+    0.4
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    1,
+    0.7,
+    0.3
+   ]
+  },
+  "frame_steel": {
+   "color": [
+    0.45,
+    0.46,
+    0.48
+   ],
+   "metallic": 1,
+   "roughness": 0.35
+  }
+ },
+ "nodes": [
+  {
+   "name": "Airship",
+   "vars": {
+    "L": "$length",
+    "R": "$diameter / 2",
+    "st": "$style",
+    "gl": "$length * $gondolaLength",
+    "gh": "max(2.4, $diameter * 0.17)",
+    "gz": "$length * 0.14",
+    "fs": "$diameter * 0.42 * $finSize",
+    "yc": "max(0.5 + max(2.4, $diameter * 0.17) + $diameter / 2 - 0.3 + $style * (max(2.4, $diameter * 0.17) * 1.5 + 1.5), ($diameter / 2 * 0.45 + $diameter * 0.42 * $finSize) * 0.72 + 1)"
+   },
+   "children": [
+    {
+     "name": "Envelope",
+     "children": [
+      {
+       "name": "Skin_zeppelin",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "$L * -0.5000",
+         "superellipse": {
+          "width": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4900",
+         "superellipse": {
+          "width": "$diameter * 0.0468 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.0468 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4700",
+         "superellipse": {
+          "width": "$diameter * 0.1179 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.1179 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4400",
+         "superellipse": {
+          "width": "$diameter * 0.2094 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.2094 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4000",
+         "superellipse": {
+          "width": "$diameter * 0.3166 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.3166 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.3500",
+         "superellipse": {
+          "width": "$diameter * 0.4350 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.4350 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.2900",
+         "superellipse": {
+          "width": "$diameter * 0.5594 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.5594 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.2200",
+         "superellipse": {
+          "width": "$diameter * 0.6842 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.6842 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.1400",
+         "superellipse": {
+          "width": "$diameter * 0.8023 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.8023 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.0500",
+         "superellipse": {
+          "width": "$diameter * 0.9050 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.9050 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.0500",
+         "superellipse": {
+          "width": "$diameter * 0.9791 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.9791 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.1200",
+         "superellipse": {
+          "width": "$diameter * 1.0000 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 1.0000 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.2000",
+         "superellipse": {
+          "width": "$diameter * 0.9776 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.9776 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.2800",
+         "superellipse": {
+          "width": "$diameter * 0.9070 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.9070 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.3500",
+         "superellipse": {
+          "width": "$diameter * 0.7960 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.7960 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4000",
+         "superellipse": {
+          "width": "$diameter * 0.6761 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.6761 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4400",
+         "superellipse": {
+          "width": "$diameter * 0.5393 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.5393 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4700",
+         "superellipse": {
+          "width": "$diameter * 0.3894 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.3894 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4900",
+         "superellipse": {
+          "width": "$diameter * 0.2279 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.2279 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.5000",
+         "superellipse": {
+          "width": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "height": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 0))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        }
+       ],
+       "material": "skin_silver"
+      },
+      {
+       "name": "Skin_steampunk",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "$L * -0.5000",
+         "superellipse": {
+          "width": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4900",
+         "superellipse": {
+          "width": "$diameter * 0.0468 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.0468 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4700",
+         "superellipse": {
+          "width": "$diameter * 0.1179 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.1179 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4400",
+         "superellipse": {
+          "width": "$diameter * 0.2094 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.2094 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.4000",
+         "superellipse": {
+          "width": "$diameter * 0.3166 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.3166 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.3500",
+         "superellipse": {
+          "width": "$diameter * 0.4350 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.4350 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.2900",
+         "superellipse": {
+          "width": "$diameter * 0.5594 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.5594 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.2200",
+         "superellipse": {
+          "width": "$diameter * 0.6842 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.6842 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.1400",
+         "superellipse": {
+          "width": "$diameter * 0.8023 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.8023 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * -0.0500",
+         "superellipse": {
+          "width": "$diameter * 0.9050 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.9050 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.0500",
+         "superellipse": {
+          "width": "$diameter * 0.9791 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.9791 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.1200",
+         "superellipse": {
+          "width": "$diameter * 1.0000 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 1.0000 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.2000",
+         "superellipse": {
+          "width": "$diameter * 0.9776 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.9776 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.2800",
+         "superellipse": {
+          "width": "$diameter * 0.9070 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.9070 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.3500",
+         "superellipse": {
+          "width": "$diameter * 0.7960 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.7960 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4000",
+         "superellipse": {
+          "width": "$diameter * 0.6761 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.6761 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4400",
+         "superellipse": {
+          "width": "$diameter * 0.5393 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.5393 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4700",
+         "superellipse": {
+          "width": "$diameter * 0.3894 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.3894 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.4900",
+         "superellipse": {
+          "width": "$diameter * 0.2279 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.2279 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        },
+        {
+         "z": "$L * 0.5000",
+         "superellipse": {
+          "width": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "height": "$diameter * 0.0120 * (1 - 0.01 * (1 - max(0, 1 - abs($style - 1))))",
+          "n": 2,
+          "count": 40,
+          "cy": "$yc"
+         }
+        }
+       ],
+       "material": "skin_canvas"
+      },
+      {
+       "name": "MooringCone",
+       "shape": "cylinder",
+       "radius": "$R * 0.06",
+       "height": "$R * 0.12",
+       "axis": "z",
+       "at": [
+        0,
+        "$yc",
+        "$L / 2 - $R * 0.04"
+       ],
+       "material": "frame_steel",
+       "segments": 16,
+       "bevel": "$R * 0.02"
+      },
+      {
+       "name": "Band_{i}",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R * pow(max(0, 1 - pow(abs((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) / lerp(0.62, 0.38, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)), lerp(1.7, 2, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)))), lerp(0.85, 0.5, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1))) * (1.006 - 0.06 * (1 - max(0, 1 - abs($style - 1)))) * 0.97",
+         -0.25
+        ],
+        [
+         "$R * pow(max(0, 1 - pow(abs((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) / lerp(0.62, 0.38, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)), lerp(1.7, 2, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)))), lerp(0.85, 0.5, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1))) * (1.006 - 0.06 * (1 - max(0, 1 - abs($style - 1))))",
+         -0.25
+        ],
+        [
+         "$R * pow(max(0, 1 - pow(abs((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) / lerp(0.62, 0.38, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)), lerp(1.7, 2, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)))), lerp(0.85, 0.5, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1))) * (1.006 - 0.06 * (1 - max(0, 1 - abs($style - 1))))",
+         0.25
+        ],
+        [
+         "$R * pow(max(0, 1 - pow(abs((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) / lerp(0.62, 0.38, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)), lerp(1.7, 2, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1)))), lerp(0.85, 0.5, clamp(((0.12 + 0.8 * ($i + 0.5) / $n) - 0.62) * 1000, 0, 1))) * (1.006 - 0.06 * (1 - max(0, 1 - abs($style - 1)))) * 0.97",
+         0.25
+        ]
+       ],
+       "at": [
+        0,
+        "$yc",
+        "$L * (0.12 + 0.8 * ($i + 0.5) / $n - 0.5)"
+       ],
+       "rotate": [
+        90,
+        0,
+        0
+       ],
+       "material": "brass_band",
+       "segments": 40,
+       "repeat": {
+        "count": "$bands",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "Tail",
+     "at": [
+      0,
+      "$yc",
+      0
+     ],
+     "children": [
+      {
+       "name": "Fin_{i}",
+       "repeat": {
+        "count": 4,
+        "around": "z",
+        "phase": 45
+       },
+       "children": [
+        {
+         "name": "Panel_zeppelin",
+         "shape": "extrude",
+         "plan": [
+          [
+           "$diameter * 0.3658 / 2 * 0.5",
+           "-$L / 2 + $L * 0.03"
+          ],
+          [
+           "$diameter * 0.3658 / 2 * 0.5",
+           "-$L / 2 + $L * 0.2"
+          ],
+          [
+           "$diameter * 0.3658 / 2 + $fs",
+           "-$L / 2 + $L * 0.1"
+          ],
+          [
+           "$diameter * 0.3658 / 2 + $fs",
+           "-$L / 2 + $L * 0.06"
+          ]
+         ],
+         "y0": "-$fs * 0.04 * lerp(0.5, 1, max(0, 1 - abs($style - 0)))",
+         "y1": "$fs * 0.04 * lerp(0.5, 1, max(0, 1 - abs($style - 0)))",
+         "material": "skin_silver"
+        },
+        {
+         "name": "Panel_steampunk",
+         "shape": "extrude",
+         "plan": [
+          [
+           "$diameter * 0.3658 / 2 * 0.5",
+           "-$L / 2 + $L * 0.03"
+          ],
+          [
+           "$diameter * 0.3658 / 2 * 0.5",
+           "-$L / 2 + $L * 0.2"
+          ],
+          [
+           "$diameter * 0.3658 / 2 + $fs",
+           "-$L / 2 + $L * 0.1"
+          ],
+          [
+           "$diameter * 0.3658 / 2 + $fs",
+           "-$L / 2 + $L * 0.06"
+          ]
+         ],
+         "y0": "-$fs * 0.04 * lerp(0.5, 1, max(0, 1 - abs($style - 1)))",
+         "y1": "$fs * 0.04 * lerp(0.5, 1, max(0, 1 - abs($style - 1)))",
+         "material": "fin_canvas"
+        },
+        {
+         "name": "Ruddervator",
+         "at": [
+          "$diameter * 0.3658 / 2 + 0.01",
+          0,
+          "-$L / 2 + $L * 0.06 - 0.01"
+         ],
+         "children": [
+          {
+           "name": "Surface_zeppelin",
+           "shape": "extrude",
+           "plan": [
+            [
+             0,
+             "-(0)"
+            ],
+            [
+             0,
+             "-($L * 0.035)"
+            ],
+            [
+             "$fs * 0.98",
+             "-($L * 0.035)"
+            ],
+            [
+             "$fs * 0.98",
+             "-(0)"
+            ]
+           ],
+           "y0": "-$fs * 0.025 * lerp(0.5, 1, max(0, 1 - abs($style - 0)))",
+           "y1": "$fs * 0.025 * lerp(0.5, 1, max(0, 1 - abs($style - 0)))",
+           "material": "skin_silver"
+          },
+          {
+           "name": "Surface_steampunk",
+           "shape": "extrude",
+           "plan": [
+            [
+             0,
+             "-(0)"
+            ],
+            [
+             0,
+             "-($L * 0.035)"
+            ],
+            [
+             "$fs * 0.98",
+             "-($L * 0.035)"
+            ],
+            [
+             "$fs * 0.98",
+             "-(0)"
+            ]
+           ],
+           "y0": "-$fs * 0.025 * lerp(0.5, 1, max(0, 1 - abs($style - 1)))",
+           "y1": "$fs * 0.025 * lerp(0.5, 1, max(0, 1 - abs($style - 1)))",
+           "material": "fin_canvas"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ControlCar",
+     "at": [
+      0,
+      "($yc - $gh * 0.6) * (1 - max(0, 1 - abs($style - 0)))",
+      "$gz"
+     ],
+     "children": [
+      {
+       "name": "CarBody",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "-$gl / 2",
+         "superellipse": {
+          "width": "$gh * 0.4",
+          "height": "$gh * 0.5",
+          "n": 2.4,
+          "count": 24,
+          "cy": "$gh * 0.6"
+         }
+        },
+        {
+         "z": "-$gl * 0.3",
+         "superellipse": {
+          "width": "$gh * 0.95",
+          "height": "$gh",
+          "n": 2.4,
+          "count": 24,
+          "cy": "$gh * 0.55"
+         }
+        },
+        {
+         "z": "$gl * 0.25",
+         "superellipse": {
+          "width": "$gh",
+          "height": "$gh",
+          "n": 2.4,
+          "count": 24,
+          "cy": "$gh * 0.55"
+         }
+        },
+        {
+         "z": "$gl * 0.45",
+         "superellipse": {
+          "width": "$gh * 0.75",
+          "height": "$gh * 0.8",
+          "n": 2.4,
+          "count": 24,
+          "cy": "$gh * 0.6"
+         }
+        },
+        {
+         "z": "$gl / 2",
+         "superellipse": {
+          "width": "$gh * 0.25",
+          "height": "$gh * 0.3",
+          "n": 2.4,
+          "count": 24,
+          "cy": "$gh * 0.7"
+         }
+        }
+       ],
+       "material": "car_paint"
+      },
+      {
+       "name": "WindowBand_L",
+       "shape": "box",
+       "size": [
+        0.06,
+        "$gh * 0.28",
+        "$gl * 0.55"
+       ],
+       "at": [
+        "$gh * 0.49",
+        "$gh * 0.72",
+        "$gl * 0.02"
+       ],
+       "material": "window_glass",
+       "mirror": "WindowBand_R"
+      },
+      {
+       "name": "Windscreen",
+       "shape": "box",
+       "size": [
+        "$gh * 0.7",
+        "$gh * 0.3",
+        0.06
+       ],
+       "at": [
+        0,
+        "$gh * 0.74",
+        "$gl * 0.44"
+       ],
+       "material": "window_glass",
+       "rotate": [
+        -35,
+        0,
+        0
+       ]
+      },
+      {
+       "name": "LandingWheel",
+       "shape": "cylinder",
+       "radius": 0.4,
+       "height": 0.25,
+       "axis": "x",
+       "at": [
+        0,
+        0.4,
+        0
+       ],
+       "material": "rubber",
+       "segments": 18,
+       "children": [
+        {
+         "name": "Hub",
+         "shape": "cylinder",
+         "radius": 0.2,
+         "height": 0.27,
+         "axis": "x",
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "frame_steel",
+         "segments": 12
+        }
+       ]
+      },
+      {
+       "name": "WheelFork",
+       "shape": "box",
+       "size": [
+        0.4,
+        0.6,
+        0.15
+       ],
+       "at": [
+        0,
+        0.75,
+        0
+       ],
+       "material": "frame_steel"
+      }
+     ]
+    },
+    {
+     "name": "EngineCars",
+     "children": [
+      {
+       "name": "EngineCar_L{i}",
+       "at": [
+        "$R * 0.98 * max(0, 1 - abs($style - 0))",
+        "$yc - $R * 0.62 * max(0, 1 - abs($style - 0))",
+        "$gz - $gl * 0.9 - $i * $L * 0.12"
+       ],
+       "repeat": {
+        "count": "$engines",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "mirror": "EngineCar_R{i}",
+       "children": [
+        {
+         "name": "Nacelle",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": -1.6,
+           "superellipse": {
+            "width": 0.3,
+            "height": 0.3,
+            "n": 2,
+            "count": 16,
+            "cy": 0
+           }
+          },
+          {
+           "z": -1.2,
+           "superellipse": {
+            "width": 1.3,
+            "height": 1.4,
+            "n": 2,
+            "count": 16,
+            "cy": 0
+           }
+          },
+          {
+           "z": 1,
+           "superellipse": {
+            "width": 1.4,
+            "height": 1.5,
+            "n": 2,
+            "count": 16,
+            "cy": 0
+           }
+          },
+          {
+           "z": 1.8,
+           "superellipse": {
+            "width": 0.6,
+            "height": 0.6,
+            "n": 2,
+            "count": 16,
+            "cy": 0
+           }
+          }
+         ],
+         "material": "car_paint"
+        },
+        {
+         "name": "Strut",
+         "shape": "tube",
+         "path": [
+          [
+           -0.2,
+           0.3,
+           0
+          ],
+          [
+           "-$R * 0.32",
+           "$R * 0.62",
+           0
+          ]
+         ],
+         "radius": 0.09,
+         "material": "frame_steel",
+         "segments": 8
+        },
+        {
+         "name": "StrutAft",
+         "shape": "tube",
+         "path": [
+          [
+           -0.2,
+           0.3,
+           -1
+          ],
+          [
+           "-$R * 0.32",
+           "$R * 0.62",
+           -1
+          ]
+         ],
+         "radius": 0.07,
+         "material": "frame_steel",
+         "segments": 8
+        },
+        {
+         "name": "Propeller",
+         "at": [
+          0,
+          0,
+          -1.75
+         ],
+         "children": [
+          {
+           "name": "Spinner",
+           "shape": "cylinder",
+           "radius": "max(1.2, $diameter * 0.11) * 0.12",
+           "height": "0.5",
+           "axis": "z",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "frame_steel",
+           "segments": 14,
+           "bevel": "max(1.2, $diameter * 0.11) * 0.05"
+          },
+          {
+           "name": "Blade_{i}",
+           "shape": "box",
+           "size": [
+            "max(1.2, $diameter * 0.11) * 0.16",
+            "max(1.2, $diameter * 0.11) * 0.92",
+            "max(1.2, $diameter * 0.11) * 0.05"
+           ],
+           "at": [
+            0,
+            "max(1.2, $diameter * 0.11) * 0.54",
+            0
+           ],
+           "material": "frame_steel",
+           "bevel": "max(1.2, $diameter * 0.11) * 0.02",
+           "rotate": [
+            0,
+            12,
+            0
+           ],
+           "repeat": {
+            "count": 4,
+            "around": "z"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Gondola",
+     "at": [
+      0,
+      "($yc - $gh) * (1 - max(0, 1 - abs($style - 1)))",
+      "$gz"
+     ],
+     "children": [
+      {
+       "name": "Boat",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "$gl * -0.5",
+         "points": [
+          [
+           "max(2.6, $diameter * 0.26) * 0.75 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.75 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.75 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.6)"
+          ],
+          [
+           0,
+           "$gh * (0.55 - 0.55 * 0.6)"
+          ],
+          [
+           "max(2.6, $diameter * 0.26) * 0.75 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.6)"
+          ]
+         ]
+        },
+        {
+         "z": "$gl * -0.35",
+         "points": [
+          [
+           "max(2.6, $diameter * 0.26) * 0.95 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.95 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.95 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.85)"
+          ],
+          [
+           0,
+           "$gh * (0.55 - 0.55 * 0.85)"
+          ],
+          [
+           "max(2.6, $diameter * 0.26) * 0.95 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.85)"
+          ]
+         ]
+        },
+        {
+         "z": "$gl * 0",
+         "points": [
+          [
+           "max(2.6, $diameter * 0.26) * 1.0 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 1.0 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 1.0 * 0.42",
+           "$gh * (0.55 - 0.5 * 1.0)"
+          ],
+          [
+           0,
+           "$gh * (0.55 - 0.55 * 1.0)"
+          ],
+          [
+           "max(2.6, $diameter * 0.26) * 1.0 * 0.42",
+           "$gh * (0.55 - 0.5 * 1.0)"
+          ]
+         ]
+        },
+        {
+         "z": "$gl * 0.3",
+         "points": [
+          [
+           "max(2.6, $diameter * 0.26) * 0.92 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.92 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.92 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.95)"
+          ],
+          [
+           0,
+           "$gh * (0.55 - 0.55 * 0.95)"
+          ],
+          [
+           "max(2.6, $diameter * 0.26) * 0.92 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.95)"
+          ]
+         ]
+        },
+        {
+         "z": "$gl * 0.45",
+         "points": [
+          [
+           "max(2.6, $diameter * 0.26) * 0.6 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.6 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.6 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.75)"
+          ],
+          [
+           0,
+           "$gh * (0.55 - 0.55 * 0.75)"
+          ],
+          [
+           "max(2.6, $diameter * 0.26) * 0.6 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.75)"
+          ]
+         ]
+        },
+        {
+         "z": "$gl * 0.5",
+         "points": [
+          [
+           "max(2.6, $diameter * 0.26) * 0.15 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.15 / 2",
+           "$gh * 0.55"
+          ],
+          [
+           "-max(2.6, $diameter * 0.26) * 0.15 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.55)"
+          ],
+          [
+           0,
+           "$gh * (0.55 - 0.55 * 0.55)"
+          ],
+          [
+           "max(2.6, $diameter * 0.26) * 0.15 * 0.42",
+           "$gh * (0.55 - 0.5 * 0.55)"
+          ]
+         ]
+        }
+       ],
+       "at": [
+        0,
+        0.35,
+        0
+       ],
+       "material": "hull_wood"
+      },
+      {
+       "name": "Deck",
+       "shape": "box",
+       "size": [
+        "max(2.6, $diameter * 0.26) * 0.9",
+        0.08,
+        "$gl * 0.85"
+       ],
+       "at": [
+        0,
+        "$gh * 0.55 + 0.35",
+        "-$gl * 0.02"
+       ],
+       "material": "deck_wood"
+      },
+      {
+       "name": "Rail_L",
+       "shape": "tube",
+       "path": [
+        [
+         "max(2.6, $diameter * 0.26) * 0.46",
+         "$gh * 0.55 + 1.3",
+         "-$gl * 0.45"
+        ],
+        [
+         "max(2.6, $diameter * 0.26) * 0.46",
+         "$gh * 0.55 + 1.3",
+         "$gl * 0.3"
+        ],
+        [
+         "max(2.6, $diameter * 0.26) * 0.25",
+         "$gh * 0.55 + 1.3",
+         "$gl * 0.45"
+        ]
+       ],
+       "radius": 0.05,
+       "material": "brass_band",
+       "segments": 8,
+       "mirror": "Rail_R"
+      },
+      {
+       "name": "Stanchion_{i}",
+       "shape": "box",
+       "size": [
+        0.06,
+        0.95,
+        0.06
+       ],
+       "at": [
+        "max(2.6, $diameter * 0.26) * 0.46",
+        "$gh * 0.55 + 0.85",
+        "-$gl * 0.45"
+       ],
+       "material": "brass_band",
+       "repeat": {
+        "count": 5,
+        "step": [
+         0,
+         0,
+         "$gl * 0.17"
+        ]
+       }
+      },
+      {
+       "name": "Stanchion_R{i}",
+       "shape": "box",
+       "size": [
+        0.06,
+        0.95,
+        0.06
+       ],
+       "at": [
+        "-max(2.6, $diameter * 0.26) * 0.46",
+        "$gh * 0.55 + 0.85",
+        "-$gl * 0.45"
+       ],
+       "material": "brass_band",
+       "repeat": {
+        "count": 5,
+        "step": [
+         0,
+         0,
+         "$gl * 0.17"
+        ]
+       }
+      },
+      {
+       "name": "Cabin",
+       "shape": "box",
+       "size": [
+        "max(2.6, $diameter * 0.26) * 0.62",
+        "$gh * 0.75",
+        "$gl * 0.4"
+       ],
+       "at": [
+        0,
+        "$gh * 0.55 + 0.4 + $gh * 0.375",
+        "-$gl * 0.05"
+       ],
+       "material": "hull_wood",
+       "bevel": 0.08,
+       "children": [
+        {
+         "name": "Porthole_L{i}",
+         "shape": "cylinder",
+         "radius": 0.22,
+         "height": 0.08,
+         "axis": "x",
+         "at": [
+          "max(2.6, $diameter * 0.26) * 0.31",
+          "$gh * 0.08",
+          "-$gl * 0.13"
+         ],
+         "material": "porthole_glass",
+         "segments": 16,
+         "repeat": {
+          "count": 3,
+          "step": [
+           0,
+           0,
+           "$gl * 0.13"
+          ]
+         },
+         "children": [
+          {
+           "name": "Ring",
+           "shape": "cylinder",
+           "radius": 0.28,
+           "height": 0.06,
+           "axis": "x",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "brass_band",
+           "segments": 16
+          }
+         ]
+        },
+        {
+         "name": "CabinRoof",
+         "shape": "box",
+         "size": [
+          "max(2.6, $diameter * 0.26) * 0.7",
+          0.12,
+          "$gl * 0.46"
+         ],
+         "at": [
+          0,
+          "$gh * 0.375 + 0.06",
+          0
+         ],
+         "material": "brass_band",
+         "bevel": 0.04
+        },
+        {
+         "name": "Funnel",
+         "shape": "cylinder",
+         "radius": 0.32,
+         "height": "$gh * 0.6",
+         "at": [
+          0,
+          "$gh * 0.375 + 0.12 + $gh * 0.3",
+          "-$gl * 0.1"
+         ],
+         "material": "smoke",
+         "segments": 16,
+         "bevel": 0.03,
+         "children": [
+          {
+           "name": "FunnelBand",
+           "shape": "cylinder",
+           "radius": 0.36,
+           "height": 0.18,
+           "at": [
+            0,
+            "$gh * 0.2",
+            0
+           ],
+           "material": "brass_band",
+           "segments": 16
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Lantern",
+       "shape": "cylinder",
+       "radius": 0.14,
+       "height": 0.3,
+       "at": [
+        0,
+        "$gh * 0.55 + 0.6",
+        "$gl * 0.46"
+       ],
+       "material": "lamp",
+       "segments": 12
+      },
+      {
+       "name": "Keel",
+       "shape": "box",
+       "size": [
+        0.2,
+        0.35,
+        "$gl * 0.7"
+       ],
+       "at": [
+        0,
+        0.175,
+        0
+       ],
+       "material": "brass_band"
+      },
+      {
+       "name": "Outrigger_L{i}",
+       "at": [
+        0,
+        "max($gh * 0.42, max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) + 0.25)",
+        "-$gl * 0.15 - $i * $gl * 0.25"
+       ],
+       "repeat": {
+        "count": "$engines",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "mirror": "Outrigger_R{i}",
+       "children": [
+        {
+         "name": "Boom",
+         "shape": "tube",
+         "path": [
+          [
+           0,
+           0,
+           0
+          ],
+          [
+           "(max(2.6, $diameter * 0.26) * 0.5 + max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) + 0.3) * lerp(0.2, 1, max(0, 1 - abs($style - 1)))",
+           0,
+           0
+          ]
+         ],
+         "radius": 0.08,
+         "material": "brass_band",
+         "segments": 8
+        },
+        {
+         "name": "Drum",
+         "shape": "cylinder",
+         "radius": 0.35,
+         "height": 1.2,
+         "axis": "z",
+         "at": [
+          "(max(2.6, $diameter * 0.26) * 0.5 + max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) + 0.3) * lerp(0.2, 1, max(0, 1 - abs($style - 1)))",
+          0,
+          0
+         ],
+         "material": "brass_band",
+         "segments": 16,
+         "bevel": 0.06
+        },
+        {
+         "name": "Propeller",
+         "at": [
+          "(max(2.6, $diameter * 0.26) * 0.5 + max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) + 0.3) * lerp(0.2, 1, max(0, 1 - abs($style - 1)))",
+          0,
+          -0.75
+         ],
+         "children": [
+          {
+           "name": "Spinner",
+           "shape": "cylinder",
+           "radius": "max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) * 0.12",
+           "height": "0.4",
+           "axis": "z",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "frame_steel",
+           "segments": 14,
+           "bevel": "max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) * 0.05"
+          },
+          {
+           "name": "Blade_{i}",
+           "shape": "box",
+           "size": [
+            "max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) * 0.16",
+            "max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) * 0.92",
+            "max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) * 0.05"
+           ],
+           "at": [
+            0,
+            "max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) * 0.54",
+            0
+           ],
+           "material": "prop_wood",
+           "bevel": "max(1.4, $diameter * 0.13) * lerp(0.3, 1, max(0, 1 - abs($style - 1))) * 0.02",
+           "rotate": [
+            0,
+            12,
+            0
+           ],
+           "repeat": {
+            "count": 4,
+            "around": "z"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Rope_1",
+       "shape": "tube",
+       "path": [
+        [
+         "max(2.6, $diameter * 0.26) * 0.45 * 1",
+         "$gh * 0.55",
+         "$gl * 0.38"
+        ],
+        [
+         "$R * 0.35 * 1",
+         "$yc - $R * 0.93",
+         "$gl * 0.38 * 1.3"
+        ]
+       ],
+       "radius": 0.04,
+       "material": "rope",
+       "segments": 5
+      },
+      {
+       "name": "Rope_2",
+       "shape": "tube",
+       "path": [
+        [
+         "max(2.6, $diameter * 0.26) * 0.45 * -1",
+         "$gh * 0.55",
+         "$gl * 0.38"
+        ],
+        [
+         "$R * 0.35 * -1",
+         "$yc - $R * 0.93",
+         "$gl * 0.38 * 1.3"
+        ]
+       ],
+       "radius": 0.04,
+       "material": "rope",
+       "segments": 5
+      },
+      {
+       "name": "Rope_3",
+       "shape": "tube",
+       "path": [
+        [
+         "max(2.6, $diameter * 0.26) * 0.45 * 1",
+         "$gh * 0.55",
+         "$gl * -0.4"
+        ],
+        [
+         "$R * 0.35 * 1",
+         "$yc - $R * 0.93",
+         "$gl * -0.4 * 1.3"
+        ]
+       ],
+       "radius": 0.04,
+       "material": "rope",
+       "segments": 5
+      },
+      {
+       "name": "Rope_4",
+       "shape": "tube",
+       "path": [
+        [
+         "max(2.6, $diameter * 0.26) * 0.45 * -1",
+         "$gh * 0.55",
+         "$gl * -0.4"
+        ],
+        [
+         "$R * 0.35 * -1",
+         "$yc - $R * 0.93",
+         "$gl * -0.4 * 1.3"
+        ]
+       ],
+       "radius": 0.04,
+       "material": "rope",
+       "segments": 5
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
