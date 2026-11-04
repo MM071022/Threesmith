@@ -1198,5 +1198,210 @@
    "Wake, spray and wet hull only when surfaced; keep enough water under the keel along the whole route at the chosen depth.",
    "An underwater launch has no flame or smoke until the missile breaks the surface."
   ]
+ },
+ {
+  "id": "vessel.boat.longship",
+  "name": "longship",
+  "description": "A Viking longship: a long, narrow clinker-built open hull with high curved stem and stern posts, a row of oars along each side, a single mast with a square sail, a steering oar on the right side at the stern and shields along the gunwale.",
+  "aliases": [
+   "longship",
+   "longships",
+   "viking ship",
+   "viking longship",
+   "drakkar",
+   "drakar",
+   "vikingschip",
+   "langschip",
+   "drakenboot",
+   "snekkja",
+   "karvi"
+  ],
+  "extends": "vessel.boat",
+  "hints": [
+   "viking",
+   "vikings",
+   "norse",
+   "dragon",
+   "draak",
+   "shield",
+   "schild",
+   "oars",
+   "riemen",
+   "raid"
+  ],
+  "parts": [
+   {
+    "name": "Hull",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "hull",
+     "romp",
+     "body",
+     "strake"
+    ],
+    "note": "Clinker built: overlapping planks (strakes) from keel to gunwale; the waterline is y = 0."
+   },
+   {
+    "name": "Mast",
+    "role": "mast",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "mast"
+    ],
+    "note": "Could be lowered when rowing."
+   },
+   {
+    "name": "Sail",
+    "role": "sail",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "sail",
+     "zeil",
+     "square sail",
+     "yard",
+     "ra"
+    ]
+   },
+   {
+    "name": "Oar",
+    "role": "oar",
+    "required": true,
+    "count": [
+     8,
+     80
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     },
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "oar",
+     "oars",
+     "roeispaan",
+     "riem"
+    ],
+    "note": "Each through an oar port in the top strake; the pivot is at the port."
+   },
+   {
+    "name": "SteeringOar",
+    "role": "rudder",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "steering oar",
+     "side rudder",
+     "stuurriem",
+     "stuurroer"
+    ],
+    "note": "On the right side (starboard) near the stern."
+   },
+   {
+    "name": "Shield",
+    "role": "shield",
+    "required": false,
+    "count": [
+     0,
+     80
+    ],
+    "aliases": [
+     "shield",
+     "shields",
+     "schild",
+     "schilden"
+    ]
+   },
+   {
+    "name": "Figurehead",
+    "role": "ornament",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "aliases": [
+     "figurehead",
+     "dragon head",
+     "drakenkop",
+     "boegbeeld",
+     "prow head"
+    ]
+   },
+   {
+    "name": "Stem",
+    "role": "post",
+    "required": false,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "stem",
+     "stem post",
+     "stern post",
+     "steven",
+     "voorsteven",
+     "achtersteven"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    17,
+    37
+   ],
+   "width": [
+    2.6,
+    5.5
+   ],
+   "height": [
+    8,
+    18
+   ],
+   "source": "museum data: the Gokstad ship is 23.2 m long and 5.2 m wide, Skuldelev 2 about 30 m long and 3.8 m wide, Roskilde 6 about 37 m long; height is the mast above the waterline",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "type",
+    "options": [
+     "karvi",
+     "snekkja",
+     "skeid",
+     "drakkar (fantasy dragon ship)"
+    ]
+   }
+  ],
+  "anticipate": [
+   "Oars as separate nodes pivoting at their oar ports, so a script can row; the sail as its own node to swap or furl.",
+   "Shields as separate nodes along the shield rail."
+  ],
+  "pitfalls": [
+   "The hull is open: rowers sat on sea chests, not under a deck.",
+   "Dragon heads were taken down near friendly shores; the stem post stays."
+  ]
  }
 ]
