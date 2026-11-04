@@ -14,6 +14,16 @@ import { explain, formatExplanations } from "./explain/explain.js";
 import { formatScene } from "./check/inspect.js";
 import { HOOK_EVENTS, runHook, type HookEvent, type HookInput } from "./hooks/hooks.js";
 import { VERSION } from "./version.js";
+import { formatTriage, triage } from "./doctor/triage.js";
+import { formatProjectMap, projectRootOf, scanProject } from "./scan/scan.js";
+import { checkAssets, formatAssets } from "./scan/assets.js";
+import { collect } from "./review/source.js";
+import { RULES } from "./review/rules.js";
+import { formatJournal, formatUndo, readJournal, undoJournal, writeFiles } from "./project/journal.js";
+import { applyFeedback, formatLearned } from "./learn/feedback.js";
+import { envFlag } from "./mcp/toolsets.js";
+import { join, relative } from "node:path";
+import { statSync } from "node:fs";
 
 function out(s: string): void {
   process.stdout.write(s.endsWith("\n") ? s : s + "\n");
@@ -68,7 +78,9 @@ export function buildProgram(): Command {
     .option("--disable <rules>", "comma separated rule ids to skip")
     .action(
       (path: string, o: { three?: string; json?: boolean; markdown?: boolean; limit: string; minScore?: string; failOn: string; disable?: string }) => {
-        const r = review({ path, ...(o.three ? { three: o.three } : {}), ...(o.disable ? { disable: o.disable.split(",") } : {}) });
+        const { review: r, learned } = applyFeedback(review({ path, ...(o.three ? { three: o.three } : {}), ...(o.disable ? { disable: o.disable.split(",") } : {}) }));
+        const note = formatLearned(learned);
+        if (note && !o.json) process.stderr.write(note + "\n");
         out(o.json ? JSON.stringify(r, null, 2) : o.markdown ? formatMarkdown(r, { limit: Number(o.limit) }) : formatText(r, { limit: Number(o.limit) }));
         const rank: Record<string, number> = { error: 0, warn: 1, info: 2 };
         if (o.failOn !== "none" && r.findings.some((f) => (rank[f.severity] ?? 9) <= (rank[o.failOn] ?? -1))) process.exitCode = 1;
@@ -85,8 +97,15 @@ export function buildProgram(): Command {
     .option("--only <rules>", "comma separated rule ids")
     .option("--json", "JSON output")
     .action((path: string, o: { three?: string; write?: boolean; only?: string; json?: boolean }) => {
-      const r = fix({ path, ...(o.three ? { three: o.three } : {}), ...(o.write ? { write: true } : {}), ...(o.only ? { only: o.only.split(",") } : {}) });
-      out(o.json ? JSON.stringify({ ...r, files: r.files.map(({ fixed: _f, ...rest }) => rest) }, null, 2) : formatFix(r));
+      const r = fix({ path, ...(o.three ? { three: o.three } : {}), ...(o.only ? { only: o.only.split(",") } : {}) });
+      let id = 0;
+      if (o.write && r.total) {
+        const folder = statSync(path).isDirectory() ? path : join(path, "..");
+        const root = projectRootOf(folder);
+        id = writeFiles(root, "fix", `${r.total} mechanical fix(es)`, r.files.map((f) => ({ file: relative(root, join(folder, f.file)), data: f.fixed })));
+        r.written = true;
+      }
+      out(o.json ? JSON.stringify({ ...r, files: r.files.map(({ fixed: _f, ...rest }) => rest) }, null, 2) : formatFix(r) + (id ? `\nUndo with \`threesmith undo\` (journal #${id}).` : ""));
     });
 
   program
@@ -213,14 +232,82 @@ export function buildProgram(): Command {
 
   program
     .command("doctor")
-    .description("Check what Threesmith needs here: Node, installed three, Playwright, Chromium with WebGL")
+    .description("What is wrong in this project and in which order to fix it (grouped by cause, with next steps), then what Threesmith needs here (Node, three, Playwright, Chromium with WebGL)")
     .option("-p, --path <dir>", "project directory", ".")
     .option("--three <dir>", "path to a three package")
+    .option("--env", "only check the environment")
+    .option("--no-env", "skip the environment check (no browser start)")
+    .option("--full", "every cause and fix")
     .option("--json", "JSON output")
-    .action(async (o: { path: string; three?: string; json?: boolean }) => {
-      const items = await doctor(o.path, o.three);
-      out(o.json ? JSON.stringify(items, null, 2) : formatDoctor(items));
-      if (items.some((i) => !i.ok)) process.exitCode = 1;
+    .action(async (o: { path: string; three?: string; env?: boolean; full?: boolean; json?: boolean }) => {
+      const envOnly = process.argv.includes("--env");
+      const parts: string[] = [];
+      let bad = false;
+      let data: Record<string, unknown> = {};
+      if (!envOnly) {
+        const t = triage(o.path, { ...(o.three ? { three: o.three } : {}) });
+        parts.push(formatTriage(t, { detail: o.full ? "full" : "brief" }));
+        data = { ok: t.ok, score: t.score, counts: t.counts, groups: t.groups, next: t.next };
+        if (!t.ok) bad = true;
+      }
+      if (o.env !== false) {
+        const items = await doctor(o.path, o.three);
+        parts.push(envOnly ? formatDoctor(items) : "\nEnvironment:\n" + formatDoctor(items));
+        data = { ...data, environment: items };
+        if (items.some((i) => !i.ok)) bad = true;
+      }
+      out(o.json ? JSON.stringify(data, null, 2) : parts.join("\n"));
+      if (bad) process.exitCode = 1;
+    });
+
+  program
+    .command("scan")
+    .description("Map the project: stack and versions, pages, files using three with what they create, renderer settings, assets")
+    .argument("[path]", "project directory", ".")
+    .option("--full", "imports per file, every asset problem, glTF extensions")
+    .option("--json", "JSON output")
+    .action((path: string, o: { full?: boolean; json?: boolean }) => {
+      const m = scanProject(path);
+      out(o.json ? JSON.stringify(m, null, 2) : formatProjectMap(m, o.full ? "full" : "brief"));
+    });
+
+  program
+    .command("assets")
+    .description("Check every asset path in the code: missing files, wrong capitals, decoder folders, glTF decoders the code never sets up, huge textures, unused files")
+    .argument("[path]", "project directory", ".")
+    .option("--limit <n>", "max problems shown", "50")
+    .option("--json", "JSON output")
+    .action((path: string, o: { limit: string; json?: boolean }) => {
+      const root = projectRootOf(path);
+      const r = checkAssets(root, collect(root).files);
+      out(o.json ? JSON.stringify(r, null, 2) : formatAssets(r, { limit: Number(o.limit) }));
+      if (r.problems.some((p) => p.severity === "error")) process.exitCode = 1;
+    });
+
+  program
+    .command("rules")
+    .description("List every review rule with its category, severity, release gating and fix")
+    .argument("[query]", "words in the id or title")
+    .option("--category <name>", "only this category")
+    .option("--json", "JSON output")
+    .action((query: string | undefined, o: { category?: string; json?: boolean }) => {
+      const q = query?.toLowerCase();
+      const list = RULES.filter((r) => (!o.category || r.category === o.category) && (!q || `${r.id} ${r.title}`.toLowerCase().includes(q)));
+      if (o.json) out(JSON.stringify(list.map(({ check: _c, ...r }) => r), null, 2));
+      else out(list.map((r) => `${r.id} (${r.category}, ${r.severity}${r.removedIn ? `, removed r${r.removedIn}` : ""}): ${r.title}\n  fix: ${r.fix}`).join("\n"));
+      if (!list.length) process.exitCode = 1;
+    });
+
+  program
+    .command("undo")
+    .description("Undo the last Threesmith writes (fix --write and others), newest first; files changed by hand since are left alone")
+    .option("-p, --path <dir>", "project directory", ".")
+    .option("--steps <n>", "how many writes to undo", "1")
+    .option("--force", "also restore files changed since the write")
+    .option("--list", "only show the journal")
+    .action((o: { path: string; steps: string; force?: boolean; list?: boolean }) => {
+      const root = projectRootOf(o.path);
+      out(o.list ? formatJournal(readJournal(root)) : formatUndo(undoJournal(root, { steps: Number(o.steps), ...(o.force ? { force: true } : {}) })));
     });
 
   program
@@ -245,11 +332,17 @@ export function buildProgram(): Command {
     .command("mcp")
     .description("Run the MCP server on stdio (for Claude Code, Codex, Cursor, ...)")
     .option("--project <dir>", "default project directory for the tools (default: THREESMITH_PROJECT or the working directory)")
-    .action(async (o: { project?: string }) => {
+    .option("--tier <tier>", "cheap: short output and step-by-step guidance (default); premium: full detail (THREESMITH_TIER)")
+    .option("--tools <list>", "tool sets or tool names to offer: core, run, build, model, all, or three_check ... (THREESMITH_TOOLS)")
+    .option("--read-only", "leave out tools that always write and refuse write options (THREESMITH_READ_ONLY=1)")
+    .action(async (o: { project?: string; tier?: string; tools?: string; readOnly?: boolean }) => {
       const project = o.project ?? process.env["THREESMITH_PROJECT"];
       if (project && !project.startsWith("${")) process.chdir(project);
+      const tier = o.tier ?? process.env["THREESMITH_TIER"] ?? "cheap";
+      if (tier !== "cheap" && tier !== "premium") throw new Error(`--tier must be cheap or premium, got "${tier}"`);
+      const tools = o.tools ?? process.env["THREESMITH_TOOLS"];
       const { serveStdio } = await import("./mcp/server.js");
-      await serveStdio();
+      await serveStdio({ tier, ...(tools && !tools.startsWith("${") ? { tools } : {}), readOnly: o.readOnly === true || envFlag(process.env["THREESMITH_READ_ONLY"]) });
     });
 
   return program;
