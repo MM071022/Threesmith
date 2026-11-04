@@ -59,13 +59,22 @@ function addExports(
     for (const d of body.matchAll(/^export\s+(?:const|function|class)\s+([A-Za-z_$][\w$]*)/gm)) {
       add(d[1] ?? "", target, d[1] ?? "");
     }
+    // names a file imports, so `import { A } from './A.js'; export { A };` points at A.js, where the class is
+    const imported = new Map<string, { file: string; local: string }>();
+    for (const d of body.matchAll(/^import\s*\{([^}]+)\}\s*from\s*['"]([^'"]+)['"]/gm)) {
+      for (const part of (d[1] ?? "").split(",")) {
+        const [a, b] = part.trim().split(/\s+as\s+/);
+        if (a) imported.set(b ?? a, { file: resolveRel(target, d[2] ?? ""), local: a });
+      }
+    }
     for (const d of body.matchAll(/^export\s*\{([^}]+)\}\s*(?:from\s*['"]([^'"]+)['"])?/gm)) {
       for (const part of (d[1] ?? "").split(",")) {
         const [a, b] = part.trim().split(/\s+as\s+/);
         if (!a) continue;
         const pub = b ?? a;
-        const dest = d[2] ? resolveRel(target, d[2]) : target;
-        add(pub, dest, a);
+        const via = d[2] ? undefined : imported.get(a);
+        if (via) add(pub, via.file, via.local);
+        else add(pub, d[2] ? resolveRel(target, d[2]) : target, a);
       }
     }
   }
