@@ -53,6 +53,22 @@ describe("hooks", () => {
     expect(sessionStart({ cwd: process.cwd() })?.hookSpecificOutput?.additionalContext).toMatch(/three r\d+/);
   });
 
+  it("names asset paths in the edited file that will not load", () => {
+    const dir = project({ "package.json": "{}", "public/Car.glb": "x", "main.js": "import * as THREE from 'three';\nnew THREE.Scene();\nloader.load('/car.glb');\nloader.load('/boat.glb');\n" });
+    const out = postEdit({ cwd: dir, tool_input: { file_path: join(dir, "main.js") } }, ctx());
+    const text = out?.hookSpecificOutput?.additionalContext ?? "";
+    expect(text).toContain("main.js:3 [asset-case]");
+    expect(text).toContain("main.js:4 [asset-missing]");
+  });
+
+  it("does not block on a finding marked as a false alarm", async () => {
+    const { recordFeedback } = await import("../src/learn/feedback.js");
+    const dir = project({ "package.json": "{}", "main.js": bad });
+    recordFeedback({ rule: "geometry-class", snippet: "const g = new THREE.Geometry();" }, "wrong");
+    expect(postEdit({ cwd: dir, tool_input: { file_path: join(dir, "main.js") } }, ctx())?.decision).toBeUndefined();
+    recordFeedback({ rule: "geometry-class", snippet: "const g = new THREE.Geometry();" }, "right");
+  });
+
   it("dispatches events", () => {
     expect(runHook("stop", {}, ctx())).toBeUndefined();
   });
