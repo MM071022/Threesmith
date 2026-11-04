@@ -1159,20 +1159,7 @@
   "id": "vehicle.rail.train",
   "name": "train",
   "description": "A locomotive, railcar or train.",
-  "aliases": [
-   "train",
-   "trains",
-   "trein",
-   "locomotive",
-   "loc",
-   "railcar",
-   "tram",
-   "metro",
-   "subway",
-   "sneltrein",
-   "intercity",
-   "treinstel"
-  ],
+  "aliases": ["train", "trains", "trein", "locomotive", "loc", "railcar", "metro", "subway", "sneltrein", "intercity", "treinstel"],
   "extends": "vehicle.rail",
   "scale": {
    "length": [
@@ -2219,18 +2206,7 @@
   "id": "vehicle.rail.tram",
   "name": "tram",
   "description": "A low-floor articulated city tram: several short carbody sections joined by bellows, with a cab at each end, wide double doors, large windows and a pantograph; bogies sit under some sections, the others hang between them.",
-  "aliases": [
-   "streetcar",
-   "light rail vehicle",
-   "low-floor tram",
-   "articulated tram",
-   "stadstram",
-   "sneltram",
-   "lagevloertram",
-   "lrv",
-   "strassenbahn",
-   "trolley car"
-  ],
+  "aliases": ["tram", "streetcar", "light rail vehicle", "low-floor tram", "articulated tram", "stadstram", "sneltram", "lagevloertram", "lrv", "strassenbahn", "trolley car"],
   "extends": "vehicle.rail",
   "hints": [
    "tram",

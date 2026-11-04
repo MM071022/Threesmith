@@ -298,20 +298,7 @@
   "id": "building.tower",
   "name": "tower",
   "description": "A tall building or tower.",
-  "aliases": [
-   "tower",
-   "skyscraper",
-   "wolkenkrabber",
-   "toren",
-   "office tower",
-   "kantoortoren",
-   "high-rise",
-   "hoogbouw",
-   "lighthouse",
-   "vuurtoren",
-   "water tower",
-   "watertoren"
-  ],
+  "aliases": ["tower", "skyscraper", "wolkenkrabber", "toren", "office tower", "kantoortoren", "high-rise", "hoogbouw"],
   "extends": "building",
   "scale": {
    "length": [
@@ -1300,14 +1287,7 @@
   "id": "building.lighthouse",
   "name": "lighthouse",
   "description": "A coastal light tower: a tall round or many-sided tower with a gallery and a glazed lantern room on top, often with a keeper's house at its foot.",
-  "aliases": [
-   "lighthouse tower",
-   "light tower",
-   "lichttoren",
-   "beacon tower",
-   "pharos",
-   "kustlicht"
-  ],
+  "aliases": ["vuurtoren", "lighthouse", "lighthouse tower", "light tower", "lichttoren", "beacon tower", "pharos", "kustlicht"],
   "extends": "building.tower",
   "parts": [
    {
@@ -1429,14 +1409,7 @@
   "id": "building.water-tower",
   "name": "water tower",
   "description": "An elevated water tank: a tank high on steel legs or on a masonry or concrete column, with a ladder or stair, a balcony and a roof on the tank.",
-  "aliases": [
-   "elevated water tank",
-   "water tank tower",
-   "hoogreservoir",
-   "watertank op poten",
-   "elevated tank",
-   "water tank on legs"
-  ],
+  "aliases": ["watertoren", "water tower", "elevated water tank", "water tank tower", "hoogreservoir", "watertank op poten", "elevated tank", "water tank on legs"],
   "extends": "building.tower",
   "parts": [
    {
