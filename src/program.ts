@@ -23,6 +23,8 @@ import { formatJournal, formatUndo, readJournal, undoJournal, writeFiles } from 
 import { applyFeedback, formatLearned } from "./learn/feedback.js";
 import { envFlag } from "./mcp/toolsets.js";
 import { checkTypes, formatTypes } from "./types/types.js";
+import { toSarif } from "./review/sarif.js";
+import { formatCompact } from "./review/compact.js";
 import { join, relative } from "node:path";
 import { statSync } from "node:fs";
 
@@ -73,16 +75,22 @@ export function buildProgram(): Command {
     .option("--three <dir>", "path to a three package to pin against")
     .option("--json", "JSON output")
     .option("--markdown", "markdown output")
+    .option("--sarif <file>", "also write the findings as SARIF 2.1.0 (GitHub code scanning)")
+    .option("--compact", "one line per finding (file:line severity [rule] message Fix: ...), the format agents read best")
     .option("--limit <n>", "max findings shown", "50")
     .option("--min-score <n>", "exit 1 when the score is lower")
     .option("--fail-on <severity>", "exit 1 on findings of this severity or worse: error | warn | info | none", "none")
     .option("--disable <rules>", "comma separated rule ids to skip")
     .action(
-      (path: string, o: { three?: string; json?: boolean; markdown?: boolean; limit: string; minScore?: string; failOn: string; disable?: string }) => {
+      (path: string, o: { three?: string; json?: boolean; markdown?: boolean; sarif?: string; compact?: boolean; limit: string; minScore?: string; failOn: string; disable?: string }) => {
         const { review: r, learned } = applyFeedback(review({ path, ...(o.three ? { three: o.three } : {}), ...(o.disable ? { disable: o.disable.split(",") } : {}) }));
         const note = formatLearned(learned);
         if (note && !o.json) process.stderr.write(note + "\n");
-        out(o.json ? JSON.stringify(r, null, 2) : o.markdown ? formatMarkdown(r, { limit: Number(o.limit) }) : formatText(r, { limit: Number(o.limit) }));
+        if (o.sarif) {
+          mkdirSync(dirname(o.sarif), { recursive: true });
+          writeFileSync(o.sarif, JSON.stringify(toSarif(r), null, 1) + "\n");
+        }
+        out(o.json ? JSON.stringify(r, null, 2) : o.markdown ? formatMarkdown(r, { limit: Number(o.limit) }) : o.compact ? formatCompact(r, { limit: Number(o.limit) }) : formatText(r, { limit: Number(o.limit) }));
         const rank: Record<string, number> = { error: 0, warn: 1, info: 2 };
         if (o.failOn !== "none" && r.findings.some((f) => (rank[f.severity] ?? 9) <= (rank[o.failOn] ?? -1))) process.exitCode = 1;
         if (o.minScore !== undefined && r.score !== null && r.score < Number(o.minScore)) process.exitCode = 1;

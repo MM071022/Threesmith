@@ -6,6 +6,7 @@ import { assertWritable, ProtectedPathError, resetProtect } from "../src/project
 import { reviewDelta } from "../src/review/delta.js";
 import { applyFeedback, fingerprint, readFeedback, recordFeedback } from "../src/learn/feedback.js";
 import { project, reviewFiles } from "./helpers.js";
+import { toSarif } from "../src/review/sarif.js";
 
 describe("journal and undo", () => {
   it("undoes a write, newest first, and removes files that were new", () => {
@@ -73,5 +74,17 @@ describe("feedback", () => {
     expect(fingerprint("x", "  a   b ")).toBe(fingerprint("x", "a b"));
     recordFeedback(f, "right");
     expect(applyFeedback(reviewFiles({ "c.js": code })).review.findings.some((x) => x.rule === "geometry-class")).toBe(true);
+  });
+});
+
+describe("sarif", () => {
+  it("writes SARIF 2.1.0 with rules and locations", () => {
+    const r = reviewFiles({ "a.js": "import * as THREE from 'three';\nconst g = new THREE.Geometry();\n" });
+    const s = toSarif(r) as { version: string; runs: { tool: { driver: { rules: { id: string }[] } }; results: { ruleId: string; level: string; locations: { physicalLocation: { artifactLocation: { uri: string }; region: { startLine: number } } }[] }[] }[] };
+    expect(s.version).toBe("2.1.0");
+    const res = s.runs[0]!.results.find((x) => x.ruleId === "geometry-class")!;
+    expect(res.level).toBe("error");
+    expect(res.locations[0]!.physicalLocation).toEqual({ artifactLocation: { uri: "a.js" }, region: { startLine: 2 } });
+    expect(s.runs[0]!.tool.driver.rules.map((x) => x.id)).toContain("geometry-class");
   });
 });
