@@ -831,5 +831,234 @@
   "pitfalls": [
    "Streets on a perfect grid look artificial: bend them, vary the plot sizes and let them follow the slope."
   ]
+ },
+ {
+  "id": "world.rock",
+  "name": "boulder",
+  "description": "A boulder or a loose block of rock lying in the landscape: one irregular, weathered mass, often with moss or lichen, and smaller stones around it.",
+  "aliases": [
+   "boulder",
+   "rotsblok",
+   "kei",
+   "zwerfkei",
+   "glacial erratic",
+   "rock block",
+   "big rock",
+   "grote steen"
+  ],
+  "extends": "world",
+  "hints": [
+   "weathered",
+   "verweerd",
+   "moss",
+   "mos",
+   "lichen",
+   "korstmos",
+   "granite",
+   "graniet",
+   "scatter rock"
+  ],
+  "parts": [
+   {
+    "name": "Boulder",
+    "role": "rock",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "boulder",
+     "rock",
+     "rots",
+     "kei",
+     "block",
+     "blok",
+     "mass"
+    ],
+    "note": "The main mass: irregular and faceted, resting on a flat bed so it does not rock on the ground."
+   },
+   {
+    "name": "Moss",
+    "role": "cover",
+    "required": false,
+    "aliases": [
+     "moss",
+     "mos",
+     "lichen",
+     "korstmos"
+    ],
+    "note": "A thin shell on the top and the side that stays damp."
+   },
+   {
+    "name": "Pebble",
+    "role": "stone",
+    "required": false,
+    "count": [
+     0,
+     16
+    ],
+    "aliases": [
+     "pebble",
+     "pebbles",
+     "stone",
+     "stones",
+     "kiezel",
+     "steen",
+     "stenen"
+    ],
+    "note": "Loose stones at the foot."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.26,
+    10
+   ],
+   "width": [
+    0.2,
+    8
+   ],
+   "height": [
+    0.15,
+    6
+   ],
+   "source": "Wentworth (1922) grain-size scale, also ISO 14688-1: a boulder is a fragment larger than 256 mm (200 mm in ISO 14688-1); most boulders in a field are under a few metres, large glacial erratics reach 10 m and more",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "shape",
+    "options": [
+     "angular (freshly broken)",
+     "sub-rounded",
+     "rounded (water-worn)"
+    ]
+   },
+   {
+    "axis": "cover",
+    "options": [
+     "bare",
+     "mossy",
+     "lichen"
+    ]
+   }
+  ],
+  "conventions": [
+   "A boulder is a prop of the world, not a tile: its origin is under its middle on the ground, and it sits on a flat bed at y = 0 that a terrain can sink into."
+  ],
+  "anticipate": [
+   "Placed in numbers as InstancedMesh, with random rotation about y and a scale of 70-130%.",
+   "A convex hull or a few spheres for collision, not the visual mesh."
+  ],
+  "pitfalls": [
+   "A smooth sphere reads as a ball: rocks have flat facets, edges and a flattened bottom.",
+   "A rock that rests on one point floats or rocks: give it a flat or buried base."
+  ]
+ },
+ {
+  "id": "world.crystal-cluster",
+  "name": "crystal cluster",
+  "description": "A cluster of crystals growing out of a rock base: a geode or a druse in nature, a glowing magic crystal in a fantasy world.",
+  "aliases": [
+   "crystal cluster",
+   "crystals",
+   "kristal",
+   "kristallen",
+   "geode",
+   "druse",
+   "magic crystal",
+   "magisch kristal",
+   "amethyst cluster",
+   "quartz cluster",
+   "kristalcluster"
+  ],
+  "extends": "world",
+  "hints": [
+   "glowing",
+   "gloeiend",
+   "gem",
+   "edelsteen",
+   "fantasy",
+   "cave",
+   "grot",
+   "mana",
+   "shard"
+  ],
+  "parts": [
+   {
+    "name": "Base",
+    "role": "rock",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "base",
+     "matrix",
+     "rock",
+     "voet",
+     "sokkel"
+    ],
+    "note": "The rock the crystals grow from; it hides their roots."
+   },
+   {
+    "name": "Crystal",
+    "role": "crystal",
+    "required": true,
+    "count": [
+     1,
+     60
+    ],
+    "aliases": [
+     "crystal",
+     "crystals",
+     "kristal",
+     "shard",
+     "point",
+     "prism",
+     "spike"
+    ],
+    "note": "A six-sided prism with a pointed tip; its node sits where it leaves the base, so it can be scaled to grow."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.05,
+    12
+   ],
+   "width": [
+    0.05,
+    12
+   ],
+   "height": [
+    0.05,
+    12
+   ],
+   "source": "general knowledge: quartz and amethyst clusters are a few cm to about 1 m; the largest known crystals, the selenite beams of the Naica cave in Mexico, reach about 11-12 m; fantasy clusters in games stay within this range",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "mineral",
+    "options": [
+     "amethyst",
+     "quartz",
+     "emerald",
+     "ice",
+     "fantasy"
+    ]
+   },
+   {
+    "axis": "glow",
+    "options": [
+     "dull",
+     "glowing"
+    ]
+   }
+  ],
+  "anticipate": [
+   "A point light or an emissive bloom pass for the glow; an emissive material alone does not light the scene.",
+   "Transparent shells sort per object in three.js: keep the cores opaque and the shells few."
+  ],
+  "pitfalls": [
+   "Round, smooth crystals read as plastic: crystals have flat facets and sharp edges.",
+   "Crystals that float on the rock: their roots go into the base."
+  ]
  }
 ]

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ensureStateDir, stateDir } from "../project/journal.js";
 import type { ReviewResult } from "./review.js";
@@ -22,7 +22,7 @@ const keyOf = (f: Finding): string => `${f.file}|${f.rule}|${f.snippet}`;
 export function reviewDelta(root: string, r: ReviewResult, opts: { remember?: boolean } = {}): ReviewDelta {
   const file = join(stateDir(root), "review-last.json");
   let before: string[] | undefined;
-  if (existsSync(file)) {
+  {
     try {
       const data = JSON.parse(readFileSync(file, "utf8")) as { keys?: unknown };
       if (Array.isArray(data.keys)) before = data.keys.filter((k): k is string => typeof k === "string");

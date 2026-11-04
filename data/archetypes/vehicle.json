@@ -1159,20 +1159,7 @@
   "id": "vehicle.rail.train",
   "name": "train",
   "description": "A locomotive, railcar or train.",
-  "aliases": [
-   "train",
-   "trains",
-   "trein",
-   "locomotive",
-   "loc",
-   "railcar",
-   "tram",
-   "metro",
-   "subway",
-   "sneltrein",
-   "intercity",
-   "treinstel"
-  ],
+  "aliases": ["train", "trains", "trein", "locomotive", "loc", "railcar", "metro", "subway", "sneltrein", "intercity", "treinstel"],
   "extends": "vehicle.rail",
   "scale": {
    "length": [
@@ -1488,6 +1475,1497 @@
   "pitfalls": [
    "The cab is narrower than the body behind it; roller shutters must not run through the wheel arches.",
    "A ladder truck deploys its outriggers before the ladder may rise."
+  ]
+ },
+ {
+  "id": "vehicle.wheeled.ambulance",
+  "name": "ambulance",
+  "description": "An emergency ambulance: a van or light-truck cab with a box-shaped patient compartment behind it, warning lights, and rear and side doors.",
+  "aliases": [
+   "ambulance",
+   "ambulances",
+   "ziekenauto",
+   "ambulancewagen",
+   "box ambulance",
+   "emergency ambulance",
+   "rettungswagen",
+   "ziekenwagen"
+  ],
+  "extends": "vehicle.wheeled",
+  "hints": [
+   "paramedic",
+   "patient",
+   "stretcher",
+   "brancard",
+   "emergency",
+   "siren",
+   "sirene",
+   "hospital",
+   "ziekenhuis"
+  ],
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "body",
+     "box",
+     "patient compartment",
+     "module",
+     "opbouw"
+    ],
+    "note": "The box behind the cab, wider and taller than the cab."
+   },
+   {
+    "name": "Cab",
+    "role": "cab",
+    "required": true,
+    "aliases": [
+     "cab",
+     "cabin",
+     "cabine",
+     "front"
+    ]
+   },
+   {
+    "name": "Wheel",
+    "role": "wheel",
+    "required": true,
+    "count": [
+     4,
+     6
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "wheel",
+     "tire",
+     "tyre",
+     "wiel",
+     "band"
+    ],
+    "note": "Twin rear wheels on heavier chassis. Spins about the axle (x); the front pair also steers about y."
+   },
+   {
+    "name": "Glass",
+    "role": "glazing",
+    "required": true,
+    "aliases": [
+     "glass",
+     "window",
+     "windows",
+     "windscreen",
+     "windshield",
+     "ruit",
+     "raam"
+    ]
+   },
+   {
+    "name": "Door",
+    "role": "door",
+    "required": false,
+    "count": [
+     2,
+     6
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "door",
+     "deur",
+     "rear door",
+     "side door",
+     "achterdeur",
+     "zijdeur"
+    ],
+    "note": "Cab doors hinge at the front edge, the rear doors at the outer edges; the side door often slides."
+   },
+   {
+    "name": "LightBar",
+    "role": "light",
+    "required": false,
+    "count": [
+     1,
+     8
+    ],
+    "aliases": [
+     "light bar",
+     "beacon",
+     "flashers",
+     "zwaailicht",
+     "lichtbalk",
+     "blauwe lamp"
+    ]
+   },
+   {
+    "name": "Headlight",
+    "role": "light",
+    "required": false,
+    "count": 2,
+    "aliases": [
+     "headlight",
+     "headlamp",
+     "koplamp"
+    ]
+   },
+   {
+    "name": "Taillight",
+    "role": "light",
+    "required": false,
+    "count": [
+     2,
+     4
+    ],
+    "aliases": [
+     "taillight",
+     "tail light",
+     "achterlicht"
+    ]
+   },
+   {
+    "name": "Mirror",
+    "role": "mirror",
+    "required": false,
+    "count": 2,
+    "aliases": [
+     "mirror",
+     "spiegel"
+    ]
+   },
+   {
+    "name": "SteeringWheel",
+    "role": "control",
+    "required": false,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "steering wheel",
+     "stuurwiel",
+     "stuur"
+    ],
+    "note": "Inside the cab; the pivot is the column axis."
+   }
+  ],
+  "scale": {
+   "length": [
+    5.8,
+    7.6
+   ],
+   "width": [
+    2.0,
+    2.5
+   ],
+   "height": [
+    2.6,
+    3.2
+   ],
+   "source": "general knowledge: box ambulances on Mercedes-Benz Sprinter, Fiat Ducato or Ford E-Series chassis are about 6-7.5 m long, the box about 2.1-2.4 m wide and the roof 2.7-3.1 m high",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "type",
+    "options": [
+     "European box (type C)",
+     "US type I on a truck chassis",
+     "US type III on a van chassis",
+     "panel van (type A/B)"
+    ]
+   },
+   {
+    "axis": "livery",
+    "options": [
+     "battenburg checks",
+     "white with red stripe",
+     "yellow with blue and red"
+    ]
+   }
+  ],
+  "anticipate": [
+   "Flashing warning lights as separate emissive nodes, so a script can blink them.",
+   "Rear doors hinged at the outer edges for loading a stretcher; a step at the rear."
+  ],
+  "pitfalls": [
+   "The box is wider than the cab: a box flush with the cab doors looks like a plain van.",
+   "Mirror-reversed lettering on the bonnet is only for the front; do not mirror it on the sides."
+  ]
+ },
+ {
+  "id": "vehicle.wheeled.forklift",
+  "name": "forklift",
+  "description": "A counterbalance forklift truck: a short chassis with a heavy counterweight at the rear, an overhead guard over the driver, and a tilting mast at the front with a carriage and two forks that lift.",
+  "aliases": [
+   "forklift",
+   "forklifts",
+   "forklift truck",
+   "heftruck",
+   "vorkheftruck",
+   "fork lift",
+   "lift truck",
+   "counterbalance truck",
+   "gabelstapler"
+  ],
+  "extends": "vehicle.wheeled",
+  "hints": [
+   "pallet",
+   "pallets",
+   "warehouse",
+   "magazijn",
+   "lift",
+   "forks",
+   "vork",
+   "vorken",
+   "loading"
+  ],
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "body",
+     "chassis",
+     "frame",
+     "hood",
+     "motorkap"
+    ]
+   },
+   {
+    "name": "Wheel",
+    "role": "wheel",
+    "required": true,
+    "count": [
+     3,
+     6
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "wheel",
+     "tire",
+     "tyre",
+     "wiel",
+     "band"
+    ],
+    "note": "Large drive wheels under the mast, smaller steered wheels under the counterweight (the rear wheels steer)."
+   },
+   {
+    "name": "Counterweight",
+    "role": "ballast",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "counterweight",
+     "contragewicht",
+     "tegengewicht",
+     "ballast"
+    ]
+   },
+   {
+    "name": "Mast",
+    "role": "machine",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "mast",
+     "upright",
+     "hefmast"
+    ],
+    "note": "Tilts about x on the pins at its foot (about 6 degrees forward, 6-12 back); the inner channels and the carriage slide up inside it."
+   },
+   {
+    "name": "Carriage",
+    "role": "machine",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "slide",
+      "axis": "y"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "carriage",
+     "fork carriage",
+     "vorkbord",
+     "slede"
+    ],
+    "note": "Carries the forks and the load backrest; slides up the mast."
+   },
+   {
+    "name": "Fork",
+    "role": "fork",
+    "required": true,
+    "count": 2,
+    "aliases": [
+     "fork",
+     "forks",
+     "tine",
+     "tines",
+     "vork",
+     "lepel"
+    ],
+    "note": "About 1.0-1.2 m long, level with the ground when lowered."
+   },
+   {
+    "name": "OverheadGuard",
+    "role": "guard",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "overhead guard",
+     "roof guard",
+     "canopy",
+     "veiligheidsdak",
+     "beschermdak"
+    ]
+   },
+   {
+    "name": "Seat",
+    "role": "seat",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "seat",
+     "stoel",
+     "zitting"
+    ]
+   },
+   {
+    "name": "SteeringWheel",
+    "role": "steering",
+    "required": false,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "y"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "steering wheel",
+     "stuur",
+     "stuurwiel"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    2.6,
+    4.2
+   ],
+   "width": [
+    0.95,
+    1.6
+   ],
+   "height": [
+    2.0,
+    2.7
+   ],
+   "source": "general knowledge: 1.5-3.5 t counterbalance trucks (Toyota, Linde, Jungheinrich data sheets) are about 2.1-2.8 m long to the fork face plus 0.9-1.2 m of forks, 1.0-1.3 m wide, with the overhead guard about 2.1-2.2 m high and the lowered mast 2.0-2.5 m",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "drive",
+    "options": [
+     "electric (battery)",
+     "LPG",
+     "diesel"
+    ]
+   },
+   {
+    "axis": "wheels",
+    "options": [
+     "four-wheel",
+     "three-wheel"
+    ]
+   },
+   {
+    "axis": "mast",
+    "options": [
+     "simplex",
+     "duplex",
+     "triplex"
+    ]
+   }
+  ],
+  "anticipate": [
+   "The carriage as its own node with the pivot at its base, so a script can lift the forks by moving it up y.",
+   "Mast tilt about its foot pin (x), a few degrees forward and back."
+  ],
+  "pitfalls": [
+   "The forks must be level and touch the ground when lowered, not float in front of the mast.",
+   "The steered wheels are at the rear, under the counterweight."
+  ]
+ },
+ {
+  "id": "vehicle.tracked.excavator",
+  "name": "excavator",
+  "description": "A crawler excavator: an undercarriage with two tracks, an upper structure that slews on a turntable with the cab, engine and counterweight, and a digging arm of boom, stick and bucket moved by hydraulic cylinders.",
+  "aliases": [
+   "excavator",
+   "excavators",
+   "graafmachine",
+   "rupsgraafmachine",
+   "digger",
+   "crawler excavator",
+   "hydraulic excavator",
+   "kraan op rupsen",
+   "bagger"
+  ],
+  "extends": "vehicle.tracked",
+  "hints": [
+   "dig",
+   "digging",
+   "graven",
+   "bucket",
+   "bak",
+   "boom",
+   "construction",
+   "bouw",
+   "earthmoving",
+   "grondverzet"
+  ],
+  "parts": [
+   {
+    "name": "Hull",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "hull",
+     "undercarriage",
+     "carbody",
+     "onderwagen",
+     "chassis"
+    ],
+    "note": "The lower frame between the tracks."
+   },
+   {
+    "name": "Track",
+    "role": "track",
+    "required": true,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "slide",
+      "axis": "z"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "track",
+     "tracks",
+     "rups",
+     "rupsband",
+     "crawler"
+    ]
+   },
+   {
+    "name": "RoadWheel",
+    "role": "wheel",
+    "required": true,
+    "count": [
+     4,
+     24
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "road wheel",
+     "roller",
+     "track roller",
+     "loopwiel",
+     "idler",
+     "sprocket"
+    ]
+   },
+   {
+    "name": "House",
+    "role": "superstructure",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "house",
+     "upper structure",
+     "upperstructure",
+     "superstructure",
+     "bovenwagen",
+     "turntable",
+     "upper"
+    ],
+    "note": "Slews about the vertical axis through the centre of the slewing ring, on top of the undercarriage; the arm is its child."
+   },
+   {
+    "name": "Cab",
+    "role": "cab",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "cab",
+     "cabin",
+     "cabine",
+     "operator cab"
+    ]
+   },
+   {
+    "name": "Boom",
+    "role": "arm",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "boom",
+     "giek",
+     "main boom"
+    ],
+    "note": "Pivots about x at its foot pin on the upper structure; the stick and bucket are its children."
+   },
+   {
+    "name": "Stick",
+    "role": "arm",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "stick",
+     "arm",
+     "dipper",
+     "steel",
+     "graafarm"
+    ],
+    "note": "Pivots about x at the boom tip."
+   },
+   {
+    "name": "Bucket",
+    "role": "tool",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "bucket",
+     "graafbak",
+     "bak",
+     "shovel"
+    ],
+    "note": "Pivots about x on its pin at the stick tip; teeth on the cutting edge."
+   },
+   {
+    "name": "Counterweight",
+    "role": "ballast",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "counterweight",
+     "contragewicht"
+    ]
+   },
+   {
+    "name": "Cylinder",
+    "role": "actuator",
+    "required": false,
+    "count": [
+     2,
+     6
+    ],
+    "aliases": [
+     "cylinder",
+     "hydraulic cylinder",
+     "ram",
+     "cilinder"
+    ]
+   },
+   {
+    "name": "Blade",
+    "role": "tool",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "dozer blade",
+     "blade",
+     "schuifbord"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    5.0,
+    11.0
+   ],
+   "width": [
+    2.2,
+    3.4
+   ],
+   "height": [
+    2.7,
+    7.0
+   ],
+   "source": "manufacturer data: 20 t class crawler excavators (Cat 320, Komatsu PC210) are about 9.5 m long in transport position, 2.8-3.2 m wide over the tracks and 3.0 m high at the cab; with the boom raised the arm reaches 6-7 m",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "size",
+    "options": [
+     "mini (1-6 t)",
+     "midi (6-12 t)",
+     "standard (13-30 t)",
+     "large (30 t and up)"
+    ]
+   },
+   {
+    "axis": "tail",
+    "options": [
+     "conventional",
+     "short tail swing",
+     "zero tail swing"
+    ]
+   }
+  ],
+  "anticipate": [
+   "The house, boom, stick and bucket as a chain of nodes, each with its pivot on its pin, so a script can dig.",
+   "Hydraulic cylinders that follow the arm: aim them at their far pin every frame (lookAt) or give them a slide node."
+  ],
+  "pitfalls": [
+   "The cab sits on the left of the boom, the engine and counterweight at the back.",
+   "The house slews on the centre of the undercarriage, not on the middle of its own box."
+  ]
+ },
+ {
+  "id": "vehicle.rail.tram",
+  "name": "tram",
+  "description": "A low-floor articulated city tram: several short carbody sections joined by bellows, with a cab at each end, wide double doors, large windows and a pantograph; bogies sit under some sections, the others hang between them.",
+  "aliases": ["tram", "streetcar", "light rail vehicle", "low-floor tram", "articulated tram", "stadstram", "sneltram", "lagevloertram", "lrv", "strassenbahn", "trolley car"],
+  "extends": "vehicle.rail",
+  "hints": [
+   "tram",
+   "trams",
+   "tramway",
+   "tramlijn",
+   "streetcar",
+   "overhead line",
+   "bovenleiding",
+   "city"
+  ],
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "body",
+     "section",
+     "carbody",
+     "module",
+     "bak"
+    ],
+    "note": "One node per carbody section."
+   },
+   {
+    "name": "Bogie",
+    "role": "bogie",
+    "required": true,
+    "count": [
+     2,
+     5
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "bogie",
+     "draaistel",
+     "truck"
+    ]
+   },
+   {
+    "name": "Wheelset",
+    "role": "wheel",
+    "required": true,
+    "count": [
+     8,
+     20
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "wheelset",
+     "wheel",
+     "wiel",
+     "wielstel"
+    ]
+   },
+   {
+    "name": "Pantograph",
+    "role": "pantograph",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "pantograph",
+     "stroomafnemer",
+     "beugel"
+    ]
+   },
+   {
+    "name": "Articulation",
+    "role": "joint",
+    "required": false,
+    "count": [
+     1,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "articulation",
+     "bellows",
+     "joint",
+     "harmonica",
+     "balg",
+     "gelenk"
+    ]
+   },
+   {
+    "name": "Door",
+    "role": "door",
+    "required": false,
+    "count": [
+     2,
+     20
+    ],
+    "moves": [
+     {
+      "kind": "slide",
+      "axis": "z"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "door",
+     "deur",
+     "doors"
+    ]
+   },
+   {
+    "name": "Glass",
+    "role": "glazing",
+    "required": false,
+    "aliases": [
+     "glass",
+     "window",
+     "windscreen",
+     "ruit",
+     "raam"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    18,
+    45
+   ],
+   "width": [
+    2.3,
+    2.65
+   ],
+   "height": [
+    3.2,
+    3.8
+   ],
+   "source": "general knowledge: low-floor trams such as the Siemens Combino, Alstom Citadis and Bombardier Flexity are 2.3-2.65 m wide, 20-45 m long in 3-7 sections and about 3.4-3.6 m high to the lowered pantograph; floor about 0.35 m above the rail",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "sections",
+    "options": [
+     "3",
+     "5",
+     "7"
+    ]
+   },
+   {
+    "axis": "gauge",
+    "options": [
+     "standard (1.435 m)",
+     "metre"
+    ]
+   }
+  ],
+  "anticipate": [
+   "Each section its own node, so a script can bend the tram through a curve at the articulations.",
+   "Doors as sliding nodes (plug doors move out and along z)."
+  ],
+  "pitfalls": [
+   "A low-floor tram has its floor about 0.35 m above the rail: a body on top of the bogies looks like a train.",
+   "Sections without a bogie hang between their neighbours; do not give every section wheels."
+  ]
+ },
+ {
+  "id": "vehicle.wheeled.go-kart",
+  "name": "go-kart",
+  "description": "A racing kart: a low tubular steel frame without suspension, four small wheels, a bucket seat, a steering column, a small engine beside the seat, and plastic nose, side pods and rear bumper.",
+  "aliases": [
+   "go-kart",
+   "go kart",
+   "gokart",
+   "kart",
+   "karts",
+   "racing kart",
+   "skelter",
+   "kartwagen",
+   "karting kart"
+  ],
+  "extends": "vehicle.wheeled",
+  "hints": [
+   "karting",
+   "track",
+   "baan",
+   "race",
+   "racing",
+   "circuit"
+  ],
+  "parts": [
+   {
+    "name": "Frame",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "frame",
+     "chassis",
+     "body",
+     "frame tube"
+    ],
+    "replaces": [
+     "Body"
+    ]
+   },
+   {
+    "name": "Wheel",
+    "role": "wheel",
+    "required": true,
+    "count": 4,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "wheel",
+     "tire",
+     "tyre",
+     "wiel",
+     "band"
+    ],
+    "note": "Rear tyres are wider than the front ones; the rear axle is solid. Spins about the axle (x); the front pair also steers about y."
+   },
+   {
+    "name": "Seat",
+    "role": "seat",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "seat",
+     "stoel",
+     "kuipstoel"
+    ]
+   },
+   {
+    "name": "SteeringWheel",
+    "role": "steering",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "steering wheel",
+     "stuur",
+     "stuurwiel"
+    ]
+   },
+   {
+    "name": "Engine",
+    "role": "engine",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "engine",
+     "motor"
+    ]
+   },
+   {
+    "name": "Bodywork",
+    "role": "fairing",
+    "required": false,
+    "count": [
+     1,
+     5
+    ],
+    "aliases": [
+     "nose",
+     "nosecone",
+     "side pod",
+     "sidepod",
+     "bumper",
+     "fairing",
+     "spoiler",
+     "neus"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    1.5,
+    2.1
+   ],
+   "width": [
+    1.1,
+    1.4
+   ],
+   "height": [
+    0.45,
+    0.65
+   ],
+   "source": "CIK-FIA technical regulations for karts: overall length at most 2.1 m, overall width at most 1.4 m, height at most 0.65 m from the ground without the driver; wheelbase 1.01-1.07 m",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "class",
+    "options": [
+     "rental kart",
+     "sprint kart (KZ, OK)",
+     "kid kart",
+     "electric kart"
+    ]
+   }
+  ],
+  "anticipate": [
+   "A driver position low between the side pods, legs forward to the pedals.",
+   "Front wheels steer about a kingpin each (y), the rear axle spins as one."
+  ],
+  "pitfalls": [
+   "A kart has no suspension and no body over the wheels: the wheels stand free beside the frame.",
+   "The engine sits to the right (or left) of the seat, driving the rear axle by a chain."
+  ]
+ },
+ {
+  "id": "vehicle.wheeled.carriage",
+  "name": "horse-drawn carriage",
+  "description": "A horse-drawn carriage or coach: a sprung body on four wooden spoked wheels, larger at the rear, with a driver's box at the front and shafts or a pole for the horse. Closed coaches have a roof, doors and windows; open ones a folding hood.",
+  "aliases": [
+   "horse-drawn carriage",
+   "horse carriage",
+   "carriage",
+   "koets",
+   "rijtuig",
+   "stagecoach",
+   "postkoets",
+   "horse-drawn coach",
+   "landau",
+   "kutsche",
+   "paardenkoets",
+   "fairy tale carriage",
+   "sprookjeskoets"
+  ],
+  "extends": "vehicle.wheeled",
+  "hints": [
+   "horse",
+   "horses",
+   "paard",
+   "paarden",
+   "coachman",
+   "koetsier",
+   "victorian",
+   "historic",
+   "fantasy",
+   "royal"
+  ],
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "body",
+     "coach body",
+     "cabin",
+     "bak",
+     "carriage body"
+    ]
+   },
+   {
+    "name": "Wheel",
+    "role": "wheel",
+    "required": true,
+    "count": 4,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "wheel",
+     "wiel",
+     "spoked wheel"
+    ],
+    "note": "Wooden spoked wheels with an iron tyre; the front pair is smaller and turns with the front axle (a fifth wheel)."
+   },
+   {
+    "name": "Shaft",
+    "role": "draught",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "shaft",
+     "shafts",
+     "pole",
+     "disselboom",
+     "lamoen",
+     "boom"
+    ],
+    "note": "Two shafts for one horse, or a single pole between a pair."
+   },
+   {
+    "name": "Axle",
+    "role": "axle",
+    "required": false,
+    "count": [
+     1,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "axle",
+     "as",
+     "front axle",
+     "fifth wheel"
+    ],
+    "note": "The front axle turns about y to steer."
+   },
+   {
+    "name": "Door",
+    "role": "door",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "door",
+     "deur",
+     "portier"
+    ]
+   },
+   {
+    "name": "Seat",
+    "role": "seat",
+    "required": false,
+    "count": [
+     1,
+     3
+    ],
+    "aliases": [
+     "seat",
+     "box seat",
+     "bok",
+     "bank",
+     "driver's box",
+     "coachman seat"
+    ]
+   },
+   {
+    "name": "Lamp",
+    "role": "light",
+    "required": false,
+    "count": [
+     0,
+     4
+    ],
+    "aliases": [
+     "lamp",
+     "lantern",
+     "lantaarn"
+    ]
+   },
+   {
+    "name": "Spring",
+    "role": "suspension",
+    "required": false,
+    "count": [
+     2,
+     8
+    ],
+    "aliases": [
+     "spring",
+     "leaf spring",
+     "c-spring",
+     "veer",
+     "bladveer"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    3.0,
+    6.5
+   ],
+   "width": [
+    1.4,
+    2.1
+   ],
+   "height": [
+    1.8,
+    3.0
+   ],
+   "source": "general knowledge: a coach body is about 2-3 m long on wheels of 0.9-1.5 m diameter; with the shafts the carriage is about 4.5-6 m long, 1.6-2 m wide over the hubs and 2.2-2.8 m high when closed",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "type",
+    "options": [
+     "closed coach (brougham, berline)",
+     "open carriage (landau, victoria)",
+     "stagecoach",
+     "fairy-tale state coach"
+    ]
+   },
+   {
+    "axis": "draught",
+    "options": [
+     "shafts for one horse",
+     "pole for a pair"
+    ]
+   }
+  ],
+  "anticipate": [
+   "An attachment point at the shaft tips for a horse model (the horse stands between the shafts).",
+   "The front axle as its own node that turns about y to steer."
+  ],
+  "pitfalls": [
+   "The rear wheels are larger than the front ones; equal wheels look like a cart.",
+   "The shafts are level with the horse's shoulders, about 1-1.2 m above the ground at their tips."
+  ]
+ },
+ {
+  "id": "vehicle.hovercraft",
+  "name": "hovercraft",
+  "description": "An air-cushion vehicle: a buoyant hull on a flexible skirt filled by lift fans, driven over land and water by ducted propellers at the stern with rudders behind them.",
+  "aliases": [
+   "hovercraft",
+   "hovercrafts",
+   "air cushion vehicle",
+   "acv",
+   "luchtkussenvoertuig",
+   "luchtkussenboot",
+   "hoovercraft",
+   "luftkissenboot"
+  ],
+  "extends": "vehicle",
+  "hints": [
+   "skirt",
+   "cushion",
+   "luchtkussen",
+   "amphibious",
+   "amfibie",
+   "solent",
+   "ferry",
+   "hover"
+  ],
+  "parts": [
+   {
+    "name": "Hull",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "hull",
+     "body",
+     "buoyancy tank",
+     "romp"
+    ]
+   },
+   {
+    "name": "Skirt",
+    "role": "skirt",
+    "required": true,
+    "aliases": [
+     "skirt",
+     "rok",
+     "fingers",
+     "cushion"
+    ],
+    "note": "Rubberised fabric around the hull; it touches the ground when the craft is at rest."
+   },
+   {
+    "name": "Cabin",
+    "role": "cabin",
+    "required": true,
+    "aliases": [
+     "cabin",
+     "passenger cabin",
+     "superstructure",
+     "cabine",
+     "salon"
+    ]
+   },
+   {
+    "name": "Propeller",
+    "role": "propeller",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "propeller",
+     "prop",
+     "airscrew",
+     "schroef",
+     "luchtschroef"
+    ]
+   },
+   {
+    "name": "Duct",
+    "role": "duct",
+    "required": false,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "duct",
+     "propeller duct",
+     "shroud",
+     "mantel"
+    ]
+   },
+   {
+    "name": "Rudder",
+    "role": "control surface",
+    "required": false,
+    "count": [
+     2,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "rudder",
+     "air rudder",
+     "roer"
+    ]
+   },
+   {
+    "name": "LiftFan",
+    "role": "fan",
+    "required": false,
+    "count": [
+     1,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "lift fan",
+     "fan",
+     "liftventilator"
+    ]
+   },
+   {
+    "name": "Glass",
+    "role": "glazing",
+    "required": false,
+    "aliases": [
+     "glass",
+     "window",
+     "windows",
+     "ruit",
+     "raam"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    12,
+    56
+   ],
+   "width": [
+    6,
+    24
+   ],
+   "height": [
+    5,
+    14
+   ],
+   "source": "builder data: the Griffon 12000TD on the Solent is about 22 m long and 10.5 m wide, the BHT130 about 30 m by 12 m, the SR.N4 Mk III was 56.4 m long and 23.2 m wide",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "size",
+    "options": [
+     "light (2-12 seats)",
+     "passenger ferry (50-130 seats)",
+     "car ferry (SR.N4)",
+     "military landing craft (LCAC)"
+    ]
+   }
+  ],
+  "anticipate": [
+   "Propellers as separate nodes with the pivot at the hub, spinning about z.",
+   "The craft rises about 1-2 m on its cushion when running: move the whole model up, the skirt stays its shape."
+  ],
+  "pitfalls": [
+   "A hovercraft rests on its skirt on y = 0; it has no keel below the waterline like a boat.",
+   "The propellers push air backwards: they sit at the stern, facing -z, with the rudders behind them."
   ]
  }
 ]

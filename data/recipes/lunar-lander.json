@@ -1,0 +1,1252 @@
+{
+ "version": 1,
+ "name": "lunar-lander",
+ "archetype": "spacecraft.lander",
+ "description": "A lunar lander, 7 m high by default like the Apollo Lunar Module (9.4 m across the gear): an octagonal descent stage in gold foil with black panels and a gimballed engine bell; three to six landing legs, each a node hinged at the top of its main strut, with secondary struts, a downlock, a dish footpad and a contact probe; a ladder and porch on the front leg; and an ascent stage: Apollo-style (crew cabin with two triangular windows, hatch, docking tunnel, aft equipment bay, four RCS quads, S-band dish, rendezvous radar and VHF antennas) or a fictional modern conical crew capsule. Hatch to +Z, footpads on y = 0.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 7.0,
+   "min": 4,
+   "max": 9,
+   "description": "Height to the top of the cabin (the Apollo LM is 7.04 m); everything scales with it."
+  },
+  {
+   "name": "legs",
+   "type": "integer",
+   "default": 4,
+   "min": 3,
+   "max": 6,
+   "description": "Landing legs."
+  },
+  {
+   "name": "legSpread",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.8,
+   "max": 1.3,
+   "description": "How far the footpads stand out (1 is the Apollo 9.4 m across the gear)."
+  },
+  {
+   "name": "descentHeight",
+   "type": "number",
+   "default": 1.65,
+   "min": 1.2,
+   "max": 2.4,
+   "description": "Height of the octagonal descent stage at the default size."
+  },
+  {
+   "name": "engineSize",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.7,
+   "max": 1.4,
+   "description": "Size of the descent engine bell."
+  },
+  {
+   "name": "style",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 Apollo-style lunar module (gold foil descent stage, faceted ascent stage with triangular windows); 1 a fictional modern lander (white descent stage, conical crew capsule)."
+  },
+  {
+   "name": "ladder",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A ladder down the front leg and a porch in front of the hatch."
+  },
+  {
+   "name": "antennas",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "The steerable S-band dish, rendezvous radar and VHF antennas on the ascent stage."
+  }
+ ],
+ "materials": {
+  "gold_foil": {
+   "color": [
+    0.78,
+    0.5,
+    0.12
+   ],
+   "metallic": 1,
+   "roughness": 0.38,
+   "texture": "plaster"
+  },
+  "black_panel": {
+   "color": [
+    0.03,
+    0.03,
+    0.035
+   ],
+   "metallic": 0.3,
+   "roughness": 0.55
+  },
+  "white_blanket": {
+   "color": [
+    0.85,
+    0.85,
+    0.83
+   ],
+   "metallic": 0,
+   "roughness": 0.55,
+   "texture": "plaster"
+  },
+  "ascent_grey": {
+   "color": [
+    0.38,
+    0.39,
+    0.41
+   ],
+   "metallic": 0.6,
+   "roughness": 0.45,
+   "texture": "concrete"
+  },
+  "ascent_dark": {
+   "color": [
+    0.2,
+    0.2,
+    0.21
+   ],
+   "metallic": 0.5,
+   "roughness": 0.5
+  },
+  "capsule_white": {
+   "color": [
+    0.88,
+    0.88,
+    0.86
+   ],
+   "metallic": 0.05,
+   "roughness": 0.4
+  },
+  "strut": {
+   "color": [
+    0.75,
+    0.6,
+    0.25
+   ],
+   "metallic": 1,
+   "roughness": 0.3
+  },
+  "pad": {
+   "color": [
+    0.6,
+    0.6,
+    0.62
+   ],
+   "metallic": 0.9,
+   "roughness": 0.35
+  },
+  "nozzle": {
+   "color": [
+    0.3,
+    0.3,
+    0.32
+   ],
+   "metallic": 0.9,
+   "roughness": 0.45
+  },
+  "window": {
+   "color": [
+    0.05,
+    0.06,
+    0.08,
+    0.8
+   ],
+   "metallic": 0,
+   "roughness": 0.04,
+   "alpha": "BLEND"
+  },
+  "dish": {
+   "color": [
+    0.85,
+    0.85,
+    0.85
+   ],
+   "metallic": 0.3,
+   "roughness": 0.4
+  },
+  "rcs": {
+   "color": [
+    0.25,
+    0.25,
+    0.27
+   ],
+   "metallic": 0.8,
+   "roughness": 0.4
+  },
+  "flag_red": {
+   "color": [
+    0.6,
+    0.04,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.6
+  }
+ },
+ "nodes": [
+  {
+   "name": "Lander",
+   "vars": {
+    "s": "$height / 7",
+    "st": "$style",
+    "yd0": "1.25 * $height / 7",
+    "hd": "$descentHeight * $height / 7",
+    "Rd": "2.1 * $height / 7",
+    "Rf": "4.25 * $height / 7 * $legSpread",
+    "yd1": "1.25 * $height / 7 + $descentHeight * $height / 7"
+   },
+   "children": [
+    {
+     "name": "DescentStage",
+     "children": [
+      {
+       "name": "Skin_gold",
+       "shape": "extrude",
+       "plan": [
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42"
+        ],
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42"
+        ],
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))"
+        ],
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0)))) * 0.42",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 0))))"
+        ]
+       ],
+       "y0": "$yd0 + 0.02 * (1 - max(0, 1 - abs($style - 0)))",
+       "y1": "$yd1 - 0.02 * (1 - max(0, 1 - abs($style - 0)))",
+       "material": "gold_foil"
+      },
+      {
+       "name": "Skin_white",
+       "shape": "extrude",
+       "plan": [
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42"
+        ],
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42"
+        ],
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))",
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42"
+        ],
+        [
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))"
+        ],
+        [
+         "$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1)))) * 0.42",
+         "-$Rd * (1 - 0.03 * (1 - max(0, 1 - abs($style - 1))))"
+        ]
+       ],
+       "y0": "$yd0 + 0.02 * (1 - max(0, 1 - abs($style - 1)))",
+       "y1": "$yd1 - 0.02 * (1 - max(0, 1 - abs($style - 1)))",
+       "material": "white_blanket"
+      },
+      {
+       "name": "Panel_{i}",
+       "shape": "box",
+       "size": [
+        "1.2 * $s",
+        "$hd * 0.6",
+        "0.03 * $s"
+       ],
+       "at": [
+        0,
+        "$yd0 + $hd * 0.5",
+        "$Rd + 0.005"
+       ],
+       "material": "black_panel",
+       "repeat": {
+        "count": 4,
+        "around": "y",
+        "phase": 45
+       }
+      },
+      {
+       "name": "Deck",
+       "shape": "box",
+       "size": [
+        "$Rd * 1.6",
+        "0.06 * $s",
+        "$Rd * 1.6"
+       ],
+       "at": [
+        0,
+        "$yd1",
+        0
+       ],
+       "material": "black_panel"
+      },
+      {
+       "name": "Engine",
+       "at": [
+        0,
+        "$yd0 + max(0, $engineSize - 1) * 0.45 * $s",
+        0
+       ],
+       "children": [
+        {
+         "name": "Bell",
+         "shape": "lathe",
+         "profile": [
+          [
+           "0.42 * $s * $engineSize",
+           0
+          ],
+          [
+           "0.32 * $s * $engineSize",
+           "-0.25 * $s * $engineSize"
+          ],
+          [
+           "0.48 * $s * $engineSize",
+           "-0.6 * $s * $engineSize"
+          ],
+          [
+           "0.72 * $s * $engineSize",
+           "-0.95 * $s * $engineSize"
+          ],
+          [
+           "0.7 * $s * $engineSize",
+           "-0.95 * $s * $engineSize"
+          ],
+          [
+           "0.46 * $s * $engineSize",
+           "-0.6 * $s * $engineSize"
+          ],
+          [
+           "0.3 * $s * $engineSize",
+           "-0.25 * $s * $engineSize"
+          ],
+          [
+           "0.4 * $s * $engineSize",
+           0
+          ],
+          [
+           "0.42 * $s * $engineSize",
+           0
+          ]
+         ],
+         "material": "nozzle",
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Throat",
+         "shape": "cylinder",
+         "radius": "0.42 * $s",
+         "height": "0.3 * $s",
+         "at": [
+          0,
+          "0.15 * $s",
+          0
+         ],
+         "material": "black_panel",
+         "segments": 24
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_{i}",
+     "at": [
+      0,
+      "($yd1 - 0.15 * $s)",
+      "$Rd - 0.02 * $s"
+     ],
+     "repeat": {
+      "count": "$legs",
+      "around": "y"
+     },
+     "children": [
+      {
+       "name": "PrimaryStrut",
+       "shape": "tube",
+       "path": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         0,
+         "-($yd1 - 0.15 * $s) + 0.2 * $s",
+         "($Rf - $Rd)"
+        ]
+       ],
+       "radius": "0.09 * $s",
+       "material": "strut",
+       "segments": 10
+      },
+      {
+       "name": "SecondaryStrut_L",
+       "shape": "tube",
+       "path": [
+        [
+         "0.06 * $s",
+         "-$hd + 0.3 * $s",
+         "0.02 * $s"
+        ],
+        [
+         0,
+         "-(($yd1 - 0.15 * $s) - 0.12 * $s) * 0.62",
+         "($Rf - $Rd) * 0.62"
+        ]
+       ],
+       "radius": "0.05 * $s",
+       "material": "strut",
+       "segments": 8
+      },
+      {
+       "name": "SecondaryStrut_R",
+       "shape": "tube",
+       "path": [
+        [
+         "-0.06 * $s",
+         "-$hd + 0.3 * $s",
+         "0.02 * $s"
+        ],
+        [
+         0,
+         "-(($yd1 - 0.15 * $s) - 0.12 * $s) * 0.62",
+         "($Rf - $Rd) * 0.62"
+        ]
+       ],
+       "radius": "0.05 * $s",
+       "material": "strut",
+       "segments": 8
+      },
+      {
+       "name": "Downlock",
+       "shape": "tube",
+       "path": [
+        [
+         0,
+         "-$hd * 0.5",
+         "0.02 * $s"
+        ],
+        [
+         0,
+         "-(($yd1 - 0.15 * $s) - 0.12 * $s) * 0.4",
+         "($Rf - $Rd) * 0.4"
+        ]
+       ],
+       "radius": "0.04 * $s",
+       "material": "strut",
+       "segments": 8
+      },
+      {
+       "name": "Footpad",
+       "at": [
+        0,
+        "-($yd1 - 0.15 * $s)",
+        "($Rf - $Rd)"
+       ],
+       "children": [
+        {
+         "name": "Dish",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           0
+          ],
+          [
+           "0.47 * $s",
+           "0.02 * $s"
+          ],
+          [
+           "0.48 * $s",
+           "0.12 * $s"
+          ],
+          [
+           "0.4 * $s",
+           "0.18 * $s"
+          ],
+          [
+           0,
+           "0.18 * $s"
+          ]
+         ],
+         "material": "pad",
+         "segments": 24
+        },
+        {
+         "name": "Probe",
+         "shape": "tube",
+         "path": [
+          [
+           0,
+           "0.05 * $s",
+           "-0.2 * $s"
+          ],
+          [
+           0,
+           "0.03 * $s",
+           "-1.4 * $s"
+          ]
+         ],
+         "radius": "0.015 * $s",
+         "material": "strut",
+         "segments": 5
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Ladder",
+     "at": [
+      0,
+      0,
+      "-0.45 * $s * (1 - $ladder)"
+     ],
+     "children": [
+      {
+       "name": "Rail_L",
+       "shape": "tube",
+       "path": [
+        [
+         "0.22 * $s",
+         "$yd1 - 0.25 * $s",
+         "$Rd + 0.1 * $s"
+        ],
+        [
+         "0.22 * $s",
+         "($yd1 - 0.15 * $s) - (($yd1 - 0.15 * $s) - 0.12 * $s) * lerp(0.15, 0.78, $ladder)",
+         "$Rd + ($Rf - $Rd) * lerp(0.15, 0.78, $ladder)"
+        ]
+       ],
+       "radius": "0.025 * $s",
+       "material": "strut",
+       "segments": 6,
+       "mirror": "Rail_R"
+      },
+      {
+       "name": "Rung_{i}",
+       "shape": "box",
+       "size": [
+        "0.44 * $s",
+        "0.03 * $s",
+        "0.05 * $s"
+       ],
+       "at": [
+        0,
+        "$yd1 - 0.35 * $s - $i * ((($yd1 - 0.15 * $s) - 0.12 * $s) * lerp(0.1, 0.7, $ladder)) / 8",
+        "$Rd + 0.1 * $s + $i * (($Rf - $Rd) * lerp(0.1, 0.7, $ladder)) / 8"
+       ],
+       "material": "strut",
+       "repeat": {
+        "count": 9,
+        "step": [
+         0,
+         0,
+         0
+        ]
+       }
+      },
+      {
+       "name": "Porch",
+       "shape": "box",
+       "size": [
+        "1.0 * $s",
+        "0.05 * $s",
+        "0.2 * $s + 0.5 * $s * $ladder"
+       ],
+       "at": [
+        0,
+        "$yd1 - 0.05 * $s",
+        "$Rd + 0.1 * $s + 0.25 * $s * $ladder"
+       ],
+       "material": "pad"
+      }
+     ]
+    },
+    {
+     "name": "AscentStage",
+     "children": [
+      {
+       "name": "Apollo",
+       "at": [
+        0,
+        "$yd1 + (1 - max(0, 1 - abs($style - 0))) * ($hd * -0.45)",
+        0
+       ],
+       "children": [
+        {
+         "name": "Cabin",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": "-0.4 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "superellipse": {
+            "width": "2.35 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "height": "2.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "n": 3,
+            "count": 24,
+            "cy": "1.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           }
+          },
+          {
+           "z": "0.9 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "superellipse": {
+            "width": "2.35 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "height": "2.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "n": 3,
+            "count": 24,
+            "cy": "1.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           }
+          },
+          {
+           "z": "1.25 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "superellipse": {
+            "width": "1.7 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "height": "1.65 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "n": 3,
+            "count": 24,
+            "cy": "1.45 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           }
+          }
+         ],
+         "material": "ascent_grey"
+        },
+        {
+         "name": "Midsection",
+         "shape": "box",
+         "size": [
+          "2.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "1.0 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "2.0 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "at": [
+          0,
+          "0.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "-0.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "material": "ascent_dark",
+         "bevel": "0.05 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+        },
+        {
+         "name": "AftBay",
+         "shape": "box",
+         "size": [
+          "2.9 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "1.45 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "1.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "at": [
+          0,
+          "1.7 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "-1.05 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "material": "ascent_grey",
+         "bevel": "0.05 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+        },
+        {
+         "name": "AftRack",
+         "shape": "box",
+         "size": [
+          "2.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.7 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "at": [
+          0,
+          "0.95 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "-1.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "material": "black_panel"
+        },
+        {
+         "name": "DockingTunnel",
+         "shape": "cylinder",
+         "radius": "0.42 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+         "height": "0.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+         "at": [
+          0,
+          "2.75 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.25 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "material": "ascent_grey",
+         "segments": 24,
+         "children": [
+          {
+           "name": "DrogueRing",
+           "shape": "cylinder",
+           "radius": "0.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "height": "0.08 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "at": [
+            0,
+            "0.28 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            0
+           ],
+           "material": "pad",
+           "segments": 24
+          }
+         ]
+        },
+        {
+         "name": "Hatch",
+         "shape": "box",
+         "size": [
+          "0.8 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.8 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.06 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "at": [
+          0,
+          "1.05 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "1.27 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "material": "ascent_dark",
+         "bevel": "0.02 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+         "children": [
+          {
+           "name": "HatchHandle",
+           "shape": "box",
+           "size": [
+            "0.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "0.04 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "0.04 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           ],
+           "at": [
+            "0.22 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            0,
+            "0.04 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           ],
+           "material": "pad"
+          }
+         ]
+        },
+        {
+         "name": "SidePatch_L",
+         "shape": "box",
+         "size": [
+          "0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "1.0 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.9 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "at": [
+          "1.17 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "1.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "material": "ascent_dark",
+         "mirror": "SidePatch_R"
+        },
+        {
+         "name": "ThermalPanel",
+         "shape": "box",
+         "size": [
+          "2.0 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "at": [
+          0,
+          "0.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "0.91 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+         ],
+         "material": "black_panel"
+        },
+        {
+         "name": "Windows",
+         "children": [
+          {
+           "name": "Window_L",
+           "shape": "extrude",
+           "plan": [
+            [
+             0,
+             0
+            ],
+            [
+             "0.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             0
+            ],
+            [
+             0,
+             "0.45 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ]
+           ],
+           "y0": "-0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "y1": "0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "at": [
+            "0.18 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "2.05 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "1.26 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           ],
+           "rotate": [
+            -90,
+            0,
+            0
+           ],
+           "material": "window"
+          },
+          {
+           "name": "Window_R",
+           "shape": "extrude",
+           "plan": [
+            [
+             0,
+             0
+            ],
+            [
+             "-0.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             0
+            ],
+            [
+             0,
+             "0.45 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ]
+           ],
+           "y0": "-0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "y1": "0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "at": [
+            "-0.18 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "2.05 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "1.26 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           ],
+           "rotate": [
+            -90,
+            0,
+            0
+           ],
+           "material": "window"
+          }
+         ]
+        },
+        {
+         "name": "RCSQuad_{i}",
+         "at": [
+          "1.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          "1.85 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+          0
+         ],
+         "repeat": {
+          "count": 4,
+          "around": "y",
+          "phase": 45
+         },
+         "children": [
+          {
+           "name": "Housing",
+           "shape": "box",
+           "size": [
+            "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           ],
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "rcs",
+           "bevel": "0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+          },
+          {
+           "name": "Thruster_Up",
+           "shape": "cylinder",
+           "radius": "0.07 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "height": "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "at": [
+            0,
+            "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            0
+           ],
+           "material": "nozzle",
+           "segments": 10
+          },
+          {
+           "name": "Thruster_Down",
+           "shape": "cylinder",
+           "radius": "0.07 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "height": "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "at": [
+            0,
+            "-0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            0
+           ],
+           "material": "nozzle",
+           "segments": 10
+          },
+          {
+           "name": "Thruster_Side",
+           "shape": "cylinder",
+           "radius": "0.07 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "height": "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "axis": "x",
+           "at": [
+            "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            0,
+            0
+           ],
+           "material": "nozzle",
+           "segments": 10
+          },
+          {
+           "name": "Boom",
+           "shape": "tube",
+           "path": [
+            [
+             0,
+             0,
+             0
+            ],
+            [
+             "-0.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             0,
+             0
+            ]
+           ],
+           "radius": "0.06 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "material": "rcs",
+           "segments": 8
+          }
+         ]
+        },
+        {
+         "name": "Antennas",
+         "children": [
+          {
+           "name": "DishBoom",
+           "shape": "tube",
+           "path": [
+            [
+             "-1.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "2.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "-0.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ],
+            [
+             "-1.4 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "3.0999999999999996 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "-0.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ]
+           ],
+           "radius": "0.06 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "material": "pad",
+           "segments": 6
+          },
+          {
+           "name": "SBandDish",
+           "shape": "lathe",
+           "profile": [
+            [
+             0,
+             0
+            ],
+            [
+             "0.42 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "0.12 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ],
+            [
+             "0.42 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "0.14 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ],
+            [
+             0,
+             "0.04 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ]
+           ],
+           "at": [
+            "-1.4 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "3.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0))) * lerp(0.6, 1, $antennas)",
+            "-0.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           ],
+           "rotate": [
+            20,
+            0,
+            0
+           ],
+           "material": "dish",
+           "segments": 20
+          },
+          {
+           "name": "RadarDish",
+           "shape": "lathe",
+           "profile": [
+            [
+             0,
+             0
+            ],
+            [
+             "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "0.08 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ],
+            [
+             "0.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "0.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ],
+            [
+             0,
+             "0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ]
+           ],
+           "at": [
+            "0.7 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "2.62 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+            "0.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+           ],
+           "rotate": [
+            50,
+            0,
+            0
+           ],
+           "material": "dish",
+           "segments": 16
+          },
+          {
+           "name": "VHF_L",
+           "shape": "tube",
+           "path": [
+            [
+             "0.9 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "2.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "-1.4 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ],
+            [
+             "1.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "2.3 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0))) + 1.0 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0))) * $antennas + 0.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+             "-1.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))"
+            ]
+           ],
+           "radius": "0.025 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 0)))",
+           "material": "pad",
+           "segments": 5,
+           "mirror": "VHF_R"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Modern",
+       "at": [
+        0,
+        "$yd1 + (1 - max(0, 1 - abs($style - 1))) * ($hd * -0.45)",
+        0
+       ],
+       "children": [
+        {
+         "name": "ServiceRing",
+         "shape": "cylinder",
+         "radius": "1.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "height": "0.8 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "at": [
+          0,
+          "0.4 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          0
+         ],
+         "material": "capsule_white",
+         "segments": 32,
+         "bevel": "0.06 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+        },
+        {
+         "name": "Capsule",
+         "shape": "lathe",
+         "profile": [
+          [
+           "1.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+           0
+          ],
+          [
+           "1.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+           "0.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+          ],
+          [
+           "0.75 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+           "2.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+          ],
+          [
+           "0.55 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+           "2.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+          ],
+          [
+           0,
+           "2.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+          ]
+         ],
+         "at": [
+          0,
+          "0.8 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          0
+         ],
+         "material": "capsule_white",
+         "segments": 32
+        },
+        {
+         "name": "HeatShieldBand",
+         "shape": "cylinder",
+         "radius": "1.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "height": "0.12 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "at": [
+          0,
+          "0.86 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          0
+         ],
+         "material": "ascent_dark",
+         "segments": 32
+        },
+        {
+         "name": "Window_{i}",
+         "shape": "cylinder",
+         "radius": "0.16 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "height": "0.08 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "axis": "z",
+         "at": [
+          0,
+          "2.1 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          "1.12 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+         ],
+         "rotate": [
+          -21,
+          0,
+          0
+         ],
+         "material": "window",
+         "segments": 16,
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           "0.42 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+           "-0.16 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+          ]
+         }
+        },
+        {
+         "name": "DockingPort",
+         "shape": "cylinder",
+         "radius": "0.45 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "height": "0.35 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+         "at": [
+          0,
+          "3.15 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          0
+         ],
+         "material": "pad",
+         "segments": 24
+        },
+        {
+         "name": "Hatch",
+         "shape": "box",
+         "size": [
+          "0.9 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          "1.0 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          "0.06 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+         ],
+         "at": [
+          0,
+          "1.5 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          "1.31 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+         ],
+         "rotate": [
+          -21,
+          0,
+          0
+         ],
+         "material": "ascent_dark",
+         "bevel": "0.03 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+        },
+        {
+         "name": "Thrusters",
+         "children": [
+          {
+           "name": "Thruster_{i}",
+           "shape": "cylinder",
+           "radius": "0.08 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+           "height": "0.25 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+           "axis": "x",
+           "at": [
+            "1.62 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+            "0.45 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+            0
+           ],
+           "material": "nozzle",
+           "segments": 10,
+           "repeat": {
+            "count": 4,
+            "around": "y",
+            "phase": 45
+           }
+          }
+         ]
+        },
+        {
+         "name": "Stripe",
+         "shape": "box",
+         "size": [
+          "0.06 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          "1.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          "0.7 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))"
+         ],
+         "at": [
+          "1.2 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          "1.6 * $s * lerp(0.3, 1, max(0, 1 - abs($style - 1)))",
+          0
+         ],
+         "rotate": [
+          0,
+          0,
+          21
+         ],
+         "material": "flag_red"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

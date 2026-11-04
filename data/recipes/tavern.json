@@ -1,0 +1,2020 @@
+{
+ "version": 1,
+ "name": "tavern",
+ "archetype": "building.tavern",
+ "description": "A medieval timber-framed inn with its door on the +Z front: a stone ground floor with dressed quoins and a plinth, one or two jettied upper storeys on projecting joists with a bressumer, dark posts, rails, braces and plates over plastered infill, glowing leaded windows, timbered gable ends with a king post, a steep tiled or thatched roof with a ridge roll and barge boards, a brick chimney with pots, a plank door hinged at its side with iron straps and a ring pull, a gabled porch on posts, a hanging sign on an iron bracket that swings about x, and a barrel by the door.",
+ "params": [
+  {
+   "name": "length",
+   "type": "number",
+   "default": 11,
+   "min": 8,
+   "max": 16,
+   "description": "Length of the front (x) in metres."
+  },
+  {
+   "name": "depth",
+   "type": "number",
+   "default": 7,
+   "min": 6,
+   "max": 10,
+   "description": "Depth of the ground floor (z)."
+  },
+  {
+   "name": "floors",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 3,
+   "description": "Storeys: the stone ground floor plus timber-framed upper storeys."
+  },
+  {
+   "name": "jetty",
+   "type": "number",
+   "default": 0.45,
+   "min": 0.2,
+   "max": 0.8,
+   "description": "How far the upper storeys overhang front and back."
+  },
+  {
+   "name": "roofPitch",
+   "type": "number",
+   "default": 52,
+   "min": 40,
+   "max": 62,
+   "description": "Pitch of the roof in degrees."
+  },
+  {
+   "name": "roofStyle",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 = clay tiles, 1 = thatch."
+  },
+  {
+   "name": "infill",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "Colour of the plaster between the timbers: 0 cream, 1 white, 2 ochre."
+  },
+  {
+   "name": "porch",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A gabled porch over the door."
+  },
+  {
+   "name": "sign",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A hanging sign on an iron bracket."
+  },
+  {
+   "name": "signSwing",
+   "type": "number",
+   "default": 0,
+   "min": -30,
+   "max": 30,
+   "description": "Swing of the sign board about its hooks, in degrees."
+  }
+ ],
+ "materials": {
+  "tav_stone": {
+   "color": [
+    0.14,
+    0.13,
+    0.115
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "stone"
+  },
+  "tav_dress": {
+   "color": [
+    0.2,
+    0.19,
+    0.17
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "tav_timber": {
+   "color": [
+    0.045,
+    0.028,
+    0.017
+   ],
+   "metallic": 0,
+   "roughness": 0.8,
+   "texture": "wood"
+  },
+  "tav_door": {
+   "color": [
+    0.13,
+    0.07,
+    0.035
+   ],
+   "metallic": 0,
+   "roughness": 0.75,
+   "texture": "wood"
+  },
+  "tav_lit": {
+   "color": [
+    0.25,
+    0.16,
+    0.06
+   ],
+   "metallic": 0.1,
+   "roughness": 0.2,
+   "emissive": [
+    0.32,
+    0.18,
+    0.05
+   ]
+  },
+  "tav_lead": {
+   "color": [
+    0.03,
+    0.03,
+    0.03
+   ],
+   "metallic": 0.6,
+   "roughness": 0.5
+  },
+  "tav_iron": {
+   "color": [
+    0.03,
+    0.03,
+    0.035
+   ],
+   "metallic": 0.7,
+   "roughness": 0.5
+  },
+  "tav_sign": {
+   "color": [
+    0.2,
+    0.11,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "tav_emblem": {
+   "color": [
+    0.7,
+    0.45,
+    0.08
+   ],
+   "metallic": 0.6,
+   "roughness": 0.4
+  },
+  "tav_brick": {
+   "color": [
+    0.22,
+    0.08,
+    0.045
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "brick"
+  },
+  "tav_barrel": {
+   "color": [
+    0.2,
+    0.12,
+    0.055
+   ],
+   "metallic": 0,
+   "roughness": 0.75
+  },
+  "tav_infill_cream": {
+   "color": [
+    0.55,
+    0.47,
+    0.33
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "tav_infill_white": {
+   "color": [
+    0.68,
+    0.66,
+    0.6
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "tav_infill_ochre": {
+   "color": [
+    0.5,
+    0.3,
+    0.1
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "tav_roof_tiles": {
+   "color": [
+    0.22,
+    0.065,
+    0.035
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "texture": "roof_tile"
+  },
+  "tav_roof_thatch": {
+   "color": [
+    0.26,
+    0.19,
+    0.09
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "texture": "grass"
+  }
+ },
+ "nodes": [
+  {
+   "name": "Tavern",
+   "vars": {
+    "L": "$length",
+    "D": "$depth",
+    "gh": 3.1,
+    "sh": 2.7,
+    "nu": "$floors - 1",
+    "j": "$jetty * min(1, $floors - 1)",
+    "Du": "$depth + 2 * $jetty * min(1, $floors - 1)",
+    "Hw": "3.1 + ($floors - 1) * 2.7",
+    "rise": "($depth + 2 * $jetty * min(1, $floors - 1)) / 2 * tan(rad($roofPitch))",
+    "oh": "min(0.55, 0.45 / tan(rad($roofPitch)))",
+    "nb": "max(3, round($length / 1.25))",
+    "bay": "$length / max(3, round($length / 1.25))",
+    "dx": "$length * 0.15",
+    "nwl": "max(1, floor(($length * 0.15 + $length / 2 - 1.6) / 2.3))",
+    "fi0": "max(0.03, max(0, 1 - min(1, abs($infill - 0))))",
+    "fi1": "max(0.03, max(0, 1 - min(1, abs($infill - 1))))",
+    "fi2": "max(0.03, max(0, 1 - min(1, abs($infill - 2))))",
+    "fr0": "max(0.02, max(0, 1 - min(1, abs($roofStyle - 0))))",
+    "fr1": "max(0.02, max(0, 1 - min(1, abs($roofStyle - 1))))",
+    "fup": "max(0.03, min(1, $floors - 1))",
+    "fporch": "max(0.05, $porch)",
+    "fsign": "max(0.05, $sign)"
+   },
+   "children": [
+    {
+     "name": "Walls",
+     "children": [
+      {
+       "name": "GroundWalls",
+       "shape": "box",
+       "size": [
+        "$L",
+        "$gh",
+        "$D"
+       ],
+       "at": [
+        0,
+        "$gh / 2",
+        0
+       ],
+       "material": "tav_stone"
+      },
+      {
+       "name": "Plinth",
+       "shape": "box",
+       "size": [
+        "$L + 0.12",
+        0.35,
+        "$D + 0.12"
+       ],
+       "at": [
+        0,
+        0.175,
+        0
+       ],
+       "material": "tav_dress"
+      },
+      {
+       "name": "Quoin_{i}",
+       "shape": "box",
+       "size": [
+        0.36,
+        "$gh - 0.35",
+        0.36
+       ],
+       "at": [
+        "$L / 2 - 0.15",
+        "0.35 + ($gh - 0.35) / 2",
+        "$D / 2 - 0.15"
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         "-$D + 0.3"
+        ]
+       },
+       "material": "tav_dress",
+       "mirror": "QuoinR_{i}"
+      },
+      {
+       "name": "Storey_{i}",
+       "at": [
+        0,
+        "$gh / 2 + (($gh + $sh / 2) - ($gh / 2)) * $fup",
+        0
+       ],
+       "repeat": {
+        "count": "max(1, $nu)",
+        "step": [
+         0,
+         "($sh) * $fup",
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "InfillCream",
+         "shape": "box",
+         "size": [
+          "(($L) * $fi0) * $fup",
+          "(($sh) * $fi0) * $fup",
+          "(($Du) * $fi0) * $fup"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "tav_infill_cream"
+        },
+        {
+         "name": "InfillWhite",
+         "shape": "box",
+         "size": [
+          "(($L) * $fi1) * $fup",
+          "(($sh) * $fi1) * $fup",
+          "(($Du) * $fi1) * $fup"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "tav_infill_white"
+        },
+        {
+         "name": "InfillOchre",
+         "shape": "box",
+         "size": [
+          "(($L) * $fi2) * $fup",
+          "(($sh) * $fi2) * $fup",
+          "(($Du) * $fi2) * $fup"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "tav_infill_ochre"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "TimberFrame",
+     "children": [
+      {
+       "name": "Upper",
+       "children": [
+        {
+         "name": "Frame_{i}",
+         "at": [
+          0,
+          "($gh + $sh / 2) * $fup",
+          0
+         ],
+         "repeat": {
+          "count": "max(1, $nu)",
+          "step": [
+           0,
+           "($sh) * $fup",
+           0
+          ]
+         },
+         "material": "tav_timber",
+         "children": [
+          {
+           "name": "PostF_{i}",
+           "shape": "box",
+           "size": [
+            "0.16 * $fup",
+            "($sh) * $fup",
+            "0.08 * $fup"
+           ],
+           "at": [
+            "(-$L / 2 + $TB / 2 + $i * $bay) * $fup",
+            0,
+            "($Du / 2 + 0.03) * $fup"
+           ],
+           "repeat": {
+            "count": "$nb + 1",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "vars": {
+            "TB": 0.16
+           }
+          },
+          {
+           "name": "SillPlateF",
+           "shape": "box",
+           "size": [
+            "($L + 0.04) * $fup",
+            "0.2 * $fup",
+            "0.1 * $fup"
+           ],
+           "at": [
+            0,
+            "(-$sh / 2 + 0.1) * $fup",
+            "($Du / 2 + 0.03) * $fup"
+           ]
+          },
+          {
+           "name": "MidRailF",
+           "shape": "box",
+           "size": [
+            "($L) * $fup",
+            "0.13 * $fup",
+            "0.09 * $fup"
+           ],
+           "at": [
+            0,
+            "(-$sh / 2 + 0.95) * $fup",
+            "($Du / 2 + 0.03) * $fup"
+           ]
+          },
+          {
+           "name": "TopPlateF",
+           "shape": "box",
+           "size": [
+            "($L + 0.04) * $fup",
+            "0.18 * $fup",
+            "0.1 * $fup"
+           ],
+           "at": [
+            0,
+            "($sh / 2 - 0.09) * $fup",
+            "($Du / 2 + 0.03) * $fup"
+           ]
+          },
+          {
+           "name": "BraceF_{i}",
+           "shape": "box",
+           "size": [
+            "0.13 * $fup",
+            "(hypot($bay - 0.16, $sh - 0.38)) * $fup",
+            "0.08 * $fup"
+           ],
+           "at": [
+            "(-$L / 2 + $bay * (2 * $i + 0.5)) * $fup",
+            "0.01 * $fup",
+            "($Du / 2 + 0.03) * $fup"
+           ],
+           "rotate": [
+            0,
+            0,
+            "1 * deg(atan2($bay - 0.16, $sh - 0.38))"
+           ],
+           "repeat": {
+            "count": "ceil($nb / 2)",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           }
+          },
+          {
+           "name": "PostB_{i}",
+           "shape": "box",
+           "size": [
+            "0.16 * $fup",
+            "($sh) * $fup",
+            "0.08 * $fup"
+           ],
+           "at": [
+            "(-$L / 2 + $TB / 2 + $i * $bay) * $fup",
+            0,
+            "(-$Du / 2 - 0.03) * $fup"
+           ],
+           "repeat": {
+            "count": "$nb + 1",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "vars": {
+            "TB": 0.16
+           }
+          },
+          {
+           "name": "SillPlateB",
+           "shape": "box",
+           "size": [
+            "($L + 0.04) * $fup",
+            "0.2 * $fup",
+            "0.1 * $fup"
+           ],
+           "at": [
+            0,
+            "(-$sh / 2 + 0.1) * $fup",
+            "(-$Du / 2 - 0.03) * $fup"
+           ]
+          },
+          {
+           "name": "MidRailB",
+           "shape": "box",
+           "size": [
+            "($L) * $fup",
+            "0.13 * $fup",
+            "0.09 * $fup"
+           ],
+           "at": [
+            0,
+            "(-$sh / 2 + 0.95) * $fup",
+            "(-$Du / 2 - 0.03) * $fup"
+           ]
+          },
+          {
+           "name": "TopPlateB",
+           "shape": "box",
+           "size": [
+            "($L + 0.04) * $fup",
+            "0.18 * $fup",
+            "0.1 * $fup"
+           ],
+           "at": [
+            0,
+            "($sh / 2 - 0.09) * $fup",
+            "(-$Du / 2 - 0.03) * $fup"
+           ]
+          },
+          {
+           "name": "BraceB_{i}",
+           "shape": "box",
+           "size": [
+            "0.13 * $fup",
+            "(hypot($bay - 0.16, $sh - 0.38)) * $fup",
+            "0.08 * $fup"
+           ],
+           "at": [
+            "(-$L / 2 + $bay * (2 * $i + 0.5)) * $fup",
+            "0.01 * $fup",
+            "(-$Du / 2 - 0.03) * $fup"
+           ],
+           "rotate": [
+            0,
+            0,
+            "-1 * deg(atan2($bay - 0.16, $sh - 0.38))"
+           ],
+           "repeat": {
+            "count": "ceil($nb / 2)",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           }
+          },
+          {
+           "name": "CornerPost_{i}",
+           "shape": "box",
+           "size": [
+            "0.2 * $fup",
+            "($sh) * $fup",
+            "0.2 * $fup"
+           ],
+           "at": [
+            "($L / 2 - 0.08) * $fup",
+            0,
+            "($Du / 2 - 0.08) * $fup"
+           ],
+           "repeat": {
+            "count": 2,
+            "step": [
+             0,
+             0,
+             "(-$Du + 0.16) * $fup"
+            ]
+           },
+           "mirror": "CornerPostR_{i}"
+          },
+          {
+           "name": "SidePost_L_{i}",
+           "shape": "box",
+           "size": [
+            "0.08 * $fup",
+            "($sh) * $fup",
+            "0.16 * $fup"
+           ],
+           "at": [
+            "($L / 2 + 0.03) * $fup",
+            0,
+            "(-$Du / 2 + $Du * ($i + 1) / 3) * $fup"
+           ],
+           "repeat": {
+            "count": 2,
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "mirror": "SidePost_R_{i}"
+          },
+          {
+           "name": "SideRail_L",
+           "shape": "box",
+           "size": [
+            "0.09 * $fup",
+            "0.13 * $fup",
+            "($Du) * $fup"
+           ],
+           "at": [
+            "($L / 2 + 0.03) * $fup",
+            "(-$sh / 2 + 0.95) * $fup",
+            0
+           ],
+           "mirror": "SideRail_R"
+          },
+          {
+           "name": "SideSill_L",
+           "shape": "box",
+           "size": [
+            "0.1 * $fup",
+            "0.2 * $fup",
+            "($Du + 0.04) * $fup"
+           ],
+           "at": [
+            "($L / 2 + 0.03) * $fup",
+            "(-$sh / 2 + 0.1) * $fup",
+            0
+           ],
+           "mirror": "SideSill_R"
+          },
+          {
+           "name": "SideTop_L",
+           "shape": "box",
+           "size": [
+            "0.1 * $fup",
+            "0.18 * $fup",
+            "($Du + 0.04) * $fup"
+           ],
+           "at": [
+            "($L / 2 + 0.03) * $fup",
+            "($sh / 2 - 0.09) * $fup",
+            0
+           ],
+           "mirror": "SideTop_R"
+          }
+         ]
+        },
+        {
+         "name": "Joists",
+         "material": "tav_timber",
+         "children": [
+          {
+           "name": "JoistF_{i}",
+           "shape": "box",
+           "size": [
+            "0.18 * $fup",
+            "0.2 * $fup",
+            "($j + 0.3) * $fup"
+           ],
+           "at": [
+            "(-$L / 2 + 0.3) * $fup",
+            "($gh - 0.1) * $fup",
+            "($D / 2 + ($j - 0.3) / 2) * $fup"
+           ],
+           "repeat": {
+            "count": "max(2, round(($L - 0.6) / 1.0) + 1)",
+            "step": [
+             "(($L - 0.6) / max(1, round(($L - 0.6) / 1.0))) * $fup",
+             0,
+             0
+            ]
+           }
+          },
+          {
+           "name": "JoistB_{i}",
+           "shape": "box",
+           "size": [
+            "0.18 * $fup",
+            "0.2 * $fup",
+            "($j + 0.3) * $fup"
+           ],
+           "at": [
+            "(-$L / 2 + 0.3) * $fup",
+            "($gh - 0.1) * $fup",
+            "(-$D / 2 - ($j - 0.3) / 2) * $fup"
+           ],
+           "repeat": {
+            "count": "max(2, round(($L - 0.6) / 1.0) + 1)",
+            "step": [
+             "(($L - 0.6) / max(1, round(($L - 0.6) / 1.0))) * $fup",
+             0,
+             0
+            ]
+           }
+          },
+          {
+           "name": "Bressumer",
+           "shape": "box",
+           "size": [
+            "($L + 0.05) * $fup",
+            "0.22 * $fup",
+            "0.2 * $fup"
+           ],
+           "at": [
+            0,
+            "($gh + 0.02) * $fup",
+            "($D / 2 + $j - 0.08) * $fup"
+           ]
+          },
+          {
+           "name": "BressumerB",
+           "shape": "box",
+           "size": [
+            "($L + 0.05) * $fup",
+            "0.22 * $fup",
+            "0.2 * $fup"
+           ],
+           "at": [
+            0,
+            "($gh + 0.02) * $fup",
+            "(-$D / 2 - $j + 0.08) * $fup"
+           ]
+          }
+         ]
+        }
+       ],
+       "at": [
+        0,
+        "$gh / 2 + ((0) - ($gh / 2)) * $fup",
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Gables",
+     "children": [
+      {
+       "name": "Gable_L",
+       "at": [
+        "$L / 2 - 0.1",
+        "$Hw",
+        0
+       ],
+       "rotate": [
+        0,
+        90,
+        0
+       ],
+       "mirror": "Gable_R",
+       "children": [
+        {
+         "name": "GableInfillCream",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": 0,
+           "points": [
+            [
+             "(-$Du / 2 - 0.02) * $fi0",
+             0
+            ],
+            [
+             "($Du / 2 + 0.02) * $fi0",
+             0
+            ],
+            [
+             0,
+             "($rise) * $fi0"
+            ]
+           ]
+          },
+          {
+           "z": "0.12 * $fi0",
+           "points": [
+            [
+             "(-$Du / 2 - 0.02) * $fi0",
+             0
+            ],
+            [
+             "($Du / 2 + 0.02) * $fi0",
+             0
+            ],
+            [
+             0,
+             "($rise) * $fi0"
+            ]
+           ]
+          }
+         ],
+         "material": "tav_infill_cream",
+         "at": [
+          0,
+          "$rise / 3 + ((0) - ($rise / 3)) * $fi0",
+          "0.06 + -0.06 * $fi0"
+         ]
+        },
+        {
+         "name": "GableInfillWhite",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": 0,
+           "points": [
+            [
+             "(-$Du / 2 - 0.02) * $fi1",
+             0
+            ],
+            [
+             "($Du / 2 + 0.02) * $fi1",
+             0
+            ],
+            [
+             0,
+             "($rise) * $fi1"
+            ]
+           ]
+          },
+          {
+           "z": "0.12 * $fi1",
+           "points": [
+            [
+             "(-$Du / 2 - 0.02) * $fi1",
+             0
+            ],
+            [
+             "($Du / 2 + 0.02) * $fi1",
+             0
+            ],
+            [
+             0,
+             "($rise) * $fi1"
+            ]
+           ]
+          }
+         ],
+         "material": "tav_infill_white",
+         "at": [
+          0,
+          "$rise / 3 + ((0) - ($rise / 3)) * $fi1",
+          "0.06 + -0.06 * $fi1"
+         ]
+        },
+        {
+         "name": "GableInfillOchre",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": 0,
+           "points": [
+            [
+             "(-$Du / 2 - 0.02) * $fi2",
+             0
+            ],
+            [
+             "($Du / 2 + 0.02) * $fi2",
+             0
+            ],
+            [
+             0,
+             "($rise) * $fi2"
+            ]
+           ]
+          },
+          {
+           "z": "0.12 * $fi2",
+           "points": [
+            [
+             "(-$Du / 2 - 0.02) * $fi2",
+             0
+            ],
+            [
+             "($Du / 2 + 0.02) * $fi2",
+             0
+            ],
+            [
+             0,
+             "($rise) * $fi2"
+            ]
+           ]
+          }
+         ],
+         "material": "tav_infill_ochre",
+         "at": [
+          0,
+          "$rise / 3 + ((0) - ($rise / 3)) * $fi2",
+          "0.06 + -0.06 * $fi2"
+         ]
+        },
+        {
+         "name": "KingPost",
+         "shape": "box",
+         "size": [
+          0.16,
+          "$rise - 0.2",
+          0.06
+         ],
+         "at": [
+          0,
+          "($rise - 0.2) / 2",
+          0.13
+         ],
+         "material": "tav_timber"
+        },
+        {
+         "name": "TieBeam",
+         "shape": "box",
+         "size": [
+          "$Du",
+          0.18,
+          0.08
+         ],
+         "at": [
+          0,
+          0.09,
+          0.13
+         ],
+         "material": "tav_timber"
+        },
+        {
+         "name": "Strut_A",
+         "shape": "box",
+         "size": [
+          0.12,
+          "hypot($Du / 4, $rise / 2)",
+          0.06
+         ],
+         "at": [
+          "$Du / 8",
+          "$rise / 4",
+          0.13
+         ],
+         "rotate": [
+          0,
+          0,
+          "deg(atan2($Du / 4, $rise / 2))"
+         ],
+         "material": "tav_timber"
+        },
+        {
+         "name": "Strut_B",
+         "shape": "box",
+         "size": [
+          0.12,
+          "hypot($Du / 4, $rise / 2)",
+          0.06
+         ],
+         "at": [
+          "-$Du / 8",
+          "$rise / 4",
+          0.13
+         ],
+         "rotate": [
+          0,
+          0,
+          "-deg(atan2($Du / 4, $rise / 2))"
+         ],
+         "material": "tav_timber"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Roof",
+     "children": [
+      {
+       "name": "CoverTiles",
+       "material": "tav_roof_tiles",
+       "children": [
+        {
+         "name": "SlopeTiles_F",
+         "shape": "box",
+         "size": [
+          "($L + 0.7) * $fr0",
+          "0.22 * $fr0",
+          "(($Du / 2 + $oh) / cos(rad($roofPitch))) * $fr0"
+         ],
+         "at": [
+          0,
+          "($Hw + $rise - ($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * sin(rad($roofPitch)) + 0.22 / 2 / cos(rad($roofPitch))) * $fr0",
+          "(($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * cos(rad($roofPitch))) * $fr0"
+         ],
+         "rotate": [
+          "$roofPitch",
+          0,
+          0
+         ]
+        },
+        {
+         "name": "SlopeTiles_B",
+         "shape": "box",
+         "size": [
+          "($L + 0.7) * $fr0",
+          "0.22 * $fr0",
+          "(($Du / 2 + $oh) / cos(rad($roofPitch))) * $fr0"
+         ],
+         "at": [
+          0,
+          "($Hw + $rise - ($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * sin(rad($roofPitch)) + 0.22 / 2 / cos(rad($roofPitch))) * $fr0",
+          "(-($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * cos(rad($roofPitch))) * $fr0"
+         ],
+         "rotate": [
+          "-$roofPitch",
+          0,
+          0
+         ]
+        },
+        {
+         "name": "RidgeRollTiles",
+         "shape": "box",
+         "size": [
+          "($L + 0.75) * $fr0",
+          "0.28600000000000003 * $fr0",
+          "0.35200000000000004 * $fr0"
+         ],
+         "at": [
+          0,
+          "($Hw + $rise + 0.22 / cos(rad($roofPitch))) * $fr0",
+          0
+         ],
+         "bevel": "0.05 * $fr0"
+        }
+       ],
+       "at": [
+        0,
+        "$gh / 2 + ((0) - ($gh / 2)) * $fr0",
+        0
+       ]
+      },
+      {
+       "name": "CoverThatch",
+       "material": "tav_roof_thatch",
+       "children": [
+        {
+         "name": "SlopeThatch_F",
+         "shape": "box",
+         "size": [
+          "($L + 0.7) * $fr1",
+          "0.5 * $fr1",
+          "(($Du / 2 + $oh) / cos(rad($roofPitch))) * $fr1"
+         ],
+         "at": [
+          0,
+          "($Hw + $rise - ($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * sin(rad($roofPitch)) + 0.5 / 2 / cos(rad($roofPitch))) * $fr1",
+          "(($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * cos(rad($roofPitch))) * $fr1"
+         ],
+         "rotate": [
+          "$roofPitch",
+          0,
+          0
+         ]
+        },
+        {
+         "name": "SlopeThatch_B",
+         "shape": "box",
+         "size": [
+          "($L + 0.7) * $fr1",
+          "0.5 * $fr1",
+          "(($Du / 2 + $oh) / cos(rad($roofPitch))) * $fr1"
+         ],
+         "at": [
+          0,
+          "($Hw + $rise - ($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * sin(rad($roofPitch)) + 0.5 / 2 / cos(rad($roofPitch))) * $fr1",
+          "(-($Du / 2 + $oh) / cos(rad($roofPitch)) / 2 * cos(rad($roofPitch))) * $fr1"
+         ],
+         "rotate": [
+          "-$roofPitch",
+          0,
+          0
+         ]
+        },
+        {
+         "name": "RidgeRollThatch",
+         "shape": "box",
+         "size": [
+          "($L + 0.75) * $fr1",
+          "0.65 * $fr1",
+          "0.8 * $fr1"
+         ],
+         "at": [
+          0,
+          "($Hw + $rise + 0.5 / cos(rad($roofPitch))) * $fr1",
+          0
+         ],
+         "bevel": "0.05 * $fr1"
+        }
+       ],
+       "at": [
+        0,
+        "$gh / 2 + ((0) - ($gh / 2)) * $fr1",
+        0
+       ]
+      },
+      {
+       "name": "Barge_FL",
+       "shape": "box",
+       "size": [
+        0.08,
+        0.28,
+        "($Du / 2 + $oh) / cos(rad($roofPitch))"
+       ],
+       "at": [
+        "$L / 2 + 0.33",
+        "$Hw + $rise - ($Du / 2 + $oh) / 2 * tan(rad($roofPitch))",
+        "($Du / 2 + $oh) / 2"
+       ],
+       "rotate": [
+        "$roofPitch",
+        0,
+        0
+       ],
+       "material": "tav_timber",
+       "mirror": "Barge_FR"
+      },
+      {
+       "name": "Barge_BL",
+       "shape": "box",
+       "size": [
+        0.08,
+        0.28,
+        "($Du / 2 + $oh) / cos(rad($roofPitch))"
+       ],
+       "at": [
+        "$L / 2 + 0.33",
+        "$Hw + $rise - ($Du / 2 + $oh) / 2 * tan(rad($roofPitch))",
+        "-($Du / 2 + $oh) / 2"
+       ],
+       "rotate": [
+        "-$roofPitch",
+        0,
+        0
+       ],
+       "material": "tav_timber",
+       "mirror": "Barge_BR"
+      }
+     ]
+    },
+    {
+     "name": "Chimney",
+     "at": [
+      "-$L / 2 + 1.0",
+      0,
+      "-$D / 4"
+     ],
+     "children": [
+      {
+       "name": "Stack",
+       "shape": "box",
+       "size": [
+        1.1,
+        "$Hw + $rise + 0.9",
+        0.9
+       ],
+       "at": [
+        0,
+        "($Hw + $rise + 0.9) / 2",
+        0
+       ],
+       "material": "tav_brick"
+      },
+      {
+       "name": "Coping",
+       "shape": "box",
+       "size": [
+        1.3,
+        0.15,
+        1.1
+       ],
+       "at": [
+        0,
+        "$Hw + $rise + 0.95",
+        0
+       ],
+       "material": "tav_dress"
+      },
+      {
+       "name": "Pot_{i}",
+       "shape": "cylinder",
+       "radius": 0.13,
+       "height": 0.45,
+       "at": [
+        -0.25,
+        "$Hw + $rise + 1.0",
+        0
+       ],
+       "anchor": "base",
+       "segments": 10,
+       "repeat": {
+        "count": 2,
+        "step": [
+         0.5,
+         0,
+         0
+        ]
+       },
+       "material": "tav_brick"
+      }
+     ]
+    },
+    {
+     "name": "Windows",
+     "children": [
+      {
+       "name": "WindowGroundF_{i}",
+       "at": [
+        "-$L / 2 + 1.4 + $i * 2.3",
+        1.55,
+        "$D / 2 + 0.02"
+       ],
+       "repeat": {
+        "count": "$nwl",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Glass",
+         "shape": "box",
+         "size": [
+          1.1,
+          1.2,
+          0.1
+         ],
+         "material": "tav_lit"
+        },
+        {
+         "name": "Casing",
+         "shape": "box",
+         "size": [
+          "1.1 + 0.2",
+          "1.2 + 0.2",
+          0.08
+         ],
+         "at": [
+          0,
+          0,
+          -0.02
+         ],
+         "material": "tav_timber"
+        },
+        {
+         "name": "Mullion",
+         "shape": "box",
+         "size": [
+          0.05,
+          1.2,
+          0.12
+         ],
+         "material": "tav_lead"
+        },
+        {
+         "name": "Sill",
+         "shape": "box",
+         "size": [
+          "1.1 + 0.3",
+          0.1,
+          0.22
+         ],
+         "at": [
+          0,
+          "-1.2 / 2 - 0.08",
+          0.05
+         ],
+         "material": "tav_dress"
+        }
+       ]
+      },
+      {
+       "name": "WindowGroundR",
+       "at": [
+        "($dx + 0.6 + $L / 2) / 2",
+        1.55,
+        "$D / 2 + 0.02"
+       ],
+       "children": [
+        {
+         "name": "Glass",
+         "shape": "box",
+         "size": [
+          "min(1.0, ($L / 2 - $dx - 0.9) * 0.7)",
+          1.2,
+          0.1
+         ],
+         "material": "tav_lit"
+        },
+        {
+         "name": "Casing",
+         "shape": "box",
+         "size": [
+          "min(1.0, ($L / 2 - $dx - 0.9) * 0.7) + 0.2",
+          "1.2 + 0.2",
+          0.08
+         ],
+         "at": [
+          0,
+          0,
+          -0.02
+         ],
+         "material": "tav_timber"
+        },
+        {
+         "name": "Mullion",
+         "shape": "box",
+         "size": [
+          0.05,
+          1.2,
+          0.12
+         ],
+         "material": "tav_lead"
+        },
+        {
+         "name": "Sill",
+         "shape": "box",
+         "size": [
+          "min(1.0, ($L / 2 - $dx - 0.9) * 0.7) + 0.3",
+          0.1,
+          0.22
+         ],
+         "at": [
+          0,
+          "-1.2 / 2 - 0.08",
+          0.05
+         ],
+         "material": "tav_dress"
+        }
+       ]
+      },
+      {
+       "name": "WindowBack_{i}",
+       "at": [
+        "-$L / 2 + 2",
+        1.55,
+        "-$D / 2 - 0.02"
+       ],
+       "repeat": {
+        "count": "max(1, floor(($L - 2.5) / 3))",
+        "step": [
+         3,
+         0,
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Glass",
+         "shape": "box",
+         "size": [
+          1.0,
+          1.1,
+          0.1
+         ],
+         "material": "tav_lit"
+        },
+        {
+         "name": "Casing",
+         "shape": "box",
+         "size": [
+          "1.0 + 0.2",
+          "1.1 + 0.2",
+          0.08
+         ],
+         "at": [
+          0,
+          0,
+          0.02
+         ],
+         "material": "tav_timber"
+        },
+        {
+         "name": "Mullion",
+         "shape": "box",
+         "size": [
+          0.05,
+          1.1,
+          0.12
+         ],
+         "material": "tav_lead"
+        },
+        {
+         "name": "Sill",
+         "shape": "box",
+         "size": [
+          "1.0 + 0.3",
+          0.1,
+          0.22
+         ],
+         "at": [
+          0,
+          "-1.1 / 2 - 0.08",
+          -0.05
+         ],
+         "material": "tav_dress"
+        }
+       ]
+      },
+      {
+       "name": "WindowUpper_{i}",
+       "at": [
+        0,
+        "$gh / 2 + (($gh + $sh / 2 + 0.25) - ($gh / 2)) * $fup",
+        0
+       ],
+       "repeat": {
+        "count": "max(1, $nu)",
+        "step": [
+         0,
+         "($sh) * $fup",
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Bay_{i}",
+         "at": [
+          "(-$L / 2 + $bay * (2 * $i + 1.5)) * $fup",
+          0,
+          "($Du / 2 + 0.04) * $fup"
+         ],
+         "repeat": {
+          "count": "floor($nb / 2)",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "children": [
+          {
+           "name": "Glass",
+           "shape": "box",
+           "size": [
+            "($bay - 0.45) * $fup",
+            "0.95 * $fup",
+            "0.1 * $fup"
+           ],
+           "material": "tav_lit"
+          },
+          {
+           "name": "Casing",
+           "shape": "box",
+           "size": [
+            "($bay - 0.45 + 0.2) * $fup",
+            "(0.95 + 0.2) * $fup",
+            "0.08 * $fup"
+           ],
+           "at": [
+            0,
+            0,
+            "-0.02 * $fup"
+           ],
+           "material": "tav_timber"
+          },
+          {
+           "name": "Mullion",
+           "shape": "box",
+           "size": [
+            "0.05 * $fup",
+            "0.95 * $fup",
+            "0.12 * $fup"
+           ],
+           "material": "tav_lead"
+          },
+          {
+           "name": "Sill",
+           "shape": "box",
+           "size": [
+            "($bay - 0.45 + 0.3) * $fup",
+            "0.1 * $fup",
+            "0.22 * $fup"
+           ],
+           "at": [
+            0,
+            "(-0.95 / 2 - 0.08) * $fup",
+            "0.05 * $fup"
+           ],
+           "material": "tav_dress"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Entry",
+     "at": [
+      "$dx",
+      0,
+      "$D / 2"
+     ],
+     "children": [
+      {
+       "name": "Doorcase",
+       "shape": "box",
+       "size": [
+        1.5,
+        2.55,
+        0.16
+       ],
+       "at": [
+        0,
+        1.275,
+        0.04
+       ],
+       "material": "tav_timber"
+      },
+      {
+       "name": "Lintel",
+       "shape": "box",
+       "size": [
+        1.9,
+        0.3,
+        0.2
+       ],
+       "at": [
+        0,
+        2.6,
+        0.06
+       ],
+       "material": "tav_dress"
+      },
+      {
+       "name": "Step",
+       "shape": "box",
+       "size": [
+        1.8,
+        0.18,
+        0.6
+       ],
+       "at": [
+        0,
+        0.09,
+        0.3
+       ],
+       "bevel": 0.03,
+       "material": "tav_dress"
+      }
+     ]
+    },
+    {
+     "name": "Door",
+     "at": [
+      "$dx - 0.55",
+      0.18,
+      "$D / 2 + 0.13"
+     ],
+     "children": [
+      {
+       "name": "Planks",
+       "shape": "box",
+       "size": [
+        1.1,
+        2.25,
+        0.07
+       ],
+       "at": [
+        0.55,
+        1.125,
+        0
+       ],
+       "material": "tav_door"
+      },
+      {
+       "name": "Ledge_{i}",
+       "shape": "box",
+       "size": [
+        1.0,
+        0.12,
+        0.04
+       ],
+       "at": [
+        0.55,
+        0.35,
+        0.05
+       ],
+       "repeat": {
+        "count": 3,
+        "step": [
+         0,
+         0.75,
+         0
+        ]
+       },
+       "material": "tav_timber"
+      },
+      {
+       "name": "Hinge_{i}",
+       "shape": "box",
+       "size": [
+        0.5,
+        0.05,
+        0.03
+       ],
+       "at": [
+        0.25,
+        0.35,
+        0.075
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         1.5,
+         0
+        ]
+       },
+       "material": "tav_iron"
+      },
+      {
+       "name": "RingPull",
+       "shape": "tube",
+       "path": [
+        [
+         0.95,
+         1.15,
+         0.06
+        ],
+        [
+         1.0,
+         1.08,
+         0.08
+        ],
+        [
+         0.95,
+         1.0,
+         0.08
+        ],
+        [
+         0.9,
+         1.08,
+         0.08
+        ],
+        [
+         0.95,
+         1.15,
+         0.06
+        ]
+       ],
+       "radius": 0.012,
+       "segments": 6,
+       "material": "tav_iron"
+      }
+     ]
+    },
+    {
+     "name": "Porch",
+     "at": [
+      "($dx) * $fporch",
+      "1.5 + -1.5 * $fporch",
+      "-0.8 + (($D / 2) - (-0.8)) * $fporch"
+     ],
+     "material": "tav_timber",
+     "children": [
+      {
+       "name": "PorchPost_L",
+       "shape": "box",
+       "size": [
+        "0.16 * $fporch",
+        "2.75 * $fporch",
+        "0.16 * $fporch"
+       ],
+       "at": [
+        "0.85 * $fporch",
+        "1.555 * $fporch",
+        "1.3 * $fporch"
+       ],
+       "mirror": "PorchPost_R"
+      },
+      {
+       "name": "PorchPad_L",
+       "shape": "box",
+       "size": [
+        "0.4 * $fporch",
+        "0.18 * $fporch",
+        "0.4 * $fporch"
+       ],
+       "at": [
+        "0.85 * $fporch",
+        "0.09 * $fporch",
+        "1.3 * $fporch"
+       ],
+       "material": "tav_dress",
+       "mirror": "PorchPad_R"
+      },
+      {
+       "name": "PorchBeam",
+       "shape": "box",
+       "size": [
+        "1.95 * $fporch",
+        "0.18 * $fporch",
+        "0.18 * $fporch"
+       ],
+       "at": [
+        0,
+        "2.95 * $fporch",
+        "1.3 * $fporch"
+       ]
+      },
+      {
+       "name": "PorchPlate_L",
+       "shape": "box",
+       "size": [
+        "0.16 * $fporch",
+        "0.16 * $fporch",
+        "1.45 * $fporch"
+       ],
+       "at": [
+        "0.85 * $fporch",
+        "3.06 * $fporch",
+        "0.62 * $fporch"
+       ],
+       "mirror": "PorchPlate_R"
+      },
+      {
+       "name": "PorchBrace_L",
+       "shape": "box",
+       "size": [
+        "0.1 * $fporch",
+        "0.6 * $fporch",
+        "0.1 * $fporch"
+       ],
+       "at": [
+        "0.85 * $fporch",
+        "2.7 * $fporch",
+        "1.05 * $fporch"
+       ],
+       "rotate": [
+        45,
+        0,
+        0
+       ],
+       "mirror": "PorchBrace_R"
+      },
+      {
+       "name": "PorchCanopy",
+       "shape": "roof",
+       "x0": "-1.15 * $fporch",
+       "x1": "1.15 * $fporch",
+       "z0": "0.1 * $fporch",
+       "z1": "1.65 * $fporch",
+       "y": "3.12 * $fporch",
+       "rise": "0.8 * $fporch",
+       "kind": "gable",
+       "material": "tav_roof_tiles"
+      }
+     ]
+    },
+    {
+     "name": "Sign",
+     "at": [
+      "$dx - 1.5 + (($dx - 1.5) - ($dx - 1.5)) * $fsign",
+      "$gh * 0.5 + (($gh - 0.35) - ($gh * 0.5)) * $fsign",
+      "$D / 2 - 0.5 + (($D / 2) - ($D / 2 - 0.5)) * $fsign"
+     ],
+     "children": [
+      {
+       "name": "WallPlate",
+       "shape": "box",
+       "size": [
+        "0.12 * $fsign",
+        "0.7 * $fsign",
+        "0.06 * $fsign"
+       ],
+       "at": [
+        0,
+        "-0.15 * $fsign",
+        "0.03 * $fsign"
+       ],
+       "material": "tav_iron"
+      },
+      {
+       "name": "Bracket",
+       "shape": "tube",
+       "path": [
+        [
+         0,
+         0,
+         "0.04 * $fsign"
+        ],
+        [
+         0,
+         0,
+         "1.15 * $fsign"
+        ]
+       ],
+       "radius": "0.03 * $fsign",
+       "segments": 8,
+       "material": "tav_iron"
+      },
+      {
+       "name": "Stay",
+       "shape": "tube",
+       "path": [
+        [
+         0,
+         "-0.45 * $fsign",
+         "0.04 * $fsign"
+        ],
+        [
+         0,
+         "-0.2 * $fsign",
+         "0.45 * $fsign"
+        ],
+        [
+         0,
+         "-0.02 * $fsign",
+         "0.9 * $fsign"
+        ]
+       ],
+       "radius": "0.018 * $fsign",
+       "segments": 6,
+       "material": "tav_iron"
+      },
+      {
+       "name": "SignBoard",
+       "at": [
+        0,
+        "-0.03 * $fsign",
+        "0.75 * $fsign"
+       ],
+       "rotate": [
+        "$signSwing",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Hook_L",
+         "shape": "box",
+         "size": [
+          "0.02 * $fsign",
+          "0.14 * $fsign",
+          "0.02 * $fsign"
+         ],
+         "at": [
+          0,
+          "-0.07 * $fsign",
+          "-0.25 * $fsign"
+         ],
+         "material": "tav_iron",
+         "mirror": "Hook_R"
+        },
+        {
+         "name": "Board",
+         "shape": "box",
+         "size": [
+          "0.06 * $fsign",
+          "0.6 * $fsign",
+          "0.8 * $fsign"
+         ],
+         "at": [
+          0,
+          "-0.44 * $fsign",
+          0
+         ],
+         "bevel": "0.015 * $fsign",
+         "material": "tav_sign",
+         "children": [
+          {
+           "name": "Emblem",
+           "shape": "cylinder",
+           "radius": "0.17 * $fsign",
+           "height": "0.08 * $fsign",
+           "axis": "x",
+           "segments": 20,
+           "material": "tav_emblem"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Barrel",
+     "at": [
+      "$dx + 1.4",
+      0,
+      "$D / 2 + 0.45"
+     ],
+     "children": [
+      {
+       "name": "Cask",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         0.26,
+         0
+        ],
+        [
+         0.3,
+         0.2
+        ],
+        [
+         0.31,
+         0.38
+        ],
+        [
+         0.3,
+         0.56
+        ],
+        [
+         0.26,
+         0.76
+        ],
+        [
+         0,
+         0.76
+        ]
+       ],
+       "segments": 16,
+       "material": "tav_barrel"
+      },
+      {
+       "name": "CaskHoop_{i}",
+       "shape": "lathe",
+       "profile": [
+        [
+         0.27,
+         0.08
+        ],
+        [
+         0.295,
+         0.1
+        ],
+        [
+         0.3,
+         0.14
+        ],
+        [
+         0.27,
+         0.16
+        ],
+        [
+         0.27,
+         0.08
+        ]
+       ],
+       "at": [
+        0,
+        "$i * 0.5",
+        0
+       ],
+       "segments": 16,
+       "caps": false,
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "material": "tav_iron"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

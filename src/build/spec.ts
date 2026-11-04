@@ -11,7 +11,7 @@ export const LIMITS = { nodes: 5000, depth: 100, repeat: 500, triangles: 3_000_0
 
 type Obj = Record<string, unknown>;
 
-const COMMON_KEYS = ["name", "shape", "material", "at", "offset", "rotate", "mirror", "repeat", "vars", "children"];
+const COMMON_KEYS = ["name", "shape", "material", "at", "offset", "rotate", "mirror", "repeat", "vars", "visible", "children"];
 const SHAPE_KEYS: Record<string, string[]> = {
   box: ["size", "anchor", "bevel"],
   cylinder: ["radius", "height", "axis", "segments", "anchor", "bevel"],
@@ -25,6 +25,8 @@ const SHAPE_KEYS: Record<string, string[]> = {
 
 interface Ctx {
   scope: Scope;
+  /** The values of enum params, for "{param}" in a material name. */
+  strings: Record<string, string>;
   material?: string;
   materials: Record<string, Material>;
   counters: { nodes: number; triangles: number };
@@ -74,15 +76,31 @@ function list(v: unknown, path: string, max: number, min = 1): unknown[] {
   return v;
 }
 
+/** visible: true/false, or an expression that is 0 for off ("$lightBar", "$style_military", "$doors >= 4"). */
+function shown(v: unknown, scope: Scope, path: string): boolean {
+  if (typeof v === "boolean") return v;
+  return num(v, scope, path) !== 0;
+}
+
 function integer(v: unknown, scope: Scope, path: string, min: number, max: number): number {
   const n = num(v, scope, path);
   if (!Number.isInteger(n) || n < min || n > max) throw new BuildError(`${path}: must be a whole number from ${min} to ${max}, got ${n}`);
   return n;
 }
 
+/** "paint_{scheme}" with the enum param scheme = "red" is "paint_red"; numbers and booleans fill in as numbers. */
+function materialName(template: string, ctx: Ctx, path: string): string {
+  return template.replace(/\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (_, key: string) => {
+    if (Object.hasOwn(ctx.strings, key)) return ctx.strings[key] as string;
+    if (Object.hasOwn(ctx.scope, key)) return String(ctx.scope[key]);
+    throw new BuildError(`${path}: "{${key}}" in the material name is not a param`);
+  });
+}
+
 function material(name: unknown, ctx: Ctx, path: string): string {
-  const chosen = name ?? ctx.material;
-  if (typeof chosen !== "string") throw new BuildError(`${path}: this shape needs a "material" (here or on a parent)`);
+  const raw = name ?? ctx.material;
+  if (typeof raw !== "string") throw new BuildError(`${path}: this shape needs a "material" (here or on a parent)`);
+  const chosen = raw.includes("{") ? materialName(raw, ctx, path) : raw;
   if (!Object.hasOwn(ctx.materials, chosen)) throw new BuildError(`${path}: unknown material "${chosen}" (presets: ${Object.keys(MATERIALS).join(", ")}; or define it under "materials")`);
   return chosen;
 }
@@ -297,7 +315,7 @@ function buildNodes(raw: unknown, parent: Ctx, path: string): BuildNode[] {
   if (repeat !== undefined) {
     if (!isObj(repeat)) throw new BuildError(`${path}.repeat: expected { "count": n, "step": [dx, dy, dz] } or { "count": n, "around": "y" }`);
     checkKeys(repeat, ["count", "step", "around", "phase"], `${path}.repeat`);
-    count = integer(repeat["count"], scope, `${path}.repeat.count`, 1, LIMITS.repeat);
+    count = integer(repeat["count"], scope, `${path}.repeat.count`, 0, LIMITS.repeat);
     if (repeat["around"] !== undefined) {
       if (repeat["around"] !== "x" && repeat["around"] !== "y" && repeat["around"] !== "z") throw new BuildError(`${path}.repeat.around: use "x", "y" or "z"`);
       if (repeat["step"] !== undefined) throw new BuildError(`${path}.repeat: use either "step" (a row) or "around" (a ring), not both`);
@@ -315,6 +333,8 @@ function buildNodes(raw: unknown, parent: Ctx, path: string): BuildNode[] {
   let firstTriangles = 0;
   for (let i = 0; i < count; i++) {
     const local: Ctx = { ...ctx, scope: { ...scope, ...(repeat ? { i, n: count } : {}) } };
+    // A part that is switched off (visible: 0) is left out with its children and its mirror copy.
+    if (raw["visible"] !== undefined && !shown(raw["visible"], local.scope, `${path}.visible`)) continue;
     const at = raw["at"] === undefined ? [0, 0, 0] : vec(raw["at"], 3, local.scope, `${path}.at`);
     let position: V3 = [(at[0] ?? 0) + i * (step[0] ?? 0), (at[1] ?? 0) + i * (step[1] ?? 0), (at[2] ?? 0) + i * (step[2] ?? 0)];
     let rotation = raw["rotate"] === undefined ? undefined : quaternion(vec(raw["rotate"], 3, local.scope, `${path}.rotate`));
@@ -371,7 +391,7 @@ function assertUnique(nodes: BuildNode[], path: string): void {
   }
 }
 
-function readParams(raw: unknown, overrides: Record<string, unknown>): { scope: Scope; defs: ParamDef[] } {
+function readParams(raw: unknown, overrides: Record<string, unknown>): { scope: Scope; strings: Record<string, string>; defs: ParamDef[] } {
   const defs: ParamDef[] = [];
   for (const [i, d] of (raw === undefined ? [] : list(raw, "params", 100, 0)).entries()) {
     if (!isObj(d)) throw new BuildError(`params[${i}]: expected an object`);
@@ -383,11 +403,22 @@ function readParams(raw: unknown, overrides: Record<string, unknown>): { scope: 
   }
   const values = resolveParams(defs, overrides, "spec");
   const scope: Scope = bare<number>();
+  const strings = bare<string>();
   for (const [k, v] of Object.entries(values)) {
     if (typeof v === "number") scope[k] = v;
     else if (typeof v === "boolean") scope[k] = v ? 1 : 0;
+    else {
+      // An enum is its option's index in expressions ($style), plus a 0/1 flag per option ($style_military).
+      const options = defs.find((d) => d.name === k)?.options ?? [];
+      strings[k] = v;
+      scope[k] = Math.max(0, options.indexOf(v));
+      for (const o of options) {
+        const flag = `${k}_${o.replace(/[^A-Za-z0-9_]/g, "_")}`;
+        scope[flag] = o === v ? 1 : 0;
+      }
+    }
   }
-  return { scope, defs };
+  return { scope, strings, defs };
 }
 
 function readMaterials(raw: unknown): Record<string, Material> {
@@ -432,9 +463,9 @@ export function buildSpec(raw: unknown, overrides: Record<string, unknown> = {})
   if (!isObj(raw)) throw new BuildError("the spec must be a JSON object");
   checkKeys(raw, ["version", "name", "description", "archetype", "params", "materials", "nodes"], "spec");
   if (raw["version"] !== 1) throw new BuildError('the spec needs "version": 1');
-  const { scope } = readParams(raw["params"], overrides);
+  const { scope, strings } = readParams(raw["params"], overrides);
   const materials = readMaterials(raw["materials"]);
-  const ctx: Ctx = { scope, materials, counters: { nodes: 0, triangles: 0 }, depth: 0 };
+  const ctx: Ctx = { scope, strings, materials, counters: { nodes: 0, triangles: 0 }, depth: 0 };
   const roots = list(raw["nodes"], "nodes", LIMITS.nodes).flatMap((n, i) => buildNodes(n, ctx, `nodes[${i}]`));
   assertUnique(roots, "nodes");
   if (raw["archetype"] !== undefined && typeof raw["archetype"] !== "string") throw new BuildError('"archetype" must be an archetype id such as "vehicle.wheeled.car"');

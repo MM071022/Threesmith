@@ -243,7 +243,7 @@ describe("mistakes get a path and a reason", () => {
     fail(spec([solid({ size: [1, -1, 1] })]), /all sizes must be positive/);
     fail(spec([solid({ size: ["$x", 1, 1] })]), /nodes\[0\]\.size\[0\]: unknown variable \$x/);
     fail(spec([solid(), solid()]), /two nodes are called "A"/);
-    fail(spec([solid({ repeat: { count: 0, step: [1, 0, 0] } })]), /whole number from 1 to 500/);
+    fail(spec([solid({ repeat: { count: -1, step: [1, 0, 0] } })]), /whole number from 0 to 500/);
     fail(spec([solid({ mirror: "" })]), /give the name of the mirrored node/);
     fail(spec([{ name: "A", bogus: 1 }]), /nodes\[0\]: unknown key "bogus"/);
     fail(spec([{ name: "L", shape: "loft", material: "paint", sections: [{ z: 0, points: [[0, 0], [1, 0], [1, 1]] }, { z: 1, points: [[0, 0], [1, 0], [1, 1], [0, 1]] }] }]), /every section needs the same number/);
@@ -338,5 +338,59 @@ describe("model build --spec and model spec", () => {
   it("needs a kind or a spec, and reports a bad spec", () => {
     expect(() => buildModel({})).toThrow(/give a kind/);
     expect(() => buildModel({ spec: { version: 1, nodes: [{ name: "A", shape: "cube" }] } })).toThrow(/cube/);
+  });
+});
+
+describe("adjustable blueprints: visible, enum params, material templates, empty repeats", () => {
+  const spec = {
+    version: 1,
+    name: "kiosk",
+    params: [
+      { name: "roof", type: "boolean", default: true },
+      { name: "style", type: "enum", default: "open", options: ["open", "closed"] },
+      { name: "colour", type: "enum", default: "red", options: ["red", "blue"] },
+      { name: "posts", type: "integer", default: 4, min: 0, max: 8 },
+    ],
+    materials: { paint_red: { color: [0.8, 0.1, 0.1] }, paint_blue: { color: [0.1, 0.2, 0.8] } },
+    nodes: [
+      {
+        name: "Kiosk",
+        material: "paint_{colour}",
+        children: [
+          { name: "Base", shape: "box", size: [2, 0.2, 2], anchor: "bottom" },
+          { name: "Roof", shape: "box", size: [2.2, 0.1, 2.2], at: [0, 2.2, 0], visible: "$roof" },
+          { name: "Walls", shape: "box", size: [2, 2, 2], at: [0, 1.2, 0], visible: "$style_closed" },
+          { name: "Sign", shape: "box", size: ["0.5 + $style", 0.3, 0.05], at: [0, 2.5, 1] },
+          { name: "Post{i}", shape: "cylinder", radius: 0.04, height: 2, at: ["-0.9 + $i * 0.6", 1.2, 0.9], repeat: { count: "$posts", step: [0, 0, 0] } },
+        ],
+      },
+    ],
+  };
+  const scene = (o: Record<string, unknown> = {}) => buildSpec(spec, o);
+  const kids = (o: Record<string, unknown> = {}) => (scene(o).nodes[0]!.children ?? []).map((c) => c.name);
+
+  it("leaves a part out when visible is 0, with an enum flag or a boolean", () => {
+    expect(kids()).toEqual(["Base", "Roof", "Sign", "Post1", "Post2", "Post3", "Post4"]);
+    expect(kids({ roof: false })).not.toContain("Roof");
+    expect(kids({ style: "closed" })).toContain("Walls");
+  });
+
+  it("gives an enum its index in expressions", () => {
+    const width = (o: Record<string, unknown>) => {
+      const m = inspectModel(writeScene(buildSpec({ ...spec, nodes: [{ ...spec.nodes[0], children: [spec.nodes[0]!.children[3]] }] }, o)));
+      return m.bounds!.size[0];
+    };
+    expect(width({ style: "closed" })).toBeCloseTo(width({ style: "open" }) + 1, 3);
+  });
+
+  it("picks the material by an enum param", () => {
+    const base = (o: Record<string, unknown>) => [...scene(o).nodes[0]!.children![0]!.mesh!.prims.keys()];
+    expect(base({})).toEqual(["paint_red"]);
+    expect(base({ colour: "blue" })).toEqual(["paint_blue"]);
+    expect(() => buildSpec({ ...spec, nodes: [{ name: "X", shape: "box", size: [1, 1, 1], material: "paint_{nope}" }] })).toThrow(/not a param/);
+  });
+
+  it("makes no copies for a repeat count of 0", () => {
+    expect(kids({ posts: 0 }).filter((n) => n.startsWith("Post"))).toEqual([]);
   });
 });

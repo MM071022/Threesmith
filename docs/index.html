@@ -32,7 +32,7 @@
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Windows, macOS, Linux",
   "description": "MCP server, CLI and Claude Code plugin that checks the three.js code coding agents write: the API of the installed three version, a scored review pinned to it, asset and decoder checks, the page run in headless Chromium with the live scene read back, behaviour proven with steps and claims, perf and leak measurements, build checks, and 3D models built without Blender.",
-  "featureList": ["three.js API lookup pinned to the installed version", "Doctor that groups problems by cause", "Scored review with 97 rules incl. shaders and React Three Fiber", "TypeScript type errors answered from the installed release", "Asset path, case and decoder checks", "Headless WebGL 2 check with screenshots and baselines", "Live scene inspector: why objects are not visible", "Play with steps and claims, regression scenarios with JUnit", "Draw-call, triangle and leak measurements", "Build output check", "100 lessons from real three.js projects", "60 ready-made 3D models (.glb) with text views and lint", "Claude Code plugin with hooks, skills and subagents", "GitHub Action receipt on pull requests"],
+  "featureList": ["three.js API lookup pinned to the installed version", "Doctor that groups problems by cause", "Scored review with 97 rules incl. shaders and React Three Fiber", "TypeScript type errors answered from the installed release", "Asset path, case and decoder checks", "Headless WebGL 2 check with screenshots and baselines", "Live scene inspector: why objects are not visible", "Play with steps and claims, regression scenarios with JUnit", "Draw-call, triangle and leak measurements", "Build output check", "100 lessons from real three.js projects", "110 ready-made 3D models (.glb) with text views and lint", "Claude Code plugin with hooks, skills and subagents", "GitHub Action receipt on pull requests"],
   "url": "https://laaielichter.github.io/Threesmith/",
   "codeRepository": "https://github.com/laaielichter/Threesmith",
   "license": "https://opensource.org/licenses/MIT",
@@ -199,7 +199,7 @@ screenshot: ./examples/agent-mistakes/.threesmith/last.png<!--/out--></pre></div
       <tr><td>fixes a bug</td><td class="no">cannot show it was there, or that it is gone</td><td><code>three_play</code> judges claims frame by frame; <code>three_scenario</code> keeps it as a regression test</td></tr>
       <tr><td>makes it fast</td><td class="no">changes things and hopes</td><td><code>three_perf</code>: draw calls, triangles, programs against a budget; <code>three_leaks</code>: what is never disposed</td></tr>
       <tr><td>ships it</td><td class="no">builds, deploys, sees a 404</td><td><code>three_build</code>: copies of three, missing assets, sub-path URLs, then the built page headless</td></tr>
-      <tr><td>needs a 3D model</td><td class="no">a placeholder cube</td><td><code>three_model_build</code>: a clean <code>.glb</code> from 60 kinds, shown as text views, linted</td></tr>
+      <tr><td>needs a 3D model</td><td class="no">a placeholder cube</td><td><code>three_model_build</code>: a clean <code>.glb</code> from 110 kinds, shown as text views, linted</td></tr>
     </tbody>
   </table></div>
 </div></section>
@@ -259,7 +259,7 @@ screenshot: ./examples/agent-mistakes/.threesmith/last.png<!--/out--></pre></div
 
 <section id="models"><div class="wrap">
   <h2>It builds 3D models too, no Blender</h2>
-  <p class="sub">60 ready-made kinds or your own JSON spec, as clean, deterministic <code>.glb</code> files with a node per part. Agents that cannot see pictures check them with <code>three_model_view</code> (front, side and top views as text) and <code>three_model_lint</code>. These are rendered by three.js itself, headless. <a href="models.html">All renders</a>.</p>
+  <p class="sub">110 ready-made kinds, from vehicles and buildings to fantasy props and creatures, or your own JSON spec, as clean, deterministic <code>.glb</code> files with a node per part. Agents that cannot see pictures check them with <code>three_model_view</code> (front, side and top views as text) and <code>three_model_lint</code>. These are rendered by three.js itself, headless. <a href="models.html">All renders</a>.</p>
   <div class="gallery" id="gallery"></div>
 </div></section>
 
@@ -305,7 +305,7 @@ for (const b of document.querySelectorAll("[data-copy]")) {
     try { await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); } catch { /* no clipboard */ }
   });
 }
-const pick = ["car", "helicopter", "castle", "tree", "sailboat", "dragon", "train", "windmill", "airliner", "rocket", "tractor", "street-lamp"];
+const pick = ["car", "airship", "wizard-tower", "excavator", "treasure-chest", "dragon", "lighthouse", "mech-walker", "viking-longship", "stone-golem", "hot-air-balloon", "castle"];
 document.getElementById("gallery").innerHTML = pick.map((k) => `<figure><img loading="lazy" src="gallery/${k}.jpg" alt="${k}, built by threesmith model build and rendered by three.js" width="640" height="480"><figcaption>${k}</figcaption></figure>`).join("");
 const root = document.documentElement, t = document.getElementById("theme");
 try { const s = localStorage.getItem("theme"); if (s) root.dataset.theme = s; } catch {}

@@ -1,0 +1,504 @@
+{
+ "version": 1,
+ "name": "bookshelf",
+ "archetype": "prop.bookcase",
+ "description": "A freestanding wooden bookcase facing +Z: two sides with face strips, a plinth, a top with a crown moulding, a back panel and one to eight shelves with front lips, filled with rows of books whose thickness, height, depth and colour vary with a seed.",
+ "params": [
+  {
+   "name": "width",
+   "type": "number",
+   "default": 0.8,
+   "min": 0.4,
+   "max": 1.4,
+   "description": "Outside width of the bookcase, in metres."
+  },
+  {
+   "name": "height",
+   "type": "number",
+   "default": 1.8,
+   "min": 0.6,
+   "max": 2.4,
+   "description": "Outside height, with the plinth and the crown moulding."
+  },
+  {
+   "name": "depth",
+   "type": "number",
+   "default": 0.3,
+   "min": 0.22,
+   "max": 0.45,
+   "description": "Outside depth."
+  },
+  {
+   "name": "shelves",
+   "type": "integer",
+   "default": 4,
+   "min": 1,
+   "max": 8,
+   "description": "Number of shelves between the bottom and the top (fewer when the case is too low for them)."
+  },
+  {
+   "name": "fill",
+   "type": "number",
+   "default": 0.85,
+   "min": 0.3,
+   "max": 1,
+   "description": "How much of each shelf is filled with books."
+  },
+  {
+   "name": "seed",
+   "type": "integer",
+   "default": 7,
+   "min": 1,
+   "max": 999,
+   "description": "Changes the colours, heights and depths of the books."
+  },
+  {
+   "name": "crown",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A crown moulding on top."
+  }
+ ],
+ "materials": {
+  "case_wood": {
+   "color": [
+    0.11,
+    0.055,
+    0.025
+   ],
+   "metallic": 0,
+   "roughness": 0.6,
+   "texture": "wood"
+  },
+  "back_panel": {
+   "color": [
+    0.075,
+    0.038,
+    0.018
+   ],
+   "metallic": 0,
+   "roughness": 0.75,
+   "texture": "wood"
+  },
+  "book_red": {
+   "color": [
+    0.22,
+    0.025,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "book_navy": {
+   "color": [
+    0.02,
+    0.04,
+    0.13
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "book_green": {
+   "color": [
+    0.03,
+    0.1,
+    0.045
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "book_tan": {
+   "color": [
+    0.36,
+    0.24,
+    0.11
+   ],
+   "metallic": 0,
+   "roughness": 0.75
+  },
+  "book_dark": {
+   "color": [
+    0.05,
+    0.032,
+    0.022
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  }
+ },
+ "nodes": [
+  {
+   "name": "Bookshelf",
+   "material": "case_wood",
+   "vars": {
+    "W": "$width",
+    "H": "$height",
+    "D": "$depth",
+    "tw": 0.019,
+    "ph": 0.07,
+    "cr": "0.035 * $crown",
+    "iw": "$width - 2 * 0.019",
+    "ns": "max(1, min($shelves, floor(($height - 0.2) / 0.2)))",
+    "y0": "0.07 + 0.019",
+    "y1": "$height - 0.019 - 0.035 * $crown",
+    "ch": "(($height - 0.019 - 0.035 * $crown) - (0.07 + 0.019) - max(1, min($shelves, floor(($height - 0.2) / 0.2))) * 0.019) / (max(1, min($shelves, floor(($height - 0.2) / 0.2))) + 1)",
+    "bs": 0.031,
+    "slots": "max(1, floor($fill * ($width - 2 * 0.019 - 0.01) / 0.031))"
+   },
+   "children": [
+    {
+     "name": "Body",
+     "children": [
+      {
+       "name": "SideL",
+       "shape": "box",
+       "size": [
+        "$tw",
+        "$H - $cr",
+        "$D"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.003,
+       "at": [
+        "-$W / 2 + $tw / 2",
+        0,
+        0
+       ],
+       "mirror": "SideR"
+      },
+      {
+       "name": "Bottom",
+       "shape": "box",
+       "size": [
+        "$iw + 0.002",
+        "$tw",
+        "$D - 0.01"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.002,
+       "at": [
+        0,
+        "$ph",
+        0
+       ]
+      },
+      {
+       "name": "Plinth",
+       "shape": "box",
+       "size": [
+        "$iw + 0.002",
+        "$ph",
+        "$tw"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.002,
+       "at": [
+        0,
+        0,
+        "$D / 2 - 0.03"
+       ]
+      },
+      {
+       "name": "Top",
+       "shape": "box",
+       "size": [
+        "$W + 0.002",
+        "$tw",
+        "$D"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.003,
+       "at": [
+        0,
+        "$y1",
+        0
+       ]
+      },
+      {
+       "name": "Crown",
+       "shape": "box",
+       "size": [
+        "$W + 0.05 * $crown + 0.001",
+        "$cr + 0.004",
+        "$D + 0.025 * $crown"
+       ],
+       "anchor": "bottom",
+       "bevel": "0.002 + 0.008 * $crown",
+       "at": [
+        0,
+        "$H - $cr - 0.004",
+        "-0.0125 * $crown"
+       ],
+       "children": [
+        {
+         "name": "CrownLip",
+         "shape": "box",
+         "size": [
+          "$W + 0.07 * $crown + 0.001",
+          "0.012 * $crown + 0.002",
+          "$D + 0.035 * $crown"
+         ],
+         "anchor": "bottom",
+         "bevel": "0.001 + 0.004 * $crown",
+         "at": [
+          0,
+          "$cr - 0.012 * $crown + 0.002",
+          "0.0175 * $crown - 0.0125 * $crown"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "FaceL",
+       "shape": "box",
+       "size": [
+        0.03,
+        "$H - $cr - 0.01",
+        0.012
+       ],
+       "anchor": "bottom",
+       "bevel": 0.003,
+       "at": [
+        "-$W / 2 + 0.015",
+        0.005,
+        "$D / 2"
+       ],
+       "mirror": "FaceR"
+      }
+     ]
+    },
+    {
+     "name": "Back",
+     "shape": "box",
+     "material": "back_panel",
+     "size": [
+      "$iw + 0.004",
+      "$H - $cr - 0.01",
+      0.008
+     ],
+     "anchor": "bottom",
+     "at": [
+      0,
+      0.005,
+      "-$D / 2 + 0.004"
+     ]
+    },
+    {
+     "name": "Shelf{i}",
+     "shape": "box",
+     "size": [
+      "$iw + 0.002",
+      "$tw",
+      "$D - 0.012"
+     ],
+     "anchor": "bottom",
+     "bevel": 0.003,
+     "repeat": {
+      "count": "$ns",
+      "step": [
+       0,
+       "$ch + $tw",
+       0
+      ]
+     },
+     "at": [
+      0,
+      "$y0 + $ch",
+      0.002
+     ],
+     "children": [
+      {
+       "name": "Lip",
+       "shape": "box",
+       "size": [
+        "$iw + 0.002",
+        "$tw + 0.012",
+        0.012
+       ],
+       "anchor": "bottom",
+       "bevel": 0.003,
+       "at": [
+        0,
+        -0.006,
+        "($D - 0.012) / 2 - 0.006"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Row{i}",
+     "repeat": {
+      "count": "$ns + 1",
+      "step": [
+       0,
+       "$ch + $tw",
+       0
+      ]
+     },
+     "at": [
+      0,
+      "$y0",
+      0
+     ],
+     "children": [
+      {
+       "name": "Books",
+       "vars": {
+        "row": "$i"
+       },
+       "children": [
+        {
+         "name": "BooksRed",
+         "children": [
+          {
+           "name": "Book{i}",
+           "shape": "box",
+           "material": "book_red",
+           "anchor": "bottom",
+           "repeat": {
+            "count": "max(1, floor(($slots - 0 + 4) / 5))",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "size": [
+            "($bs * (0.72 + 0.26 * (sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453 - floor(sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453)))) * min(1, max(0, $slots - (0 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (0 + 5 * $i))))",
+            "min($ch - 0.02, 0.18 + 0.12 * (sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453 - floor(sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453))) * min(1, max(0, $slots - (0 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (0 + 5 * $i))))",
+            "min($D - 0.05, 0.14 + 0.09 * (sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) * min(1, max(0, $slots - (0 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (0 + 5 * $i))))"
+           ],
+           "at": [
+            "(-$iw / 2 + ((0 + 5 * $i) + 0.5) * $bs) * min(1, max(0, $slots - (0 + 5 * $i))) + (-$iw / 2 - $tw / 2) * (1 - min(1, max(0, $slots - (0 + 5 * $i))))",
+            0,
+            "($D / 2 - 0.025 - min($D - 0.05, 0.14 + 0.09 * (sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((0 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) / 2) * min(1, max(0, $slots - (0 + 5 * $i))) + (1 - min(1, max(0, $slots - (0 + 5 * $i)))) * 0"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "BooksNavy",
+         "children": [
+          {
+           "name": "Book{i}",
+           "shape": "box",
+           "material": "book_navy",
+           "anchor": "bottom",
+           "repeat": {
+            "count": "max(1, floor(($slots - 1 + 4) / 5))",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "size": [
+            "($bs * (0.72 + 0.26 * (sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453 - floor(sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453)))) * min(1, max(0, $slots - (1 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (1 + 5 * $i))))",
+            "min($ch - 0.02, 0.18 + 0.12 * (sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453 - floor(sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453))) * min(1, max(0, $slots - (1 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (1 + 5 * $i))))",
+            "min($D - 0.05, 0.14 + 0.09 * (sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) * min(1, max(0, $slots - (1 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (1 + 5 * $i))))"
+           ],
+           "at": [
+            "(-$iw / 2 + ((1 + 5 * $i) + 0.5) * $bs) * min(1, max(0, $slots - (1 + 5 * $i))) + (-$iw / 2 - $tw / 2) * (1 - min(1, max(0, $slots - (1 + 5 * $i))))",
+            0,
+            "($D / 2 - 0.025 - min($D - 0.05, 0.14 + 0.09 * (sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((1 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) / 2) * min(1, max(0, $slots - (1 + 5 * $i))) + (1 - min(1, max(0, $slots - (1 + 5 * $i)))) * 0"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "BooksGreen",
+         "children": [
+          {
+           "name": "Book{i}",
+           "shape": "box",
+           "material": "book_green",
+           "anchor": "bottom",
+           "repeat": {
+            "count": "max(1, floor(($slots - 2 + 4) / 5))",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "size": [
+            "($bs * (0.72 + 0.26 * (sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453 - floor(sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453)))) * min(1, max(0, $slots - (2 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (2 + 5 * $i))))",
+            "min($ch - 0.02, 0.18 + 0.12 * (sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453 - floor(sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453))) * min(1, max(0, $slots - (2 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (2 + 5 * $i))))",
+            "min($D - 0.05, 0.14 + 0.09 * (sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) * min(1, max(0, $slots - (2 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (2 + 5 * $i))))"
+           ],
+           "at": [
+            "(-$iw / 2 + ((2 + 5 * $i) + 0.5) * $bs) * min(1, max(0, $slots - (2 + 5 * $i))) + (-$iw / 2 - $tw / 2) * (1 - min(1, max(0, $slots - (2 + 5 * $i))))",
+            0,
+            "($D / 2 - 0.025 - min($D - 0.05, 0.14 + 0.09 * (sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((2 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) / 2) * min(1, max(0, $slots - (2 + 5 * $i))) + (1 - min(1, max(0, $slots - (2 + 5 * $i)))) * 0"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "BooksTan",
+         "children": [
+          {
+           "name": "Book{i}",
+           "shape": "box",
+           "material": "book_tan",
+           "anchor": "bottom",
+           "repeat": {
+            "count": "max(1, floor(($slots - 3 + 4) / 5))",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "size": [
+            "($bs * (0.72 + 0.26 * (sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453 - floor(sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453)))) * min(1, max(0, $slots - (3 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (3 + 5 * $i))))",
+            "min($ch - 0.02, 0.18 + 0.12 * (sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453 - floor(sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453))) * min(1, max(0, $slots - (3 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (3 + 5 * $i))))",
+            "min($D - 0.05, 0.14 + 0.09 * (sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) * min(1, max(0, $slots - (3 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (3 + 5 * $i))))"
+           ],
+           "at": [
+            "(-$iw / 2 + ((3 + 5 * $i) + 0.5) * $bs) * min(1, max(0, $slots - (3 + 5 * $i))) + (-$iw / 2 - $tw / 2) * (1 - min(1, max(0, $slots - (3 + 5 * $i))))",
+            0,
+            "($D / 2 - 0.025 - min($D - 0.05, 0.14 + 0.09 * (sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((3 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) / 2) * min(1, max(0, $slots - (3 + 5 * $i))) + (1 - min(1, max(0, $slots - (3 + 5 * $i)))) * 0"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "BooksDark",
+         "children": [
+          {
+           "name": "Book{i}",
+           "shape": "box",
+           "material": "book_dark",
+           "anchor": "bottom",
+           "repeat": {
+            "count": "max(1, floor(($slots - 4 + 4) / 5))",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "size": [
+            "($bs * (0.72 + 0.26 * (sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453 - floor(sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 4.1) * 43758.5453)))) * min(1, max(0, $slots - (4 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (4 + 5 * $i))))",
+            "min($ch - 0.02, 0.18 + 0.12 * (sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453 - floor(sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 8.2) * 43758.5453))) * min(1, max(0, $slots - (4 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (4 + 5 * $i))))",
+            "min($D - 0.05, 0.14 + 0.09 * (sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) * min(1, max(0, $slots - (4 + 5 * $i))) + 0.004 * (1 - min(1, max(0, $slots - (4 + 5 * $i))))"
+           ],
+           "at": [
+            "(-$iw / 2 + ((4 + 5 * $i) + 0.5) * $bs) * min(1, max(0, $slots - (4 + 5 * $i))) + (-$iw / 2 - $tw / 2) * (1 - min(1, max(0, $slots - (4 + 5 * $i))))",
+            0,
+            "($D / 2 - 0.025 - min($D - 0.05, 0.14 + 0.09 * (sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453 - floor(sin((4 + 5 * $i) * 12.9898 + $row * 78.233 + $seed * 37.719 + 12.3) * 43758.5453))) / 2) * min(1, max(0, $slots - (4 + 5 * $i))) + (1 - min(1, max(0, $slots - (4 + 5 * $i)))) * 0"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, fstatSync, mkdirSync, openSync, readdirSync, readFileSync, readSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { assertWritable } from "./protect.js";
 
@@ -48,11 +48,12 @@ export function ensureStateDir(root: string): string {
   const dir = stateDir(root);
   mkdirSync(dir, { recursive: true });
   const ignore = join(dir, ".gitignore");
-  if (!existsSync(ignore)) {
+  {
     try {
-      writeFileSync(ignore, "# local Threesmith state; baselines/ and scenarios/ are meant to be committed\njournal/\nreview-last.json\nlast.png\ndiff/\nperf/\n");
+      // "wx": create it only when it is not there yet, in one step (an existing one is kept as it is)
+      writeFileSync(ignore, "# local Threesmith state; baselines/ and scenarios/ are meant to be committed\njournal/\nreview-last.json\nlast.png\ndiff/\nperf/\n", { flag: "wx" });
     } catch {
-      /* read-only project */
+      /* already there, or a read-only project */
     }
   }
   return dir;
@@ -68,6 +69,30 @@ function entryIds(root: string): number[] {
 }
 
 const rel = (root: string, full: string): string => relative(root, full).split(sep).join("/");
+
+/** The file as it is now, read through one handle (size and contents of the same file), or that it is not there. */
+function previous(full: string): { existed: boolean; data?: Buffer; notKept?: boolean } {
+  let fd: number;
+  try {
+    fd = openSync(full, "r");
+  } catch {
+    return { existed: false };
+  }
+  try {
+    const size = fstatSync(fd).size;
+    if (size > MAX_COPY) return { existed: true, notKept: true };
+    const data = Buffer.alloc(size);
+    let read = 0;
+    while (read < size) {
+      const n = readSync(fd, data, read, size - read, read);
+      if (n === 0) break;
+      read += n;
+    }
+    return { existed: true, data: data.subarray(0, read) };
+  } finally {
+    closeSync(fd);
+  }
+}
 
 /** One call's writes. Every write goes through `write`; `commit` stores the entry when something was written. */
 export class JournalWriter {
@@ -90,10 +115,7 @@ export class JournalWriter {
     assertWritable(this.root, full);
     const key = rel(this.root, full);
     if (!this.before.has(key)) {
-      if (existsSync(full)) {
-        const size = statSync(full).size;
-        this.before.set(key, size > MAX_COPY ? { existed: true, notKept: true } : { existed: true, data: readFileSync(full) });
-      } else this.before.set(key, { existed: false });
+      this.before.set(key, previous(full));
     }
     mkdirSync(dirname(full), { recursive: true });
     writeFileSync(full, data);

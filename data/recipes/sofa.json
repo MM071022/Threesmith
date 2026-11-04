@@ -1,0 +1,428 @@
+{
+ "version": 1,
+ "name": "sofa",
+ "archetype": "prop.sofa",
+ "description": "An upholstered sofa facing +Z: a fabric frame on tapered walnut legs, one to four seat cushions with piping, matching back cushions that lean back on the back frame, rolled or square track arms (or armless), and two throw pillows in the corners.",
+ "params": [
+  {
+   "name": "seats",
+   "type": "integer",
+   "default": 3,
+   "min": 1,
+   "max": 4,
+   "description": "Number of seat cushions (1 = an armchair-width love seat, 3 = a three-seater)."
+  },
+  {
+   "name": "seatWidth",
+   "type": "number",
+   "default": 0.6,
+   "min": 0.48,
+   "max": 0.8,
+   "description": "Width of one seat cushion, in metres."
+  },
+  {
+   "name": "depth",
+   "type": "number",
+   "default": 0.92,
+   "min": 0.75,
+   "max": 1.1,
+   "description": "Depth of the sofa from front to back."
+  },
+  {
+   "name": "seatHeight",
+   "type": "number",
+   "default": 0.44,
+   "min": 0.36,
+   "max": 0.52,
+   "description": "Height of the top of the seat cushions."
+  },
+  {
+   "name": "backHeight",
+   "type": "number",
+   "default": 0.86,
+   "min": 0.68,
+   "max": 1.1,
+   "description": "Height of the top of the back."
+  },
+  {
+   "name": "armStyle",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "0 = rolled arms, 1 = square track arms, 2 = armless (low side panels)."
+  },
+  {
+   "name": "legHeight",
+   "type": "number",
+   "default": 0.1,
+   "min": 0.03,
+   "max": 0.18,
+   "description": "Height of the wooden legs."
+  },
+  {
+   "name": "pillows",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "Two throw pillows in the corners."
+  },
+  {
+   "name": "recline",
+   "type": "number",
+   "default": 12,
+   "min": 0,
+   "max": 22,
+   "description": "How far the back cushions lean back, in degrees."
+  }
+ ],
+ "materials": {
+  "fabric": {
+   "color": [
+    0.065,
+    0.075,
+    0.095
+   ],
+   "metallic": 0,
+   "roughness": 0.95,
+   "texture": "plaster"
+  },
+  "fabric_dark": {
+   "color": [
+    0.035,
+    0.04,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.95,
+   "texture": "plaster"
+  },
+  "pillow_fabric": {
+   "color": [
+    0.3,
+    0.16,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "plaster"
+  },
+  "walnut": {
+   "color": [
+    0.12,
+    0.06,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.5,
+   "texture": "wood"
+  }
+ },
+ "nodes": [
+  {
+   "name": "Sofa",
+   "material": "fabric",
+   "vars": {
+    "n": "$seats",
+    "sw": "$seatWidth",
+    "D": "$depth",
+    "lh": "$legHeight",
+    "a0": "(1 - min(abs($armStyle - 0), 1))",
+    "a1": "(1 - min(abs($armStyle - 1), 1))",
+    "a2": "(1 - min(abs($armStyle - 2), 1))",
+    "aw": "0.22 * (1 - min(abs($armStyle - 0), 1)) + 0.17 * (1 - min(abs($armStyle - 1), 1)) + 0.05 * (1 - min(abs($armStyle - 2), 1))",
+    "Win": "$seats * $seatWidth",
+    "W": "$seats * $seatWidth + 2 * $aw",
+    "ct": 0.16,
+    "bt": "$seatHeight - 0.16 + 0.01",
+    "bd": 0.17,
+    "bfd": 0.16,
+    "ah": "($seatHeight + 0.2) * (1 - (1 - min(abs($armStyle - 2), 1))) + ($seatHeight - 0.08) * (1 - min(abs($armStyle - 2), 1))",
+    "sd": "$depth - 0.17 - 0.16 - 0.01",
+    "bch": "$backHeight - $seatHeight - 0.02"
+   },
+   "children": [
+    {
+     "name": "Frame",
+     "shape": "box",
+     "size": [
+      "$W - 0.02",
+      "$bt - $lh",
+      "$D - 0.02"
+     ],
+     "anchor": "bottom",
+     "bevel": 0.025,
+     "at": [
+      0,
+      "$lh",
+      0
+     ],
+     "children": [
+      {
+       "name": "Skirt",
+       "shape": "box",
+       "material": "fabric_dark",
+       "size": [
+        "$W - 0.01",
+        0.03,
+        "$D - 0.01"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.01,
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "name": "BackFrame",
+     "shape": "box",
+     "size": [
+      "$Win + 0.04",
+      "$backHeight - $bt - 0.02",
+      "$bfd"
+     ],
+     "anchor": "bottom",
+     "bevel": 0.04,
+     "at": [
+      0,
+      "$bt - 0.01",
+      "-$D / 2 + $bfd / 2"
+     ]
+    },
+    {
+     "name": "Seat{i}",
+     "shape": "box",
+     "size": [
+      "$sw - 0.008",
+      "$ct",
+      "$sd + 0.02"
+     ],
+     "bevel": 0.05,
+     "repeat": {
+      "count": "$n",
+      "step": [
+       "$sw",
+       0,
+       0
+      ]
+     },
+     "at": [
+      "-$Win / 2 + $sw / 2",
+      "$seatHeight - $ct / 2",
+      "$D / 2 - ($sd + 0.02) / 2 - 0.005"
+     ],
+     "children": [
+      {
+       "name": "Piping",
+       "shape": "box",
+       "material": "fabric_dark",
+       "size": [
+        "$sw - 0.04",
+        0.012,
+        0.012
+       ],
+       "bevel": 0.005,
+       "at": [
+        0,
+        0,
+        "($sd + 0.02) / 2 + 0.001"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Backrest{i}",
+     "repeat": {
+      "count": "$n",
+      "step": [
+       "$sw",
+       0,
+       0
+      ]
+     },
+     "at": [
+      "-$Win / 2 + $sw / 2",
+      "$seatHeight - 0.02",
+      "-$D / 2 + $bfd + $bd / 2 - 0.02"
+     ],
+     "rotate": [
+      "-$recline",
+      0,
+      0
+     ],
+     "children": [
+      {
+       "name": "Pad",
+       "shape": "box",
+       "size": [
+        "$sw - 0.008",
+        "$bch",
+        "$bd"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.06
+      }
+     ]
+    },
+    {
+     "name": "ArmL",
+     "at": [
+      "-$W / 2 + $aw / 2",
+      0,
+      0
+     ],
+     "mirror": "ArmR",
+     "children": [
+      {
+       "name": "Block",
+       "shape": "box",
+       "size": [
+        "$aw",
+        "$ah - $lh - $a0 * 0.08",
+        "$D"
+       ],
+       "anchor": "bottom",
+       "bevel": "0.02 + 0.025 * $a1 + 0.005 * $a2",
+       "at": [
+        0,
+        "$lh",
+        0
+       ]
+      },
+      {
+       "name": "Roll",
+       "shape": "cylinder",
+       "axis": "z",
+       "segments": 24,
+       "bevel": "0.03 * $a0 + 0.004",
+       "radius": "0.12 * $a0 + 0.02",
+       "height": "$D + 0.01 * $a0 - 0.02 * (1 - $a0)",
+       "at": [
+        "-0.015 * $a0",
+        "$ah - 0.1 * $a0 - 0.05 * (1 - $a0)",
+        0
+       ]
+      },
+      {
+       "name": "ArmFront",
+       "shape": "cylinder",
+       "material": "fabric_dark",
+       "axis": "z",
+       "segments": 24,
+       "radius": "0.1 * $a0 + 0.015",
+       "height": 0.02,
+       "at": [
+        "-0.015 * $a0",
+        "$ah - 0.1 * $a0 - 0.05 * (1 - $a0)",
+        "$D / 2 + 0.002 * $a0 - 0.02 * (1 - $a0)"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "LegFL",
+     "shape": "lathe",
+     "material": "walnut",
+     "segments": 12,
+     "at": [
+      "-$W / 2 + 0.07",
+      0,
+      "$D / 2 - 0.07"
+     ],
+     "mirror": "LegFR",
+     "profile": [
+      [
+       0,
+       0
+      ],
+      [
+       0.016,
+       0
+      ],
+      [
+       0.018,
+       0.004
+      ],
+      [
+       "0.024",
+       "$lh * 0.85"
+      ],
+      [
+       0.027,
+       "$lh + 0.004"
+      ],
+      [
+       0,
+       "$lh + 0.004"
+      ]
+     ]
+    },
+    {
+     "name": "LegBL",
+     "shape": "lathe",
+     "material": "walnut",
+     "segments": 12,
+     "at": [
+      "-$W / 2 + 0.07",
+      0,
+      "-$D / 2 + 0.07"
+     ],
+     "mirror": "LegBR",
+     "profile": [
+      [
+       0,
+       0
+      ],
+      [
+       0.016,
+       0
+      ],
+      [
+       0.018,
+       0.004
+      ],
+      [
+       "0.024",
+       "$lh * 0.85"
+      ],
+      [
+       0.027,
+       "$lh + 0.004"
+      ],
+      [
+       0,
+       "$lh + 0.004"
+      ]
+     ]
+    },
+    {
+     "name": "PillowL",
+     "shape": "box",
+     "material": "pillow_fabric",
+     "bevel": "0.055 * $pillows + 0.015",
+     "size": [
+      "0.38 * $pillows + 0.06",
+      "0.38 * $pillows + 0.06",
+      "0.12 * $pillows + 0.04"
+     ],
+     "at": [
+      "-$Win / 2 + 0.22",
+      "$seatHeight + 0.2 * $pillows + 0.15 * (1 - $pillows)",
+      "(-$D / 2 + $bfd + $bd + 0.02) * $pillows + (-$D / 2 + $bfd / 2) * (1 - $pillows)"
+     ],
+     "rotate": [
+      "-$recline - 6",
+      18,
+      12
+     ],
+     "mirror": "PillowR"
+    }
+   ]
+  }
+ ]
+}

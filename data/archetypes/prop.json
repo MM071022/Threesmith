@@ -1413,5 +1413,1256 @@
   "pitfalls": [
    "A wall-mounted box needs a flat mounting face; a freestanding box needs a supporting post."
   ]
+ },
+ {
+  "id": "prop.sword",
+  "name": "sword",
+  "description": "A sword: a long straight blade with a crossguard, a grip and a pommel, from a one-handed arming sword to a two-handed longsword or a fantasy blade.",
+  "aliases": [
+   "sword",
+   "swords",
+   "zwaard",
+   "zwaarden",
+   "longsword",
+   "long sword",
+   "arming sword",
+   "broadsword",
+   "langzwaard",
+   "slagzwaard",
+   "knight sword",
+   "ridderzwaard",
+   "fantasy sword"
+  ],
+  "extends": "prop",
+  "hints": [
+   "blade",
+   "kling",
+   "hilt",
+   "gevest",
+   "crossguard",
+   "pommel",
+   "knight",
+   "ridder",
+   "weapon",
+   "wapen",
+   "melee"
+  ],
+  "parts": [
+   {
+    "name": "Blade",
+    "role": "blade",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "blade",
+     "kling",
+     "lemmet",
+     "fuller",
+     "bloedgroef"
+    ],
+    "note": "Double edged and tapering to a point, with a fuller down the middle; the flat of the blade faces +Z."
+   },
+   {
+    "name": "Guard",
+    "role": "guard",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "guard",
+     "crossguard",
+     "cross guard",
+     "quillons",
+     "pareerstang",
+     "stootplaat",
+     "kruisstuk"
+    ],
+    "note": "Crosses the blade along x at the bottom of the blade."
+   },
+   {
+    "name": "Grip",
+    "role": "grip",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "grip",
+     "handle",
+     "hilt",
+     "handvat",
+     "greep",
+     "gevest"
+    ],
+    "note": "Wrapped in leather or cord; its node is where a hand holds the sword."
+   },
+   {
+    "name": "Pommel",
+    "role": "pommel",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "pommel",
+     "knop",
+     "pommeau",
+     "peen"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    0.12,
+    0.35
+   ],
+   "height": [
+    0.7,
+    1.4
+   ],
+   "source": "general knowledge of surviving medieval swords (Oakeshott typology): one-handed arming swords are about 0.8-1.0 m long overall, longswords about 1.1-1.3 m, with a crossguard 0.15-0.3 m wide",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "type",
+    "options": [
+     "arming sword",
+     "longsword",
+     "fantasy"
+    ]
+   },
+   {
+    "axis": "guard",
+    "options": [
+     "straight",
+     "curved",
+     "disc"
+    ]
+   }
+  ],
+  "conventions": [
+   "A sword stands upright with the end of the pommel on y = 0 and the point up (+Y); the guard runs along x and the flat of the blade faces +Z.",
+   "Attach it to a hand at the Grip node; the blade's point is at the top of the bounding box."
+  ],
+  "anticipate": [
+   "A thin box or capsule collider along the blade for hits, separate from the grip."
+  ],
+  "pitfalls": [
+   "A blade as a flat box has no edge: give it a diamond or lenticular section that thins to the edges and to the point.",
+   "A sword is long and thin: about 0.8-1.3 m, with a blade only 4-6 cm wide at the guard."
+  ]
+ },
+ {
+  "id": "prop.shield",
+  "name": "shield",
+  "description": "A hand-held shield: a round, heater or kite shaped board with a rim, a boss in the middle and a grip on the back.",
+  "aliases": [
+   "shield",
+   "shields",
+   "schild",
+   "schilden",
+   "round shield",
+   "rondschild",
+   "heater shield",
+   "kite shield",
+   "buckler",
+   "beukelaar",
+   "viking shield",
+   "vikingschild",
+   "knight shield",
+   "riddersschild"
+  ],
+  "extends": "prop",
+  "hints": [
+   "boss",
+   "umbo",
+   "heraldry",
+   "heraldiek",
+   "emblem",
+   "blazoen",
+   "wapenschild",
+   "defence",
+   "parry"
+  ],
+  "parts": [
+   {
+    "name": "Board",
+    "role": "face",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "board",
+     "face",
+     "planks",
+     "plank",
+     "body",
+     "front"
+    ],
+    "note": "Slightly domed or curved planks, faced with leather or paint; the front faces +Z."
+   },
+   {
+    "name": "Rim",
+    "role": "rim",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "rim",
+     "edge",
+     "edging",
+     "rand",
+     "rawhide"
+    ]
+   },
+   {
+    "name": "Boss",
+    "role": "boss",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "boss",
+     "umbo",
+     "schildknop",
+     "knop"
+    ]
+   },
+   {
+    "name": "Emblem",
+    "role": "emblem",
+    "required": false,
+    "aliases": [
+     "emblem",
+     "charge",
+     "heraldry",
+     "blazon",
+     "blazoen",
+     "teken",
+     "paint",
+     "design"
+    ]
+   },
+   {
+    "name": "Grip",
+    "role": "grip",
+    "required": false,
+    "aliases": [
+     "grip",
+     "handle",
+     "enarmes",
+     "strap",
+     "guige",
+     "handgreep",
+     "riem"
+    ],
+    "note": "On the back (-Z), behind the boss on a round shield."
+   }
+  ],
+  "scale": {
+   "width": [
+    0.45,
+    1.0
+   ],
+   "height": [
+    0.45,
+    1.3
+   ],
+   "source": "general knowledge of museum finds and reconstructions: the Gokstad ship burial round shields are about 0.94 m across, bucklers 0.3-0.45 m, heater shields about 0.6-0.9 m high, kite shields up to about 1.2 m",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "shape",
+    "options": [
+     "round",
+     "heater",
+     "kite"
+    ]
+   },
+   {
+    "axis": "decoration",
+    "options": [
+     "plain",
+     "painted",
+     "heraldic"
+    ]
+   }
+  ],
+  "conventions": [
+   "A shield stands upright on its lowest point at y = 0 with its face towards +Z; the grip is on the back (-Z).",
+   "Attach it to the forearm or the hand at the Grip node."
+  ],
+  "pitfalls": [
+   "A shield is not flat: a round shield's board is slightly domed and a heater shield is curved around the body.",
+   "The boss is a hollow dome over a hole in the board, with the hand grip right behind it."
+  ]
+ },
+ {
+  "id": "prop.battle-axe",
+  "name": "battle axe",
+  "description": "A battle axe: an iron head with one or two crescent blades on a long wooden haft.",
+  "aliases": [
+   "battle axe",
+   "battleaxe",
+   "battle axes",
+   "strijdbijl",
+   "strijdbijlen",
+   "war axe",
+   "oorlogsbijl",
+   "dane axe",
+   "double axe",
+   "dubbele bijl",
+   "labrys",
+   "bearded axe",
+   "baardbijl",
+   "viking axe"
+  ],
+  "extends": "prop",
+  "hints": [
+   "axe",
+   "bijl",
+   "haft",
+   "steel",
+   "bit",
+   "weapon",
+   "wapen",
+   "viking",
+   "dwarf"
+  ],
+  "parts": [
+   {
+    "name": "Haft",
+    "role": "haft",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "haft",
+     "handle",
+     "shaft",
+     "steel",
+     "stok"
+    ],
+    "note": "Wood, slightly oval in section, with a leather grip wrap near the end."
+   },
+   {
+    "name": "Head",
+    "role": "head",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "head",
+     "kop",
+     "bijlkop",
+     "eye",
+     "oog",
+     "socket"
+    ],
+    "note": "The eye of the head wraps around the haft near its top."
+   },
+   {
+    "name": "Blade",
+    "role": "blade",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "blade",
+     "bit",
+     "edge",
+     "blad",
+     "snede",
+     "beard",
+     "baard"
+    ],
+    "note": "Crescent shaped and thin at the edge; a double axe has one on each side (along x)."
+   },
+   {
+    "name": "Spike",
+    "role": "spike",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "aliases": [
+     "spike",
+     "top spike",
+     "punt",
+     "pin"
+    ]
+   },
+   {
+    "name": "Wrap",
+    "role": "grip",
+    "required": false,
+    "aliases": [
+     "wrap",
+     "grip",
+     "leather",
+     "greep",
+     "omwikkeling"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    0.15,
+    0.6
+   ],
+   "height": [
+    0.6,
+    1.8
+   ],
+   "source": "general knowledge of Viking-age finds and reconstructions: one-handed axes have a haft of about 0.6-0.9 m, a two-handed Dane axe about 1.2-1.7 m, with a cutting edge of about 0.1-0.3 m",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "head",
+    "options": [
+     "single bit",
+     "double bit"
+    ]
+   },
+   {
+    "axis": "haft",
+    "options": [
+     "one-handed",
+     "two-handed"
+    ]
+   }
+  ],
+  "conventions": [
+   "The axe stands upright with the end of the haft on y = 0 and the head at the top; the blade points along +X (and -X for a double axe), its flat faces +Z."
+  ],
+  "pitfalls": [
+   "The head is thin at the edge and thick at the eye: a flat box reads as a sign, not a blade."
+  ]
+ },
+ {
+  "id": "prop.potion-bottle",
+  "name": "potion bottle",
+  "description": "A small glass bottle or flask with a coloured liquid and a cork, as a game pickup or on an apothecary's shelf.",
+  "aliases": [
+   "potion bottle",
+   "potion",
+   "potions",
+   "toverdrank",
+   "toverdrankje",
+   "drankje",
+   "health potion",
+   "mana potion",
+   "flask",
+   "flacon",
+   "vial",
+   "fiool",
+   "apothecary bottle",
+   "glass bottle",
+   "glazen fles",
+   "erlenmeyer"
+  ],
+  "extends": "prop",
+  "hints": [
+   "elixir",
+   "alchemy",
+   "alchemie",
+   "magic",
+   "magie",
+   "cork",
+   "kurk",
+   "liquid",
+   "vloeistof",
+   "pickup",
+   "health",
+   "mana"
+  ],
+  "parts": [
+   {
+    "name": "Bottle",
+    "role": "glass",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "bottle",
+     "glass",
+     "fles",
+     "flesje",
+     "glas",
+     "flask"
+    ],
+    "note": "Transparent glass with a visible thickness; the lip at the top is a little thicker."
+   },
+   {
+    "name": "Liquid",
+    "role": "liquid",
+    "required": true,
+    "aliases": [
+     "liquid",
+     "potion",
+     "vloeistof",
+     "drank",
+     "fluid"
+    ],
+    "note": "A separate mesh inside the glass up to the fill level, with a flat top; it may glow (emissive)."
+   },
+   {
+    "name": "Stopper",
+    "role": "stopper",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "stopper",
+     "cork",
+     "kurk",
+     "dop",
+     "plug"
+    ]
+   },
+   {
+    "name": "Label",
+    "role": "label",
+    "required": false,
+    "aliases": [
+     "label",
+     "etiket",
+     "tag"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    0.03,
+    0.16
+   ],
+   "height": [
+    0.06,
+    0.3
+   ],
+   "source": "laboratory glassware: ISO 1773 Erlenmeyer flasks of 100-250 ml are about 64-85 mm across and 105-145 mm tall; small apothecary bottles and vials are 50-150 mm tall",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "shape",
+    "options": [
+     "round flask",
+     "tall vial",
+     "conical flask"
+    ]
+   },
+   {
+    "axis": "liquid",
+    "options": [
+     "red",
+     "blue",
+     "green",
+     "purple"
+    ]
+   }
+  ],
+  "conventions": [
+   "The bottle stands on y = 0; the liquid is its own node inside the glass so its colour and fill level can change."
+  ],
+  "anticipate": [
+   "The liquid is drawn after the glass: give the glass alphaMode BLEND and the liquid an opaque material so sorting stays stable."
+  ],
+  "pitfalls": [
+   "Liquid exactly on the glass surface z-fights: keep it a wall thickness inside.",
+   "Opaque glass hides the liquid; the glass needs BLEND with a low alpha."
+  ]
+ },
+ {
+  "id": "prop.treasure-chest",
+  "name": "treasure chest",
+  "description": "A wooden treasure chest with a barrel-vaulted lid on hinges, iron bands and corners, a lock plate at the front and handles at the ends.",
+  "aliases": [
+   "treasure chest",
+   "treasure chests",
+   "schatkist",
+   "schatkisten",
+   "pirate chest",
+   "piratenkist",
+   "loot chest",
+   "buitkist",
+   "wooden chest",
+   "houten kist",
+   "trunk",
+   "hutkoffer",
+   "chest of gold"
+  ],
+  "extends": "prop",
+  "hints": [
+   "treasure",
+   "schat",
+   "gold",
+   "goud",
+   "coins",
+   "munten",
+   "loot",
+   "buit",
+   "pirate",
+   "piraat"
+  ],
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "body",
+     "box",
+     "base",
+     "bak",
+     "romp"
+    ]
+   },
+   {
+    "name": "Lid",
+    "role": "lid",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "lid",
+     "deksel",
+     "cover"
+    ],
+    "note": "Hinged at the back top edge (-Z) about x; opening turns the front up and back."
+   },
+   {
+    "name": "Band",
+    "role": "band",
+    "required": false,
+    "aliases": [
+     "band",
+     "bands",
+     "strap",
+     "beslag",
+     "corner",
+     "hoek",
+     "iron"
+    ],
+    "note": "Iron straps over the planks and corner fittings."
+   },
+   {
+    "name": "Lock",
+    "role": "lock",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "lock",
+     "hasp",
+     "slot",
+     "lockplate",
+     "keyhole",
+     "sleutelgat"
+    ]
+   },
+   {
+    "name": "Handle",
+    "role": "handle",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "aliases": [
+     "handle",
+     "handvat",
+     "hengsel",
+     "ring"
+    ]
+   },
+   {
+    "name": "Treasure",
+    "role": "contents",
+    "required": false,
+    "aliases": [
+     "treasure",
+     "gold",
+     "coins",
+     "goud",
+     "munten",
+     "loot"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    0.5,
+    1.2
+   ],
+   "width": [
+    0.35,
+    0.75
+   ],
+   "height": [
+    0.35,
+    0.8
+   ],
+   "source": "general knowledge of wooden chests and travel trunks: about 0.6-1.0 m long, 0.4-0.6 m deep and 0.4-0.7 m high with the lid closed",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "lid",
+    "options": [
+     "flat",
+     "barrel vault"
+    ]
+   },
+   {
+    "axis": "state",
+    "options": [
+     "closed",
+     "open"
+    ]
+   }
+  ],
+  "conventions": [
+   "The front with the lock faces +Z; the lid's pivot is on its back hinge line, so lid.rotation.x = -angle opens it."
+  ],
+  "pitfalls": [
+   "A lid that turns about its middle: put the Lid origin on the back hinge line.",
+   "Iron bands floating off the wood: they lie on the planks with a few millimetres of thickness."
+  ]
+ },
+ {
+  "id": "prop.lantern",
+  "name": "oil lantern",
+  "description": "A hanging oil lantern: a fuel tank at the bottom, a glass globe around a burning wick, a wire guard or frame, a vented cap and a bail handle to hang it by.",
+  "aliases": [
+   "oil lantern",
+   "oil lanterns",
+   "olielantaarn",
+   "olielamp",
+   "hurricane lantern",
+   "hurricane lamp",
+   "stormlantaarn",
+   "stormlamp",
+   "kerosene lantern",
+   "kerosene lamp",
+   "petroleumlamp",
+   "hanging lantern",
+   "hanglantaarn",
+   "carriage lantern",
+   "ship lantern",
+   "scheepslantaarn"
+  ],
+  "extends": "prop",
+  "hints": [
+   "lantern",
+   "wick",
+   "pit",
+   "globe",
+   "kerosene",
+   "petroleum",
+   "hang",
+   "bail",
+   "glow",
+   "flame"
+  ],
+  "parts": [
+   {
+    "name": "Base",
+    "role": "fuel tank",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "base",
+     "font",
+     "tank",
+     "fuel tank",
+     "reservoir",
+     "oliereservoir",
+     "voet"
+    ]
+   },
+   {
+    "name": "Glass",
+    "role": "glass",
+    "required": true,
+    "aliases": [
+     "glass",
+     "globe",
+     "chimney",
+     "glas",
+     "pane",
+     "panes",
+     "ruit"
+    ],
+    "note": "Clear glass (BLEND) around the flame."
+   },
+   {
+    "name": "Frame",
+    "role": "frame",
+    "required": true,
+    "aliases": [
+     "frame",
+     "cage",
+     "guard",
+     "wire",
+     "korf",
+     "frame bar"
+    ],
+    "note": "Wire guards or corner posts that protect the glass and carry the cap."
+   },
+   {
+    "name": "Cap",
+    "role": "cap",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "cap",
+     "hood",
+     "roof",
+     "top",
+     "kap",
+     "dak",
+     "vent"
+    ]
+   },
+   {
+    "name": "Handle",
+    "role": "handle",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "handle",
+     "bail",
+     "hengsel",
+     "ring",
+     "hanger"
+    ],
+    "note": "A bail that swings about x at the two points where it meets the lantern; its origin is on that line."
+   },
+   {
+    "name": "Flame",
+    "role": "flame",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "flame",
+     "wick",
+     "vlam",
+     "pit",
+     "vuur"
+    ],
+    "note": "Emissive; a PointLight goes at its node."
+   }
+  ],
+  "scale": {
+   "width": [
+    0.1,
+    0.35
+   ],
+   "height": [
+    0.2,
+    0.6
+   ],
+   "source": "general knowledge: a common hurricane lantern (such as the Feuerhand 276) is about 0.26 m tall and 0.15 m across without its handle; carriage and ship lanterns reach about 0.5 m",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "style",
+    "options": [
+     "hurricane (round globe)",
+     "square (four panes)"
+    ]
+   },
+   {
+    "axis": "flame",
+    "options": [
+     "lit",
+     "out"
+    ]
+   }
+  ],
+  "conventions": [
+   "The lantern stands on its base at y = 0 with the handle up; hang it from the handle's top. Put a PointLight at the Flame node."
+  ],
+  "anticipate": [
+   "A warm PointLight with a short distance at the flame; the emissive flame alone does not light the scene."
+  ],
+  "pitfalls": [
+   "Opaque glass hides the flame: give the glass BLEND with a low alpha.",
+   "The flame is tiny (2-4 cm) compared with the lantern."
+  ]
+ },
+ {
+  "id": "prop.teapot",
+  "name": "teapot",
+  "description": "A teapot: a round belly turned on a wheel, a curved spout at the front, a loop handle at the back and a lid with a knob.",
+  "aliases": [
+   "teapot",
+   "teapots",
+   "theepot",
+   "theepotten",
+   "tea pot",
+   "porcelain teapot",
+   "porseleinen theepot",
+   "china teapot",
+   "utah teapot",
+   "tea kettle"
+  ],
+  "extends": "prop",
+  "hints": [
+   "tea",
+   "thee",
+   "porcelain",
+   "porselein",
+   "ceramic",
+   "keramiek",
+   "spout",
+   "tuit",
+   "kettle"
+  ],
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "body",
+     "belly",
+     "pot",
+     "buik",
+     "romp"
+    ],
+    "note": "A surface of revolution (lathe) with a foot ring and an opening at the top."
+   },
+   {
+    "name": "Spout",
+    "role": "spout",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "spout",
+     "tuit",
+     "schenktuit",
+     "nozzle"
+    ],
+    "note": "Rises from the lower belly at the front (+Z) to above the rim, so the pot can be full."
+   },
+   {
+    "name": "Handle",
+    "role": "handle",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "handle",
+     "oor",
+     "hengsel",
+     "handvat",
+     "loop"
+    ],
+    "note": "A loop at the back (-Z), wide enough for fingers."
+   },
+   {
+    "name": "Lid",
+    "role": "lid",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "lid",
+     "deksel",
+     "cover"
+    ]
+   },
+   {
+    "name": "Knob",
+    "role": "knob",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "knob",
+     "finial",
+     "knop",
+     "dekselknop"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    0.15,
+    0.35
+   ],
+   "width": [
+    0.1,
+    0.22
+   ],
+   "height": [
+    0.1,
+    0.25
+   ],
+   "source": "general knowledge of household teapots: a 1-1.5 litre pot is about 0.13-0.2 m tall and 0.22-0.3 m from spout to handle",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "shape",
+    "options": [
+     "round",
+     "squat",
+     "tall"
+    ]
+   }
+  ],
+  "conventions": [
+   "The teapot stands on its foot at y = 0 with the spout towards +Z and the handle at -Z."
+  ],
+  "pitfalls": [
+   "The spout's tip must reach above the rim of the body, or the tea would pour out before the pot is full.",
+   "A spout and handle that stop short of the body float: sink their ends a little into the belly."
+  ]
+ },
+ {
+  "id": "prop.grandfather-clock",
+  "name": "grandfather clock",
+  "description": "A longcase (grandfather) clock: a tall wooden case on a plinth, a hood with a glazed dial and hands, and a swinging pendulum and weights behind a door in the trunk.",
+  "aliases": [
+   "grandfather clock",
+   "grandfather clocks",
+   "longcase clock",
+   "long case clock",
+   "staande klok",
+   "staande klokken",
+   "staand uurwerk",
+   "tall case clock",
+   "floor clock",
+   "grandmother clock",
+   "friese staartklok",
+   "pendulum clock",
+   "slingerklok"
+  ],
+  "extends": "prop",
+  "hints": [
+   "clock",
+   "klok",
+   "pendulum",
+   "slinger",
+   "dial",
+   "wijzerplaat",
+   "hands",
+   "wijzers",
+   "chime",
+   "uurwerk"
+  ],
+  "parts": [
+   {
+    "name": "Case",
+    "role": "case",
+    "required": true,
+    "aliases": [
+     "case",
+     "trunk",
+     "body",
+     "kast",
+     "romp"
+    ],
+    "note": "The tall middle section (the trunk) on a wider plinth."
+   },
+   {
+    "name": "Hood",
+    "role": "hood",
+    "required": true,
+    "aliases": [
+     "hood",
+     "bonnet",
+     "kap",
+     "crest",
+     "kroon",
+     "bonnet top"
+    ],
+    "note": "The top section that holds the dial, often with a pediment or crest."
+   },
+   {
+    "name": "Dial",
+    "role": "dial",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "dial",
+     "face",
+     "clock face",
+     "wijzerplaat"
+    ],
+    "note": "Faces +Z behind a glazed door."
+   },
+   {
+    "name": "Hand",
+    "role": "hand",
+    "required": true,
+    "count": [
+     2,
+     3
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "hand",
+     "hands",
+     "wijzer",
+     "wijzers",
+     "hour hand",
+     "minute hand"
+    ],
+    "note": "Each hand turns about z at the centre of the dial; its origin is on that arbor, not in the middle of the hand."
+   },
+   {
+    "name": "Pendulum",
+    "role": "pendulum",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "pendulum",
+     "slinger",
+     "bob",
+     "pendule"
+    ],
+    "note": "Swings about z from its suspension at the top; a seconds pendulum is 0.994 m long."
+   },
+   {
+    "name": "Weight",
+    "role": "weight",
+    "required": false,
+    "count": [
+     0,
+     3
+    ],
+    "aliases": [
+     "weight",
+     "weights",
+     "gewicht",
+     "gewichten"
+    ]
+   },
+   {
+    "name": "Plinth",
+    "role": "base",
+    "required": false,
+    "aliases": [
+     "plinth",
+     "base",
+     "foot",
+     "feet",
+     "sokkel",
+     "voet"
+    ]
+   },
+   {
+    "name": "Door",
+    "role": "door",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "door",
+     "trunk door",
+     "deur",
+     "deurtje"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    0.35,
+    0.65
+   ],
+   "length": [
+    0.2,
+    0.4
+   ],
+   "height": [
+    1.8,
+    2.5
+   ],
+   "source": "general knowledge of longcase clocks: usually 1.9-2.4 m tall, 0.4-0.6 m wide at the hood and 0.25-0.35 m deep; the seconds pendulum that defines them is 0.994 m long",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "hood",
+    "options": [
+     "flat top",
+     "arched (broken pediment)"
+    ]
+   },
+   {
+    "axis": "wood",
+    "options": [
+     "oak",
+     "mahogany",
+     "walnut"
+    ]
+   }
+  ],
+  "conventions": [
+   "The clock stands on y = 0 with the dial facing +Z. Animate the hands by rotation.z about their own origin (negative is clockwise seen from the front) and the pendulum by rotation.z = A * sin(pi * t) for a seconds pendulum."
+  ],
+  "pitfalls": [
+   "The pendulum pivots at its suspension spring at the top, not at the bob: put its origin there.",
+   "A clock hand with its origin in its middle spins like a propeller: put the origin on the dial centre."
+  ]
  }
 ]

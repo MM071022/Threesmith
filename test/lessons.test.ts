@@ -289,3 +289,12 @@ describe("format and hints", () => {
     expect(lessonHintsForRules(["unknown"])).toEqual([]);
   });
 });
+
+describe("placeholders", () => {
+  it("are removed until none is left, also when nested", async () => {
+    const { withoutPlaceholders } = await import("../src/lessons/anonymize.js");
+    expect(withoutPlaceholders("load <path> failed")).toBe("load  failed");
+    expect(withoutPlaceholders("<<path>name>x")).toBe("x");
+    expect(withoutPlaceholders("a <b> c", " ")).toBe("a   c");
+  });
+});

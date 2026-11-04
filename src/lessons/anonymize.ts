@@ -286,3 +286,13 @@ export function placeholderShare(text: string): number {
   if (!tokens.length) return 1;
   return tokens.filter((t) => /<\w+>/.test(t)).length / tokens.length;
 }
+
+/** The text without `<kind>` placeholders, removed until none is left (so "<<a>b>" leaves no placeholder behind). */
+export function withoutPlaceholders(text: string, by = ""): string {
+  let out = text;
+  for (let prev = ""; prev !== out; ) {
+    prev = out;
+    out = out.replace(/<\w+>/g, by);
+  }
+  return out;
+}

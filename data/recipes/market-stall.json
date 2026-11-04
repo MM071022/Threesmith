@@ -1,0 +1,1150 @@
+{
+ "version": 1,
+ "name": "market-stall",
+ "archetype": "building.market-stall",
+ "description": "A wooden market stall with its counter facing +Z: four posts on feet with side rails, a front beam and a higher back beam carrying a sloping striped canvas awning that overhangs the front with a scalloped valance, a planked counter with a front apron, bearers and a lower shelf, crates of apples, oranges and greens on the counter, a stack of spare crates underneath, and a chalkboard sign on the apron.",
+ "params": [
+  {
+   "name": "width",
+   "type": "number",
+   "default": 3,
+   "min": 2,
+   "max": 5,
+   "description": "Width of the stall along the counter (x) in metres."
+  },
+  {
+   "name": "depth",
+   "type": "number",
+   "default": 1.8,
+   "min": 1.3,
+   "max": 2.5,
+   "description": "Depth from back to front (z)."
+  },
+  {
+   "name": "height",
+   "type": "number",
+   "default": 2.2,
+   "min": 2,
+   "max": 2.6,
+   "description": "Height of the front beam (the low edge of the awning)."
+  },
+  {
+   "name": "slope",
+   "type": "number",
+   "default": 0.4,
+   "min": 0.15,
+   "max": 0.8,
+   "description": "How much higher the back beam is than the front beam."
+  },
+  {
+   "name": "counterHeight",
+   "type": "number",
+   "default": 0.85,
+   "min": 0.75,
+   "max": 1,
+   "description": "Height of the counter top."
+  },
+  {
+   "name": "awningColour",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 3,
+   "description": "Colour of the stripes (with white): 0 red, 1 green, 2 blue, 3 orange."
+  },
+  {
+   "name": "crates",
+   "type": "integer",
+   "default": 4,
+   "min": 1,
+   "max": 9,
+   "description": "Crates of produce on the counter (apples, oranges and greens in turn)."
+  },
+  {
+   "name": "valance",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "The scalloped flap along the front of the awning."
+  },
+  {
+   "name": "sign",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A chalkboard sign on the front of the counter."
+  }
+ ],
+ "materials": {
+  "stall_wood": {
+   "color": [
+    0.1,
+    0.06,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.8,
+   "texture": "wood"
+  },
+  "stall_board": {
+   "color": [
+    0.15,
+    0.095,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.75,
+   "texture": "wood"
+  },
+  "crate_wood": {
+   "color": [
+    0.26,
+    0.17,
+    0.085
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  },
+  "stall_cloth_white": {
+   "color": [
+    0.82,
+    0.8,
+    0.74
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "doubleSided": true
+  },
+  "chalkboard": {
+   "color": [
+    0.03,
+    0.04,
+    0.035
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "chalk": {
+   "color": [
+    0.8,
+    0.8,
+    0.78
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "stall_iron": {
+   "color": [
+    0.06,
+    0.06,
+    0.065
+   ],
+   "metallic": 0.7,
+   "roughness": 0.5
+  },
+  "stall_cloth_red": {
+   "color": [
+    0.5,
+    0.03,
+    0.025
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "doubleSided": true
+  },
+  "stall_cloth_green": {
+   "color": [
+    0.03,
+    0.22,
+    0.07
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "doubleSided": true
+  },
+  "stall_cloth_blue": {
+   "color": [
+    0.03,
+    0.09,
+    0.38
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "doubleSided": true
+  },
+  "stall_cloth_orange": {
+   "color": [
+    0.75,
+    0.25,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "doubleSided": true
+  },
+  "produce_apples": {
+   "color": [
+    0.38,
+    0.03,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.55
+  },
+  "produce_oranges": {
+   "color": [
+    0.75,
+    0.25,
+    0.01
+   ],
+   "metallic": 0,
+   "roughness": 0.55
+  },
+  "produce_greens": {
+   "color": [
+    0.12,
+    0.3,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.55
+  }
+ },
+ "nodes": [
+  {
+   "name": "MarketStall",
+   "vars": {
+    "W": "$width",
+    "D": "$depth",
+    "H": "$height",
+    "Hb": "$height + $slope",
+    "ch": "$counterHeight",
+    "px": "$width / 2 - 0.05",
+    "pz": "$depth / 2 - 0.05",
+    "zc": "$depth / 2 - 0.42",
+    "ns": "2 * max(2, round(($width + 0.2) / 0.64))",
+    "sw": "($width + 0.2) / (2 * max(2, round(($width + 0.2) / 0.64)))",
+    "run": "$depth + 0.32",
+    "drop": "$slope + 0.03",
+    "al": "hypot($depth + 0.32, $slope + 0.03) + 0.02",
+    "aa": "deg(atan2($slope + 0.03, $depth + 0.32))",
+    "ay": "$height + $slope / 2 + 0.03",
+    "az": "-$depth / 2 + ($depth + 0.32) / 2 - 0.05",
+    "sp": "($width - 0.3) / $crates",
+    "cw": "min(0.45, ($width - 0.3) / $crates - 0.04)",
+    "fa0": "max(0.02, max(0, 1 - min(1, abs($awningColour - 0))))",
+    "fa1": "max(0.02, max(0, 1 - min(1, abs($awningColour - 1))))",
+    "fa2": "max(0.02, max(0, 1 - min(1, abs($awningColour - 2))))",
+    "fa3": "max(0.02, max(0, 1 - min(1, abs($awningColour - 3))))",
+    "fk0": "max(0.05, min(1, max(0, $crates - 0)))",
+    "fk1": "max(0.05, min(1, max(0, $crates - 1)))",
+    "fk2": "max(0.05, min(1, max(0, $crates - 2)))",
+    "fval": "max(0.03, $valance)",
+    "fv0": "max(0.02, max(0, 1 - min(1, abs($awningColour - 0))) * $valance)",
+    "fv1": "max(0.02, max(0, 1 - min(1, abs($awningColour - 1))) * $valance)",
+    "fv2": "max(0.02, max(0, 1 - min(1, abs($awningColour - 2))) * $valance)",
+    "fv3": "max(0.02, max(0, 1 - min(1, abs($awningColour - 3))) * $valance)",
+    "fsign": "max(0.05, $sign)"
+   },
+   "children": [
+    {
+     "name": "Frame",
+     "material": "stall_wood",
+     "children": [
+      {
+       "name": "UprightFront_L",
+       "shape": "box",
+       "size": [
+        0.07,
+        "$H",
+        0.07
+       ],
+       "at": [
+        "$px",
+        "$H / 2",
+        "$pz"
+       ],
+       "bevel": 0.008,
+       "mirror": "UprightFront_R"
+      },
+      {
+       "name": "UprightBack_L",
+       "shape": "box",
+       "size": [
+        0.07,
+        "$Hb",
+        0.07
+       ],
+       "at": [
+        "$px",
+        "$Hb / 2",
+        "-$pz"
+       ],
+       "bevel": 0.008,
+       "mirror": "UprightBack_R"
+      },
+      {
+       "name": "HeaderFront",
+       "shape": "box",
+       "size": [
+        "$W",
+        0.07,
+        0.06
+       ],
+       "at": [
+        0,
+        "$H - 0.035",
+        "$pz"
+       ],
+       "bevel": 0.006
+      },
+      {
+       "name": "HeaderBack",
+       "shape": "box",
+       "size": [
+        "$W",
+        0.07,
+        0.06
+       ],
+       "at": [
+        0,
+        "$Hb - 0.035",
+        "-$pz"
+       ],
+       "bevel": 0.006
+      },
+      {
+       "name": "Rafter_L",
+       "shape": "tube",
+       "path": [
+        [
+         "$px",
+         "$Hb - 0.01",
+         "-$pz - 0.06"
+        ],
+        [
+         "$px",
+         "$H - 0.03",
+         "$D / 2 + 0.27"
+        ]
+       ],
+       "radius": 0.025,
+       "segments": 8,
+       "mirror": "Rafter_R"
+      },
+      {
+       "name": "Rail_L",
+       "shape": "box",
+       "size": [
+        0.05,
+        0.05,
+        "2 * $pz"
+       ],
+       "at": [
+        "$px",
+        0.3,
+        0
+       ],
+       "mirror": "Rail_R"
+      },
+      {
+       "name": "Foot_L",
+       "shape": "box",
+       "size": [
+        0.16,
+        0.04,
+        "2 * $pz + 0.16"
+       ],
+       "at": [
+        "$px",
+        0.02,
+        0
+       ],
+       "bevel": 0.01,
+       "mirror": "Foot_R"
+      }
+     ]
+    },
+    {
+     "name": "Counter",
+     "material": "stall_board",
+     "children": [
+      {
+       "name": "Top",
+       "shape": "box",
+       "size": [
+        "$W - 0.02",
+        0.04,
+        0.78
+       ],
+       "at": [
+        0,
+        "$ch - 0.02",
+        "$zc"
+       ],
+       "bevel": 0.008
+      },
+      {
+       "name": "Apron",
+       "shape": "box",
+       "size": [
+        "$W - 0.1",
+        "$ch - 0.3",
+        0.025
+       ],
+       "at": [
+        0,
+        "($ch + 0.26) / 2",
+        "$pz + 0.04"
+       ],
+       "bevel": 0.005
+      },
+      {
+       "name": "Plank_{i}",
+       "shape": "box",
+       "size": [
+        0.02,
+        "$ch - 0.32",
+        0.03
+       ],
+       "at": [
+        "-$W / 2 + 0.3",
+        "($ch + 0.26) / 2",
+        "$pz + 0.06"
+       ],
+       "repeat": {
+        "count": "max(2, floor(($W - 0.5) / 0.6) + 1)",
+        "step": [
+         "($W - 0.6) / max(1, floor(($W - 0.5) / 0.6))",
+         0,
+         0
+        ]
+       },
+       "material": "stall_wood"
+      },
+      {
+       "name": "Shelf",
+       "shape": "box",
+       "size": [
+        "$W - 0.06",
+        0.03,
+        0.7
+       ],
+       "at": [
+        0,
+        0.3,
+        "$zc"
+       ],
+       "material": "stall_wood"
+      },
+      {
+       "name": "Bearer_L",
+       "shape": "box",
+       "size": [
+        0.05,
+        0.06,
+        0.82
+       ],
+       "at": [
+        "$px",
+        "$ch - 0.07",
+        "$zc"
+       ],
+       "material": "stall_wood",
+       "mirror": "Bearer_R"
+      }
+     ]
+    },
+    {
+     "name": "Awning",
+     "children": [
+      {
+       "name": "ClothWhite_{i}",
+       "shape": "box",
+       "size": [
+        "$sw + 0.002",
+        0.012,
+        "$al"
+       ],
+       "at": [
+        "-$W / 2 - 0.1 + $sw * (1 + 0.5)",
+        "$ay",
+        "$az"
+       ],
+       "rotate": [
+        "$aa",
+        0,
+        0
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "2 * $sw",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_white"
+      },
+      {
+       "name": "ValanceWhite_{i}",
+       "at": [
+        "-$W / 2 - 0.1 + $sw * 1.5 + ((-$W / 2 - 0.1 + $sw * (1 + 0.5)) - (-$W / 2 - 0.1 + $sw * 1.5)) * $fval",
+        "$H - 0.035 + (($H - 0.04) - ($H - 0.035)) * $fval",
+        "$D / 2 + 0.27 + (($D / 2 + 0.27) - ($D / 2 + 0.27)) * $fval"
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fval",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_white",
+       "children": [
+        {
+         "name": "FlapWhite",
+         "shape": "box",
+         "size": [
+          "($sw + 0.002) * $fval",
+          "0.2 * $fval",
+          "0.01 * $fval"
+         ],
+         "at": [
+          0,
+          "-0.1 * $fval",
+          0
+         ]
+        },
+        {
+         "name": "TongueWhite",
+         "shape": "cylinder",
+         "radius": "($sw / 2) * $fval",
+         "height": "0.01 * $fval",
+         "at": [
+          0,
+          "-0.2 * $fval",
+          0
+         ],
+         "axis": "z",
+         "segments": 16
+        }
+       ]
+      },
+      {
+       "name": "ClothRed_{i}",
+       "shape": "box",
+       "size": [
+        "($sw + 0.002) * $fa0",
+        "0.012 * $fa0",
+        "($al) * $fa0"
+       ],
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fa0",
+        "$ch - 0.06 + (($ay) - ($ch - 0.06)) * $fa0",
+        "$zc + (($az) - ($zc)) * $fa0"
+       ],
+       "rotate": [
+        "$aa",
+        0,
+        0
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fa0",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_red"
+      },
+      {
+       "name": "ValanceRed_{i}",
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fv0",
+        "$ch - 0.06 + (($H - 0.04) - ($ch - 0.06)) * $fv0",
+        "$zc + (($D / 2 + 0.27) - ($zc)) * $fv0"
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fv0",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_red",
+       "children": [
+        {
+         "name": "FlapRed",
+         "shape": "box",
+         "size": [
+          "($sw + 0.002) * $fv0",
+          "0.2 * $fv0",
+          "0.01 * $fv0"
+         ],
+         "at": [
+          0,
+          "-0.1 * $fv0",
+          0
+         ]
+        },
+        {
+         "name": "TongueRed",
+         "shape": "cylinder",
+         "radius": "($sw / 2) * $fv0",
+         "height": "0.01 * $fv0",
+         "at": [
+          0,
+          "-0.2 * $fv0",
+          0
+         ],
+         "axis": "z",
+         "segments": 16
+        }
+       ]
+      },
+      {
+       "name": "ClothGreen_{i}",
+       "shape": "box",
+       "size": [
+        "($sw + 0.002) * $fa1",
+        "0.012 * $fa1",
+        "($al) * $fa1"
+       ],
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fa1",
+        "$ch - 0.06 + (($ay) - ($ch - 0.06)) * $fa1",
+        "$zc + (($az) - ($zc)) * $fa1"
+       ],
+       "rotate": [
+        "$aa",
+        0,
+        0
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fa1",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_green"
+      },
+      {
+       "name": "ValanceGreen_{i}",
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fv1",
+        "$ch - 0.06 + (($H - 0.04) - ($ch - 0.06)) * $fv1",
+        "$zc + (($D / 2 + 0.27) - ($zc)) * $fv1"
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fv1",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_green",
+       "children": [
+        {
+         "name": "FlapGreen",
+         "shape": "box",
+         "size": [
+          "($sw + 0.002) * $fv1",
+          "0.2 * $fv1",
+          "0.01 * $fv1"
+         ],
+         "at": [
+          0,
+          "-0.1 * $fv1",
+          0
+         ]
+        },
+        {
+         "name": "TongueGreen",
+         "shape": "cylinder",
+         "radius": "($sw / 2) * $fv1",
+         "height": "0.01 * $fv1",
+         "at": [
+          0,
+          "-0.2 * $fv1",
+          0
+         ],
+         "axis": "z",
+         "segments": 16
+        }
+       ]
+      },
+      {
+       "name": "ClothBlue_{i}",
+       "shape": "box",
+       "size": [
+        "($sw + 0.002) * $fa2",
+        "0.012 * $fa2",
+        "($al) * $fa2"
+       ],
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fa2",
+        "$ch - 0.06 + (($ay) - ($ch - 0.06)) * $fa2",
+        "$zc + (($az) - ($zc)) * $fa2"
+       ],
+       "rotate": [
+        "$aa",
+        0,
+        0
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fa2",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_blue"
+      },
+      {
+       "name": "ValanceBlue_{i}",
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fv2",
+        "$ch - 0.06 + (($H - 0.04) - ($ch - 0.06)) * $fv2",
+        "$zc + (($D / 2 + 0.27) - ($zc)) * $fv2"
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fv2",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_blue",
+       "children": [
+        {
+         "name": "FlapBlue",
+         "shape": "box",
+         "size": [
+          "($sw + 0.002) * $fv2",
+          "0.2 * $fv2",
+          "0.01 * $fv2"
+         ],
+         "at": [
+          0,
+          "-0.1 * $fv2",
+          0
+         ]
+        },
+        {
+         "name": "TongueBlue",
+         "shape": "cylinder",
+         "radius": "($sw / 2) * $fv2",
+         "height": "0.01 * $fv2",
+         "at": [
+          0,
+          "-0.2 * $fv2",
+          0
+         ],
+         "axis": "z",
+         "segments": 16
+        }
+       ]
+      },
+      {
+       "name": "ClothOrange_{i}",
+       "shape": "box",
+       "size": [
+        "($sw + 0.002) * $fa3",
+        "0.012 * $fa3",
+        "($al) * $fa3"
+       ],
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fa3",
+        "$ch - 0.06 + (($ay) - ($ch - 0.06)) * $fa3",
+        "$zc + (($az) - ($zc)) * $fa3"
+       ],
+       "rotate": [
+        "$aa",
+        0,
+        0
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fa3",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_orange"
+      },
+      {
+       "name": "ValanceOrange_{i}",
+       "at": [
+        "(-$W / 2 - 0.1 + $sw * (0 + 0.5)) * $fv3",
+        "$ch - 0.06 + (($H - 0.04) - ($ch - 0.06)) * $fv3",
+        "$zc + (($D / 2 + 0.27) - ($zc)) * $fv3"
+       ],
+       "repeat": {
+        "count": "$ns / 2",
+        "step": [
+         "(2 * $sw) * $fv3",
+         0,
+         0
+        ]
+       },
+       "material": "stall_cloth_orange",
+       "children": [
+        {
+         "name": "FlapOrange",
+         "shape": "box",
+         "size": [
+          "($sw + 0.002) * $fv3",
+          "0.2 * $fv3",
+          "0.01 * $fv3"
+         ],
+         "at": [
+          0,
+          "-0.1 * $fv3",
+          0
+         ]
+        },
+        {
+         "name": "TongueOrange",
+         "shape": "cylinder",
+         "radius": "($sw / 2) * $fv3",
+         "height": "0.01 * $fv3",
+         "at": [
+          0,
+          "-0.2 * $fv3",
+          0
+         ],
+         "axis": "z",
+         "segments": 16
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Crates",
+     "children": [
+      {
+       "name": "CrateApples_{i}",
+       "children": [
+        {
+         "name": "Box",
+         "shape": "box",
+         "size": [
+          "($cw) * $fk0",
+          "0.14 * $fk0",
+          "0.32 * $fk0"
+         ],
+         "at": [
+          0,
+          "0.07 * $fk0",
+          0
+         ],
+         "bevel": "0.006 * $fk0",
+         "material": "crate_wood"
+        },
+        {
+         "name": "Rim",
+         "shape": "box",
+         "size": [
+          "($cw + 0.012) * $fk0",
+          "0.025 * $fk0",
+          "0.332 * $fk0"
+         ],
+         "at": [
+          0,
+          "0.13 * $fk0",
+          0
+         ],
+         "material": "crate_wood"
+        },
+        {
+         "name": "Produce",
+         "shape": "ellipsoid",
+         "radii": [
+          "($cw / 2 - 0.02) * $fk0",
+          "0.09 * $fk0",
+          "0.14 * $fk0"
+         ],
+         "at": [
+          0,
+          "0.13 * $fk0",
+          0
+         ],
+         "lumps": 0.5,
+         "segments": 14,
+         "material": "produce_apples"
+        }
+       ],
+       "at": [
+        "(-$W / 2 + 0.15 + (0 + 0.5) * $sp) * $fk0",
+        "$ch - 0.025 + (($ch) - ($ch - 0.025)) * $fk0",
+        "$zc + 0.05 + (($zc + 0.05) - ($zc + 0.05)) * $fk0"
+       ],
+       "repeat": {
+        "count": "max(1, ceil(($crates - 0) / 3))",
+        "step": [
+         "(3 * $sp) * $fk0",
+         0,
+         0
+        ]
+       }
+      },
+      {
+       "name": "CrateOranges_{i}",
+       "children": [
+        {
+         "name": "Box",
+         "shape": "box",
+         "size": [
+          "($cw) * $fk1",
+          "0.14 * $fk1",
+          "0.32 * $fk1"
+         ],
+         "at": [
+          0,
+          "0.07 * $fk1",
+          0
+         ],
+         "bevel": "0.006 * $fk1",
+         "material": "crate_wood"
+        },
+        {
+         "name": "Rim",
+         "shape": "box",
+         "size": [
+          "($cw + 0.012) * $fk1",
+          "0.025 * $fk1",
+          "0.332 * $fk1"
+         ],
+         "at": [
+          0,
+          "0.13 * $fk1",
+          0
+         ],
+         "material": "crate_wood"
+        },
+        {
+         "name": "Produce",
+         "shape": "ellipsoid",
+         "radii": [
+          "($cw / 2 - 0.02) * $fk1",
+          "0.09 * $fk1",
+          "0.14 * $fk1"
+         ],
+         "at": [
+          0,
+          "0.13 * $fk1",
+          0
+         ],
+         "lumps": 0.5,
+         "segments": 14,
+         "material": "produce_oranges"
+        }
+       ],
+       "at": [
+        "(-$W / 2 + 0.15 + (1 + 0.5) * $sp) * $fk1",
+        "$ch - 0.025 + (($ch) - ($ch - 0.025)) * $fk1",
+        "$zc + 0.05 + (($zc + 0.05) - ($zc + 0.05)) * $fk1"
+       ],
+       "repeat": {
+        "count": "max(1, ceil(($crates - 1) / 3))",
+        "step": [
+         "(3 * $sp) * $fk1",
+         0,
+         0
+        ]
+       }
+      },
+      {
+       "name": "CrateGreens_{i}",
+       "children": [
+        {
+         "name": "Box",
+         "shape": "box",
+         "size": [
+          "($cw) * $fk2",
+          "0.14 * $fk2",
+          "0.32 * $fk2"
+         ],
+         "at": [
+          0,
+          "0.07 * $fk2",
+          0
+         ],
+         "bevel": "0.006 * $fk2",
+         "material": "crate_wood"
+        },
+        {
+         "name": "Rim",
+         "shape": "box",
+         "size": [
+          "($cw + 0.012) * $fk2",
+          "0.025 * $fk2",
+          "0.332 * $fk2"
+         ],
+         "at": [
+          0,
+          "0.13 * $fk2",
+          0
+         ],
+         "material": "crate_wood"
+        },
+        {
+         "name": "Produce",
+         "shape": "ellipsoid",
+         "radii": [
+          "($cw / 2 - 0.02) * $fk2",
+          "0.09 * $fk2",
+          "0.14 * $fk2"
+         ],
+         "at": [
+          0,
+          "0.13 * $fk2",
+          0
+         ],
+         "lumps": 0.5,
+         "segments": 14,
+         "material": "produce_greens"
+        }
+       ],
+       "at": [
+        "(-$W / 2 + 0.15 + (2 + 0.5) * $sp) * $fk2",
+        "$ch - 0.025 + (($ch) - ($ch - 0.025)) * $fk2",
+        "$zc + 0.05 + (($zc + 0.05) - ($zc + 0.05)) * $fk2"
+       ],
+       "repeat": {
+        "count": "max(1, ceil(($crates - 2) / 3))",
+        "step": [
+         "(3 * $sp) * $fk2",
+         0,
+         0
+        ]
+       }
+      },
+      {
+       "name": "CrateStack",
+       "at": [
+        "-$W / 2 + 0.45",
+        0.315,
+        "$zc - 0.05"
+       ],
+       "vars": {
+        "sh": "min(0.28, ($ch - 0.36) / 2)"
+       },
+       "children": [
+        {
+         "name": "Lower",
+         "shape": "box",
+         "size": [
+          0.45,
+          "$sh",
+          0.32
+         ],
+         "at": [
+          0,
+          "$sh / 2",
+          0
+         ],
+         "bevel": 0.008,
+         "material": "crate_wood"
+        },
+        {
+         "name": "Upper",
+         "shape": "box",
+         "size": [
+          0.45,
+          "$sh",
+          0.32
+         ],
+         "at": [
+          0.03,
+          "$sh * 1.5",
+          -0.02
+         ],
+         "rotate": [
+          0,
+          6,
+          0
+         ],
+         "bevel": 0.008,
+         "material": "crate_wood"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Sign",
+     "at": [
+      0,
+      "$ch * 0.62 + (($ch * 0.62) - ($ch * 0.62)) * $fsign",
+      "$pz + 0.03 + (($pz + 0.055) - ($pz + 0.03)) * $fsign"
+     ],
+     "children": [
+      {
+       "name": "Board",
+       "shape": "box",
+       "size": [
+        "0.7 * $fsign",
+        "0.32 * $fsign",
+        "0.02 * $fsign"
+       ],
+       "material": "chalkboard"
+      },
+      {
+       "name": "BoardFrame",
+       "shape": "box",
+       "size": [
+        "0.76 * $fsign",
+        "0.38 * $fsign",
+        "0.012 * $fsign"
+       ],
+       "at": [
+        0,
+        0,
+        "-0.008 * $fsign"
+       ],
+       "bevel": "0.004 * $fsign",
+       "material": "stall_wood"
+      },
+      {
+       "name": "Line_{i}",
+       "shape": "box",
+       "size": [
+        "0.42 * $fsign",
+        "0.025 * $fsign",
+        "0.004 * $fsign"
+       ],
+       "at": [
+        "-0.08 * $fsign",
+        "0.08 * $fsign",
+        "0.011 * $fsign"
+       ],
+       "repeat": {
+        "count": 3,
+        "step": [
+         "0.04 * $fsign",
+         "-0.08 * $fsign",
+         0
+        ]
+       },
+       "material": "chalk"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

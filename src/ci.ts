@@ -80,7 +80,7 @@ export async function ci(opts: CiOptions): Promise<CiResult> {
     lines.push("", `### Scenarios: ${scenarios.filter((s) => s.ok).length} of ${scenarios.length} passed`);
     for (const s of scenarios) {
       lines.push(`- ${s.ok ? "✔" : "✖"} \`${s.name}\` (${s.seconds.toFixed(1)} s)`);
-      for (const cl of s.claims.filter((x) => !x.ok)) lines.push(`  - ${cl.text.replace(/\|/g, "\\|")}: ${cl.message}`);
+      for (const cl of s.claims.filter((x) => !x.ok)) lines.push(`  - ${cl.text.replace(/\\/g, "\\\\").replace(/\|/g, "\\|")}: ${cl.message}`);
     }
   }
   lines.push("", "<sub>Made by [Threesmith](https://github.com/laaielichter/Threesmith)</sub>");

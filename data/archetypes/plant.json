@@ -495,5 +495,271 @@
     ]
    }
   ]
+ },
+ {
+  "id": "plant.cactus",
+  "name": "cactus",
+  "description": "A columnar cactus such as a saguaro: a ribbed, spiny column, often with arms that bend upwards, and flowers at the tips.",
+  "aliases": [
+   "cactus",
+   "cacti",
+   "cactussen",
+   "saguaro",
+   "saguaro cactus",
+   "columnar cactus",
+   "zuilcactus",
+   "cereus"
+  ],
+  "extends": "plant",
+  "hints": [
+   "desert plant",
+   "woestijnplant",
+   "spines",
+   "stekels",
+   "succulent",
+   "vetplant",
+   "ribs",
+   "ribben"
+  ],
+  "parts": [
+   {
+    "name": "Trunk",
+    "role": "trunk",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "trunk",
+     "stem",
+     "column",
+     "stam",
+     "zuil",
+     "body"
+    ],
+    "note": "The main column, ribbed along its length, with a rounded top."
+   },
+   {
+    "name": "Arm",
+    "role": "branch",
+    "required": false,
+    "count": [
+     0,
+     25
+    ],
+    "aliases": [
+     "arm",
+     "arms",
+     "armen",
+     "branch",
+     "tak"
+    ],
+    "note": "Each arm grows sideways out of the trunk, bends at an elbow and rises parallel to it; its node sits where it leaves the trunk."
+   },
+   {
+    "name": "Flower",
+    "role": "flower",
+    "required": false,
+    "aliases": [
+     "flower",
+     "flowers",
+     "bloem",
+     "bloemen",
+     "blossom",
+     "bloom"
+    ],
+    "note": "Waxy white flowers in a crown at the tips of the trunk and arms."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.3,
+    6
+   ],
+   "width": [
+    0.3,
+    6
+   ],
+   "height": [
+    1,
+    18
+   ],
+   "source": "US National Park Service, Saguaro National Park: a saguaro grows 40-60 ft (12-18 m) tall and starts its first arms at about 50-70 years and 15-16 ft (about 4.5 m); younger plants are smaller, the spread is the arm span",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "age",
+    "options": [
+     "young spear without arms",
+     "mature with arms",
+     "old with many arms"
+    ]
+   },
+   {
+    "axis": "season",
+    "options": [
+     "flowering (May-June)",
+     "fruiting",
+     "bare"
+    ]
+   }
+  ],
+  "conventions": [
+   "The origin is at the foot of the trunk on the ground; the ribs run along the trunk and the arms."
+  ],
+  "anticipate": [
+   "Spines as a normal map or a fine texture, not as geometry.",
+   "A seed for the arm layout, so a desert does not repeat one cactus."
+  ],
+  "pitfalls": [
+   "A smooth round column reads as a pole: the ribs (pleats) are what make it a cactus.",
+   "Arms that stick straight out: saguaro arms bend up at an elbow and run parallel to the trunk."
+  ]
+ },
+ {
+  "id": "plant.mushroom",
+  "name": "mushroom",
+  "description": "A mushroom or toadstool (the fruiting body of a fungus): a stem with a cap, gills or pores under it, often a ring and warts. Real ones are hand-sized; fantasy worlds have giant ones.",
+  "aliases": [
+   "mushroom",
+   "paddenstoel",
+   "toadstool",
+   "fungus",
+   "zwam",
+   "fly agaric",
+   "vliegenzwam",
+   "cep",
+   "porcini",
+   "eekhoorntjesbrood",
+   "champignon",
+   "giant mushroom",
+   "reuzenpaddenstoel"
+  ],
+  "extends": "plant",
+  "hints": [
+   "forest floor",
+   "bosgrond",
+   "spores",
+   "sporen",
+   "fairy ring",
+   "heksenkring",
+   "gills",
+   "lamellen"
+  ],
+  "parts": [
+   {
+    "name": "Stem",
+    "role": "trunk",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "stem",
+     "stalk",
+     "stipe",
+     "steel",
+     "voet"
+    ],
+    "note": "From the ground to the cap, often with a swollen foot."
+   },
+   {
+    "name": "Cap",
+    "role": "cap",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "cap",
+     "hoed",
+     "pileus",
+     "kap"
+    ],
+    "note": "A dome, plate or bell; its node sits on top of the stem so it can tilt."
+   },
+   {
+    "name": "Gills",
+    "role": "gills",
+    "required": false,
+    "aliases": [
+     "gills",
+     "gill",
+     "lamellae",
+     "lamellen",
+     "plaatjes",
+     "pores",
+     "buisjes"
+    ]
+   },
+   {
+    "name": "Ring",
+    "role": "ring",
+    "required": false,
+    "aliases": [
+     "ring",
+     "annulus",
+     "skirt",
+     "manchet"
+    ]
+   },
+   {
+    "name": "Spot",
+    "role": "decoration",
+    "required": false,
+    "aliases": [
+     "spot",
+     "spots",
+     "wart",
+     "warts",
+     "wrat",
+     "wratten",
+     "stip",
+     "stippen"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    0.02,
+    4.5
+   ],
+   "width": [
+    0.02,
+    4.5
+   ],
+   "height": [
+    0.03,
+    6
+   ],
+   "source": "general knowledge: real mushrooms are 2-30 cm tall (a fly agaric cap is 8-20 cm across on a stem of 5-20 cm, a parasol reaches about 40 cm); the upper end is for giant fantasy mushrooms in games, which have no real size",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "species",
+    "options": [
+     "fly agaric",
+     "cep",
+     "parasol",
+     "chanterelle",
+     "fantasy"
+    ]
+   },
+   {
+    "axis": "cap",
+    "options": [
+     "dome",
+     "flat",
+     "bell"
+    ]
+   }
+  ],
+  "conventions": [
+   "The origin is at the foot of the stem on the ground."
+  ],
+  "anticipate": [
+   "Scattered in groups (InstancedMesh) with a random scale and tilt.",
+   "A glowing fantasy mushroom needs a bloom pass or a point light to light its surroundings."
+  ],
+  "pitfalls": [
+   "A cap without an underside reads as a lamp shade: show the gills.",
+   "A real mushroom at metre scale (a unit mistake) looks like a fantasy one."
+  ]
  }
 ]

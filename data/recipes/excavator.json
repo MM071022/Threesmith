@@ -1,0 +1,2063 @@
+{
+ "version": 1,
+ "name": "excavator",
+ "archetype": "vehicle.tracked.excavator",
+ "description": "A 20 t class crawler excavator: an undercarriage with two steel tracks with grousers, idlers, drive sprockets, track rollers and carrier rollers on track frames, a car body and a slewing ring; an upper structure with a rounded counterweight, engine hood with grilles and exhaust stack, fuel tank, toolbox and handrail, and a glazed operator's cab with seat, consoles and work lights on the left; and the digging arm: a banana boom, a stick and a toothed bucket, each pivoting on its pin, posed by inverse kinematics from where the bucket should be, with boom, stick and bucket cylinders that follow the pose. Optional dozer blade.",
+ "params": [
+  {
+   "name": "width",
+   "type": "number",
+   "default": 2.98,
+   "min": 2.5,
+   "max": 3.3,
+   "description": "Width over the tracks (a 20 t machine with 600 mm shoes is about 2.98 m)."
+  },
+  {
+   "name": "trackLength",
+   "type": "number",
+   "default": 4.45,
+   "min": 3.6,
+   "max": 5.0,
+   "description": "Overall length of a track."
+  },
+  {
+   "name": "boomLength",
+   "type": "number",
+   "default": 5.7,
+   "min": 4.6,
+   "max": 6.5,
+   "description": "Boom length from the foot pin to the stick pin."
+  },
+  {
+   "name": "stickLength",
+   "type": "number",
+   "default": 2.9,
+   "min": 2.2,
+   "max": 3.4,
+   "description": "Stick (arm) length from the boom pin to the bucket pin."
+  },
+  {
+   "name": "reach",
+   "type": "number",
+   "default": 6.2,
+   "min": 5.0,
+   "max": 8.0,
+   "description": "Where the bucket pin is, forward of the slewing centre; boom and stick angles follow from it (clamped to what the arm can reach)."
+  },
+  {
+   "name": "bucketHeight",
+   "type": "number",
+   "default": 1.3,
+   "min": 1.3,
+   "max": 4.5,
+   "description": "Height of the bucket pin above the ground; 1.3 m rests the teeth on the ground."
+  },
+  {
+   "name": "bucketAngle",
+   "type": "number",
+   "default": -95,
+   "min": -150,
+   "max": -30,
+   "description": "Direction of the bucket from its pin to the teeth, in degrees from horizontal: -90 points the teeth down, -150 curls them in."
+  },
+  {
+   "name": "slew",
+   "type": "number",
+   "default": 0,
+   "min": -35,
+   "max": 35,
+   "description": "Rotation of the upper structure about the slewing ring, in degrees."
+  },
+  {
+   "name": "blade",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "A dozer blade at the front of the undercarriage."
+  }
+ ],
+ "materials": {
+  "cat_yellow": {
+   "color": [
+    0.88,
+    0.46,
+    0.0
+   ],
+   "metallic": 0.25,
+   "roughness": 0.4
+  },
+  "track_steel": {
+   "color": [
+    0.05,
+    0.048,
+    0.045
+   ],
+   "metallic": 0.7,
+   "roughness": 0.6
+  },
+  "frame_dark": {
+   "color": [
+    0.035,
+    0.035,
+    0.038
+   ],
+   "metallic": 0.4,
+   "roughness": 0.5
+  },
+  "counterweight": {
+   "color": [
+    0.07,
+    0.07,
+    0.075
+   ],
+   "metallic": 0.3,
+   "roughness": 0.5
+  },
+  "grille": {
+   "color": [
+    0.012,
+    0.012,
+    0.014
+   ],
+   "metallic": 0.2,
+   "roughness": 0.6
+  },
+  "cab_glass": {
+   "color": [
+    0.25,
+    0.32,
+    0.34,
+    0.45
+   ],
+   "metallic": 0.0,
+   "roughness": 0.05,
+   "alpha": "BLEND"
+  },
+  "seat_black": {
+   "color": [
+    0.03,
+    0.03,
+    0.035
+   ],
+   "metallic": 0.0,
+   "roughness": 0.8
+  },
+  "teeth": {
+   "color": [
+    0.22,
+    0.21,
+    0.2
+   ],
+   "metallic": 0.85,
+   "roughness": 0.5
+  },
+  "rod": {
+   "color": [
+    0.85,
+    0.86,
+    0.88
+   ],
+   "metallic": 1.0,
+   "roughness": 0.12
+  },
+  "warning": {
+   "color": [
+    0.7,
+    0.02,
+    0.02
+   ],
+   "metallic": 0.1,
+   "roughness": 0.4
+  }
+ },
+ "nodes": [
+  {
+   "name": "Excavator",
+   "material": "cat_yellow",
+   "vars": {
+    "W2": "$width / 2",
+    "xt": "$width / 2 - 0.3",
+    "Lt": "$trackLength",
+    "Rt": 0.45,
+    "yH": 1.05,
+    "Lb": "$boomLength",
+    "Ls": "$stickLength",
+    "zF": 0.55,
+    "yF": 0.75,
+    "dz": "$reach - 0.55",
+    "dy": "$bucketHeight - 1.05 - 0.75",
+    "d": "hypot($reach - 0.55, $bucketHeight - 1.8)",
+    "dc": "clamp(hypot($reach - 0.55, $bucketHeight - 1.8), abs($boomLength - $stickLength) + 0.3, $boomLength + $stickLength - 0.15)",
+    "kBlade": "(0.02 + 0.98 * ($blade))"
+   },
+   "children": [
+    {
+     "name": "Undercarriage",
+     "children": [
+      {
+       "name": "CarBody",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        0.45,
+        0
+       ],
+       "size": [
+        "$width - 1.3",
+        0.5,
+        2.3
+       ],
+       "bevel": 0.06,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Beam{i}",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        0.5,
+        -0.8
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         1.6
+        ]
+       },
+       "size": [
+        "2 * $xt - 0.2",
+        0.36,
+        0.5
+       ],
+       "bevel": 0.04,
+       "anchor": "bottom"
+      },
+      {
+       "name": "SlewRing",
+       "shape": "cylinder",
+       "material": "steel",
+       "at": [
+        0,
+        0.93,
+        0
+       ],
+       "radius": 0.95,
+       "height": 0.12,
+       "segments": 32,
+       "anchor": "base"
+      },
+      {
+       "name": "Track_L",
+       "at": [
+        "$xt",
+        "$Rt",
+        0
+       ],
+       "mirror": "Track_R",
+       "children": [
+        {
+         "name": "Run",
+         "at": [
+          0,
+          "0.03 - $Rt",
+          0
+         ],
+         "children": [
+          {
+           "name": "Belt",
+           "shape": "loft",
+           "material": "track_steel",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "rotate": [
+            0,
+            90,
+            0
+           ],
+           "sections": [
+            {
+             "z": -0.3,
+             "points": [
+              [
+               "($Lt / 2 - $Rt) + 0 * $Rt",
+               "$Rt + -1 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.30902 * $Rt",
+               "$Rt + -0.95106 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.58779 * $Rt",
+               "$Rt + -0.80902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.80902 * $Rt",
+               "$Rt + -0.58779 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.95106 * $Rt",
+               "$Rt + -0.30902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 1 * $Rt",
+               "$Rt + 0 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.95106 * $Rt",
+               "$Rt + 0.30902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.80902 * $Rt",
+               "$Rt + 0.58779 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.58779 * $Rt",
+               "$Rt + 0.80902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.30902 * $Rt",
+               "$Rt + 0.95106 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0 * $Rt",
+               "$Rt + 1 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + 0 * $Rt",
+               "$Rt + 1 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.30902 * $Rt",
+               "$Rt + 0.95106 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.58779 * $Rt",
+               "$Rt + 0.80902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.80902 * $Rt",
+               "$Rt + 0.58779 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.95106 * $Rt",
+               "$Rt + 0.30902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -1 * $Rt",
+               "$Rt + 0 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.95106 * $Rt",
+               "$Rt + -0.30902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.80902 * $Rt",
+               "$Rt + -0.58779 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.58779 * $Rt",
+               "$Rt + -0.80902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.30902 * $Rt",
+               "$Rt + -0.95106 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + 0 * $Rt",
+               "$Rt + -1 * $Rt"
+              ]
+             ]
+            },
+            {
+             "z": 0.3,
+             "points": [
+              [
+               "($Lt / 2 - $Rt) + 0 * $Rt",
+               "$Rt + -1 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.30902 * $Rt",
+               "$Rt + -0.95106 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.58779 * $Rt",
+               "$Rt + -0.80902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.80902 * $Rt",
+               "$Rt + -0.58779 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.95106 * $Rt",
+               "$Rt + -0.30902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 1 * $Rt",
+               "$Rt + 0 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.95106 * $Rt",
+               "$Rt + 0.30902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.80902 * $Rt",
+               "$Rt + 0.58779 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.58779 * $Rt",
+               "$Rt + 0.80902 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0.30902 * $Rt",
+               "$Rt + 0.95106 * $Rt"
+              ],
+              [
+               "($Lt / 2 - $Rt) + 0 * $Rt",
+               "$Rt + 1 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + 0 * $Rt",
+               "$Rt + 1 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.30902 * $Rt",
+               "$Rt + 0.95106 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.58779 * $Rt",
+               "$Rt + 0.80902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.80902 * $Rt",
+               "$Rt + 0.58779 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.95106 * $Rt",
+               "$Rt + 0.30902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -1 * $Rt",
+               "$Rt + 0 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.95106 * $Rt",
+               "$Rt + -0.30902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.80902 * $Rt",
+               "$Rt + -0.58779 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.58779 * $Rt",
+               "$Rt + -0.80902 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + -0.30902 * $Rt",
+               "$Rt + -0.95106 * $Rt"
+              ],
+              [
+               "-(($Lt / 2 - $Rt)) + 0 * $Rt",
+               "$Rt + -1 * $Rt"
+              ]
+             ]
+            }
+           ]
+          },
+          {
+           "name": "Grouser{i}",
+           "shape": "box",
+           "material": "track_steel",
+           "at": [
+            0,
+            "2 * $Rt + 0.012",
+            "-($Lt / 2 - $Rt)"
+           ],
+           "repeat": {
+            "count": "floor(2 * ($Lt / 2 - $Rt) / 0.19) + 1",
+            "step": [
+             0,
+             0,
+             0.19
+            ]
+           },
+           "size": [
+            0.62,
+            0.035,
+            0.05
+           ]
+          },
+          {
+           "name": "GrouserLow{i}",
+           "shape": "box",
+           "material": "track_steel",
+           "at": [
+            0,
+            -0.012,
+            "-($Lt / 2 - $Rt)"
+           ],
+           "repeat": {
+            "count": "floor(2 * ($Lt / 2 - $Rt) / 0.19) + 1",
+            "step": [
+             0,
+             0,
+             0.19
+            ]
+           },
+           "size": [
+            0.62,
+            0.035,
+            0.05
+           ]
+          },
+          {
+           "name": "FramePlate",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0.31,
+            "$Rt",
+            0
+           ],
+           "size": [
+            0.03,
+            0.46,
+            "2 * ($Lt / 2 - $Rt) - 0.2"
+           ],
+           "bevel": 0.01
+          },
+          {
+           "name": "FrameInner",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            -0.05,
+            "$Rt",
+            0
+           ],
+           "size": [
+            0.5,
+            0.42,
+            "2 * ($Lt / 2 - $Rt) - 0.3"
+           ]
+          },
+          {
+           "name": "Idler_L",
+           "at": [
+            0.29,
+            "$Rt",
+            "($Lt / 2 - $Rt)"
+           ],
+           "children": [
+            {
+             "name": "Disc",
+             "shape": "cylinder",
+             "material": "frame_dark",
+             "radius": 0.37,
+             "height": 0.07,
+             "axis": "x",
+             "segments": 24
+            },
+            {
+             "name": "Hub",
+             "shape": "cylinder",
+             "material": "steel",
+             "radius": 0.12,
+             "height": 0.1,
+             "axis": "x",
+             "segments": 12
+            }
+           ]
+          },
+          {
+           "name": "Sprocket_L",
+           "at": [
+            0.29,
+            "$Rt",
+            "-($Lt / 2 - $Rt)"
+           ],
+           "children": [
+            {
+             "name": "Disc",
+             "shape": "cylinder",
+             "material": "frame_dark",
+             "radius": 0.38,
+             "height": 0.07,
+             "axis": "x",
+             "segments": 24
+            },
+            {
+             "name": "Tooth{i}",
+             "shape": "box",
+             "material": "track_steel",
+             "at": [
+              0,
+              0.39,
+              0
+             ],
+             "repeat": {
+              "count": 11,
+              "around": "x"
+             },
+             "size": [
+              0.06,
+              0.08,
+              0.06
+             ]
+            },
+            {
+             "name": "Motor",
+             "shape": "cylinder",
+             "material": "steel",
+             "at": [
+              0.03,
+              0,
+              0
+             ],
+             "radius": 0.22,
+             "height": 0.16,
+             "axis": "x",
+             "segments": 16
+            }
+           ]
+          },
+          {
+           "name": "Roller{i}_L",
+           "at": [
+            0.33,
+            0.13,
+            "-($Lt / 2 - $Rt) + 0.55"
+           ],
+           "repeat": {
+            "count": 7,
+            "step": [
+             0,
+             0,
+             "(2 * ($Lt / 2 - $Rt) - 1.1) / 6"
+            ]
+           },
+           "children": [
+            {
+             "name": "Disc",
+             "shape": "cylinder",
+             "material": "steel",
+             "radius": 0.1,
+             "height": 0.06,
+             "axis": "x",
+             "segments": 14
+            }
+           ]
+          },
+          {
+           "name": "Carrier_L",
+           "at": [
+            0.33,
+            "2 * $Rt - 0.12",
+            0.2
+           ],
+           "children": [
+            {
+             "name": "Disc",
+             "shape": "cylinder",
+             "material": "steel",
+             "radius": 0.08,
+             "height": 0.06,
+             "axis": "x",
+             "segments": 12
+            }
+           ]
+          },
+          {
+           "name": "Guard",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0.32,
+            0.06,
+            0
+           ],
+           "size": [
+            0.04,
+            0.1,
+            "2 * ($Lt / 2 - $Rt) - 0.6"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Blade",
+       "at": [
+        0,
+        "lerp(0.6, 0.0, $blade)",
+        "lerp(0, ($Lt / 2 - $Rt) - 0.3, $blade)"
+       ],
+       "children": [
+        {
+         "name": "Plate",
+         "shape": "box",
+         "material": "cat_yellow",
+         "at": [
+          0,
+          "0.31 * $kBlade",
+          "0.95 * $kBlade"
+         ],
+         "size": [
+          "($width - 0.1) * $kBlade",
+          "0.62 * $kBlade",
+          "0.12 * $kBlade"
+         ],
+         "bevel": "0.03 * $kBlade"
+        },
+        {
+         "name": "Edge",
+         "shape": "box",
+         "material": "teeth",
+         "at": [
+          0,
+          "0.03 * $kBlade",
+          "1.02 * $kBlade"
+         ],
+         "size": [
+          "($width - 0.1) * $kBlade",
+          "0.06 * $kBlade",
+          "0.1 * $kBlade"
+         ]
+        },
+        {
+         "name": "Strut_L",
+         "shape": "box",
+         "material": "cat_yellow",
+         "at": [
+          "($W2 - 0.9) * $kBlade",
+          "0.45 * $kBlade",
+          "0.45 * $kBlade"
+         ],
+         "rotate": [
+          -8,
+          0,
+          0
+         ],
+         "mirror": "Strut_R",
+         "size": [
+          "0.18 * $kBlade",
+          "0.18 * $kBlade",
+          "1 * $kBlade"
+         ]
+        },
+        {
+         "name": "BladeRam",
+         "children": [
+          {
+           "name": "Barrel",
+           "shape": "tube",
+           "material": "cat_yellow",
+           "path": [
+            [
+             0,
+             "0.75 * $kBlade",
+             "0.2 * $kBlade"
+            ],
+            [
+             0,
+             "((0.75) + 0.58 * ((0.48) - (0.75))) * $kBlade",
+             "((0.2) + 0.58 * ((0.8) - (0.2))) * $kBlade"
+            ]
+           ],
+           "radius": "0.07 * $kBlade",
+           "segments": 12
+          },
+          {
+           "name": "Rod",
+           "shape": "tube",
+           "material": "rod",
+           "path": [
+            [
+             0,
+             "((0.75) + 0.5 * ((0.48) - (0.75))) * $kBlade",
+             "((0.2) + 0.5 * ((0.8) - (0.2))) * $kBlade"
+            ],
+            [
+             0,
+             "0.48 * $kBlade",
+             "0.8 * $kBlade"
+            ]
+           ],
+           "radius": "0.04 * $kBlade",
+           "segments": 10
+          },
+          {
+           "name": "EyeA",
+           "shape": "cylinder",
+           "material": "frame_dark",
+           "at": [
+            0,
+            "0.75 * $kBlade",
+            "0.2 * $kBlade"
+           ],
+           "radius": "0.063 * $kBlade",
+           "height": "0.16 * $kBlade",
+           "axis": "x",
+           "segments": 12
+          },
+          {
+           "name": "EyeB",
+           "shape": "cylinder",
+           "material": "frame_dark",
+           "at": [
+            0,
+            "0.48 * $kBlade",
+            "0.8 * $kBlade"
+           ],
+           "radius": "0.052 * $kBlade",
+           "height": "0.14 * $kBlade",
+           "axis": "x",
+           "segments": 10
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "House",
+     "material": "cat_yellow",
+     "at": [
+      0,
+      "$yH",
+      0
+     ],
+     "rotate": [
+      0,
+      "$slew",
+      0
+     ],
+     "children": [
+      {
+       "name": "Deck",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        0,
+        -0.35
+       ],
+       "size": [
+        2.54,
+        0.3,
+        3.2
+       ],
+       "bevel": 0.04,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Counterweight",
+       "shape": "extrude",
+       "material": "cat_yellow",
+       "plan": [
+        [
+         -1.27,
+         -1.9
+        ],
+        [
+         1.27,
+         -1.9
+        ],
+        [
+         1.27,
+         -2.43918
+        ],
+        [
+         0.96884,
+         -2.57368
+        ],
+        [
+         0.65374,
+         -2.67117
+        ],
+        [
+         0.32924,
+         -2.73022
+        ],
+        [
+         0,
+         -2.75
+        ],
+        [
+         -0.32924,
+         -2.73022
+        ],
+        [
+         -0.65374,
+         -2.67117
+        ],
+        [
+         -0.96884,
+         -2.57368
+        ],
+        [
+         -1.27,
+         -2.43918
+        ]
+       ],
+       "y0": 0.1,
+       "y1": 1.25
+      },
+      {
+       "name": "TailCap",
+       "shape": "box",
+       "material": "counterweight",
+       "at": [
+        0,
+        1.25,
+        -2.25
+       ],
+       "size": [
+        2.4,
+        0.04,
+        0.6
+       ]
+      },
+      {
+       "name": "Engine",
+       "shape": "box",
+       "material": "cat_yellow",
+       "at": [
+        0,
+        0.28,
+        -1.15
+       ],
+       "size": [
+        2.54,
+        0.72,
+        1.55
+       ],
+       "bevel": 0.06,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Grille_L",
+       "shape": "box",
+       "material": "grille",
+       "at": [
+        1.272,
+        0.65,
+        -1.15
+       ],
+       "mirror": "Grille_R",
+       "size": [
+        0.02,
+        0.4,
+        1
+       ]
+      },
+      {
+       "name": "EngineLid",
+       "shape": "box",
+       "material": "cat_yellow",
+       "at": [
+        -0.3,
+        1.01,
+        -1.15
+       ],
+       "size": [
+        1.4,
+        0.04,
+        1.1
+       ],
+       "bevel": 0.01
+      },
+      {
+       "name": "Stack",
+       "shape": "cylinder",
+       "material": "frame_dark",
+       "at": [
+        -0.75,
+        1,
+        -0.85
+       ],
+       "radius": 0.07,
+       "height": 0.55,
+       "segments": 12,
+       "anchor": "base"
+      },
+      {
+       "name": "Tank",
+       "shape": "box",
+       "material": "cat_yellow",
+       "at": [
+        -0.8,
+        0.28,
+        0.35
+       ],
+       "size": [
+        0.9,
+        0.8,
+        1.35
+       ],
+       "bevel": 0.05,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Toolbox",
+       "shape": "box",
+       "material": "cat_yellow",
+       "at": [
+        -0.8,
+        0.28,
+        1
+       ],
+       "size": [
+        0.9,
+        0.35,
+        0.6
+       ],
+       "bevel": 0.04,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Handrail",
+       "shape": "tube",
+       "material": "cat_yellow",
+       "path": [
+        [
+         -1.2,
+         1.08,
+         1.2
+        ],
+        [
+         -1.2,
+         1.45,
+         1.1
+        ],
+        [
+         -1.2,
+         1.45,
+         -0.3
+        ],
+        [
+         -1.2,
+         1.08,
+         -0.4
+        ]
+       ],
+       "radius": 0.02,
+       "segments": 8
+      },
+      {
+       "name": "FootBracket",
+       "shape": "box",
+       "material": "cat_yellow",
+       "at": [
+        0,
+        0.28,
+        "$zF - 0.05"
+       ],
+       "size": [
+        0.9,
+        0.55,
+        0.6
+       ],
+       "bevel": 0.04,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Stripe_L",
+       "shape": "box",
+       "material": "warning",
+       "at": [
+        1.274,
+        0.45,
+        -2
+       ],
+       "mirror": "Stripe_R",
+       "size": [
+        0.012,
+        0.08,
+        1
+       ]
+      },
+      {
+       "name": "Cab",
+       "at": [
+        "$xc",
+        0.28,
+        0
+       ],
+       "children": [
+        {
+         "name": "Base",
+         "shape": "box",
+         "material": "cat_yellow",
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "size": [
+          1,
+          0.5,
+          1.7
+         ],
+         "bevel": 0.04,
+         "anchor": "bottom"
+        },
+        {
+         "name": "Glass",
+         "shape": "box",
+         "material": "cab_glass",
+         "at": [
+          0,
+          0.48,
+          -0.02
+         ],
+         "size": [
+          0.96,
+          1.22,
+          1.62
+         ],
+         "anchor": "bottom"
+        },
+        {
+         "name": "Roof",
+         "shape": "box",
+         "material": "cat_yellow",
+         "at": [
+          0,
+          1.68,
+          -0.02
+         ],
+         "size": [
+          1.04,
+          0.12,
+          1.76
+         ],
+         "bevel": 0.04,
+         "anchor": "bottom"
+        },
+        {
+         "name": "Post{i}_L",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0.47,
+          1.09,
+          -0.8
+         ],
+         "repeat": {
+          "count": 3,
+          "step": [
+           0,
+           0,
+           0.78
+          ]
+         },
+         "mirror": "Post{i}_R",
+         "size": [
+          0.07,
+          1.22,
+          0.07
+         ]
+        },
+        {
+         "name": "FrontBar",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          0.98,
+          0.79
+         ],
+         "size": [
+          0.98,
+          0.06,
+          0.06
+         ]
+        },
+        {
+         "name": "CabDoor",
+         "at": [
+          0.505,
+          0.05,
+          0.55
+         ],
+         "children": [
+          {
+           "name": "Frame",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0,
+            0.8,
+            -0.375
+           ],
+           "size": [
+            0.03,
+            1.6,
+            0.75
+           ]
+          },
+          {
+           "name": "Pane",
+           "shape": "box",
+           "material": "cab_glass",
+           "at": [
+            0.012,
+            1,
+            -0.375
+           ],
+           "size": [
+            0.015,
+            1.1,
+            0.62
+           ]
+          },
+          {
+           "name": "Handle",
+           "shape": "box",
+           "material": "steel",
+           "at": [
+            0.03,
+            0.9,
+            -0.68
+           ],
+           "size": [
+            0.04,
+            0.2,
+            0.03
+           ]
+          }
+         ]
+        },
+        {
+         "name": "Wiper",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0.1,
+          1.2,
+          0.83
+         ],
+         "rotate": [
+          0,
+          0,
+          15
+         ],
+         "size": [
+          0.02,
+          0.7,
+          0.015
+         ]
+        },
+        {
+         "name": "Visor",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          1.7,
+          0.92
+         ],
+         "size": [
+          1,
+          0.03,
+          0.25
+         ]
+        },
+        {
+         "name": "Interior",
+         "material": "seat_black",
+         "children": [
+          {
+           "name": "Seat",
+           "shape": "box",
+           "at": [
+            0,
+            0.7,
+            -0.2
+           ],
+           "size": [
+            0.5,
+            0.15,
+            0.5
+           ],
+           "bevel": 0.04
+          },
+          {
+           "name": "Back",
+           "shape": "box",
+           "at": [
+            0,
+            1.1,
+            -0.5
+           ],
+           "rotate": [
+            -12,
+            0,
+            0
+           ],
+           "size": [
+            0.5,
+            0.7,
+            0.14
+           ],
+           "bevel": 0.05
+          },
+          {
+           "name": "Console_L",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0.33,
+            0.7,
+            -0.1
+           ],
+           "mirror": "Console_R",
+           "size": [
+            0.14,
+            0.3,
+            0.55
+           ]
+          },
+          {
+           "name": "Joystick_L",
+           "shape": "cylinder",
+           "material": "seat_black",
+           "at": [
+            0.33,
+            0.85,
+            0.05
+           ],
+           "mirror": "Joystick_R",
+           "radius": 0.02,
+           "height": 0.18,
+           "segments": 8,
+           "anchor": "base"
+          },
+          {
+           "name": "Panel",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0.15,
+            0.7,
+            0.6
+           ],
+           "size": [
+            0.5,
+            0.3,
+            0.15
+           ]
+          }
+         ]
+        },
+        {
+         "name": "WorkLight_L",
+         "at": [
+          0.35,
+          1.86,
+          0.82
+         ],
+         "mirror": "WorkLight_R",
+         "children": [
+          {
+           "name": "Housing",
+           "shape": "box",
+           "material": "frame_dark",
+           "size": [
+            0.12,
+            0.1,
+            0.08
+           ]
+          },
+          {
+           "name": "Lens",
+           "shape": "box",
+           "material": "light",
+           "at": [
+            0,
+            0,
+            0.04
+           ],
+           "size": [
+            0.1,
+            0.08,
+            0.02
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Boom",
+       "at": [
+        0,
+        "$yF",
+        "$zF"
+       ],
+       "rotate": [
+        "-deg($ab)",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Beam",
+         "shape": "loft",
+         "material": "cat_yellow",
+         "sections": [
+          {
+           "z": "0.0 * $Lb",
+           "superellipse": {
+            "width": 0.56,
+            "height": 0.42,
+            "n": 6,
+            "count": 24,
+            "cy": "0.0 * $Lb / 5.7"
+           }
+          },
+          {
+           "z": "0.12 * $Lb",
+           "superellipse": {
+            "width": 0.56,
+            "height": 0.6,
+            "n": 6,
+            "count": 24,
+            "cy": "0.18 * $Lb / 5.7"
+           }
+          },
+          {
+           "z": "0.42 * $Lb",
+           "superellipse": {
+            "width": 0.56,
+            "height": 0.8,
+            "n": 6,
+            "count": 24,
+            "cy": "0.62 * $Lb / 5.7"
+           }
+          },
+          {
+           "z": "0.62 * $Lb",
+           "superellipse": {
+            "width": 0.56,
+            "height": 0.66,
+            "n": 6,
+            "count": 24,
+            "cy": "0.5 * $Lb / 5.7"
+           }
+          },
+          {
+           "z": "0.86 * $Lb",
+           "superellipse": {
+            "width": 0.56,
+            "height": 0.52,
+            "n": 6,
+            "count": 24,
+            "cy": "0.22 * $Lb / 5.7"
+           }
+          },
+          {
+           "z": "1.0 * $Lb",
+           "superellipse": {
+            "width": 0.5,
+            "height": 0.4,
+            "n": 6,
+            "count": 24,
+            "cy": "0.0 * $Lb / 5.7"
+           }
+          }
+         ]
+        },
+        {
+         "name": "FootPin",
+         "shape": "cylinder",
+         "material": "steel",
+         "radius": 0.08,
+         "height": 0.8,
+         "axis": "x",
+         "segments": 12
+        },
+        {
+         "name": "Bracket",
+         "shape": "box",
+         "material": "cat_yellow",
+         "at": [
+          0,
+          "0.53 * $Lb / 5.7 + 0.42",
+          "0.36 * $Lb"
+         ],
+         "size": [
+          0.3,
+          0.32,
+          0.4
+         ]
+        },
+        {
+         "name": "BoomLight",
+         "at": [
+          0.32,
+          "0.6 * $Lb / 5.7",
+          "0.42 * $Lb"
+         ],
+         "children": [
+          {
+           "name": "Housing",
+           "shape": "box",
+           "material": "frame_dark",
+           "size": [
+            0.14,
+            0.12,
+            0.1
+           ]
+          },
+          {
+           "name": "Lens",
+           "shape": "box",
+           "material": "light",
+           "at": [
+            0,
+            0,
+            0.05
+           ],
+           "size": [
+            0.12,
+            0.1,
+            0.02
+           ]
+          }
+         ]
+        },
+        {
+         "name": "CrowdRam",
+         "children": [
+          {
+           "name": "Barrel",
+           "shape": "tube",
+           "material": "cat_yellow",
+           "path": [
+            [
+             0,
+             "0.53 * $Lb / 5.7 + 0.5",
+             "0.36 * $Lb"
+            ],
+            [
+             0,
+             "(0.53 * $Lb / 5.7 + 0.5) + 0.58 * (((0.32) * cos($as - $ab) + (-0.55) * sin($as - $ab)) - (0.53 * $Lb / 5.7 + 0.5))",
+             "(0.36 * $Lb) + 0.58 * (($Lb + -(0.32) * sin($as - $ab) + (-0.55) * cos($as - $ab)) - (0.36 * $Lb))"
+            ]
+           ],
+           "radius": 0.1,
+           "segments": 12
+          },
+          {
+           "name": "Rod",
+           "shape": "tube",
+           "material": "rod",
+           "path": [
+            [
+             0,
+             "(0.53 * $Lb / 5.7 + 0.5) + 0.5 * (((0.32) * cos($as - $ab) + (-0.55) * sin($as - $ab)) - (0.53 * $Lb / 5.7 + 0.5))",
+             "(0.36 * $Lb) + 0.5 * (($Lb + -(0.32) * sin($as - $ab) + (-0.55) * cos($as - $ab)) - (0.36 * $Lb))"
+            ],
+            [
+             0,
+             "(0.32) * cos($as - $ab) + (-0.55) * sin($as - $ab)",
+             "$Lb + -(0.32) * sin($as - $ab) + (-0.55) * cos($as - $ab)"
+            ]
+           ],
+           "radius": 0.06,
+           "segments": 10
+          },
+          {
+           "name": "EyeA",
+           "shape": "cylinder",
+           "material": "frame_dark",
+           "at": [
+            0,
+            "0.53 * $Lb / 5.7 + 0.5",
+            "0.36 * $Lb"
+           ],
+           "radius": 0.09,
+           "height": 0.16,
+           "axis": "x",
+           "segments": 12
+          },
+          {
+           "name": "EyeB",
+           "shape": "cylinder",
+           "material": "frame_dark",
+           "at": [
+            0,
+            "(0.32) * cos($as - $ab) + (-0.55) * sin($as - $ab)",
+            "$Lb + -(0.32) * sin($as - $ab) + (-0.55) * cos($as - $ab)"
+           ],
+           "radius": 0.078,
+           "height": 0.14,
+           "axis": "x",
+           "segments": 10
+          }
+         ]
+        },
+        {
+         "name": "Stick",
+         "at": [
+          0,
+          0,
+          "$Lb"
+         ],
+         "rotate": [
+          "-deg($as - $ab)",
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Arm",
+           "shape": "loft",
+           "material": "cat_yellow",
+           "sections": [
+            {
+             "z": -0.55,
+             "superellipse": {
+              "width": 0.42,
+              "height": 0.55,
+              "n": 6,
+              "count": 24,
+              "cy": 0.12
+             }
+            },
+            {
+             "z": 0,
+             "superellipse": {
+              "width": 0.44,
+              "height": 0.62,
+              "n": 6,
+              "count": 24,
+              "cy": 0.06
+             }
+            },
+            {
+             "z": "$Ls * 0.6",
+             "superellipse": {
+              "width": 0.4,
+              "height": 0.45,
+              "n": 6,
+              "count": 24
+             }
+            },
+            {
+             "z": "$Ls",
+             "superellipse": {
+              "width": 0.36,
+              "height": 0.32,
+              "n": 6,
+              "count": 24
+             }
+            }
+           ]
+          },
+          {
+           "name": "Pin",
+           "shape": "cylinder",
+           "material": "steel",
+           "radius": 0.07,
+           "height": 0.7,
+           "axis": "x",
+           "segments": 12
+          },
+          {
+           "name": "CurlRam",
+           "children": [
+            {
+             "name": "Barrel",
+             "shape": "tube",
+             "material": "cat_yellow",
+             "path": [
+              [
+               0,
+               "0.38",
+               "0.3"
+              ],
+              [
+               0,
+               "(0.38) + 0.58 * (((0.55) * cos($phb - $as) + (-0.05) * sin($phb - $as)) - (0.38))",
+               "(0.3) + 0.58 * (($Ls + -(0.55) * sin($phb - $as) + (-0.05) * cos($phb - $as)) - (0.3))"
+              ]
+             ],
+             "radius": 0.085,
+             "segments": 12
+            },
+            {
+             "name": "Rod",
+             "shape": "tube",
+             "material": "rod",
+             "path": [
+              [
+               0,
+               "(0.38) + 0.5 * (((0.55) * cos($phb - $as) + (-0.05) * sin($phb - $as)) - (0.38))",
+               "(0.3) + 0.5 * (($Ls + -(0.55) * sin($phb - $as) + (-0.05) * cos($phb - $as)) - (0.3))"
+              ],
+              [
+               0,
+               "(0.55) * cos($phb - $as) + (-0.05) * sin($phb - $as)",
+               "$Ls + -(0.55) * sin($phb - $as) + (-0.05) * cos($phb - $as)"
+              ]
+             ],
+             "radius": 0.05,
+             "segments": 10
+            },
+            {
+             "name": "EyeA",
+             "shape": "cylinder",
+             "material": "frame_dark",
+             "at": [
+              0,
+              "0.38",
+              "0.3"
+             ],
+             "radius": 0.0765,
+             "height": 0.16,
+             "axis": "x",
+             "segments": 12
+            },
+            {
+             "name": "EyeB",
+             "shape": "cylinder",
+             "material": "frame_dark",
+             "at": [
+              0,
+              "(0.55) * cos($phb - $as) + (-0.05) * sin($phb - $as)",
+              "$Ls + -(0.55) * sin($phb - $as) + (-0.05) * cos($phb - $as)"
+             ],
+             "radius": 0.065,
+             "height": 0.14,
+             "axis": "x",
+             "segments": 10
+            }
+           ]
+          },
+          {
+           "name": "Bucket",
+           "at": [
+            0,
+            0,
+            "$Ls"
+           ],
+           "rotate": [
+            "-deg($phb - $as)",
+            0,
+            0
+           ],
+           "children": [
+            {
+             "name": "Shell",
+             "shape": "loft",
+             "material": "cat_yellow",
+             "rotate": [
+              0,
+              90,
+              0
+             ],
+             "sections": [
+              {
+               "z": -0.55,
+               "points": [
+                [
+                 0,
+                 0
+                ],
+                [
+                 -0.18,
+                 0
+                ],
+                [
+                 -0.5,
+                 0
+                ],
+                [
+                 -0.86,
+                 0
+                ],
+                [
+                 -1.13,
+                 0
+                ],
+                [
+                 -1.13,
+                 0.1
+                ],
+                [
+                 -1,
+                 0.33
+                ],
+                [
+                 -0.74,
+                 0.5
+                ],
+                [
+                 -0.42,
+                 0.56
+                ],
+                [
+                 -0.16,
+                 0.47
+                ],
+                [
+                 0,
+                 0.3
+                ]
+               ]
+              },
+              {
+               "z": 0.55,
+               "points": [
+                [
+                 0,
+                 0
+                ],
+                [
+                 -0.18,
+                 0
+                ],
+                [
+                 -0.5,
+                 0
+                ],
+                [
+                 -0.86,
+                 0
+                ],
+                [
+                 -1.13,
+                 0
+                ],
+                [
+                 -1.13,
+                 0.1
+                ],
+                [
+                 -1,
+                 0.33
+                ],
+                [
+                 -0.74,
+                 0.5
+                ],
+                [
+                 -0.42,
+                 0.56
+                ],
+                [
+                 -0.16,
+                 0.47
+                ],
+                [
+                 0,
+                 0.3
+                ]
+               ]
+              }
+             ]
+            },
+            {
+             "name": "Mouth",
+             "shape": "box",
+             "material": "grille",
+             "at": [
+              0,
+              0.006,
+              0.57
+             ],
+             "size": [
+              1.04,
+              0.012,
+              1.08
+             ]
+            },
+            {
+             "name": "Edge",
+             "shape": "box",
+             "material": "teeth",
+             "at": [
+              0,
+              0.04,
+              1.12
+             ],
+             "size": [
+              1.12,
+              0.06,
+              0.08
+             ]
+            },
+            {
+             "name": "Tooth{i}",
+             "shape": "box",
+             "material": "teeth",
+             "at": [
+              -0.48,
+              0.04,
+              1.2
+             ],
+             "repeat": {
+              "count": 5,
+              "step": [
+               0.24,
+               0,
+               0
+              ]
+             },
+             "size": [
+              0.09,
+              0.06,
+              0.16
+             ],
+             "bevel": 0.01
+            },
+            {
+             "name": "Ear_L",
+             "shape": "box",
+             "material": "cat_yellow",
+             "at": [
+              0.22,
+              0.1,
+              0
+             ],
+             "mirror": "Ear_R",
+             "size": [
+              0.05,
+              0.3,
+              0.3
+             ]
+            },
+            {
+             "name": "Pin",
+             "shape": "cylinder",
+             "material": "steel",
+             "radius": 0.06,
+             "height": 0.6,
+             "axis": "x",
+             "segments": 12
+            },
+            {
+             "name": "Link",
+             "shape": "box",
+             "material": "frame_dark",
+             "at": [
+              0,
+              0.42,
+              0.1
+             ],
+             "rotate": [
+              60,
+              0,
+              0
+             ],
+             "size": [
+              0.12,
+              0.08,
+              0.45
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "LiftRam_L",
+       "mirror": "LiftRam_R",
+       "children": [
+        {
+         "name": "Barrel",
+         "shape": "tube",
+         "material": "cat_yellow",
+         "path": [
+          [
+           0.32,
+           "0.45",
+           "$zF + 0.6"
+          ],
+          [
+           0.32,
+           "(0.45) + 0.58 * (($yF + (0.62 * $Lb / 5.7 - 0.36) * cos($ab) + (0.4 * $Lb) * sin($ab)) - (0.45))",
+           "($zF + 0.6) + 0.58 * (($zF + -(0.62 * $Lb / 5.7 - 0.36) * sin($ab) + (0.4 * $Lb) * cos($ab)) - ($zF + 0.6))"
+          ]
+         ],
+         "radius": 0.11,
+         "segments": 12
+        },
+        {
+         "name": "Rod",
+         "shape": "tube",
+         "material": "rod",
+         "path": [
+          [
+           0.32,
+           "(0.45) + 0.5 * (($yF + (0.62 * $Lb / 5.7 - 0.36) * cos($ab) + (0.4 * $Lb) * sin($ab)) - (0.45))",
+           "($zF + 0.6) + 0.5 * (($zF + -(0.62 * $Lb / 5.7 - 0.36) * sin($ab) + (0.4 * $Lb) * cos($ab)) - ($zF + 0.6))"
+          ],
+          [
+           0.32,
+           "$yF + (0.62 * $Lb / 5.7 - 0.36) * cos($ab) + (0.4 * $Lb) * sin($ab)",
+           "$zF + -(0.62 * $Lb / 5.7 - 0.36) * sin($ab) + (0.4 * $Lb) * cos($ab)"
+          ]
+         ],
+         "radius": 0.065,
+         "segments": 10
+        },
+        {
+         "name": "EyeA",
+         "shape": "cylinder",
+         "material": "frame_dark",
+         "at": [
+          0.32,
+          "0.45",
+          "$zF + 0.6"
+         ],
+         "radius": 0.099,
+         "height": 0.16,
+         "axis": "x",
+         "segments": 12
+        },
+        {
+         "name": "EyeB",
+         "shape": "cylinder",
+         "material": "frame_dark",
+         "at": [
+          0.32,
+          "$yF + (0.62 * $Lb / 5.7 - 0.36) * cos($ab) + (0.4 * $Lb) * sin($ab)",
+          "$zF + -(0.62 * $Lb / 5.7 - 0.36) * sin($ab) + (0.4 * $Lb) * cos($ab)"
+         ],
+         "radius": 0.0845,
+         "height": 0.14,
+         "axis": "x",
+         "segments": 10
+        }
+       ]
+      }
+     ],
+     "vars": {
+      "xc": 0.77,
+      "base": "atan2($dy, $dz)",
+      "ab": "atan2($dy, $dz) + acos(clamp(($Lb * $Lb + $dc * $dc - $Ls * $Ls) / (2 * $Lb * $dc), -1, 1))",
+      "tz": "$dc * cos($base) - $Lb * cos($ab)",
+      "ty": "$dc * sin($base) - $Lb * sin($ab)",
+      "as": "atan2($ty, $tz)",
+      "phb": "rad($bucketAngle)"
+     }
+    }
+   ]
+  }
+ ]
+}

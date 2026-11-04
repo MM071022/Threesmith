@@ -1,6 +1,6 @@
 // Renders ready-made model kinds with three.js itself (headless Chromium, software WebGL) into docs/gallery/.
 // node scripts/gallery.mjs [kind ...]   (needs `npm run build` first)
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { chromium } from "playwright-core";
@@ -48,9 +48,12 @@ window.show = async (url) => {
   const box = new THREE.Box3().setFromObject(model);
   const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
   const r = Math.max(size.x, size.y, size.z);
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
   ground.scale.setScalar(r * 1.6); ground.position.y = box.min.y - 0.001;
   const dir = new THREE.Vector3(1, 0.55, 1.25).normalize();
-  camera.position.copy(center).addScaledVector(dir, r * 1.9);
+  // far enough that the whole bounding sphere fits the narrower (vertical) field of view
+  const dist = Math.max(r * 1.9, (sphere.radius * 1.08) / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)));
+  camera.position.copy(center).addScaledVector(dir, dist);
   camera.near = r / 100; camera.far = r * 20; camera.updateProjectionMatrix();
   camera.lookAt(center);
   sun.position.copy(center).add(new THREE.Vector3(r, r * 2, r * 0.6));
@@ -86,7 +89,19 @@ for (const kind of kinds) {
   made.push({ kind, summary: r.summary, score: r.report.overall, tris });
   console.log(`${kind}: ${r.summary}`);
 }
-writeFileSync(join(out, "gallery.json"), JSON.stringify(made, null, 1) + "\n");
+// keep the renders of kinds not rendered this time
+let all = [];
+try {
+  all = JSON.parse(readFileSync(join(out, "gallery.json"), "utf8"));
+} catch {
+  all = [];
+}
+for (const m of made) {
+  const i = all.findIndex((g) => g.kind === m.kind);
+  if (i >= 0) all[i] = m;
+  else all.push(m);
+}
+writeFileSync(join(out, "gallery.json"), JSON.stringify(all, null, 1) + "\n");
 await browser.close();
 await server.close();
 rmSync(dir, { recursive: true, force: true });

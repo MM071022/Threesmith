@@ -141,3 +141,10 @@ describe("no false alarms on three's own addons", () => {
     expect(r.findings.filter((f) => f.rule === "unknown-symbol")).toEqual([]);
   });
 });
+
+describe("html scripts", () => {
+  it("reads a module script whose end tag has other capitals or a space", () => {
+    const r = reviewFiles({ "index.html": `<script type="module">import * as THREE from 'three';</SCRIPT >` });
+    expect(ids(r)).toContain("importmap-missing");
+  });
+});

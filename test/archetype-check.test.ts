@@ -260,7 +260,7 @@ describe("every thing that can be built has parts to compare", () => {
       const missing = report.compared?.required.filter((r) => r.found === 0).map((r) => r.part) ?? [];
       expect(missing, `${k.kind} is missing required parts`).toEqual([]);
     }
-  }, 60000);
+  }, 240000); // builds every kind with textures: 110 kinds take minutes on a busy machine
 
   it("says so when an archetype defines no required parts, instead of reporting 0 of 0", async () => {
     const good = writeScene(buildSpec(EXAMPLE_SPEC));

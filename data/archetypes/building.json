@@ -298,20 +298,7 @@
   "id": "building.tower",
   "name": "tower",
   "description": "A tall building or tower.",
-  "aliases": [
-   "tower",
-   "skyscraper",
-   "wolkenkrabber",
-   "toren",
-   "office tower",
-   "kantoortoren",
-   "high-rise",
-   "hoogbouw",
-   "lighthouse",
-   "vuurtoren",
-   "water tower",
-   "watertoren"
-  ],
+  "aliases": ["tower", "skyscraper", "wolkenkrabber", "toren", "office tower", "kantoortoren", "high-rise", "hoogbouw"],
   "extends": "building",
   "scale": {
    "length": [
@@ -1294,6 +1281,809 @@
   ],
   "pitfalls": [
    "A gatehouse with the opening modelled as a flat texture cannot be walked through: cut the archway."
+  ]
+ },
+ {
+  "id": "building.lighthouse",
+  "name": "lighthouse",
+  "description": "A coastal light tower: a tall round or many-sided tower with a gallery and a glazed lantern room on top, often with a keeper's house at its foot.",
+  "aliases": ["vuurtoren", "lighthouse", "lighthouse tower", "light tower", "lichttoren", "beacon tower", "pharos", "kustlicht"],
+  "extends": "building.tower",
+  "parts": [
+   {
+    "name": "Shaft",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "shaft",
+     "tower",
+     "body",
+     "toren",
+     "schacht",
+     "trunk"
+    ],
+    "note": "Round or many-sided, tapering; often painted in bands."
+   },
+   {
+    "name": "Lantern",
+    "role": "light",
+    "required": true,
+    "aliases": [
+     "lantern",
+     "lantern room",
+     "lichtkamer",
+     "lamp",
+     "light",
+     "lens",
+     "beacon"
+    ],
+    "note": "A glazed room with the lamp and lens, under a domed or conical cap with a vent ball."
+   },
+   {
+    "name": "Gallery",
+    "role": "gallery",
+    "required": false,
+    "aliases": [
+     "gallery",
+     "balcony",
+     "omloop",
+     "galerij",
+     "walkway",
+     "railing"
+    ],
+    "note": "A walkway with railings around the foot of the lantern, on corbels or brackets."
+   },
+   {
+    "name": "Entrance",
+    "role": "door",
+    "required": true,
+    "aliases": [
+     "entrance",
+     "door",
+     "deur",
+     "ingang"
+    ],
+    "note": "At the foot, facing +Z."
+   },
+   {
+    "name": "KeepersHouse",
+    "role": "annex",
+    "required": false,
+    "aliases": [
+     "keepers house",
+     "keeper",
+     "wachterswoning",
+     "dienstwoning",
+     "cottage",
+     "annex"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    3,
+    15
+   ],
+   "length": [
+    3,
+    15
+   ],
+   "height": [
+    10,
+    65
+   ],
+   "source": "public data: Lange Jaap (Den Helder) is 63.45 m tall, the tallest lighthouse of the Netherlands, and the Brandaris (Terschelling) about 55 m; small harbour lights are about 10 m",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "shaft",
+    "options": [
+     "round",
+     "octagonal",
+     "lattice"
+    ]
+   },
+   {
+    "axis": "paint",
+    "options": [
+     "plain",
+     "bands",
+     "spiral"
+    ]
+   }
+  ],
+  "conventions": [
+   "The lantern is a separate node so the lamp can glow and the lens can turn about y."
+  ],
+  "anticipate": [
+   "A rotating beam: a light or a cone mesh on the Lantern's axis, turned about y.",
+   "A spiral stair inside only if the camera goes in."
+  ],
+  "pitfalls": [
+   "A lighthouse is not a high-rise: it is a few metres across and 10-65 m tall.",
+   "The lantern glazing must be see-through (alpha BLEND) or the lamp is hidden."
+  ]
+ },
+ {
+  "id": "building.water-tower",
+  "name": "water tower",
+  "description": "An elevated water tank: a tank high on steel legs or on a masonry or concrete column, with a ladder or stair, a balcony and a roof on the tank.",
+  "aliases": ["watertoren", "water tower", "elevated water tank", "water tank tower", "hoogreservoir", "watertank op poten", "elevated tank", "water tank on legs"],
+  "extends": "building.tower",
+  "parts": [
+   {
+    "name": "Tank",
+    "role": "tank",
+    "required": true,
+    "aliases": [
+     "tank",
+     "reservoir",
+     "vat",
+     "kuip",
+     "bowl",
+     "waterreservoir"
+    ]
+   },
+   {
+    "name": "Support",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "support",
+     "legs",
+     "leg",
+     "column",
+     "pedestal",
+     "poten",
+     "kolom",
+     "standpipe",
+     "shaft"
+    ],
+    "replaces": [
+     "Shaft"
+    ],
+    "note": "Steel legs with cross bracing, or one round column."
+   },
+   {
+    "name": "Door",
+    "role": "door",
+    "required": false,
+    "aliases": [
+     "door",
+     "deur",
+     "entrance"
+    ],
+    "replaces": [
+     "Entrance"
+    ],
+    "note": "Only a column has a door at its foot."
+   },
+   {
+    "name": "Ladder",
+    "role": "access",
+    "required": false,
+    "aliases": [
+     "ladder",
+     "ladders",
+     "stair",
+     "trap"
+    ]
+   },
+   {
+    "name": "Balcony",
+    "role": "gallery",
+    "required": false,
+    "aliases": [
+     "balcony",
+     "gallery",
+     "catwalk",
+     "omloop",
+     "railing"
+    ]
+   },
+   {
+    "name": "Roof",
+    "role": "roof",
+    "required": false,
+    "aliases": [
+     "roof",
+     "dak",
+     "cap",
+     "cone"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    4,
+    30
+   ],
+   "length": [
+    4,
+    30
+   ],
+   "height": [
+    12,
+    60
+   ],
+   "source": "general knowledge: elevated tanks usually stand 25-50 m tall, because every 10.2 m of water height gives 1 bar of pressure in the mains",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "support",
+    "options": [
+     "legs",
+     "column"
+    ]
+   },
+   {
+    "axis": "tank",
+    "options": [
+     "cylinder",
+     "sphere",
+     "bowl"
+    ]
+   }
+  ],
+  "pitfalls": [
+   "Legs without cross bracing read as stilts: add diagonal rods and horizontal struts between them."
+  ]
+ },
+ {
+  "id": "building.wizard-tower",
+  "name": "wizard tower",
+  "description": "A fantasy wizard's tower: a slender round stone tower of several floors with small arched windows, a balcony near the top and a tall, steep conical roof.",
+  "aliases": [
+   "wizard tower",
+   "wizard's tower",
+   "tovenaarstoren",
+   "mage tower",
+   "magiërstoren",
+   "sorcerer tower",
+   "tower of a wizard",
+   "magic tower"
+  ],
+  "extends": "building.watchtower",
+  "parts": [
+   {
+    "name": "Door",
+    "role": "door",
+    "required": true,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "door",
+     "deur",
+     "entrance",
+     "gate"
+    ],
+    "note": "At the foot, facing +Z, hinged at one side."
+   },
+   {
+    "name": "Window",
+    "role": "glazing",
+    "required": true,
+    "aliases": [
+     "window",
+     "windows",
+     "raam",
+     "ramen",
+     "slit"
+    ]
+   },
+   {
+    "name": "Orb",
+    "role": "magic",
+    "required": false,
+    "aliases": [
+     "orb",
+     "crystal",
+     "kristal",
+     "bol",
+     "gem"
+    ],
+    "note": "A glowing crystal on the spire or in the top room."
+   }
+  ],
+  "conventions": [
+   "Each floor's string course and windows repeat per floor, so the floor count is a parameter."
+  ],
+  "pitfalls": [
+   "A wizard tower is tall and slender (height 4-6 times the width) with a roof as steep as a witch's hat; a squat tower with a low roof reads as a castle turret."
+  ]
+ },
+ {
+  "id": "building.tavern",
+  "name": "tavern",
+  "description": "A medieval inn: a timber-framed building of two floors with an overhanging upper floor, a steep roof, a chimney, a porch over the door and a hanging sign.",
+  "aliases": [
+   "tavern",
+   "inn",
+   "herberg",
+   "taveerne",
+   "alehouse",
+   "medieval inn",
+   "roadside inn",
+   "kroeg",
+   "pub"
+  ],
+  "extends": "building.house",
+  "parts": [
+   {
+    "name": "Sign",
+    "role": "sign",
+    "required": false,
+    "aliases": [
+     "sign",
+     "uithangbord",
+     "bord",
+     "signboard",
+     "bracket"
+    ],
+    "note": "Hangs from an iron or wooden bracket beside the door."
+   },
+   {
+    "name": "Porch",
+    "role": "porch",
+    "required": false,
+    "aliases": [
+     "porch",
+     "veranda",
+     "luifel",
+     "portico",
+     "afdak"
+    ]
+   },
+   {
+    "name": "TimberFrame",
+    "role": "frame",
+    "required": false,
+    "aliases": [
+     "timber frame",
+     "timbers",
+     "vakwerk",
+     "beams",
+     "studs",
+     "braces"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    8,
+    25
+   ],
+   "width": [
+    6,
+    14
+   ],
+   "height": [
+    7,
+    14
+   ],
+   "source": "general knowledge: a two-storey timber-framed house has storeys of about 2.5-3 m with a roof pitched 45-60 degrees",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "floors",
+    "options": [
+     "1",
+     "2",
+     "3"
+    ]
+   },
+   {
+    "axis": "roof",
+    "options": [
+     "gable",
+     "hip"
+    ]
+   }
+  ],
+  "pitfalls": [
+   "Timber framing is a pattern of posts, rails and braces in front of light infill: without the dark timbers the building reads as a plain house."
+  ]
+ },
+ {
+  "id": "building.market-stall",
+  "name": "market stall",
+  "description": "A market stall: a light frame of posts with a counter at the front and a sloping canvas awning, with goods in crates on the counter.",
+  "aliases": [
+   "market stall",
+   "marktkraam",
+   "market stand",
+   "vendor stall",
+   "kraampje",
+   "street stall",
+   "market booth"
+  ],
+  "extends": "building",
+  "parts": [
+   {
+    "name": "Frame",
+    "role": "frame",
+    "required": true,
+    "aliases": [
+     "frame",
+     "posts",
+     "post",
+     "palen",
+     "frame work",
+     "beams"
+    ]
+   },
+   {
+    "name": "Counter",
+    "role": "counter",
+    "required": true,
+    "aliases": [
+     "counter",
+     "table",
+     "toonbank",
+     "tafel",
+     "top"
+    ]
+   },
+   {
+    "name": "Awning",
+    "role": "roof",
+    "required": true,
+    "aliases": [
+     "awning",
+     "canopy",
+     "zeil",
+     "luifel",
+     "canvas",
+     "roof",
+     "dak"
+    ],
+    "note": "Slopes down to the front so rain runs off on the customers' side, often striped."
+   },
+   {
+    "name": "Crates",
+    "role": "goods",
+    "required": false,
+    "aliases": [
+     "crate",
+     "crates",
+     "kist",
+     "kisten",
+     "goods",
+     "produce",
+     "waren"
+    ]
+   },
+   {
+    "name": "Sign",
+    "role": "sign",
+    "required": false,
+    "aliases": [
+     "sign",
+     "bord",
+     "price board",
+     "chalkboard"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    1.5,
+    6
+   ],
+   "length": [
+    1,
+    3
+   ],
+   "height": [
+    2,
+    3.2
+   ],
+   "source": "general knowledge: rented market stalls (marktkramen) come in lengths of about 2-6 m, are about 2 m deep, with the counter at about 0.8-0.9 m",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "awning",
+    "options": [
+     "striped",
+     "plain"
+    ]
+   },
+   {
+    "axis": "goods",
+    "options": [
+     "produce",
+     "cloth",
+     "crafts"
+    ]
+   }
+  ],
+  "conventions": [
+   "The counter faces +Z, the customers' side; the origin is at the middle of the footprint on the ground."
+  ],
+  "pitfalls": [
+   "An awning that slopes to the back pours rain on the seller and looks wrong: it is higher at the back."
+  ]
+ },
+ {
+  "id": "building.greenhouse",
+  "name": "greenhouse",
+  "description": "A glass greenhouse: a light metal frame of glazing bars on a low base wall, with glass walls and a glass roof, a door at one end and roof vents.",
+  "aliases": [
+   "greenhouse",
+   "glasshouse",
+   "broeikas",
+   "tuinkas",
+   "hothouse",
+   "kweekkas",
+   "glass house",
+   "serre"
+  ],
+  "extends": "building",
+  "parts": [
+   {
+    "name": "Frame",
+    "role": "frame",
+    "required": true,
+    "aliases": [
+     "frame",
+     "glazing bar",
+     "glazing bars",
+     "bars",
+     "structure",
+     "skeleton",
+     "constructie",
+     "ribs"
+    ]
+   },
+   {
+    "name": "Glazing",
+    "role": "glazing",
+    "required": true,
+    "aliases": [
+     "glazing",
+     "glass",
+     "panes",
+     "pane",
+     "glas",
+     "ruit",
+     "ruiten"
+    ]
+   },
+   {
+    "name": "Roof",
+    "role": "roof",
+    "required": true,
+    "aliases": [
+     "roof",
+     "dak",
+     "ridge",
+     "nok"
+    ]
+   },
+   {
+    "name": "Door",
+    "role": "door",
+    "required": false,
+    "moves": [
+     {
+      "kind": "slide",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "door",
+     "deur"
+    ],
+    "note": "In a gable end; garden greenhouses mostly have a sliding door."
+   },
+   {
+    "name": "Vent",
+    "role": "vent",
+    "required": false,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "vent",
+     "vents",
+     "luchtraam",
+     "roof window",
+     "louvre"
+    ]
+   },
+   {
+    "name": "Base",
+    "role": "foundation",
+    "required": false,
+    "aliases": [
+     "base",
+     "plinth",
+     "voet",
+     "base wall",
+     "kneewall",
+     "foundation"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    1.5,
+    13
+   ],
+   "length": [
+    1.5,
+    40
+   ],
+   "height": [
+    1.8,
+    7
+   ],
+   "source": "general knowledge: garden greenhouses are about 2-4 m wide and 2-6 m long with the ridge at 2-2.6 m; a commercial Venlo span is 3.2 or 4 m wide",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "roof",
+    "options": [
+     "gable",
+     "arched",
+     "lean-to",
+     "venlo"
+    ]
+   }
+  ],
+  "pitfalls": [
+   "Glass must be see-through (alpha BLEND, low roughness) with the glazing bars as separate opaque parts, or it reads as a grey box."
+  ]
+ },
+ {
+  "id": "building.gas-station",
+  "name": "gas station",
+  "description": "A fuel station: a flat canopy on columns over one or more pump islands, with fuel dispensers, a small shop and a price sign.",
+  "aliases": [
+   "gas station",
+   "petrol station",
+   "filling station",
+   "tankstation",
+   "benzinestation",
+   "fuel station",
+   "service station",
+   "pompstation",
+   "gas stop"
+  ],
+  "extends": "building",
+  "parts": [
+   {
+    "name": "Canopy",
+    "role": "roof",
+    "required": true,
+    "aliases": [
+     "canopy",
+     "overkapping",
+     "luifel",
+     "roof",
+     "dak"
+    ]
+   },
+   {
+    "name": "Pump",
+    "role": "dispenser",
+    "required": true,
+    "count": [
+     1,
+     16
+    ],
+    "aliases": [
+     "pump",
+     "pumps",
+     "dispenser",
+     "pomp",
+     "pompen",
+     "fuel pump",
+     "zuil"
+    ]
+   },
+   {
+    "name": "Column",
+    "role": "support",
+    "required": false,
+    "aliases": [
+     "column",
+     "columns",
+     "pillar",
+     "kolom",
+     "steun"
+    ]
+   },
+   {
+    "name": "Island",
+    "role": "base",
+    "required": false,
+    "aliases": [
+     "island",
+     "islands",
+     "pompeiland",
+     "kerb"
+    ]
+   },
+   {
+    "name": "Shop",
+    "role": "shop",
+    "required": false,
+    "aliases": [
+     "shop",
+     "store",
+     "kiosk",
+     "winkel",
+     "kassa"
+    ]
+   },
+   {
+    "name": "PriceSign",
+    "role": "sign",
+    "required": false,
+    "aliases": [
+     "price sign",
+     "pylon",
+     "totem",
+     "prijsbord",
+     "sign"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    10,
+    50
+   ],
+   "length": [
+    8,
+    45
+   ],
+   "height": [
+    4,
+    12
+   ],
+   "source": "general knowledge: a fuel canopy has about 4.3-5 m clear height for lorries, and a pump island is about 1.2 m wide; small stations have one or two islands",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "islands",
+    "options": [
+     "1",
+     "2",
+     "3"
+    ]
+   },
+   {
+    "axis": "shop",
+    "options": [
+     "none",
+     "kiosk",
+     "shop"
+    ]
+   }
+  ],
+  "conventions": [
+   "The forecourt faces +Z (the road); the canopy is centred on the origin and the shop stands behind it at -Z."
+  ],
+  "pitfalls": [
+   "Dispensers stand on raised islands with bollards, and the canopy fascia is deep and lit: a thin slab on poles reads as a carport."
   ]
  }
 ]

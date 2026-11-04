@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+- **50 new ready-made 3D models, 110 in all**, each an adjustable blueprint with 5 to 12 parameters (sizes, counts,
+  styles, optional parts, colours, seeds) and pivots on the parts that move, linting 100/100 against what it should be:
+  - vehicles and vessels: ambulance, fire truck, forklift, excavator, tram, go-kart, horse-drawn carriage, submarine,
+    hovercraft, Viking longship;
+  - air, space and machines: hot-air balloon, airship (zeppelin or steampunk), seaplane, space station, lunar lander,
+    Mars rover, mech walker, robot, vending machine, arcade cabinet;
+  - buildings and street: lighthouse, gas station, wizard tower, tavern, market stall, water tower, greenhouse,
+    bus stop, fire hydrant, well;
+  - items and furniture: sword, shield, battle axe, potion bottle, treasure chest, lantern, teapot, sofa, bookshelf,
+    grandfather clock;
+  - nature and creatures: cactus, mushroom, crystal cluster, boulder, birch, dog, cow, deer, snowman, stone golem.
+- **Blueprints are easier to adapt:** `"visible"` leaves a part out, enum params work in expressions (`$style`,
+  `$style_military`), `"material": "paint_{colour}"` picks a material by param, and `repeat` takes a count of 0.
+- "lighthouse", "water tower" and "tram" now name their own archetypes instead of the generic tower and train.
+- Security and robustness fixes from code scanning: step and watch code reaches the page as data instead of being
+  pasted into a script, files are read and created without a check-then-use gap (undo journal, review memory,
+  `.threesmith/.gitignore`), lesson placeholders are removed until none is left, Markdown escaping in the CI receipt
+  escapes backslashes too, and the import-map rule reads `</script >` in any case.
+
 ## 0.2.0
 
 The agent-first toolkit of Godotwright (the same project for Godot), ported to three.js and extended with what coding
@@ -32,7 +53,7 @@ agents get wrong in three.js.
   scene, steps, frames, until, screenshots, inspect, reload, new errors after every answer.
 - **Ship:** `three_build` runs the build, checks the output (copies of three, missing assets, sub-path URLs,
   decoders) and opens the built page headless.
-- **3D models without Blender:** `three_model_build` builds clean, deterministic `.glb` files from 60 kinds or a JSON
+- **3D models without Blender:** `three_model_build` builds clean, deterministic `.glb` files from 110 kinds or a JSON
   spec; `three_model_view` draws them as text; `three_model_lint` scores them for the web and against 129 archetypes;
   `three_model_inspect` says which loaders and decoders three.js needs and checks the code sets them up.
 - **For agents and teams:** tool sets (`--tools core` loads 14 tools), `--tier cheap|premium`, `--read-only`,

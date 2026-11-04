@@ -15,6 +15,21 @@ describe("perf numbers", () => {
     expect(s).toEqual({ p50: 50, p95: 95, p99: 99, max: 100, mean: 50.5 });
   });
 
+  it("keeps a shader-compile frame in the list when a busy machine makes other frames slower", () => {
+    // five random hiccups slower than the compile spike, as on a loaded CI runner
+    const frames = [
+      ...Array.from({ length: 40 }, () => frame(16.7)),
+      frame(45, { programs: 9, geometries: 30 }),
+      ...Array.from({ length: 10 }, () => frame(16.7, { programs: 9, geometries: 30 })),
+      ...[90, 85, 80, 75, 70].flatMap((ms) => [frame(ms, { programs: 9, geometries: 30 }), ...Array.from({ length: 4 }, () => frame(16.7, { programs: 9, geometries: 30 }))]),
+    ];
+    const r = summarize(frames);
+    expect(r.slowest).toHaveLength(5);
+    expect(r.slowest.some((f) => f.frame === 40 && /shader program/.test(f.cause))).toBe(true);
+    // still slowest first
+    expect(r.slowest.map((f) => f.ms)).toEqual([...r.slowest.map((f) => f.ms)].sort((a, b) => b - a));
+  });
+
   it("names why the slowest frames were slow, checks budgets and compares with the last run", () => {
     const frames = [...Array.from({ length: 50 }, () => frame(16.7)), frame(80, { programs: 4, geometries: 9 }), frame(16.7, { programs: 4, geometries: 9 }), frame(40, { cpu: 30, programs: 4, geometries: 9 }), frame(16.7, { calls: 60, programs: 4, geometries: 9 })];
     const r = summarize(frames, { budget: { frameMs: 20, calls: 50 } });

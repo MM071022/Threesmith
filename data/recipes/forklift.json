@@ -1,0 +1,1965 @@
+{
+ "version": 1,
+ "name": "forklift",
+ "archetype": "vehicle.wheeled.forklift",
+ "description": "A counterbalance forklift truck (2.5 t class): a short chassis with fenders over large drive wheels at the front and small steered wheels under a heavy rounded counterweight at the rear, a hood with the driver's seat, a dash cowl with hydraulic levers and a steering wheel, and an overhead guard with work lights and a beacon. At the front a two-stage mast tilts about its foot; the inner mast slides up once the free lift is used, and the carriage with its load backrest and two forks lifts inside it. Electric with a charging plug or LPG with a gas bottle; optional glazing.",
+ "params": [
+  {
+   "name": "wheelbase",
+   "type": "number",
+   "default": 1.65,
+   "min": 1.3,
+   "max": 2.0,
+   "description": "Distance between the drive axle (front) and the steer axle (rear); 1.65 m is a 2.5 t truck."
+  },
+  {
+   "name": "width",
+   "type": "number",
+   "default": 1.15,
+   "min": 1.0,
+   "max": 1.4,
+   "description": "Overall width over the drive wheels."
+  },
+  {
+   "name": "mastHeight",
+   "type": "number",
+   "default": 2.1,
+   "min": 1.8,
+   "max": 2.8,
+   "description": "Height of the lowered mast."
+  },
+  {
+   "name": "lift",
+   "type": "number",
+   "default": 0.0,
+   "min": 0.0,
+   "max": 1.0,
+   "description": "How far the forks are raised: 0 = on the ground, 1 = full lift (the inner mast slides up once the free lift is used)."
+  },
+  {
+   "name": "mastTilt",
+   "type": "number",
+   "default": 0,
+   "min": -5,
+   "max": 6,
+   "description": "Mast tilt in degrees about its foot: positive tilts back towards the driver, negative forward."
+  },
+  {
+   "name": "forkLength",
+   "type": "number",
+   "default": 1.07,
+   "min": 0.8,
+   "max": 1.6,
+   "description": "Length of the fork blades."
+  },
+  {
+   "name": "forkSpread",
+   "type": "number",
+   "default": 0.62,
+   "min": 0.3,
+   "max": 0.86,
+   "description": "Distance between the fork centres."
+  },
+  {
+   "name": "gasBottle",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "An LPG truck with a gas bottle on the counterweight and an exhaust, instead of an electric (battery) one."
+  },
+  {
+   "name": "enclosedCab",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "Glass windscreen, rear window and roof panel on the overhead guard."
+  }
+ ],
+ "materials": {
+  "body_paint": {
+   "color": [
+    0.8,
+    0.26,
+    0.0
+   ],
+   "metallic": 0.25,
+   "roughness": 0.35
+  },
+  "frame_dark": {
+   "color": [
+    0.04,
+    0.04,
+    0.045
+   ],
+   "metallic": 0.5,
+   "roughness": 0.45
+  },
+  "counterweight": {
+   "color": [
+    0.06,
+    0.06,
+    0.065
+   ],
+   "metallic": 0.4,
+   "roughness": 0.5
+  },
+  "fork_steel": {
+   "color": [
+    0.08,
+    0.08,
+    0.085
+   ],
+   "metallic": 0.8,
+   "roughness": 0.45
+  },
+  "tyre_black": {
+   "color": [
+    0.02,
+    0.02,
+    0.022
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85
+  },
+  "rim_paint": {
+   "color": [
+    0.75,
+    0.6,
+    0.05
+   ],
+   "metallic": 0.5,
+   "roughness": 0.35
+  },
+  "wheel_dark": {
+   "color": [
+    0.01,
+    0.01,
+    0.012
+   ],
+   "metallic": 0.0,
+   "roughness": 0.9
+  },
+  "seat_black": {
+   "color": [
+    0.03,
+    0.03,
+    0.035
+   ],
+   "metallic": 0.0,
+   "roughness": 0.8
+  },
+  "step_plate": {
+   "color": [
+    0.35,
+    0.35,
+    0.37
+   ],
+   "metallic": 0.9,
+   "roughness": 0.45
+  },
+  "gas_bottle": {
+   "color": [
+    0.6,
+    0.6,
+    0.62
+   ],
+   "metallic": 0.7,
+   "roughness": 0.3
+  },
+  "chain": {
+   "color": [
+    0.12,
+    0.12,
+    0.13
+   ],
+   "metallic": 0.9,
+   "roughness": 0.5
+  },
+  "hose": {
+   "color": [
+    0.02,
+    0.02,
+    0.025
+   ],
+   "metallic": 0.0,
+   "roughness": 0.6
+  }
+ },
+ "nodes": [
+  {
+   "name": "Forklift",
+   "material": "body_paint",
+   "vars": {
+    "T": "$wheelbase + 1.0 + $forkLength + 0.12",
+    "zFA": "-($wheelbase + 1.0 + $forkLength + 0.12) / 2 + 0.5 + $wheelbase",
+    "zRA": "-($wheelbase + 1.0 + $forkLength + 0.12) / 2 + 0.5",
+    "W2": "$width / 2",
+    "rf": 0.335,
+    "rr": 0.27,
+    "twf": 0.2,
+    "twr": 0.17,
+    "xf": "$width / 2 - 0.1",
+    "xr": "$width / 2 - 0.16",
+    "cw": "$width - 0.44",
+    "hG": 2.12,
+    "zM": "-($wheelbase + 1.0 + $forkLength + 0.12) / 2 + 0.5 + $wheelbase + 0.3",
+    "free": 0.15,
+    "maxLift": "0.15 + $mastHeight - 0.35",
+    "fy": "$lift * (0.15 + $mastHeight - 0.35)",
+    "rise": "max(0, $lift * (0.15 + $mastHeight - 0.35) - 0.15)",
+    "kGas": "(0.02 + 0.98 * ($gasBottle))",
+    "kBat": "(0.02 + 0.98 * (1 - $gasBottle))",
+    "kCab": "(0.02 + 0.98 * ($enclosedCab))"
+   },
+   "children": [
+    {
+     "name": "Body",
+     "children": [
+      {
+       "name": "Frame",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        0.12,
+        "($zFA + $zRA) / 2 + 0.1"
+       ],
+       "size": [
+        "$cw",
+        0.42,
+        "$wheelbase + 0.25"
+       ],
+       "bevel": 0.03,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Side_L",
+       "shape": "box",
+       "material": "body_paint",
+       "at": [
+        "$cw / 2 + 0.02",
+        0.42,
+        "$zFA - $rf - ($wheelbase - 2 * $rf - 0.05) / 2 - 0.08"
+       ],
+       "mirror": "Side_R",
+       "size": [
+        0.06,
+        0.4,
+        "$wheelbase - 2 * $rf - 0.05"
+       ],
+       "bevel": 0.02
+      },
+      {
+       "name": "Fender_L",
+       "shape": "box",
+       "material": "body_paint",
+       "at": [
+        "$xf",
+        "2 * $rf + 0.06",
+        "$zFA"
+       ],
+       "mirror": "Fender_R",
+       "size": [
+        "$twf + 0.1",
+        0.05,
+        "2 * $rf + 0.12"
+       ],
+       "bevel": 0.02
+      },
+      {
+       "name": "FenderSkirt_L",
+       "shape": "box",
+       "material": "body_paint",
+       "at": [
+        "$xf",
+        "2 * $rf - 0.05",
+        "$zFA - $rf - 0.06"
+       ],
+       "mirror": "FenderSkirt_R",
+       "size": [
+        "$twf + 0.1",
+        0.25,
+        0.05
+       ],
+       "bevel": 0.015
+      },
+      {
+       "name": "Floor",
+       "shape": "box",
+       "material": "step_plate",
+       "at": [
+        0,
+        0.58,
+        "$zFA - $rf - 0.25"
+       ],
+       "size": [
+        "$width - 0.2",
+        0.05,
+        0.55
+       ],
+       "bevel": 0.01
+      },
+      {
+       "name": "Step_L",
+       "shape": "box",
+       "material": "step_plate",
+       "at": [
+        "$W2 - 0.14",
+        0.33,
+        "$zFA - $rf - 0.25"
+       ],
+       "mirror": "Step_R",
+       "size": [
+        0.24,
+        0.03,
+        0.34
+       ]
+      },
+      {
+       "name": "Hood",
+       "shape": "box",
+       "material": "body_paint",
+       "at": [
+        0,
+        0.6,
+        "$zRA + 0.3 + ($wheelbase - 0.55) / 2"
+       ],
+       "size": [
+        "$width - 0.12",
+        0.42,
+        "$wheelbase - 0.55"
+       ],
+       "bevel": 0.06,
+       "anchor": "bottom"
+      },
+      {
+       "name": "HoodSeam",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        0.95,
+        "$zFA - 0.27"
+       ],
+       "size": [
+        "$width - 0.1",
+        0.03,
+        0.02
+       ]
+      },
+      {
+       "name": "Cowl",
+       "at": [
+        0,
+        0,
+        "$zFA + 0.02"
+       ],
+       "children": [
+        {
+         "name": "Panel",
+         "shape": "box",
+         "material": "body_paint",
+         "at": [
+          0,
+          0.6,
+          0
+         ],
+         "size": [
+          "$width - 0.3",
+          0.55,
+          0.3
+         ],
+         "bevel": 0.05,
+         "anchor": "bottom"
+        },
+        {
+         "name": "Display",
+         "shape": "box",
+         "material": "glass_tinted",
+         "at": [
+          0,
+          1.05,
+          -0.155
+         ],
+         "rotate": [
+          -20,
+          0,
+          0
+         ],
+         "size": [
+          0.22,
+          0.12,
+          0.02
+         ]
+        },
+        {
+         "name": "Lever{i}",
+         "at": [
+          0.2,
+          1.13,
+          -0.05
+         ],
+         "repeat": {
+          "count": 3,
+          "step": [
+           0.06,
+           0,
+           0
+          ]
+         },
+         "children": [
+          {
+           "name": "Stem",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0,
+            0.12,
+            0
+           ],
+           "size": [
+            0.02,
+            0.24,
+            0.02
+           ]
+          },
+          {
+           "name": "Knob",
+           "shape": "ellipsoid",
+           "material": "seat_black",
+           "at": [
+            0,
+            0.25,
+            0
+           ],
+           "radii": [
+            0.025,
+            0.035,
+            0.025
+           ],
+           "segments": 10
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Column",
+       "shape": "tube",
+       "material": "frame_dark",
+       "path": [
+        [
+         0,
+         1,
+         "$zFA - 0.1"
+        ],
+        [
+         0,
+         1.26,
+         "$zFA - 0.34"
+        ]
+       ],
+       "radius": 0.035,
+       "segments": 10
+      },
+      {
+       "name": "Seat",
+       "at": [
+        0,
+        1.02,
+        "$zRA + 0.55"
+       ],
+       "children": [
+        {
+         "name": "Base",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          0.05,
+          0
+         ],
+         "size": [
+          0.42,
+          0.1,
+          0.44
+         ],
+         "bevel": 0.02
+        },
+        {
+         "name": "Cushion",
+         "shape": "box",
+         "material": "seat_black",
+         "at": [
+          0,
+          0.15,
+          0
+         ],
+         "size": [
+          0.48,
+          0.12,
+          0.46
+         ],
+         "bevel": 0.05
+        },
+        {
+         "name": "Back",
+         "shape": "box",
+         "material": "seat_black",
+         "at": [
+          0,
+          0.45,
+          -0.25
+         ],
+         "rotate": [
+          -12,
+          0,
+          0
+         ],
+         "size": [
+          0.48,
+          0.5,
+          0.12
+         ],
+         "bevel": 0.05
+        },
+        {
+         "name": "Arm_R",
+         "shape": "box",
+         "material": "seat_black",
+         "at": [
+          -0.27,
+          0.3,
+          -0.02
+         ],
+         "size": [
+          0.06,
+          0.06,
+          0.32
+         ],
+         "bevel": 0.02
+        }
+       ]
+      },
+      {
+       "name": "Counterweight",
+       "at": [
+        0,
+        0,
+        "$zRA - 0.05"
+       ],
+       "children": [
+        {
+         "name": "Upper",
+         "shape": "box",
+         "material": "counterweight",
+         "at": [
+          0,
+          0.55,
+          0
+         ],
+         "size": [
+          "$width",
+          0.6,
+          0.85
+         ],
+         "bevel": 0.14,
+         "anchor": "bottom"
+        },
+        {
+         "name": "Lower",
+         "shape": "box",
+         "material": "counterweight",
+         "at": [
+          0,
+          0.12,
+          -0.03
+         ],
+         "size": [
+          "$width - 2 * $twr - 0.1",
+          0.5,
+          0.75
+         ],
+         "bevel": 0.06,
+         "anchor": "bottom"
+        },
+        {
+         "name": "Cap",
+         "shape": "box",
+         "material": "body_paint",
+         "at": [
+          0,
+          1.12,
+          0.06
+         ],
+         "size": [
+          "$width - 0.06",
+          0.08,
+          0.6
+         ],
+         "bevel": 0.03
+        },
+        {
+         "name": "Lamp_L",
+         "shape": "box",
+         "material": "light_red",
+         "at": [
+          "$W2 - 0.16",
+          1,
+          -0.43
+         ],
+         "mirror": "Lamp_R",
+         "size": [
+          0.12,
+          0.06,
+          0.03
+         ]
+        },
+        {
+         "name": "Reverse_L",
+         "shape": "box",
+         "material": "frame_white",
+         "at": [
+          "$W2 - 0.3",
+          1,
+          -0.43
+         ],
+         "mirror": "Reverse_R",
+         "size": [
+          0.08,
+          0.06,
+          0.03
+         ]
+        },
+        {
+         "name": "Pin",
+         "shape": "cylinder",
+         "material": "steel",
+         "at": [
+          0,
+          0.4,
+          -0.38
+         ],
+         "radius": 0.05,
+         "height": 0.12,
+         "axis": "z",
+         "segments": 12
+        },
+        {
+         "name": "Slot",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          0.55,
+          -0.4
+         ],
+         "size": [
+          0.3,
+          0.06,
+          0.05
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Battery",
+       "at": [
+        "lerp(0, -$W2 + 0.3, 1 - $gasBottle)",
+        "lerp(0.7, 1.02, 1 - $gasBottle)",
+        "$zRA + 0.1"
+       ],
+       "children": [
+        {
+         "name": "Plug",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          "0.05 * $kBat",
+          0
+         ],
+         "size": [
+          "0.16 * $kBat",
+          "0.1 * $kBat",
+          "0.08 * $kBat"
+         ],
+         "bevel": "0.02 * $kBat"
+        },
+        {
+         "name": "Cable",
+         "shape": "cylinder",
+         "material": "hose",
+         "at": [
+          0,
+          "0.08 * $kBat",
+          "-0.1 * $kBat"
+         ],
+         "radius": "0.02 * $kBat",
+         "height": "0.2 * $kBat",
+         "axis": "z",
+         "segments": 8
+        }
+       ]
+      },
+      {
+       "name": "GasBottle",
+       "at": [
+        0,
+        "lerp(0.7, 1.33, $gasBottle)",
+        "$zRA + 0.05"
+       ],
+       "children": [
+        {
+         "name": "Bottle",
+         "shape": "cylinder",
+         "material": "gas_bottle",
+         "radius": "0.155 * $kGas",
+         "height": "0.75 * $kGas",
+         "axis": "x",
+         "segments": 20,
+         "bevel": "0.06 * $kGas"
+        },
+        {
+         "name": "Valve",
+         "shape": "cylinder",
+         "material": "brass",
+         "at": [
+          "0.42 * $kGas",
+          0,
+          0
+         ],
+         "radius": "0.03 * $kGas",
+         "height": "0.1 * $kGas",
+         "axis": "x",
+         "segments": 10
+        },
+        {
+         "name": "Bracket{i}",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          "-0.25 * $kGas",
+          "-0.1 * $kGas",
+          0
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           "0.5 * $kGas",
+           0,
+           0
+          ]
+         },
+         "size": [
+          "0.04 * $kGas",
+          "0.2 * $kGas",
+          "0.34 * $kGas"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Exhaust",
+       "shape": "tube",
+       "material": "steel",
+       "at": [
+        "lerp(0, -$W2 + 0.25, $gasBottle)",
+        "lerp(0.5, 0.3, $gasBottle)",
+        "$zRA - 0.2"
+       ],
+       "path": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         0,
+         0,
+         "-0.25 * $kGas"
+        ],
+        [
+         0,
+         "-0.15 * $kGas",
+         "-0.35 * $kGas"
+        ]
+       ],
+       "radius": "0.03 * $kGas",
+       "segments": 8
+      }
+     ]
+    },
+    {
+     "name": "OverheadGuard",
+     "material": "frame_dark",
+     "children": [
+      {
+       "name": "PostFront_L",
+       "shape": "tube",
+       "material": "frame_dark",
+       "mirror": "PostFront_R",
+       "path": [
+        [
+         "$W2 - 0.08",
+         0.9,
+         "$zFA - 0.12"
+        ],
+        [
+         "$W2 - 0.08",
+         "$hG - 0.05",
+         "$zFA - 0.26"
+        ]
+       ],
+       "radius": 0.035,
+       "segments": 10
+      },
+      {
+       "name": "PostRear_L",
+       "shape": "tube",
+       "material": "frame_dark",
+       "mirror": "PostRear_R",
+       "path": [
+        [
+         "$W2 - 0.08",
+         1.1,
+         "$zRA - 0.0"
+        ],
+        [
+         "$W2 - 0.08",
+         "$hG - 0.05",
+         "$zRA + 0.1"
+        ]
+       ],
+       "radius": 0.035,
+       "segments": 10
+      },
+      {
+       "name": "Rail_L",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        "$W2 - 0.08",
+        "$hG - 0.035",
+        "($zFA + $zRA) / 2 - 0.08"
+       ],
+       "mirror": "Rail_R",
+       "size": [
+        0.07,
+        0.07,
+        "$zFA - $zRA - 0.25"
+       ]
+      },
+      {
+       "name": "Cross{i}",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        "$hG - 0.03",
+        "$zRA + 0.1"
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         "$wheelbase - 0.36"
+        ]
+       },
+       "size": [
+        "$width - 0.16",
+        0.06,
+        0.06
+       ]
+      },
+      {
+       "name": "Slat{i}",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        "-$W2 + 0.2",
+        "$hG - 0.03",
+        "($zFA + $zRA) / 2 - 0.08"
+       ],
+       "repeat": {
+        "count": 7,
+        "step": [
+         "($width - 0.4) / 6",
+         0,
+         0
+        ]
+       },
+       "size": [
+        0.04,
+        0.04,
+        "$zFA - $zRA - 0.35"
+       ]
+      },
+      {
+       "name": "Worklight_L",
+       "at": [
+        "$W2 - 0.08",
+        "$hG - 0.13",
+        "$zFA - 0.2"
+       ],
+       "mirror": "Worklight_R",
+       "children": [
+        {
+         "name": "Housing",
+         "shape": "box",
+         "material": "frame_dark",
+         "size": [
+          0.12,
+          0.1,
+          0.08
+         ],
+         "bevel": 0.02
+        },
+        {
+         "name": "Lens",
+         "shape": "box",
+         "material": "light",
+         "at": [
+          0,
+          0,
+          0.04
+         ],
+         "size": [
+          0.1,
+          0.08,
+          0.02
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Beacon",
+       "at": [
+        0,
+        "$hG",
+        "$zRA + 0.12"
+       ],
+       "children": [
+        {
+         "name": "Base",
+         "shape": "cylinder",
+         "material": "frame_dark",
+         "radius": 0.06,
+         "height": 0.03,
+         "segments": 12,
+         "anchor": "base"
+        },
+        {
+         "name": "Dome",
+         "shape": "cylinder",
+         "material": "light_amber",
+         "at": [
+          0,
+          0.03,
+          0
+         ],
+         "radius": 0.05,
+         "height": 0.09,
+         "segments": 12,
+         "bevel": 0.02,
+         "anchor": "base"
+        }
+       ]
+      },
+      {
+       "name": "Cabin",
+       "at": [
+        0,
+        "lerp(1.3, 1.5, $enclosedCab)",
+        "$zFA - 0.19"
+       ],
+       "children": [
+        {
+         "name": "Windscreen",
+         "shape": "box",
+         "material": "glass",
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "rotate": [
+          -7,
+          0,
+          0
+         ],
+         "size": [
+          "($width - 0.22) * $kCab",
+          "1.05 * $kCab",
+          "0.015 * $kCab"
+         ]
+        },
+        {
+         "name": "RearWindow",
+         "shape": "box",
+         "material": "glass",
+         "at": [
+          0,
+          "0.05 * $kCab",
+          "(-($zFA - $zRA - 0.3)) * $kCab"
+         ],
+         "rotate": [
+          6,
+          0,
+          0
+         ],
+         "size": [
+          "($width - 0.22) * $kCab",
+          "0.9 * $kCab",
+          "0.015 * $kCab"
+         ]
+        },
+        {
+         "name": "RoofPanel",
+         "shape": "box",
+         "material": "glass_tinted",
+         "at": [
+          0,
+          "0.58 * $kCab",
+          "(-($zFA - $zRA - 0.3) / 2) * $kCab"
+         ],
+         "size": [
+          "($width - 0.2) * $kCab",
+          "0.012 * $kCab",
+          "($zFA - $zRA - 0.32) * $kCab"
+         ]
+        },
+        {
+         "name": "Wiper",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          "0.15 * $kCab",
+          "0.1 * $kCab",
+          "0.02 * $kCab"
+         ],
+         "rotate": [
+          -7,
+          0,
+          20
+         ],
+         "size": [
+          "0.02 * $kCab",
+          "0.5 * $kCab",
+          "0.015 * $kCab"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Mast",
+     "at": [
+      0,
+      "max(0, -sin(rad($mastTilt))) * 0.16 + 0.005",
+      "$zM - 0.08"
+     ],
+     "rotate": [
+      "-$mastTilt",
+      0,
+      0
+     ],
+     "children": [
+      {
+       "name": "Rail_L",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0.47,
+        "$mastHeight / 2",
+        0.075
+       ],
+       "mirror": "Rail_R",
+       "size": [
+        0.1,
+        "$mastHeight",
+        0.15
+       ]
+      },
+      {
+       "name": "Header",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        "$mastHeight - 0.05",
+        0.075
+       ],
+       "size": [
+        1.04,
+        0.1,
+        0.12
+       ]
+      },
+      {
+       "name": "Foot",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        0.08,
+        0.075
+       ],
+       "size": [
+        1.04,
+        0.12,
+        0.14
+       ]
+      },
+      {
+       "name": "Tie",
+       "shape": "box",
+       "material": "frame_dark",
+       "at": [
+        0,
+        1,
+        0.04
+       ],
+       "size": [
+        1.04,
+        0.08,
+        0.1
+       ]
+      },
+      {
+       "name": "Pin_L",
+       "shape": "cylinder",
+       "material": "steel",
+       "at": [
+        0.47,
+        0.05,
+        0.02
+       ],
+       "mirror": "Pin_R",
+       "radius": 0.04,
+       "height": 0.14,
+       "axis": "x",
+       "segments": 10
+      },
+      {
+       "name": "InnerMast",
+       "at": [
+        0,
+        "$rise + 0.04",
+        0
+       ],
+       "children": [
+        {
+         "name": "Rail_L",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0.4,
+          "($mastHeight - 0.05) / 2",
+          0.03
+         ],
+         "mirror": "Rail_R",
+         "size": [
+          0.09,
+          "($mastHeight - 0.05)",
+          0.12
+         ]
+        },
+        {
+         "name": "Top",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          "($mastHeight - 0.05) - 0.04",
+          0.03
+         ],
+         "size": [
+          0.9,
+          0.08,
+          0.1
+         ]
+        },
+        {
+         "name": "Tie",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          0.05,
+          0.03
+         ],
+         "size": [
+          0.9,
+          0.06,
+          0.08
+         ]
+        },
+        {
+         "name": "Sheave_L",
+         "shape": "cylinder",
+         "material": "steel",
+         "at": [
+          0.22,
+          "($mastHeight - 0.05) + 0.02",
+          0.03
+         ],
+         "mirror": "Sheave_R",
+         "radius": 0.06,
+         "height": 0.05,
+         "axis": "x",
+         "segments": 12
+        },
+        {
+         "name": "LiftRam",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          0,
+          0.1,
+          -0.02
+         ],
+         "radius": 0.045,
+         "height": "($mastHeight - 0.05) - 0.2",
+         "segments": 12,
+         "anchor": "base"
+        }
+       ]
+      },
+      {
+       "name": "Chain_L",
+       "shape": "box",
+       "material": "chain",
+       "at": [
+        0.22,
+        "$fy + 0.5 + max(0.2, $rise + ($mastHeight - 0.05) - $fy - 0.5) / 2",
+        0.1
+       ],
+       "mirror": "Chain_R",
+       "size": [
+        0.025,
+        "max(0.2, $rise + ($mastHeight - 0.05) - $fy - 0.5)",
+        0.02
+       ]
+      },
+      {
+       "name": "Carriage",
+       "at": [
+        0,
+        "$fy + max(0, -sin(rad($mastTilt))) * ($forkLength + 0.3)",
+        "0.16 + (0.1 + $forkLength) / 2"
+       ],
+       "children": [
+        {
+         "name": "Plate",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          0.12,
+          "0.03 - (0.1 + $forkLength) / 2"
+         ],
+         "size": [
+          1,
+          0.42,
+          0.06
+         ],
+         "bevel": 0.01,
+         "anchor": "bottom"
+        },
+        {
+         "name": "Bar{i}",
+         "shape": "box",
+         "material": "frame_dark",
+         "at": [
+          0,
+          0.18,
+          "0.06 - (0.1 + $forkLength) / 2"
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           0,
+           0.3,
+           0
+          ]
+         },
+         "size": [
+          1,
+          0.05,
+          0.05
+         ]
+        },
+        {
+         "name": "Backrest",
+         "at": [
+          0,
+          0.54,
+          "0.03 - (0.1 + $forkLength) / 2"
+         ],
+         "children": [
+          {
+           "name": "Post_L",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0.47,
+            0.375,
+            0
+           ],
+           "mirror": "Post_R",
+           "size": [
+            0.05,
+            0.75,
+            0.05
+           ]
+          },
+          {
+           "name": "Top",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            0,
+            0.75,
+            0
+           ],
+           "size": [
+            1,
+            0.05,
+            0.05
+           ]
+          },
+          {
+           "name": "Grid{i}",
+           "shape": "box",
+           "material": "frame_dark",
+           "at": [
+            -0.33,
+            0.36,
+            0
+           ],
+           "repeat": {
+            "count": 5,
+            "step": [
+             0.165,
+             0,
+             0
+            ]
+           },
+           "size": [
+            0.03,
+            0.72,
+            0.03
+           ]
+          }
+         ]
+        },
+        {
+         "name": "Roller_L",
+         "shape": "box",
+         "material": "steel",
+         "at": [
+          0.36,
+          0.45,
+          "-0.03 - (0.1 + $forkLength) / 2"
+         ],
+         "mirror": "Roller_R",
+         "size": [
+          0.06,
+          0.12,
+          0.08
+         ]
+        },
+        {
+         "name": "Fork_L",
+         "at": [
+          "$forkSpread / 2",
+          0,
+          "0.055 - (0.1 + $forkLength) / 2"
+         ],
+         "mirror": "Fork_R",
+         "children": [
+          {
+           "name": "Shank",
+           "shape": "box",
+           "material": "fork_steel",
+           "at": [
+            0,
+            0.25,
+            0.0225
+           ],
+           "size": [
+            0.12,
+            0.5,
+            0.045
+           ]
+          },
+          {
+           "name": "Hook",
+           "shape": "box",
+           "material": "fork_steel",
+           "at": [
+            0,
+            0.42,
+            -0.03
+           ],
+           "size": [
+            0.12,
+            0.06,
+            0.06
+           ]
+          },
+          {
+           "name": "Blade",
+           "shape": "loft",
+           "material": "fork_steel",
+           "sections": [
+            {
+             "z": 0,
+             "superellipse": {
+              "width": 0.12,
+              "height": 0.045,
+              "n": 8,
+              "count": 16,
+              "cy": 0.0225
+             }
+            },
+            {
+             "z": "$forkLength - 0.12",
+             "superellipse": {
+              "width": 0.12,
+              "height": 0.045,
+              "n": 8,
+              "count": 16,
+              "cy": 0.0225
+             }
+            },
+            {
+             "z": "$forkLength",
+             "superellipse": {
+              "width": 0.11,
+              "height": 0.012,
+              "n": 8,
+              "count": 16,
+              "cy": 0.006
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "TiltCylinder_L",
+     "shape": "tube",
+     "material": "chrome",
+     "mirror": "TiltCylinder_R",
+     "path": [
+      [
+       "$cw / 2 + 0.03",
+       0.75,
+       "$zFA - 0.15"
+      ],
+      [
+       "0.44",
+       1,
+       "$zM - 0.06"
+      ]
+     ],
+     "radius": 0.045,
+     "segments": 10
+    },
+    {
+     "name": "Wheels",
+     "children": [
+      {
+       "name": "Wheel_FL",
+       "at": [
+        "$xf",
+        "$rf",
+        "$zFA"
+       ],
+       "mirror": "Wheel_FR",
+       "children": [
+        {
+         "name": "Tyre",
+         "shape": "lathe",
+         "material": "rubber",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.55 * $rf",
+           "-0.44 * $twf"
+          ],
+          [
+           "0.55 * $rf + 0.45 * ($rf - 0.55 * $rf)",
+           "-0.5 * $twf"
+          ],
+          [
+           "$rf - 0.05 * $rf",
+           "-0.47 * $twf"
+          ],
+          [
+           "$rf",
+           "-0.33 * $twf"
+          ],
+          [
+           "$rf",
+           "0.33 * $twf"
+          ],
+          [
+           "$rf - 0.05 * $rf",
+           "0.47 * $twf"
+          ],
+          [
+           "0.55 * $rf + 0.45 * ($rf - 0.55 * $rf)",
+           "0.5 * $twf"
+          ],
+          [
+           "0.55 * $rf",
+           "0.44 * $twf"
+          ],
+          [
+           "0.55 * $rf",
+           "-0.44 * $twf"
+          ]
+         ],
+         "segments": 24,
+         "caps": false
+        },
+        {
+         "name": "Rim",
+         "shape": "lathe",
+         "material": "rim_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.55 * $rf - 0.02 * $rf",
+           "-0.42 * $twf"
+          ],
+          [
+           "0.55 * $rf + 0.03 * $rf",
+           "-0.46 * $twf"
+          ],
+          [
+           "0.55 * $rf + 0.03 * $rf",
+           "0.46 * $twf"
+          ],
+          [
+           "0.55 * $rf - 0.01 * $rf",
+           "0.49 * $twf"
+          ],
+          [
+           "0.55 * $rf - 0.05 * $rf",
+           "0.44 * $twf"
+          ],
+          [
+           "0.55 * $rf - 0.05 * $rf",
+           "-0.38 * $twf"
+          ],
+          [
+           "0.55 * $rf - 0.02 * $rf",
+           "-0.42 * $twf"
+          ]
+         ],
+         "segments": 24,
+         "caps": false
+        },
+        {
+         "name": "Disc",
+         "shape": "lathe",
+         "material": "rim_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.55 * $rf - 0.04 * $rf",
+           "0.1 * $twf"
+          ],
+          [
+           "0.7 * 0.55 * $rf",
+           "0.3 * $twf"
+          ],
+          [
+           "0.42 * 0.55 * $rf",
+           "0.34 * $twf"
+          ],
+          [
+           "0.42 * 0.55 * $rf",
+           "0.24 * $twf"
+          ],
+          [
+           "0.55 * $rf - 0.07 * $rf",
+           "0.04 * $twf"
+          ],
+          [
+           "0.55 * $rf - 0.04 * $rf",
+           "0.1 * $twf"
+          ]
+         ],
+         "segments": 24,
+         "caps": false
+        },
+        {
+         "name": "Hub",
+         "shape": "cylinder",
+         "material": "steel",
+         "at": [
+          "0.36 * $twf",
+          0,
+          0
+         ],
+         "radius": "0.36 * 0.55 * $rf",
+         "height": "0.16 * $twf",
+         "axis": "x",
+         "segments": 16
+        },
+        {
+         "name": "Cap",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.45 * $twf",
+          0,
+          0
+         ],
+         "radius": "0.18 * 0.55 * $rf",
+         "height": "0.1 * $twf",
+         "axis": "x",
+         "segments": 14
+        },
+        {
+         "name": "Nut{i}",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.44 * $twf",
+          "0.27 * 0.55 * $rf",
+          0
+         ],
+         "repeat": {
+          "count": 6,
+          "around": "x"
+         },
+         "radius": "0.045 * 0.55 * $rf",
+         "height": "0.06 * $twf",
+         "axis": "x",
+         "segments": 6
+        }
+       ]
+      },
+      {
+       "name": "Wheel_RL",
+       "at": [
+        "$xr",
+        "$rr",
+        "$zRA"
+       ],
+       "mirror": "Wheel_RR",
+       "children": [
+        {
+         "name": "Tyre",
+         "shape": "lathe",
+         "material": "rubber",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.55 * $rr",
+           "-0.44 * $twr"
+          ],
+          [
+           "0.55 * $rr + 0.45 * ($rr - 0.55 * $rr)",
+           "-0.5 * $twr"
+          ],
+          [
+           "$rr - 0.05 * $rr",
+           "-0.47 * $twr"
+          ],
+          [
+           "$rr",
+           "-0.33 * $twr"
+          ],
+          [
+           "$rr",
+           "0.33 * $twr"
+          ],
+          [
+           "$rr - 0.05 * $rr",
+           "0.47 * $twr"
+          ],
+          [
+           "0.55 * $rr + 0.45 * ($rr - 0.55 * $rr)",
+           "0.5 * $twr"
+          ],
+          [
+           "0.55 * $rr",
+           "0.44 * $twr"
+          ],
+          [
+           "0.55 * $rr",
+           "-0.44 * $twr"
+          ]
+         ],
+         "segments": 24,
+         "caps": false
+        },
+        {
+         "name": "Rim",
+         "shape": "lathe",
+         "material": "rim_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.55 * $rr - 0.02 * $rr",
+           "-0.42 * $twr"
+          ],
+          [
+           "0.55 * $rr + 0.03 * $rr",
+           "-0.46 * $twr"
+          ],
+          [
+           "0.55 * $rr + 0.03 * $rr",
+           "0.46 * $twr"
+          ],
+          [
+           "0.55 * $rr - 0.01 * $rr",
+           "0.49 * $twr"
+          ],
+          [
+           "0.55 * $rr - 0.05 * $rr",
+           "0.44 * $twr"
+          ],
+          [
+           "0.55 * $rr - 0.05 * $rr",
+           "-0.38 * $twr"
+          ],
+          [
+           "0.55 * $rr - 0.02 * $rr",
+           "-0.42 * $twr"
+          ]
+         ],
+         "segments": 24,
+         "caps": false
+        },
+        {
+         "name": "Disc",
+         "shape": "lathe",
+         "material": "rim_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.55 * $rr - 0.04 * $rr",
+           "0.1 * $twr"
+          ],
+          [
+           "0.7 * 0.55 * $rr",
+           "0.3 * $twr"
+          ],
+          [
+           "0.42 * 0.55 * $rr",
+           "0.34 * $twr"
+          ],
+          [
+           "0.42 * 0.55 * $rr",
+           "0.24 * $twr"
+          ],
+          [
+           "0.55 * $rr - 0.07 * $rr",
+           "0.04 * $twr"
+          ],
+          [
+           "0.55 * $rr - 0.04 * $rr",
+           "0.1 * $twr"
+          ]
+         ],
+         "segments": 24,
+         "caps": false
+        },
+        {
+         "name": "Hub",
+         "shape": "cylinder",
+         "material": "steel",
+         "at": [
+          "0.36 * $twr",
+          0,
+          0
+         ],
+         "radius": "0.36 * 0.55 * $rr",
+         "height": "0.16 * $twr",
+         "axis": "x",
+         "segments": 16
+        },
+        {
+         "name": "Cap",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.45 * $twr",
+          0,
+          0
+         ],
+         "radius": "0.18 * 0.55 * $rr",
+         "height": "0.1 * $twr",
+         "axis": "x",
+         "segments": 14
+        },
+        {
+         "name": "Nut{i}",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.44 * $twr",
+          "0.27 * 0.55 * $rr",
+          0
+         ],
+         "repeat": {
+          "count": 6,
+          "around": "x"
+         },
+         "radius": "0.045 * 0.55 * $rr",
+         "height": "0.06 * $twr",
+         "axis": "x",
+         "segments": 6
+        }
+       ]
+      },
+      {
+       "name": "SteerAxle",
+       "shape": "cylinder",
+       "material": "frame_dark",
+       "at": [
+        0,
+        "$rr",
+        "$zRA"
+       ],
+       "radius": 0.05,
+       "height": "2 * $xr - 0.1",
+       "axis": "x",
+       "segments": 10
+      },
+      {
+       "name": "DriveAxle",
+       "shape": "cylinder",
+       "material": "frame_dark",
+       "at": [
+        0,
+        "$rf",
+        "$zFA"
+       ],
+       "radius": 0.07,
+       "height": "2 * $xf - 0.15",
+       "axis": "x",
+       "segments": 10
+      }
+     ]
+    },
+    {
+     "name": "SteeringWheel",
+     "at": [
+      0,
+      1.28,
+      "$zFA - 0.36"
+     ],
+     "rotate": [
+      -40,
+      0,
+      0
+     ],
+     "children": [
+      {
+       "name": "Ring",
+       "shape": "lathe",
+       "material": "seat_black",
+       "profile": [
+        [
+         0.15,
+         -0.014
+        ],
+        [
+         0.165,
+         0
+        ],
+        [
+         0.15,
+         0.014
+        ],
+        [
+         0.135,
+         0
+        ],
+        [
+         0.15,
+         -0.014
+        ]
+       ],
+       "segments": 24,
+       "caps": false
+      },
+      {
+       "name": "Boss",
+       "shape": "cylinder",
+       "material": "seat_black",
+       "radius": 0.04,
+       "height": 0.04,
+       "segments": 12
+      },
+      {
+       "name": "Spoke",
+       "shape": "box",
+       "material": "seat_black",
+       "size": [
+        0.27,
+        0.012,
+        0.03
+       ]
+      },
+      {
+       "name": "Knob",
+       "shape": "cylinder",
+       "material": "seat_black",
+       "at": [
+        0.12,
+        0.03,
+        0.04
+       ],
+       "radius": 0.018,
+       "height": 0.06,
+       "segments": 8,
+       "anchor": "base"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

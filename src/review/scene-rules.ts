@@ -207,7 +207,7 @@ export const SCENE_RULES: Rule[] = [
       const bare = /(?:\bfrom\s*|\bimport\s*\(?\s*)['"]three(?:\/[^'"]*)?['"]/;
       for (const f of ctx.files) {
         if (!/\.html?$/.test(f.path) || /type\s*=\s*["']importmap["']/.test(f.raw)) continue;
-        for (const m of f.raw.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+        for (const m of f.raw.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/gi)) {
           const attrs = m[1] ?? "";
           if (!/type\s*=\s*["']module["']/.test(attrs)) continue;
           let hit = bare.test(m[2] ?? "");

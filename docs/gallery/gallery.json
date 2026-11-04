@@ -142,5 +142,305 @@
   "summary": "built terrain.glb: 1525 KB, 32,768 triangles, 2 nodes, 256.00 x 25.37 x 256.00 m (x y z), lint 100/100 (checked as world.terrain)",
   "score": 100,
   "tris": 65632
+ },
+ {
+  "kind": "ambulance",
+  "summary": "built ambulance.glb: 1969 KB, 30,492 triangles, 318 nodes, 2.55 x 3.34 x 6.79 m (x y z), lint 100/100 (checked as vehicle.wheeled.ambulance)",
+  "score": 100,
+  "tris": 61080
+ },
+ {
+  "kind": "fire-truck",
+  "summary": "built fire-truck.glb: 2895 KB, 41,220 triangles, 544 nodes, 3.12 x 3.59 x 8.69 m (x y z), lint 100/100 (checked as vehicle.wheeled.fire-engine)",
+  "score": 100,
+  "tris": 82536
+ },
+ {
+  "kind": "forklift",
+  "summary": "built forklift.glb: 972 KB, 13,636 triangles, 180 nodes, 1.25 x 2.24 x 3.65 m (x y z), lint 100/100 (checked as vehicle.wheeled.forklift)",
+  "score": 100,
+  "tris": 27368
+ },
+ {
+  "kind": "excavator",
+  "summary": "built excavator.glb: 972 KB, 11,284 triangles, 259 nodes, 3.18 x 4.83 x 9.58 m (x y z), lint 100/100 (checked as vehicle.tracked.excavator)",
+  "score": 100,
+  "tris": 22664
+ },
+ {
+  "kind": "tram",
+  "summary": "built tram.glb: 1773 KB, 22,204 triangles, 408 nodes, 2.94 x 4.00 x 33.70 m (x y z), lint 100/100 (checked as vehicle.rail.tram)",
+  "score": 100,
+  "tris": 44504
+ },
+ {
+  "kind": "go-kart",
+  "summary": "built go-kart.glb: 694 KB, 9,584 triangles, 124 nodes, 1.35 x 0.60 x 1.82 m (x y z), lint 100/100 (checked as vehicle.wheeled.go-kart)",
+  "score": 100,
+  "tris": 19264
+ },
+ {
+  "kind": "horse-carriage",
+  "summary": "built horse-carriage.glb: 1121 KB, 13,948 triangles, 217 nodes, 2.12 x 2.28 x 6.07 m (x y z), lint 100/100 (checked as vehicle.wheeled.carriage)",
+  "score": 100,
+  "tris": 27992
+ },
+ {
+  "kind": "submarine",
+  "summary": "built submarine.glb: 1004 KB, 14,584 triangles, 148 nodes, 9.94 x 12.00 x 68.85 m (x y z), lint 100/100 (checked as vessel.submarine)",
+  "score": 100,
+  "tris": 29264
+ },
+ {
+  "kind": "hovercraft",
+  "summary": "built hovercraft.glb: 1243 KB, 19,392 triangles, 196 nodes, 11.21 x 8.05 x 24.20 m (x y z), lint 100/100 (checked as vehicle.hovercraft)",
+  "score": 100,
+  "tris": 38880
+ },
+ {
+  "kind": "viking-longship",
+  "summary": "built viking-longship.glb: 2455 KB, 37,080 triangles, 406 nodes, 12.98 x 13.11 x 26.49 m (x y z), lint 99/100 (checked as vessel.boat.longship)",
+  "score": 99,
+  "tris": 74256
+ },
+ {
+  "kind": "hot-air-balloon",
+  "summary": "built hot-air-balloon.glb: 1706 KB, 25,300 triangles, 102 nodes, 16.38 x 23.08 x 16.38 m (x y z), lint 100/100 (checked as aircraft.lighter-than-air.hot-air-balloon)",
+  "score": 100,
+  "tris": 50696
+ },
+ {
+  "kind": "airship",
+  "summary": "built airship.glb: 1730 KB, 22,632 triangles, 155 nodes, 18.00 x 17.75 x 75.15 m (x y z), lint 100/100 (checked as aircraft.lighter-than-air.airship)",
+  "score": 100,
+  "tris": 45360
+ },
+ {
+  "kind": "seaplane",
+  "summary": "built seaplane.glb: 996 KB, 15,246 triangles, 121 nodes, 11.00 x 3.70 x 8.77 m (x y z), lint 100/100 (checked as aircraft.fixed-wing.seaplane)",
+  "score": 100,
+  "tris": 30588
+ },
+ {
+  "kind": "space-station",
+  "summary": "built space-station.glb: 1357 KB, 17,370 triangles, 184 nodes, 70.18 x 26.19 x 68.40 m (x y z), lint 100/100 (checked as spacecraft.station)",
+  "score": 100,
+  "tris": 34836
+ },
+ {
+  "kind": "lunar-lander",
+  "summary": "built lunar-lander.glb: 807 KB, 6,822 triangles, 117 nodes, 9.42 x 6.31 x 9.42 m (x y z), lint 100/100 (checked as spacecraft.lander)",
+  "score": 100,
+  "tris": 13740
+ },
+ {
+  "kind": "mars-rover",
+  "summary": "built mars-rover.glb: 693 KB, 7,680 triangles, 142 nodes, 2.66 x 2.26 x 2.83 m (x y z), lint 100/100 (checked as spacecraft.rover)",
+  "score": 100,
+  "tris": 15456
+ },
+ {
+  "kind": "mech-walker",
+  "summary": "built mech-walker.glb: 1281 KB, 20,916 triangles, 154 nodes, 5.35 x 10.57 x 5.11 m (x y z), lint 100/100 (checked as machine.mech)",
+  "score": 100,
+  "tris": 41928
+ },
+ {
+  "kind": "robot",
+  "summary": "built robot.glb: 1458 KB, 21,620 triangles, 121 nodes, 0.54 x 1.39 x 0.29 m (x y z), lint 100/100 (checked as creature.humanoid)",
+  "score": 100,
+  "tris": 43336
+ },
+ {
+  "kind": "vending-machine",
+  "summary": "built vending-machine.glb: 1606 KB, 27,064 triangles, 203 nodes, 0.99 x 1.83 x 1.00 m (x y z), lint 100/100 (checked as machine.vending-machine)",
+  "score": 100,
+  "tris": 54224
+ },
+ {
+  "kind": "arcade-cabinet",
+  "summary": "built arcade-cabinet.glb: 532 KB, 6,456 triangles, 112 nodes, 0.65 x 1.75 x 0.94 m (x y z), lint 100/100 (checked as machine.arcade-cabinet)",
+  "score": 100,
+  "tris": 13008
+ },
+ {
+  "kind": "lighthouse",
+  "summary": "built lighthouse.glb: 987 KB, 8,892 triangles, 117 nodes, 12.45 x 32.28 x 7.80 m (x y z), lint 100/100 (checked as building.lighthouse)",
+  "score": 100,
+  "tris": 17880
+ },
+ {
+  "kind": "gas-station",
+  "summary": "built gas-station.glb: 927 KB, 11,004 triangles, 137 nodes, 26.00 x 7.00 x 23.55 m (x y z), lint 100/100 (checked as building.gas-station)",
+  "score": 100,
+  "tris": 22104
+ },
+ {
+  "kind": "wizard-tower",
+  "summary": "built wizard-tower.glb: 930 KB, 8,662 triangles, 149 nodes, 8.16 x 26.49 x 8.10 m (x y z), lint 100/100 (checked as building.wizard-tower)",
+  "score": 100,
+  "tris": 17420
+ },
+ {
+  "kind": "tavern",
+  "summary": "built tavern.glb: 964 KB, 3,820 triangles, 208 nodes, 11.75 x 12.31 x 9.56 m (x y z), lint 100/100 (checked as building.tavern)",
+  "score": 100,
+  "tris": 7596
+ },
+ {
+  "kind": "market-stall",
+  "summary": "built market-stall.glb: 704 KB, 8,144 triangles, 152 nodes, 3.20 x 2.65 x 2.14 m (x y z), lint 100/100 (checked as building.market-stall)",
+  "score": 100,
+  "tris": 16384
+ },
+ {
+  "kind": "water-tower",
+  "summary": "built water-tower.glb: 882 KB, 10,180 triangles, 174 nodes, 13.27 x 36.46 x 15.13 m (x y z), lint 100/100 (checked as building.water-tower)",
+  "score": 100,
+  "tris": 20456
+ },
+ {
+  "kind": "greenhouse",
+  "summary": "built greenhouse.glb: 625 KB, 3,856 triangles, 117 nodes, 2.62 x 2.31 x 3.96 m (x y z), lint 100/100 (checked as building.greenhouse)",
+  "score": 100,
+  "tris": 8088
+ },
+ {
+  "kind": "bus-stop",
+  "summary": "built bus-stop.glb: 970 KB, 13,712 triangles, 88 nodes, 4.70 x 2.82 x 2.30 m (x y z), lint 100/100 (checked as infrastructure.bus-stop)",
+  "score": 100,
+  "tris": 27520
+ },
+ {
+  "kind": "fire-hydrant",
+  "summary": "built fire-hydrant.glb: 1033 KB, 13,000 triangles, 139 nodes, 0.53 x 0.81 x 0.44 m (x y z), lint 100/100 (checked as infrastructure.fire-hydrant)",
+  "score": 100,
+  "tris": 26096
+ },
+ {
+  "kind": "well",
+  "summary": "built well.glb: 1166 KB, 16,968 triangles, 77 nodes, 1.63 x 2.24 x 1.74 m (x y z), lint 100/100 (checked as prop.well)",
+  "score": 100,
+  "tris": 34032
+ },
+ {
+  "kind": "sword",
+  "summary": "built sword.glb: 336 KB, 5,116 triangles, 17 nodes, 0.22 x 0.94 x 0.03 m (x y z), lint 100/100 (checked as prop.sword)",
+  "score": 100,
+  "tris": 10328
+ },
+ {
+  "kind": "shield",
+  "summary": "built shield.glb: 718 KB, 10,210 triangles, 39 nodes, 0.65 x 0.82 x 0.07 m (x y z), lint 100/100 (checked as prop.shield)",
+  "score": 100,
+  "tris": 20516
+ },
+ {
+  "kind": "battle-axe",
+  "summary": "built battle-axe.glb: 297 KB, 4,128 triangles, 17 nodes, 0.20 x 0.85 x 0.04 m (x y z), lint 100/100 (checked as prop.battle-axe)",
+  "score": 100,
+  "tris": 8352
+ },
+ {
+  "kind": "potion-bottle",
+  "summary": "built potion-bottle.glb: 468 KB, 7,080 triangles, 13 nodes, 0.10 x 0.18 x 0.10 m (x y z), lint 100/100 (checked as prop.potion-bottle)",
+  "score": 100,
+  "tris": 13704
+ },
+ {
+  "kind": "treasure-chest",
+  "summary": "built treasure-chest.glb: 659 KB, 10,792 triangles, 73 nodes, 0.87 x 0.64 x 0.54 m (x y z), lint 100/100 (checked as prop.treasure-chest)",
+  "score": 100,
+  "tris": 21680
+ },
+ {
+  "kind": "lantern",
+  "summary": "built lantern.glb: 627 KB, 9,108 triangles, 32 nodes, 0.16 x 0.28 x 0.13 m (x y z), lint 100/100 (checked as prop.lantern)",
+  "score": 100,
+  "tris": 18312
+ },
+ {
+  "kind": "teapot",
+  "summary": "built teapot.glb: 570 KB, 8,668 triangles, 24 nodes, 0.17 x 0.16 x 0.28 m (x y z), lint 100/100 (checked as prop.teapot)",
+  "score": 100,
+  "tris": 17432
+ },
+ {
+  "kind": "sofa",
+  "summary": "built sofa.glb: 655 KB, 6,328 triangles, 30 nodes, 2.33 x 0.88 x 0.94 m (x y z), lint 100/100 (checked as prop.sofa)",
+  "score": 100,
+  "tris": 12752
+ },
+ {
+  "kind": "bookshelf",
+  "summary": "built bookshelf.glb: 613 KB, 6,312 triangles, 155 nodes, 0.87 x 1.80 x 0.34 m (x y z), lint 100/100 (checked as prop.bookcase)",
+  "score": 100,
+  "tris": 12720
+ },
+ {
+  "kind": "grandfather-clock",
+  "summary": "built grandfather-clock.glb: 752 KB, 10,888 triangles, 81 nodes, 0.54 x 2.25 x 0.32 m (x y z), lint 100/100 (checked as prop.grandfather-clock)",
+  "score": 100,
+  "tris": 21872
+ },
+ {
+  "kind": "cactus",
+  "summary": "built cactus.glb: 799 KB, 10,268 triangles, 78 nodes, 1.70 x 8.06 x 1.52 m (x y z), lint 100/100 (checked as plant.cactus)",
+  "score": 100,
+  "tris": 20632
+ },
+ {
+  "kind": "mushroom",
+  "summary": "built mushroom.glb: 880 KB, 10,712 triangles, 131 nodes, 0.14 x 0.18 x 0.14 m (x y z), lint 100/100 (checked as plant.mushroom)",
+  "score": 100,
+  "tris": 11816
+ },
+ {
+  "kind": "crystal-cluster",
+  "summary": "built crystal-cluster.glb: 405 KB, 2,396 triangles, 114 nodes, 1.04 x 1.38 x 1.14 m (x y z), lint 100/100 (checked as world.crystal-cluster)",
+  "score": 100,
+  "tris": 4888
+ },
+ {
+  "kind": "boulder",
+  "summary": "built boulder.glb: 315 KB, 1,840 triangles, 9 nodes, 1.42 x 1.03 x 1.60 m (x y z), lint 100/100 (checked as world.rock)",
+  "score": 100,
+  "tris": 3776
+ },
+ {
+  "kind": "birch",
+  "summary": "built birch.glb: 1277 KB, 10,708 triangles, 165 nodes, 5.65 x 14.01 x 4.41 m (x y z), lint 100/100 (checked as plant.tree.broadleaf)",
+  "score": 100,
+  "tris": 21512
+ },
+ {
+  "kind": "dog",
+  "summary": "built dog.glb: 286 KB, 3,996 triangles, 38 nodes, 0.29 x 0.79 x 1.27 m (x y z), lint 100/100 (checked as creature.quadruped)",
+  "score": 100,
+  "tris": 8088
+ },
+ {
+  "kind": "cow",
+  "summary": "built cow.glb: 1117 KB, 15,838 triangles, 95 nodes, 0.72 x 1.47 x 2.47 m (x y z), lint 100/100 (checked as creature.quadruped)",
+  "score": 100,
+  "tris": 31772
+ },
+ {
+  "kind": "deer",
+  "summary": "built deer.glb: 730 KB, 7,688 triangles, 102 nodes, 0.90 x 2.23 x 1.60 m (x y z), lint 100/100 (checked as creature.quadruped)",
+  "score": 100,
+  "tris": 15472
+ },
+ {
+  "kind": "snowman",
+  "summary": "built snowman.glb: 575 KB, 6,548 triangles, 48 nodes, 1.40 x 1.71 x 1.12 m (x y z), lint 100/100 (checked as prop.snowman)",
+  "score": 100,
+  "tris": 13192
+ },
+ {
+  "kind": "stone-golem",
+  "summary": "built stone-golem.glb: 655 KB, 9,520 triangles, 99 nodes, 2.99 x 3.57 x 1.32 m (x y z), lint 100/100 (checked as creature.humanoid.golem)",
+  "score": 100,
+  "tris": 19136
  }
 ]

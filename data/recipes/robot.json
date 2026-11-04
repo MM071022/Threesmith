@@ -1,0 +1,1253 @@
+{
+ "version": 1,
+ "name": "robot",
+ "archetype": "creature.humanoid",
+ "description": "A friendly humanoid service robot, about 1.25 m tall (between a Pepper and an ASIMO): a white moulded torso with a status light, a chest panel and a battery pack, a rounded head with a dark screen face showing glowing eyes and a smile, ear pods and an antenna, arms with shoulder, elbow and wrist joints and jointed fingers and a thumb, and legs with hip, knee and ankle joints. Head (neck), Arm_L/R (shoulder), Elbow, Hand, Leg_L/R (hip), Knee and Foot are nodes with their pivot on the joint axis. Three accent colours. Faces +Z, feet on y = 0.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 1.25,
+   "min": 0.8,
+   "max": 1.8,
+   "description": "Standing height in metres (a Pepper is 1.2 m, an ASIMO 1.3 m)."
+  },
+  {
+   "name": "build",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.8,
+   "max": 1.3,
+   "description": "Bulk of the body and limbs: below 1 is slim, above is sturdy."
+  },
+  {
+   "name": "headSize",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.8,
+   "max": 1.3,
+   "description": "Head size relative to the body; a bigger head reads friendlier."
+  },
+  {
+   "name": "armLength",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.85,
+   "max": 1.2,
+   "description": "Arm length relative to the body."
+  },
+  {
+   "name": "legLength",
+   "type": "number",
+   "default": 1.0,
+   "min": 0.8,
+   "max": 1.2,
+   "description": "Leg length relative to the body (short legs make it stockier)."
+  },
+  {
+   "name": "fingers",
+   "type": "integer",
+   "default": 3,
+   "min": 2,
+   "max": 4,
+   "description": "Fingers on each hand, besides the thumb."
+  },
+  {
+   "name": "scheme",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "Accent colour of the shoulder caps, ear pods, knee caps and chest panel, and the colour of the face: 0 blue, 1 orange, 2 green."
+  },
+  {
+   "name": "antenna",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A short antenna with a light on top of the head; false leaves a flush cap."
+  }
+ ],
+ "materials": {
+  "shell": {
+   "color": [
+    0.86,
+    0.87,
+    0.88
+   ],
+   "metallic": 0,
+   "roughness": 0.28
+  },
+  "joint": {
+   "color": [
+    0.18,
+    0.19,
+    0.21
+   ],
+   "metallic": 0.6,
+   "roughness": 0.4
+  },
+  "dark": {
+   "color": [
+    0.04,
+    0.045,
+    0.05
+   ],
+   "metallic": 0.2,
+   "roughness": 0.5
+  },
+  "screen": {
+   "color": [
+    0.008,
+    0.01,
+    0.014
+   ],
+   "metallic": 0,
+   "roughness": 0.04
+  },
+  "rubber_sole": {
+   "color": [
+    0.05,
+    0.05,
+    0.055
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "accent_blue": {
+   "color": [
+    0.03,
+    0.22,
+    0.75
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  },
+  "face_blue": {
+   "color": [
+    0.2,
+    0.85,
+    1.0
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    0.18,
+    0.765,
+    0.9
+   ]
+  },
+  "accent_orange": {
+   "color": [
+    0.95,
+    0.35,
+    0.03
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  },
+  "face_orange": {
+   "color": [
+    1.0,
+    0.6,
+    0.1
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    0.9,
+    0.54,
+    0.09
+   ]
+  },
+  "accent_green": {
+   "color": [
+    0.1,
+    0.55,
+    0.15
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  },
+  "face_green": {
+   "color": [
+    0.35,
+    1.0,
+    0.4
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    0.315,
+    0.9,
+    0.36
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "Robot",
+   "vars": {
+    "H": "$height",
+    "b": "$build",
+    "hs": "$headSize",
+    "al": "$armLength",
+    "ll": "$legLength",
+    "ankle": "0.065 * $height",
+    "knee": "0.065 * $height + 0.2 * $height * $legLength",
+    "hip": "0.065 * $height + 0.39 * $height * $legLength",
+    "top": "0.065 * $height + 0.39 * $height * $legLength + 0.36 * $height",
+    "tw": "0.27 * $height * $build",
+    "td": "0.17 * $height * $build",
+    "rt": "0.045 * $height * $build",
+    "rb": "0.048 * $height * $build",
+    "ra": "0.034 * $height * $build",
+    "hw": "0.22 * $height * $headSize",
+    "hh": "0.18 * $height * $headSize",
+    "hd": "0.18 * $height * $headSize"
+   },
+   "children": [
+    {
+     "name": "Torso",
+     "children": [
+      {
+       "name": "Chest",
+       "shape": "loft",
+       "sections": [
+        {
+         "z": "$H * 0",
+         "superellipse": {
+          "width": "$tw * 0.62",
+          "height": "$td * 0.8",
+          "n": 2.6,
+          "count": 28
+         }
+        },
+        {
+         "z": "$H * 0.06",
+         "superellipse": {
+          "width": "$tw * 0.7",
+          "height": "$td * 0.88",
+          "n": 2.6,
+          "count": 28
+         }
+        },
+        {
+         "z": "$H * 0.14",
+         "superellipse": {
+          "width": "$tw * 0.86",
+          "height": "$td * 0.95",
+          "n": 2.6,
+          "count": 28
+         }
+        },
+        {
+         "z": "$H * 0.22",
+         "superellipse": {
+          "width": "$tw * 1.0",
+          "height": "$td * 1.0",
+          "n": 2.6,
+          "count": 28
+         }
+        },
+        {
+         "z": "$H * 0.27",
+         "superellipse": {
+          "width": "$tw * 1.0",
+          "height": "$td * 0.98",
+          "n": 2.6,
+          "count": 28
+         }
+        },
+        {
+         "z": "$H * 0.3",
+         "superellipse": {
+          "width": "$tw * 0.92",
+          "height": "$td * 0.9",
+          "n": 2.6,
+          "count": 28
+         }
+        },
+        {
+         "z": "$H * 0.315",
+         "superellipse": {
+          "width": "$tw * 0.7",
+          "height": "$td * 0.72",
+          "n": 2.6,
+          "count": 28
+         }
+        }
+       ],
+       "at": [
+        0,
+        "$hip + 0.045 * $height",
+        0
+       ],
+       "rotate": [
+        -90,
+        0,
+        0
+       ],
+       "material": "shell"
+      },
+      {
+       "name": "Pelvis",
+       "shape": "box",
+       "size": [
+        "$tw * 0.62",
+        "0.08 * $height",
+        "$td * 0.75"
+       ],
+       "at": [
+        0,
+        "$hip + 0.02 * $height",
+        0
+       ],
+       "material": "joint",
+       "bevel": "0.02 * $height"
+      },
+      {
+       "name": "HipJoint_L",
+       "shape": "ellipsoid",
+       "radii": [
+        "$rt * 1.05",
+        "$rt * 1.05",
+        "$rt * 1.05"
+       ],
+       "at": [
+        "0.075 * $height * $b",
+        "$hip",
+        0
+       ],
+       "material": "joint",
+       "segments": 16,
+       "mirror": "HipJoint_R"
+      },
+      {
+       "name": "Shoulder_L",
+       "shape": "ellipsoid",
+       "radii": [
+        "$rb",
+        "$rb",
+        "$rb"
+       ],
+       "at": [
+        "$tw / 2 + $rb * 0.55",
+        "$top - 0.06 * $height",
+        0
+       ],
+       "material": "joint",
+       "segments": 20,
+       "mirror": "Shoulder_R"
+      },
+      {
+       "name": "ShoulderCap_L_blue",
+       "shape": "ellipsoid",
+       "radii": [
+        "$rb * 1.12 * lerp(0.5, 1, max(0, 1 - abs($scheme - 0)))",
+        "$rb * 0.8 * lerp(0.5, 1, max(0, 1 - abs($scheme - 0)))",
+        "$rb * 1.12 * lerp(0.5, 1, max(0, 1 - abs($scheme - 0)))"
+       ],
+       "at": [
+        "$tw / 2 + $rb * 0.55",
+        "$top - 0.06 * $height + $rb * 0.42 * max(0, 1 - abs($scheme - 0))",
+        0
+       ],
+       "material": "accent_blue",
+       "segments": 20,
+       "mirror": "ShoulderCap_R_blue"
+      },
+      {
+       "name": "ShoulderCap_L_orange",
+       "shape": "ellipsoid",
+       "radii": [
+        "$rb * 1.12 * lerp(0.5, 1, max(0, 1 - abs($scheme - 1)))",
+        "$rb * 0.8 * lerp(0.5, 1, max(0, 1 - abs($scheme - 1)))",
+        "$rb * 1.12 * lerp(0.5, 1, max(0, 1 - abs($scheme - 1)))"
+       ],
+       "at": [
+        "$tw / 2 + $rb * 0.55",
+        "$top - 0.06 * $height + $rb * 0.42 * max(0, 1 - abs($scheme - 1))",
+        0
+       ],
+       "material": "accent_orange",
+       "segments": 20,
+       "mirror": "ShoulderCap_R_orange"
+      },
+      {
+       "name": "ShoulderCap_L_green",
+       "shape": "ellipsoid",
+       "radii": [
+        "$rb * 1.12 * lerp(0.5, 1, max(0, 1 - abs($scheme - 2)))",
+        "$rb * 0.8 * lerp(0.5, 1, max(0, 1 - abs($scheme - 2)))",
+        "$rb * 1.12 * lerp(0.5, 1, max(0, 1 - abs($scheme - 2)))"
+       ],
+       "at": [
+        "$tw / 2 + $rb * 0.55",
+        "$top - 0.06 * $height + $rb * 0.42 * max(0, 1 - abs($scheme - 2))",
+        0
+       ],
+       "material": "accent_green",
+       "segments": 20,
+       "mirror": "ShoulderCap_R_green"
+      },
+      {
+       "name": "Neck",
+       "shape": "cylinder",
+       "radius": "0.03 * $height",
+       "height": "0.05 * $height",
+       "at": [
+        0,
+        "$top + 0.01 * $height",
+        "-$hd / 2 + 0.01 * $height + 0.035 * $height"
+       ],
+       "material": "joint",
+       "segments": 16
+      },
+      {
+       "name": "ChestPanel_blue",
+       "shape": "box",
+       "size": [
+        "$tw * 0.36",
+        "0.075 * $height",
+        0.012
+       ],
+       "at": [
+        0,
+        "$hip + 0.27 * $height",
+        "$td / 2 - 0.003 - 0.03 * (1 - max(0, 1 - abs($scheme - 0)))"
+       ],
+       "material": "accent_blue",
+       "bevel": 0.005
+      },
+      {
+       "name": "ChestPanel_orange",
+       "shape": "box",
+       "size": [
+        "$tw * 0.36",
+        "0.075 * $height",
+        0.012
+       ],
+       "at": [
+        0,
+        "$hip + 0.27 * $height",
+        "$td / 2 - 0.003 - 0.03 * (1 - max(0, 1 - abs($scheme - 1)))"
+       ],
+       "material": "accent_orange",
+       "bevel": 0.005
+      },
+      {
+       "name": "ChestPanel_green",
+       "shape": "box",
+       "size": [
+        "$tw * 0.36",
+        "0.075 * $height",
+        0.012
+       ],
+       "at": [
+        0,
+        "$hip + 0.27 * $height",
+        "$td / 2 - 0.003 - 0.03 * (1 - max(0, 1 - abs($scheme - 2)))"
+       ],
+       "material": "accent_green",
+       "bevel": 0.005
+      },
+      {
+       "name": "StatusLight",
+       "shape": "cylinder",
+       "radius": "0.018 * $height",
+       "height": 0.012,
+       "axis": "z",
+       "at": [
+        0,
+        "$hip + 0.19 * $height",
+        "$td / 2 - 0.003"
+       ],
+       "material": "light",
+       "segments": 20,
+       "children": [
+        {
+         "name": "LightRing",
+         "shape": "cylinder",
+         "radius": "0.024 * $height",
+         "height": 0.008,
+         "axis": "z",
+         "at": [
+          0,
+          0,
+          -0.003
+         ],
+         "material": "joint",
+         "segments": 20
+        }
+       ]
+      },
+      {
+       "name": "Backpack",
+       "shape": "box",
+       "size": [
+        "$tw * 0.62",
+        "0.17 * $height",
+        "$td * 0.32"
+       ],
+       "at": [
+        0,
+        "$hip + 0.21 * $height",
+        "-$td / 2 - $td * 0.08"
+       ],
+       "material": "shell",
+       "bevel": "0.025 * $height",
+       "children": [
+        {
+         "name": "Vent_{i}",
+         "shape": "box",
+         "size": [
+          "$tw * 0.42",
+          "0.006 * $height",
+          0.006
+         ],
+         "at": [
+          0,
+          "-0.04 * $height",
+          "-$td * 0.16 - 0.002"
+         ],
+         "material": "dark",
+         "repeat": {
+          "count": 5,
+          "step": [
+           0,
+           "0.018 * $height",
+           0
+          ]
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Head",
+     "at": [
+      0,
+      "$top + 0.03 * $height",
+      "-$hd / 2 + 0.01 * $height"
+     ],
+     "children": [
+      {
+       "name": "Skull",
+       "shape": "box",
+       "size": [
+        "$hw",
+        "$hh",
+        "$hd"
+       ],
+       "at": [
+        0,
+        "$hh / 2",
+        "$hd / 2 - 0.005"
+       ],
+       "material": "shell",
+       "bevel": "0.22 * $hh"
+      },
+      {
+       "name": "FaceScreen",
+       "shape": "box",
+       "size": [
+        "$hw * 0.82",
+        "$hh * 0.66",
+        0.02
+       ],
+       "at": [
+        0,
+        "$hh * 0.5",
+        "$hd - 0.012"
+       ],
+       "material": "screen",
+       "bevel": "0.08 * $hh"
+      },
+      {
+       "name": "Visor",
+       "shape": "box",
+       "size": [
+        "$hw * 0.9",
+        "$hh * 0.08",
+        "$hd * 0.3"
+       ],
+       "at": [
+        0,
+        "$hh * 0.9",
+        "$hd * 0.72"
+       ],
+       "material": "shell",
+       "bevel": 0.01
+      },
+      {
+       "name": "Eye_L_blue",
+       "shape": "ellipsoid",
+       "radii": [
+        "$hw * 0.075",
+        "$hh * 0.13",
+        0.008
+       ],
+       "at": [
+        "$hw * 0.18",
+        "$hh * 0.55",
+        "$hd - 0.0005 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)))"
+       ],
+       "material": "face_blue",
+       "segments": 16,
+       "mirror": "Eye_R_blue"
+      },
+      {
+       "name": "Eye_L_orange",
+       "shape": "ellipsoid",
+       "radii": [
+        "$hw * 0.075",
+        "$hh * 0.13",
+        0.008
+       ],
+       "at": [
+        "$hw * 0.18",
+        "$hh * 0.55",
+        "$hd - 0.0005 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)))"
+       ],
+       "material": "face_orange",
+       "segments": 16,
+       "mirror": "Eye_R_orange"
+      },
+      {
+       "name": "Eye_L_green",
+       "shape": "ellipsoid",
+       "radii": [
+        "$hw * 0.075",
+        "$hh * 0.13",
+        0.008
+       ],
+       "at": [
+        "$hw * 0.18",
+        "$hh * 0.55",
+        "$hd - 0.0005 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)))"
+       ],
+       "material": "face_green",
+       "segments": 16,
+       "mirror": "Eye_R_green"
+      },
+      {
+       "name": "Smile_blue",
+       "shape": "tube",
+       "path": [
+        [
+         "-$hw * 0.13",
+         "$hh * 0.36",
+         0
+        ],
+        [
+         "-$hw * 0.07",
+         "$hh * 0.3",
+         0
+        ],
+        [
+         0,
+         "$hh * 0.285",
+         0
+        ],
+        [
+         "$hw * 0.07",
+         "$hh * 0.3",
+         0
+        ],
+        [
+         "$hw * 0.13",
+         "$hh * 0.36",
+         0
+        ]
+       ],
+       "radius": "0.004 * $height",
+       "at": [
+        0,
+        0,
+        "$hd - 0.002 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)))"
+       ],
+       "material": "face_blue",
+       "segments": 6
+      },
+      {
+       "name": "Smile_orange",
+       "shape": "tube",
+       "path": [
+        [
+         "-$hw * 0.13",
+         "$hh * 0.36",
+         0
+        ],
+        [
+         "-$hw * 0.07",
+         "$hh * 0.3",
+         0
+        ],
+        [
+         0,
+         "$hh * 0.285",
+         0
+        ],
+        [
+         "$hw * 0.07",
+         "$hh * 0.3",
+         0
+        ],
+        [
+         "$hw * 0.13",
+         "$hh * 0.36",
+         0
+        ]
+       ],
+       "radius": "0.004 * $height",
+       "at": [
+        0,
+        0,
+        "$hd - 0.002 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)))"
+       ],
+       "material": "face_orange",
+       "segments": 6
+      },
+      {
+       "name": "Smile_green",
+       "shape": "tube",
+       "path": [
+        [
+         "-$hw * 0.13",
+         "$hh * 0.36",
+         0
+        ],
+        [
+         "-$hw * 0.07",
+         "$hh * 0.3",
+         0
+        ],
+        [
+         0,
+         "$hh * 0.285",
+         0
+        ],
+        [
+         "$hw * 0.07",
+         "$hh * 0.3",
+         0
+        ],
+        [
+         "$hw * 0.13",
+         "$hh * 0.36",
+         0
+        ]
+       ],
+       "radius": "0.004 * $height",
+       "at": [
+        0,
+        0,
+        "$hd - 0.002 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)))"
+       ],
+       "material": "face_green",
+       "segments": 6
+      },
+      {
+       "name": "Ear_L",
+       "at": [
+        "$hw / 2 + 0.005 * $height",
+        "$hh * 0.52",
+        "$hd / 2"
+       ],
+       "mirror": "Ear_R",
+       "children": [
+        {
+         "name": "EarRing",
+         "shape": "cylinder",
+         "radius": "$hh * 0.24",
+         "height": "0.02 * $height",
+         "axis": "x",
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "joint",
+         "segments": 24
+        },
+        {
+         "name": "EarPod_blue",
+         "shape": "cylinder",
+         "radius": "$hh * 0.2 * lerp(0.5, 1, max(0, 1 - abs($scheme - 0)))",
+         "height": "0.03 * $height * lerp(0.3, 1, max(0, 1 - abs($scheme - 0)))",
+         "axis": "x",
+         "at": [
+          "0.01 * $height * max(0, 1 - abs($scheme - 0))",
+          0,
+          0
+         ],
+         "material": "accent_blue",
+         "segments": 24,
+         "bevel": "0.006 * max(0, 1 - abs($scheme - 0)) + 0.001"
+        },
+        {
+         "name": "EarPod_orange",
+         "shape": "cylinder",
+         "radius": "$hh * 0.2 * lerp(0.5, 1, max(0, 1 - abs($scheme - 1)))",
+         "height": "0.03 * $height * lerp(0.3, 1, max(0, 1 - abs($scheme - 1)))",
+         "axis": "x",
+         "at": [
+          "0.01 * $height * max(0, 1 - abs($scheme - 1))",
+          0,
+          0
+         ],
+         "material": "accent_orange",
+         "segments": 24,
+         "bevel": "0.006 * max(0, 1 - abs($scheme - 1)) + 0.001"
+        },
+        {
+         "name": "EarPod_green",
+         "shape": "cylinder",
+         "radius": "$hh * 0.2 * lerp(0.5, 1, max(0, 1 - abs($scheme - 2)))",
+         "height": "0.03 * $height * lerp(0.3, 1, max(0, 1 - abs($scheme - 2)))",
+         "axis": "x",
+         "at": [
+          "0.01 * $height * max(0, 1 - abs($scheme - 2))",
+          0,
+          0
+         ],
+         "material": "accent_green",
+         "segments": 24,
+         "bevel": "0.006 * max(0, 1 - abs($scheme - 2)) + 0.001"
+        }
+       ]
+      },
+      {
+       "name": "Antenna",
+       "at": [
+        "$hw * 0.25",
+        "$hh - 0.01",
+        "$hd * 0.4"
+       ],
+       "children": [
+        {
+         "name": "Mast",
+         "shape": "cylinder",
+         "radius": "0.006 * $height",
+         "height": "0.01 + 0.07 * $height * $antenna",
+         "at": [
+          0,
+          "(0.01 + 0.07 * $height * $antenna) / 2",
+          0
+         ],
+         "material": "joint",
+         "segments": 10
+        },
+        {
+         "name": "Tip",
+         "shape": "ellipsoid",
+         "radii": [
+          "0.004 + 0.012 * $height * $antenna",
+          "0.004 + 0.012 * $height * $antenna",
+          "0.004 + 0.012 * $height * $antenna"
+         ],
+         "at": [
+          0,
+          "0.01 + 0.07 * $height * $antenna",
+          0
+         ],
+         "material": "light_red",
+         "segments": 12
+        },
+        {
+         "name": "Base",
+         "shape": "cylinder",
+         "radius": "0.025 * $height",
+         "height": 0.012,
+         "at": [
+          0,
+          0.003,
+          0
+         ],
+         "material": "joint",
+         "segments": 16
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Arm_L",
+     "at": [
+      "$tw / 2 + $rb * 0.55 - $ra",
+      "$top - 0.06 * $height",
+      0
+     ],
+     "mirror": "Arm_R",
+     "children": [
+      {
+       "name": "UpperArm",
+       "shape": "cylinder",
+       "radius": "$ra",
+       "height": "0.17 * $height * $al",
+       "at": [
+        "$ra",
+        "-0.085 * $height * $al",
+        0
+       ],
+       "material": "shell",
+       "segments": 20,
+       "bevel": "$ra * 0.3"
+      },
+      {
+       "name": "Elbow",
+       "at": [
+        "$ra",
+        "-0.17 * $height * $al - 0.004",
+        0
+       ],
+       "rotate": [
+        -14,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "ElbowJoint",
+         "shape": "ellipsoid",
+         "radii": [
+          "$ra * 0.95",
+          "$ra * 0.95",
+          "$ra * 0.95"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "joint",
+         "segments": 16
+        },
+        {
+         "name": "Forearm",
+         "shape": "cylinder",
+         "radius": "$ra * 0.92",
+         "height": "0.15 * $height * $al",
+         "at": [
+          0,
+          "-0.075 * $height * $al - 0.01",
+          0
+         ],
+         "material": "shell",
+         "segments": 20,
+         "bevel": "$ra * 0.3"
+        },
+        {
+         "name": "Hand_L",
+         "at": [
+          0,
+          "-0.15 * $height * $al - 0.02",
+          0
+         ],
+         "children": [
+          {
+           "name": "Wrist",
+           "shape": "ellipsoid",
+           "radii": [
+            "$ra * 0.6",
+            "$ra * 0.6",
+            "$ra * 0.6"
+           ],
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "joint",
+           "segments": 12
+          },
+          {
+           "name": "Palm",
+           "shape": "box",
+           "size": [
+            "0.026 * $height * $b",
+            "0.07 * $height",
+            "0.062 * $height * $b"
+           ],
+           "at": [
+            0,
+            "-0.035 * $height",
+            0
+           ],
+           "material": "joint",
+           "bevel": 0.006
+          },
+          {
+           "name": "Finger_{i}",
+           "at": [
+            0,
+            "-0.068 * $height",
+            "-0.052 * $height * $b / 2 + 0.052 * $height * $b * ($i + 0.5) / $fingers"
+           ],
+           "repeat": {
+            "count": "$fingers",
+            "step": [
+             0,
+             0,
+             0
+            ]
+           },
+           "children": [
+            {
+             "name": "Proximal",
+             "shape": "cylinder",
+             "radius": "0.0085 * $height * $b",
+             "height": "0.032 * $height",
+             "at": [
+              0,
+              "-0.016 * $height",
+              0
+             ],
+             "material": "shell",
+             "segments": 10,
+             "bevel": 0.002
+            },
+            {
+             "name": "Tip",
+             "at": [
+              0,
+              "-0.032 * $height",
+              0
+             ],
+             "rotate": [
+              -15,
+              0,
+              0
+             ],
+             "children": [
+              {
+               "name": "Distal",
+               "shape": "cylinder",
+               "radius": "0.008 * $height * $b",
+               "height": "0.026 * $height",
+               "at": [
+                0,
+                "-0.013 * $height",
+                0
+               ],
+               "material": "shell",
+               "segments": 10,
+               "bevel": 0.002
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "name": "Thumb",
+           "at": [
+            0,
+            "-0.025 * $height",
+            "0.033 * $height * $b"
+           ],
+           "rotate": [
+            30,
+            0,
+            0
+           ],
+           "children": [
+            {
+             "name": "ThumbSegment",
+             "shape": "cylinder",
+             "radius": "0.008 * $height * $b",
+             "height": "0.03 * $height",
+             "at": [
+              0,
+              "-0.015 * $height",
+              0
+             ],
+             "material": "shell",
+             "segments": 10,
+             "bevel": 0.002
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Leg_L",
+     "at": [
+      "0.075 * $height * $b - $rt",
+      "$hip",
+      0
+     ],
+     "mirror": "Leg_R",
+     "children": [
+      {
+       "name": "Thigh",
+       "shape": "cylinder",
+       "radius": "$rt",
+       "height": "0.19 * $height * $ll",
+       "at": [
+        "$rt",
+        "-0.095 * $height * $ll",
+        0
+       ],
+       "material": "shell",
+       "segments": 20,
+       "bevel": "$rt * 0.3"
+      },
+      {
+       "name": "Knee",
+       "at": [
+        "$rt",
+        "-0.19 * $height * $ll",
+        0
+       ],
+       "children": [
+        {
+         "name": "KneeJoint",
+         "shape": "ellipsoid",
+         "radii": [
+          "$rt * 0.95",
+          "$rt * 0.95",
+          "$rt * 0.95"
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "joint",
+         "segments": 16
+        },
+        {
+         "name": "KneeCap_blue",
+         "shape": "ellipsoid",
+         "radii": [
+          "$rt * 0.75 * lerp(0.6, 1, max(0, 1 - abs($scheme - 0)))",
+          "$rt * 0.8 * lerp(0.6, 1, max(0, 1 - abs($scheme - 0)))",
+          "$rt * 0.45 * lerp(0.6, 1, max(0, 1 - abs($scheme - 0)))"
+         ],
+         "at": [
+          0,
+          0,
+          "$rt * 0.68 * max(0, 1 - abs($scheme - 0))"
+         ],
+         "material": "accent_blue",
+         "segments": 16
+        },
+        {
+         "name": "KneeCap_orange",
+         "shape": "ellipsoid",
+         "radii": [
+          "$rt * 0.75 * lerp(0.6, 1, max(0, 1 - abs($scheme - 1)))",
+          "$rt * 0.8 * lerp(0.6, 1, max(0, 1 - abs($scheme - 1)))",
+          "$rt * 0.45 * lerp(0.6, 1, max(0, 1 - abs($scheme - 1)))"
+         ],
+         "at": [
+          0,
+          0,
+          "$rt * 0.68 * max(0, 1 - abs($scheme - 1))"
+         ],
+         "material": "accent_orange",
+         "segments": 16
+        },
+        {
+         "name": "KneeCap_green",
+         "shape": "ellipsoid",
+         "radii": [
+          "$rt * 0.75 * lerp(0.6, 1, max(0, 1 - abs($scheme - 2)))",
+          "$rt * 0.8 * lerp(0.6, 1, max(0, 1 - abs($scheme - 2)))",
+          "$rt * 0.45 * lerp(0.6, 1, max(0, 1 - abs($scheme - 2)))"
+         ],
+         "at": [
+          0,
+          0,
+          "$rt * 0.68 * max(0, 1 - abs($scheme - 2))"
+         ],
+         "material": "accent_green",
+         "segments": 16
+        },
+        {
+         "name": "Shin",
+         "shape": "cylinder",
+         "radius": "$rt * 0.9",
+         "height": "0.2 * $height * $ll - 0.02",
+         "at": [
+          0,
+          "-0.1 * $height * $ll",
+          0
+         ],
+         "material": "shell",
+         "segments": 20,
+         "bevel": "$rt * 0.3"
+        },
+        {
+         "name": "Foot_L",
+         "at": [
+          0,
+          "-0.2 * $height * $ll",
+          0
+         ],
+         "children": [
+          {
+           "name": "Ankle",
+           "shape": "ellipsoid",
+           "radii": [
+            "$rt * 0.7",
+            "$rt * 0.7",
+            "$rt * 0.7"
+           ],
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "material": "joint",
+           "segments": 12
+          },
+          {
+           "name": "FootShell",
+           "shape": "box",
+           "size": [
+            "$rt * 1.95",
+            "0.055 * $height",
+            "0.16 * $height"
+           ],
+           "at": [
+            0,
+            "-0.0375 * $height",
+            "0.025 * $height"
+           ],
+           "material": "shell",
+           "bevel": "0.018 * $height"
+          },
+          {
+           "name": "Sole",
+           "shape": "box",
+           "size": [
+            "$rt * 1.9",
+            "0.012 * $height",
+            "0.155 * $height"
+           ],
+           "at": [
+            0,
+            "-0.059 * $height",
+            "0.025 * $height"
+           ],
+           "material": "rubber_sole",
+           "bevel": "0.004 * $height"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

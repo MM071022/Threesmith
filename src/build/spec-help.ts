@@ -59,14 +59,17 @@ export const SPEC_HELP = `A model spec is JSON that describes a model as a tree 
 
 A node has a "name" and any of these (every node becomes an Object3D with the same name: gltf.scene.getObjectByName("Wheel_FL")):
   shape      box | cylinder | ellipsoid | lathe | loft | extrude | roof | tube   (no shape = an empty pivot or group)
-  material   a preset (see below) or one from "materials"; children inherit it
+  material   a preset (see below) or one from "materials"; children inherit it. "paint_{scheme}" picks the material by an
+             enum param (scheme = "red" gives paint_red), so one node can wear every colour option
+  visible    false, or an expression that is 0 to leave the node out with its children and its mirror ("$lightBar",
+             "$style_military", "$doors >= 4"); an optional part is then really gone, not hidden
   at         [x, y, z] position of the node (its pivot) in its parent
   offset     [x, y, z]: move the shape inside the node without moving the node's pivot (a blade whose pivot is its root)
   rotate     [rx, ry, rz] degrees, applied x, then y, then z
   mirror     "Name": also add a mirror image of this node and its children in the x = 0 plane, with that name
   repeat     { "count": n, "step": [dx, dy, dz] }: a row of n copies; or { "count": n, "around": "y", "phase": degrees }: a ring of n
              copies turned about that axis through the parent's origin (rotor blades, wheel spokes, branches).
-             Name them with {i} (1, 2, 3, ...) or they get _1, _2, ...
+             Name them with {i} (1, 2, 3, ...) or they get _1, _2, ... A count of 0 makes no copies.
   vars       { "x": "$width / 2" }: variables for this node and its children
   children   [ <node>, ... ]
 
@@ -82,7 +85,10 @@ Shapes and their keys:
   tube       path [[x, y, z], ...], radius or radii (one per point), segments, caps   (pipes, rails, frames, handlebars, cables,
              branches; corners keep their thickness, extra points round a bend)
 
-Numbers can be expressions: "$width / 2 - 0.1", "max($a, 1) * 2", "pi", "rad(45)", "$i * 0.5" inside repeat.
+Numbers can be expressions: "$width / 2 - 0.1", "max($a, 1) * 2", "pi", "rad(45)", "$i * 0.5" and "$n" (the count) inside repeat.
+Params: number, integer, boolean (1 or 0 in expressions) and enum with "options": in expressions $style is the index of the chosen
+option and $style_military is 1 for that option and 0 otherwise. Make a blueprint adjustable: sizes and counts as params,
+styles as enums, optional parts with "visible", colours with "material": "name_{param}".
 Functions: min max abs sqrt sin cos tan asin acos atan atan2 hypot floor ceil round pow rad deg clamp lerp (angles in radians; rad() and deg() convert). Variables start with $.
 Conventions: +y is up, the front of a model faces +z (the glTF convention, which GLTFLoader keeps: three.js is right-handed with +y up; the model's left is then +x), the model stands on y = 0, a moving part gets its own node with its pivot at its origin
 (a wheel at its hub). A custom material may also have "emissive": [r, g, b] (a lamp that glows), "alpha": "BLEND", and "texture": a
@@ -102,6 +108,7 @@ export const SPEC_CHEAT = `  { "version": 1, "name": "x", "archetype": "<id>", "
   node: { "name": "Wheel_FL", "shape": "cylinder", "material": "rubber", "at": [x, y, z], "rotate": [rx, ry, rz], "mirror": "Wheel_FR", "repeat": {...}, "vars": {...}, "children": [ <node> ] }
   shapes: box {size:[w,h,d], anchor, bevel} | cylinder {radius,height,axis,bevel} | ellipsoid {radii,lumps} | lathe {profile:[[r,y],...]} | loft {sections} | extrude {plan,y0,y1} | roof {x0,x1,z0,z1,y,rise,kind} | tube {path:[[x,y,z],...],radius}
   numbers may be expressions: "$w / 2 - 0.1"; $i inside repeat. +y up, front +z, metres, stand on y = 0.
+  options: "visible": "$roof" leaves a part out when 0; enum "style" gives $style (index) and $style_open (0/1); "material": "paint_{colour}".
   a moving part = its own node with "at" on its pivot (a wheel at its hub, a door on its hinge); use "offset" to move the shape away from the pivot.
   every part must touch another part or the ground: overlap parts by a few cm instead of leaving gaps.
   materials: plaster brick concrete stone asphalt roof_tile roof_slate wood frame_white glass glass_tinted metal steel chrome aluminium brass plastic plastic_white rubber paint canvas light light_red light_amber bark leaf grass soil sand water`;

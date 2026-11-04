@@ -43,12 +43,12 @@ safe, undoable edits. Everything runs locally; nothing leaves the machine.
 | fixes a bug | cannot show it was there, or that it is gone | `three_play` runs steps and judges claims frame by frame; `three_scenario` keeps it as a regression test |
 | makes it fast | changes things and hopes | `three_perf` counts draw calls, triangles and programs against a budget and the last run; `three_leaks` names what is never disposed |
 | ships it | builds once, deploys, sees a 404 | `three_build` builds, finds two copies of three, missing assets and sub-path URLs, then opens the built page |
-| needs a 3D model | needs Blender or a placeholder cube | `three_model_build` makes a clean `.glb` from one of 60 kinds, then shows it as text views and lints it |
+| needs a 3D model | needs Blender or a placeholder cube | `three_model_build` makes a clean `.glb` from one of 110 kinds, then shows it as text views and lints it |
 | does not know the project | reads twenty files | `three_scan` and `three_doctor` give the map and the order to fix things in one call |
 
 <p align="center">
-  <a href="https://laaielichter.github.io/Threesmith/models.html"><img src="docs/gallery/overview.jpg" alt="Cars, aircraft, boats, buildings, trees and a dragon built by Threesmith and rendered by three.js" width="860"></a><br>
-  <sub>3D models from code, no Blender: 60 ready-made kinds, rendered here by three.js itself. <a href="https://laaielichter.github.io/Threesmith/models.html">See all</a></sub>
+  <a href="https://laaielichter.github.io/Threesmith/models.html"><img src="docs/gallery/overview.jpg" alt="A car, an airship, a wizard tower, an excavator, a treasure chest, a dragon, a lighthouse, a mech, a longship, a stone golem, a hot-air balloon and a castle, built by Threesmith and rendered by three.js" width="860"></a><br>
+  <sub>3D models from code, no Blender: 110 ready-made kinds, from cars and airships to swords, teapots and golems, rendered here by three.js itself. <a href="https://laaielichter.github.io/Threesmith/models.html">See all</a></sub>
 </p>
 
 ## Quickstart
@@ -138,7 +138,7 @@ project. The browser tools need `playwright-core` and a Chromium (`npx playwrigh
 | build | `three_build` | Run the build, check the output (copies of three, missing assets, sub-path URLs, decoders) and open the built page headless |
 | model | `three_model_brief` | One page before you build a model: the nearest ready-made kind, parts, real size, rules, the order of tools |
 | model | `three_model_identify` | What a thing is (English or Dutch): parts, pivots, typical size, variants, usual mistakes |
-| model | `three_model_spec` | The JSON model spec, an example, and the 60 ready-made kinds |
+| model | `three_model_spec` | The JSON model spec, an example, and the 110 ready-made kinds |
 | model | `three_model_build` | Build a clean, deterministic `.glb` from a kind or a spec, and lint it |
 | model | `three_model_view` | A `.glb` as text: front, side and top views, parts with sizes, parts that do not touch |
 | model | `three_model_lint` | Score a `.glb` for the web (geometry, materials, triangles, draw calls, texture memory, loading), and against what it should be |

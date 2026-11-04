@@ -1,0 +1,834 @@
+{
+ "version": 1,
+ "name": "well",
+ "archetype": "prop.well",
+ "description": "A village draw well: a round wall of staggered stone blocks on a mortar core with a plinth and a coping ring, a dark shaft with water a little below the rim, two timber posts with feet and knee braces carrying a ridge beam and a shingled gable roof with barge boards, and a windlass (winch) between the posts with an iron axle, rope coil and crank handle that turns about x, plus a hooped wooden bucket on its rope.",
+ "params": [
+  {
+   "name": "radius",
+   "type": "number",
+   "default": 0.65,
+   "min": 0.5,
+   "max": 0.95,
+   "description": "Outer radius of the wall in metres."
+  },
+  {
+   "name": "wallHeight",
+   "type": "number",
+   "default": 0.8,
+   "min": 0.5,
+   "max": 1.1,
+   "description": "Height of the wall up to the coping."
+  },
+  {
+   "name": "postHeight",
+   "type": "number",
+   "default": 1.3,
+   "min": 0.9,
+   "max": 1.8,
+   "description": "Height of the posts above the wall."
+  },
+  {
+   "name": "roofPitch",
+   "type": "number",
+   "default": 40,
+   "min": 25,
+   "max": 55,
+   "description": "Slope of the roof in degrees."
+  },
+  {
+   "name": "roof",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "The gable roof on the posts (off: an open windlass frame)."
+  },
+  {
+   "name": "bucket",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A bucket on the rope."
+  },
+  {
+   "name": "bucketDrop",
+   "type": "number",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "description": "How far the bucket hangs down: 0 just under the windlass, 1 at the water."
+  },
+  {
+   "name": "crank",
+   "type": "number",
+   "default": 0,
+   "min": -180,
+   "max": 180,
+   "description": "Turn of the windlass and its crank in degrees (the Winch node turns about x)."
+  }
+ ],
+ "materials": {
+  "well_stone": {
+   "color": [
+    0.2,
+    0.185,
+    0.16
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "concrete"
+  },
+  "well_mortar": {
+   "color": [
+    0.075,
+    0.07,
+    0.065
+   ],
+   "metallic": 0,
+   "roughness": 0.95
+  },
+  "well_coping": {
+   "color": [
+    0.15,
+    0.145,
+    0.135
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "texture": "concrete"
+  },
+  "well_timber": {
+   "color": [
+    0.13,
+    0.075,
+    0.038
+   ],
+   "metallic": 0,
+   "roughness": 0.8,
+   "texture": "wood"
+  },
+  "well_shingle": {
+   "color": [
+    0.1,
+    0.065,
+    0.042
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "texture": "roof_tile"
+  },
+  "well_iron": {
+   "color": [
+    0.08,
+    0.08,
+    0.085
+   ],
+   "metallic": 0.7,
+   "roughness": 0.55
+  },
+  "well_rope": {
+   "color": [
+    0.3,
+    0.22,
+    0.12
+   ],
+   "metallic": 0,
+   "roughness": 0.95
+  },
+  "well_hole": {
+   "color": [
+    0.012,
+    0.012,
+    0.012
+   ],
+   "metallic": 0,
+   "roughness": 1
+  },
+  "well_water": {
+   "color": [
+    0.02,
+    0.07,
+    0.08,
+    0.85
+   ],
+   "metallic": 0,
+   "roughness": 0.05,
+   "alpha": "BLEND",
+   "texture": "water"
+  },
+  "bucket_wood": {
+   "color": [
+    0.2,
+    0.12,
+    0.055
+   ],
+   "metallic": 0,
+   "roughness": 0.75
+  }
+ },
+ "nodes": [
+  {
+   "name": "Well",
+   "vars": {
+    "R": "$radius",
+    "H": "$wallHeight",
+    "Ri": "$radius - 0.19",
+    "ph": "$postHeight",
+    "px": "$radius - 0.1",
+    "wy": "max(0.1, $wallHeight - 0.4)",
+    "nc": "max(2, round(($wallHeight - 0.16) / 0.21))",
+    "ch": "($wallHeight - 0.16) / max(2, round(($wallHeight - 0.16) / 0.21))",
+    "ns": "round(2 * pi * $radius / 0.34)",
+    "sw": "2 * pi * $radius / round(2 * pi * $radius / 0.34) - 0.025",
+    "yr": "$wallHeight + $postHeight + 0.06",
+    "ya": "$wallHeight + $postHeight * 0.55",
+    "rx": "$radius - 0.1 + 0.2",
+    "sl": "($radius + 0.18) / cos(rad($roofPitch))",
+    "by": "lerp($wallHeight + $postHeight * 0.55 - 0.62, max(0.1, $wallHeight - 0.4) + 0.02, $bucketDrop)",
+    "froof": "max(0.05, $roof)",
+    "fbucket": "max(0.1, $bucket)"
+   },
+   "children": [
+    {
+     "name": "Wall",
+     "material": "well_stone",
+     "children": [
+      {
+       "name": "Masonry",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$Ri",
+         0
+        ],
+        [
+         "$R - 0.02",
+         0
+        ],
+        [
+         "$R - 0.02",
+         "$H"
+        ],
+        [
+         "$Ri",
+         "$H"
+        ],
+        [
+         "$Ri",
+         0
+        ]
+       ],
+       "segments": 32,
+       "caps": false,
+       "material": "well_mortar"
+      },
+      {
+       "name": "Plinth",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$R - 0.05",
+         0
+        ],
+        [
+         "$R + 0.05",
+         0
+        ],
+        [
+         "$R + 0.05",
+         0.1
+        ],
+        [
+         "$R + 0.02",
+         0.14
+        ],
+        [
+         "$R - 0.05",
+         0.14
+        ],
+        [
+         "$R - 0.05",
+         0
+        ]
+       ],
+       "segments": 32,
+       "caps": false,
+       "material": "well_coping"
+      },
+      {
+       "name": "Course_{i}",
+       "at": [
+        0,
+        "0.14 + $ch / 2",
+        0
+       ],
+       "rotate": [
+        0,
+        "$i * 180 / $ns",
+        0
+       ],
+       "repeat": {
+        "count": "$nc",
+        "step": [
+         0,
+         "$ch",
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Stone_{i}",
+         "shape": "box",
+         "size": [
+          "$sw * (0.9 + 0.08 * sin($i * 2.3))",
+          "$ch - 0.024 - 0.012 * abs(sin($i * 1.7))",
+          0.07
+         ],
+         "at": [
+          0,
+          "0.006 * sin($i * 3.1)",
+          "$R - 0.03 + 0.01 * sin($i * 1.3)"
+         ],
+         "rotate": [
+          0,
+          0,
+          "2.5 * sin($i * 4.1)"
+         ],
+         "bevel": 0.022,
+         "repeat": {
+          "count": "$ns",
+          "around": "y"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Coping",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$Ri - 0.04",
+         "$H - 0.02"
+        ],
+        [
+         "$R + 0.05",
+         "$H - 0.02"
+        ],
+        [
+         "$R + 0.06",
+         "$H + 0.03"
+        ],
+        [
+         "$R + 0.045",
+         "$H + 0.085"
+        ],
+        [
+         "$Ri - 0.025",
+         "$H + 0.085"
+        ],
+        [
+         "$Ri - 0.045",
+         "$H + 0.04"
+        ],
+        [
+         "$Ri - 0.04",
+         "$H - 0.02"
+        ]
+       ],
+       "segments": 32,
+       "caps": false,
+       "material": "well_coping"
+      }
+     ]
+    },
+    {
+     "name": "Shaft",
+     "children": [
+      {
+       "name": "Lining",
+       "shape": "cylinder",
+       "radius": "$Ri + 0.005",
+       "height": "$wy - 0.02",
+       "at": [
+        0,
+        0.02,
+        0
+       ],
+       "anchor": "base",
+       "segments": 32,
+       "material": "well_hole"
+      },
+      {
+       "name": "Water",
+       "shape": "cylinder",
+       "radius": "$Ri + 0.008",
+       "height": 0.01,
+       "at": [
+        0,
+        "$wy",
+        0
+       ],
+       "anchor": "base",
+       "segments": 32,
+       "material": "well_water"
+      }
+     ]
+    },
+    {
+     "name": "Frame",
+     "material": "well_timber",
+     "children": [
+      {
+       "name": "Post_L",
+       "shape": "box",
+       "size": [
+        0.13,
+        "$ph + $H * 0.45",
+        0.13
+       ],
+       "at": [
+        "$px",
+        "$H * 0.55 + ($ph + $H * 0.45) / 2",
+        0
+       ],
+       "bevel": 0.012,
+       "mirror": "Post_R"
+      },
+      {
+       "name": "PostFoot_L",
+       "shape": "box",
+       "size": [
+        0.22,
+        0.08,
+        0.2
+       ],
+       "at": [
+        "$px",
+        "$H + 0.12",
+        0
+       ],
+       "bevel": 0.01,
+       "mirror": "PostFoot_R"
+      }
+     ]
+    },
+    {
+     "name": "Roof",
+     "children": [
+      {
+       "name": "RidgeBeam",
+       "shape": "box",
+       "size": [
+        "(2 * $px + 0.3) * $froof",
+        "0.12 * $froof",
+        "0.12 * $froof"
+       ],
+       "at": [
+        0,
+        "($yr - 0.06) * $froof",
+        0
+       ],
+       "bevel": "0.01 * $froof",
+       "material": "well_timber"
+      },
+      {
+       "name": "Brace_L",
+       "shape": "box",
+       "size": [
+        "0.07 * $froof",
+        "0.42 * $froof",
+        "0.07 * $froof"
+       ],
+       "at": [
+        "($px - 0.14) * $froof",
+        "($yr - 0.27) * $froof",
+        0
+       ],
+       "rotate": [
+        0,
+        0,
+        45
+       ],
+       "bevel": "0.008 * $froof",
+       "material": "well_timber",
+       "mirror": "Brace_R"
+      },
+      {
+       "name": "Slope_F",
+       "shape": "box",
+       "size": [
+        "(2 * $rx) * $froof",
+        "0.045 * $froof",
+        "($sl) * $froof"
+       ],
+       "at": [
+        0,
+        "($yr - $sl / 2 * sin(rad($roofPitch)) + 0.04) * $froof",
+        "($sl / 2 * cos(rad($roofPitch))) * $froof"
+       ],
+       "rotate": [
+        "$roofPitch",
+        0,
+        0
+       ],
+       "bevel": "0.008 * $froof",
+       "material": "well_shingle"
+      },
+      {
+       "name": "Slope_B",
+       "shape": "box",
+       "size": [
+        "(2 * $rx) * $froof",
+        "0.045 * $froof",
+        "($sl) * $froof"
+       ],
+       "at": [
+        0,
+        "($yr - $sl / 2 * sin(rad($roofPitch)) + 0.04) * $froof",
+        "(-$sl / 2 * cos(rad($roofPitch))) * $froof"
+       ],
+       "rotate": [
+        "-$roofPitch",
+        0,
+        0
+       ],
+       "bevel": "0.008 * $froof",
+       "material": "well_shingle"
+      },
+      {
+       "name": "Ridge",
+       "shape": "box",
+       "size": [
+        "(2 * $rx + 0.02) * $froof",
+        "0.06 * $froof",
+        "0.12 * $froof"
+       ],
+       "at": [
+        0,
+        "($yr + 0.055) * $froof",
+        0
+       ],
+       "bevel": "0.012 * $froof",
+       "material": "well_timber"
+      },
+      {
+       "name": "Barge_FL",
+       "shape": "box",
+       "size": [
+        "0.04 * $froof",
+        "0.1 * $froof",
+        "($sl + 0.02) * $froof"
+       ],
+       "at": [
+        "($rx + 0.0) * $froof",
+        "($yr - $sl / 2 * sin(rad($roofPitch)) + 0.0) * $froof",
+        "($sl / 2 * cos(rad($roofPitch))) * $froof"
+       ],
+       "rotate": [
+        "$roofPitch",
+        0,
+        0
+       ],
+       "material": "well_timber",
+       "mirror": "Barge_FR"
+      },
+      {
+       "name": "Barge_BL",
+       "shape": "box",
+       "size": [
+        "0.04 * $froof",
+        "0.1 * $froof",
+        "($sl + 0.02) * $froof"
+       ],
+       "at": [
+        "($rx + 0.0) * $froof",
+        "($yr - $sl / 2 * sin(rad($roofPitch)) + 0.0) * $froof",
+        "(-$sl / 2 * cos(rad($roofPitch))) * $froof"
+       ],
+       "rotate": [
+        "-$roofPitch",
+        0,
+        0
+       ],
+       "material": "well_timber",
+       "mirror": "Barge_BR"
+      }
+     ],
+     "at": [
+      0,
+      "$H * 0.5 + ((0) - ($H * 0.5)) * $froof",
+      "-($R + $Ri) / 2 + ((0) - (-($R + $Ri) / 2)) * $froof"
+     ]
+    },
+    {
+     "name": "Winch",
+     "at": [
+      0,
+      "$ya",
+      0
+     ],
+     "rotate": [
+      "$crank",
+      0,
+      0
+     ],
+     "material": "well_timber",
+     "children": [
+      {
+       "name": "Axle",
+       "shape": "cylinder",
+       "radius": 0.03,
+       "height": "2 * $px + 0.36",
+       "axis": "x",
+       "segments": 12,
+       "material": "well_iron"
+      },
+      {
+       "name": "Drum",
+       "shape": "cylinder",
+       "radius": 0.085,
+       "height": "2 * $px - 0.2",
+       "axis": "x",
+       "segments": 16,
+       "bevel": 0.01
+      },
+      {
+       "name": "Coil",
+       "shape": "cylinder",
+       "radius": 0.1,
+       "height": 0.34,
+       "at": [
+        -0.1,
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 16,
+       "bevel": 0.012,
+       "material": "well_rope"
+      },
+      {
+       "name": "Collar_L",
+       "shape": "cylinder",
+       "radius": 0.06,
+       "height": 0.04,
+       "at": [
+        "$px - 0.09",
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 12,
+       "material": "well_iron",
+       "mirror": "Collar_R"
+      },
+      {
+       "name": "CrankArm",
+       "shape": "box",
+       "size": [
+        0.04,
+        0.3,
+        0.06
+       ],
+       "at": [
+        "$px + 0.15",
+        -0.13,
+        0
+       ],
+       "bevel": 0.008,
+       "material": "well_iron"
+      },
+      {
+       "name": "CrankHandle",
+       "shape": "cylinder",
+       "radius": 0.022,
+       "height": 0.16,
+       "at": [
+        "$px + 0.23",
+        -0.26,
+        0
+       ],
+       "axis": "x",
+       "segments": 10,
+       "bevel": 0.006
+      }
+     ]
+    },
+    {
+     "name": "Bucket",
+     "at": [
+      -0.1,
+      "$ya + (($by) - ($ya)) * $fbucket",
+      0
+     ],
+     "material": "bucket_wood",
+     "children": [
+      {
+       "name": "Pail",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         "0.105 * $fbucket",
+         0
+        ],
+        [
+         "0.11 * $fbucket",
+         "0.01 * $fbucket"
+        ],
+        [
+         "0.13 * $fbucket",
+         "0.26 * $fbucket"
+        ],
+        [
+         "0.122 * $fbucket",
+         "0.26 * $fbucket"
+        ],
+        [
+         "0.1 * $fbucket",
+         "0.02 * $fbucket"
+        ],
+        [
+         0,
+         "0.02 * $fbucket"
+        ]
+       ],
+       "segments": 20
+      },
+      {
+       "name": "Hoop_Low",
+       "shape": "lathe",
+       "profile": [
+        [
+         "0.115 * $fbucket",
+         "0.05 * $fbucket"
+        ],
+        [
+         "0.12 * $fbucket",
+         "0.05 * $fbucket"
+        ],
+        [
+         "0.123 * $fbucket",
+         "0.08 * $fbucket"
+        ],
+        [
+         "0.118 * $fbucket",
+         "0.08 * $fbucket"
+        ],
+        [
+         "0.115 * $fbucket",
+         "0.05 * $fbucket"
+        ]
+       ],
+       "segments": 20,
+       "caps": false,
+       "material": "well_iron"
+      },
+      {
+       "name": "Hoop_High",
+       "shape": "lathe",
+       "profile": [
+        [
+         "0.125 * $fbucket",
+         "0.2 * $fbucket"
+        ],
+        [
+         "0.13 * $fbucket",
+         "0.2 * $fbucket"
+        ],
+        [
+         "0.133 * $fbucket",
+         "0.235 * $fbucket"
+        ],
+        [
+         "0.128 * $fbucket",
+         "0.235 * $fbucket"
+        ],
+        [
+         "0.125 * $fbucket",
+         "0.2 * $fbucket"
+        ]
+       ],
+       "segments": 20,
+       "caps": false,
+       "material": "well_iron"
+      },
+      {
+       "name": "Bail",
+       "shape": "tube",
+       "path": [
+        [
+         "0.127 * $fbucket",
+         "0.23 * $fbucket",
+         0
+        ],
+        [
+         "0.12 * $fbucket",
+         "0.3 * $fbucket",
+         0
+        ],
+        [
+         "0.085 * $fbucket",
+         "0.36 * $fbucket",
+         0
+        ],
+        [
+         "0.03 * $fbucket",
+         "0.385 * $fbucket",
+         0
+        ],
+        [
+         "-0.03 * $fbucket",
+         "0.385 * $fbucket",
+         0
+        ],
+        [
+         "-0.085 * $fbucket",
+         "0.36 * $fbucket",
+         0
+        ],
+        [
+         "-0.12 * $fbucket",
+         "0.3 * $fbucket",
+         0
+        ],
+        [
+         "-0.127 * $fbucket",
+         "0.23 * $fbucket",
+         0
+        ]
+       ],
+       "radius": "0.006 * $fbucket",
+       "segments": 6,
+       "material": "well_iron"
+      },
+      {
+       "name": "Rope",
+       "shape": "tube",
+       "path": [
+        [
+         0,
+         "0.38 * $fbucket",
+         0
+        ],
+        [
+         0,
+         "($ya - $by - 0.09) * $fbucket",
+         0
+        ]
+       ],
+       "radius": "0.011 * $fbucket",
+       "segments": 8,
+       "material": "well_rope"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
