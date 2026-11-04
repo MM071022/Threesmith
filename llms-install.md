@@ -46,6 +46,8 @@ Start with `three_doctor` in a project you do not know: it says what is wrong an
 - `--read-only`: leave out the tools that always write and refuse write options (dry runs still work).
 - Environment: `THREESMITH_PROJECT`, `THREESMITH_TIER`, `THREESMITH_TOOLS`, `THREESMITH_READ_ONLY=1`,
   `THREESMITH_PROTECT` (folders no write may touch), `THREESMITH_LEARN=0` (no local learning).
+- CLI output is plain ASCII on Windows when it is piped (PowerShell would garble UTF-8 symbols); `THREESMITH_ASCII=1`
+  forces that everywhere, `THREESMITH_ASCII=0` keeps the symbols.
 
 ## What it writes and sends
 

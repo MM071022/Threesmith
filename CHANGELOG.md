@@ -40,6 +40,7 @@ agents get wrong in three.js.
   (`three_undo`), protected paths, and false-alarm feedback that hides a finding on this machine.
 - **Plugin:** a pre-edit hook that refuses Claude's edits into protected paths (and of the protect list); settings
   for protected paths, tool sets and read-only; full-detail profile; an icon; passes `claude plugin validate`. Skills `debug`, `perf`, `review`, `upgrade`, `ship`, `model`, `learn`; a `three-debugger` subagent.
+- CLI output falls back to plain ASCII on a Windows pipe, where PowerShell turned `✖` into `Ôƒû` (`THREESMITH_ASCII`).
 - Fixed: the API lookup found no members for classes re-exported through a local export list (every material).
 
 ## 0.1.0

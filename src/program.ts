@@ -1,6 +1,7 @@
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { Command } from "commander";
+import { toAscii, useAscii } from "./ascii.js";
 import { formatSearch, lookup, search } from "./api/lookup.js";
 import { check, formatCheck, parseSteps } from "./check/check.js";
 import { ci } from "./ci.js";
@@ -62,8 +63,11 @@ import { formatCompact } from "./review/compact.js";
 import { join, relative } from "node:path";
 import { statSync } from "node:fs";
 
+const ascii = useAscii();
+
 function out(s: string): void {
-  process.stdout.write(s.endsWith("\n") ? s : s + "\n");
+  const text = ascii ? toAscii(s) : s;
+  process.stdout.write(text.endsWith("\n") ? text : text + "\n");
 }
 
 export function buildProgram(): Command {
