@@ -147,3 +147,18 @@ describe("lessons over mcp", () => {
     expect(textOf(x)).toContain("lesson ");
   });
 });
+
+describe("model tools over mcp", () => {
+  it("briefs, builds through the journal, views, lints and inspects a model", async () => {
+    const c = await client();
+    const dir = project({ "package.json": "{}", "main.js": "import * as THREE from 'three';\nnew THREE.Scene();\n" });
+    expect(textOf(await c.callTool({ name: "three_model_brief", arguments: { what: "car" } }))).toContain("car");
+    const b = await c.callTool({ name: "three_model_build", arguments: { kind: "barrel", textures: false, out: "public/barrel.glb", path: dir } });
+    expect(textOf(b)).toContain("wrote public/barrel.glb");
+    expect(textOf(await c.callTool({ name: "three_model_view", arguments: { file: "public/barrel.glb", path: dir } }))).toContain("FRONT");
+    const l = await c.callTool({ name: "three_model_lint", arguments: { file: "public/barrel.glb", path: dir } });
+    expect(l.isError).toBeFalsy();
+    expect(textOf(await c.callTool({ name: "three_model_inspect", arguments: { file: "public/barrel.glb", path: dir } }))).toContain("GLTFLoader");
+    expect(textOf(await c.callTool({ name: "three_undo", arguments: { path: dir } }))).toContain("removed public/barrel.glb");
+  }, 60_000);
+});

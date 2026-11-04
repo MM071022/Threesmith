@@ -35,6 +35,29 @@ import { formatJunit, formatScenarios, loadScenarios, runScenarios, saveScenario
 import { formatPerf, perf } from "./check/perf.js";
 import { formatLeaks, leaks } from "./check/leaks.js";
 import { buildCheck, formatBuild } from "./check/build.js";
+import {
+  EXAMPLE_SPEC,
+  SPEC_CHEAT,
+  SPEC_HELP,
+  archetypeLibrary,
+  briefFor,
+  buildModel,
+  checkModelSetup,
+  formatIdentify,
+  formatKinds,
+  formatLint,
+  formatModelInfo,
+  formatModelNeeds,
+  formatModelReport,
+  formatRecipes,
+  formatSetupProblems,
+  identify,
+  inspectModel,
+  lintModelFile,
+  modelNeeds,
+  recipeSpec,
+  viewModel,
+} from "./model/index.js";
 import { formatCompact } from "./review/compact.js";
 import { join, relative } from "node:path";
 import { statSync } from "node:fs";
@@ -351,6 +374,98 @@ export function buildProgram(): Command {
       const r = await buildCheck({ project: projectRootOf(path), script: o.script, ...(o.out ? { outDir: o.out } : {}), ...(o.base ? { base: o.base } : {}), ...(o.build ? {} : { run: false as const }), ...(o.check ? {} : { check: false as const }) });
       out(o.json ? JSON.stringify({ ...r, check: r.check ? { ok: r.check.ok, issues: r.check.issues } : undefined }, null, 2) : formatBuild(r));
       if (!r.ok) process.exitCode = 1;
+    });
+
+  const model = program.command("model").description("3D models for three.js without Blender: inspect, view, lint, identify, brief, spec, kinds, recipes, build");
+  model
+    .command("inspect")
+    .description("What is in a .glb/.gltf and which three.js loaders and decoders it needs")
+    .argument("<file>")
+    .option("--full", "every node, material and texture")
+    .option("--json", "JSON output")
+    .action((file: string, o: { full?: boolean; json?: boolean }) => {
+      const info = inspectModel(file);
+      out(o.json ? JSON.stringify({ ...info, needs: modelNeeds(info) }, null, 2) : `${formatModelInfo(info, o.full ? "full" : "brief")}\n${formatModelNeeds(modelNeeds(info))}`);
+    });
+  model
+    .command("needs")
+    .description("The decoders a model needs, and whether the project's code sets them up")
+    .argument("<file>")
+    .option("-p, --path <dir>", "project directory", ".")
+    .action((file: string, o: { path: string }) => {
+      const needs = modelNeeds(inspectModel(file));
+      const root = projectRootOf(o.path);
+      const problems = checkModelSetup(needs, collect(root).files.map((f) => f.text));
+      out(`${formatModelNeeds(needs)}\n${formatSetupProblems(problems)}`);
+      if (problems.length) process.exitCode = 1;
+    });
+  model
+    .command("view")
+    .description("A model as text: front, side and top views, parts with sizes, parts that do not touch")
+    .argument("<file>")
+    .option("--only <view>", "front | side | top")
+    .option("--width <n>", "characters per view")
+    .action((file: string, o: { only?: "front" | "side" | "top"; width?: string }) => out(viewModel(file, { ...(o.only ? { only: o.only } : {}), ...(o.width ? { width: Number(o.width) } : {}) })));
+  model
+    .command("lint")
+    .description("Score a model for the web; --archetype also checks it is what it should be")
+    .argument("<file>")
+    .option("--archetype <name>", "an archetype id or a name (car, tree, helikopter)")
+    .option("--max-triangles <n>")
+    .option("--max-draw-calls <n>")
+    .option("--full", "every finding")
+    .option("--json", "JSON output")
+    .action((file: string, o: { archetype?: string; maxTriangles?: string; maxDrawCalls?: string; full?: boolean; json?: boolean }) => {
+      const r = lintModelFile(file, { ...(o.archetype ? { archetype: o.archetype } : {}), ...(o.maxTriangles ? { maxTriangles: Number(o.maxTriangles) } : {}), ...(o.maxDrawCalls ? { maxDrawCalls: Number(o.maxDrawCalls) } : {}) });
+      out(o.json ? JSON.stringify(r, null, 2) : formatLint(r, o.full ? "full" : "brief"));
+      if (r.failed) process.exitCode = 1;
+    });
+  model
+    .command("identify")
+    .description("What a thing is: parts, pivots, size, variants (English or Dutch)")
+    .argument("<what...>")
+    .action((what: string[]) => out(formatIdentify(identify(what.join(" ")), archetypeLibrary())));
+  model
+    .command("brief")
+    .description("One page before you build a thing")
+    .argument("<what...>")
+    .action((what: string[]) => out(briefFor(what.join(" ")).text));
+  model
+    .command("spec")
+    .description("The model spec format and an example")
+    .option("--short", "cheat sheet only")
+    .action((o: { short?: boolean }) => out(o.short ? SPEC_CHEAT : `${SPEC_HELP}\n\nExample:\n${JSON.stringify(EXAMPLE_SPEC, null, 1)}`));
+  model
+    .command("kinds")
+    .description("Every ready-made kind with its parameters")
+    .action(() => out(formatKinds()));
+  model
+    .command("recipes")
+    .description("The ready-made recipes, or the full spec of one to edit")
+    .argument("[kind]")
+    .action((kind?: string) => out(kind ? JSON.stringify(recipeSpec(kind), null, 1) : formatRecipes()));
+  model
+    .command("build")
+    .description("Build a .glb from a kind or a spec file (undoable with threesmith undo)")
+    .argument("[kind]", "a ready-made kind")
+    .requiredOption("-o, --out <file>", "the .glb to write")
+    .option("--spec <file>", "a JSON model spec instead of a kind")
+    .option("--param <k=v...>", "parameters, e.g. --param length=4.5 color=#c22")
+    .option("--seed <n>")
+    .option("--no-textures", "plain colours instead of texture maps")
+    .action((kind: string | undefined, o: { out: string; spec?: string; param?: string[]; seed?: string; textures: boolean }) => {
+      const params = Object.fromEntries(
+        (o.param ?? []).map((kv) => {
+          const [k, ...rest] = kv.split("=");
+          const v = rest.join("=");
+          return [k, v !== "" && !Number.isNaN(Number(v)) ? Number(v) : v === "true" ? true : v === "false" ? false : v];
+        }),
+      );
+      const r = buildModel({ ...(kind ? { kind } : {}), ...(o.spec ? { spec: JSON.parse(readFileSync(o.spec, "utf8")) } : {}), ...(Object.keys(params).length ? { params } : {}), ...(o.seed ? { seed: Number(o.seed) } : {}), ...(o.textures ? {} : { textures: false }) });
+      const root = projectRootOf(dirname(o.out));
+      writeFiles(root, "model build", `build ${r.name}`, [{ file: relative(root, o.out), data: r.glb }]);
+      out(`wrote ${o.out}: ${r.summary}\n${formatModelReport(r.report, "brief")}`);
+      if (r.report.categories.some((c) => c.errors > 0)) process.exitCode = 1;
     });
 
   program

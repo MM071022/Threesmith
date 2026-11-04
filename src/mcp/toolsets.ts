@@ -23,6 +23,7 @@ export const TOOLSETS = {
   run: ["three_check", "three_inspect", "three_play", "three_scenario", "three_perf", "three_leaks"],
   live: ["three_session", "three_page"],
   build: ["three_assets", "three_build"],
+  model: ["three_model_brief", "three_model_identify", "three_model_spec", "three_model_build", "three_model_view", "three_model_lint", "three_model_inspect"],
 } as const satisfies Record<string, readonly string[]>;
 
 export type Toolset = keyof typeof TOOLSETS;

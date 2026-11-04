@@ -33,6 +33,28 @@ import { formatScenarios, loadScenarios, runScenarios, saveScenario } from "../c
 import { formatPerf, perf, type PerfBudget } from "../check/perf.js";
 import { formatLeaks, leaks, type LeakBudget } from "../check/leaks.js";
 import { buildCheck, formatBuild } from "../check/build.js";
+import {
+  EXAMPLE_SPEC,
+  SPEC_CHEAT,
+  SPEC_HELP,
+  archetypeLibrary,
+  briefFor,
+  buildModel,
+  checkModelSetup,
+  formatIdentify,
+  formatKinds,
+  formatLint,
+  formatModelInfo,
+  formatModelNeeds,
+  formatModelReport,
+  formatSetupProblems,
+  identify,
+  inspectModel,
+  lintModelFile,
+  modelNeeds,
+  recipeSpec,
+  viewModel,
+} from "../model/index.js";
 import { VERSION } from "../version.js";
 import { renderInstructions, type Tier } from "./instructions.js";
 import { CheckOutput, DoctorOutput, ReviewOutput, checkData, doctorData, reviewData } from "./structured.js";
@@ -667,6 +689,139 @@ export function createServer(options: ServerOptions = {}): McpServer {
           ...(a.timeout_s ? { timeoutMs: a.timeout_s * 1000 } : {}),
         });
         return text(formatBuild(r), !r.ok);
+      }),
+  );
+
+  const fileParam = z.string().describe(".glb or .gltf file (relative to the project)");
+
+  tool(
+    "three_model_brief",
+    {
+      title: "One page before you build a model",
+      description:
+        "Start here before you make a 3D model for a three.js scene: what the thing is (English or Dutch, typos and descriptions work), the nearest ready-made kind to start from, its parts and real size, the rules and usual mistakes, the order of tools and a spec cheat sheet. glTF and three.js agree: +Y up, metres, the model's front is +Z. Read-only.",
+      inputSchema: { what: z.string().describe("the thing, e.g. 'fire truck', 'oak tree', 'zeilboot'") },
+      annotations: READ,
+    },
+    async ({ what }) => guard(() => text(briefFor(what).text)),
+  );
+
+  tool(
+    "three_model_identify",
+    {
+      title: "What a thing is",
+      description:
+        "What a thing is, for building or checking a model of it: the family, the parts that must exist and how they move (pivots of wheels, doors, rotors), a typical size with its source, variants, and the usual mistakes. English or Dutch names and descriptions work. Read-only.",
+      inputSchema: { what: z.string() },
+      annotations: READ,
+    },
+    async ({ what }) => guard(() => text(formatIdentify(identify(what), archetypeLibrary()))),
+  );
+
+  tool(
+    "three_model_spec",
+    {
+      title: "The model spec format and the ready-made kinds",
+      description:
+        "The JSON model spec that three_model_build reads (a tree of named parts: box, cylinder, ellipsoid, lathe, loft, extrude, roof, tube, with expressions, mirror, repeat, bevels and textured materials), an example, and the ready-made kinds with their parameters. `kind` returns the full spec of one recipe to edit. Read-only.",
+      inputSchema: { kind: z.string().optional().describe("a recipe kind: its full spec as JSON"), short: z.boolean().optional().describe("cheat sheet only") },
+      annotations: READ,
+    },
+    async ({ kind, short }) =>
+      guard(() => {
+        if (kind) return text(JSON.stringify(recipeSpec(kind), null, 1));
+        return text(short || tier === "cheap" ? `${SPEC_CHEAT}\n\nKinds:\n${formatKinds()}` : `${SPEC_HELP}\n\nExample:\n${JSON.stringify(EXAMPLE_SPEC, null, 1)}\n\nKinds:\n${formatKinds()}`);
+      }),
+  );
+
+  tool(
+    "three_model_build",
+    {
+      title: "Build a .glb from a kind or a spec",
+      description:
+        "Make a clean .glb without Blender: a ready-made `kind` (car, tree, house, boat, aircraft, terrain, ... see three_model_spec) with `params`, or your own `spec`. Deterministic (the same request gives the same bytes), a node per part with UVs and normals, unique node names as GLTFLoader shows them. Writes `out` in the project (undoable with three_undo) and returns the size, triangles and the lint. Look at it with three_model_view afterwards.",
+      inputSchema: {
+        kind: z.string().optional(),
+        spec: z.unknown().optional().describe("a full model spec (JSON object)"),
+        params: z.record(z.string(), z.unknown()).optional(),
+        seed: z.number().int().optional(),
+        textures: z.boolean().optional().describe("false: plain colours instead of texture maps (smaller)"),
+        out: z.string().describe("where to write the .glb, e.g. public/models/car.glb"),
+        path: pathParam,
+      },
+      annotations: WRITES,
+    },
+    async (a) =>
+      guard(() => {
+        const r = buildModel({
+          ...(a.kind ? { kind: a.kind } : {}),
+          ...(a.spec !== undefined ? { spec: typeof a.spec === "string" ? JSON.parse(a.spec) : a.spec } : {}),
+          ...(a.params ? { params: a.params } : {}),
+          ...(a.seed !== undefined ? { seed: a.seed } : {}),
+          ...(a.textures === false ? { textures: false } : {}),
+        });
+        const root = projectRootOf(where(a.path));
+        const file = relative(root, resolve(root, a.out));
+        if (!file.endsWith(".glb")) return failure("out must end in .glb");
+        const id = writeFiles(root, "three_model_build", `build ${r.name}`, [{ file, data: r.glb }]);
+        return text(`wrote ${file} (journal #${id}): ${r.summary}\n${formatModelReport(r.report, tier === "premium" ? "full" : "brief")}\nLoad it: (await new GLTFLoader().loadAsync('${file.replace(/^public\//, "/")}')).scene`, r.report.categories.some((c) => c.errors > 0));
+      }),
+  );
+
+  tool(
+    "three_model_view",
+    {
+      title: "See a model as text",
+      description:
+        "Draw a .glb as text for agents that cannot see pictures: front, side and top views made of letters (one letter per part), a table of the parts with sizes, and the parts that do not touch the rest (a wheel without an axle, a roof above its house). Use it after every build to check shape, proportions and that everything is attached. Read-only.",
+      inputSchema: { file: fileParam, only: z.enum(["front", "side", "top"]).optional(), width: z.number().int().min(20).max(160).optional(), path: pathParam },
+      annotations: READ,
+    },
+    async ({ file, only, width, path }) => guard(() => text(viewModel(resolve(projectRootOf(where(path)), file), { ...(only ? { only } : {}), ...(width ? { width } : {}) }))),
+  );
+
+  tool(
+    "three_model_lint",
+    {
+      title: "Score a model for three.js",
+      description:
+        "Score a .glb or .gltf for the web: geometry (normals, winding, degenerate triangles), materials, performance (triangles, draw calls, texture memory against web budgets), loading (extensions three.js does not support, decoders needed), size and origin; with `archetype` (an id or a name such as 'car' or 'helikopter') also whether it is what it should be: parts, pivots, wheel axes, size, direction. Read-only.",
+      inputSchema: {
+        file: fileParam,
+        archetype: z.string().optional(),
+        max_triangles: z.number().int().optional(),
+        max_draw_calls: z.number().int().optional(),
+        detail: detailParam,
+        path: pathParam,
+      },
+      annotations: READ,
+    },
+    async (a) =>
+      guard(() => {
+        const r = lintModelFile(resolve(projectRootOf(where(a.path)), a.file), {
+          ...(a.archetype ? { archetype: a.archetype } : {}),
+          ...(a.max_triangles ? { maxTriangles: a.max_triangles } : {}),
+          ...(a.max_draw_calls ? { maxDrawCalls: a.max_draw_calls } : {}),
+        });
+        return text(formatLint(r, a.detail ?? profile.detail), r.failed);
+      }),
+  );
+
+  tool(
+    "three_model_inspect",
+    {
+      title: "What is in a model, and how three.js loads it",
+      description:
+        "What is in a .glb or .gltf without loading it in a browser: nodes, meshes, triangles, materials, textures with sizes, animations, skins, size in metres, glTF extensions, a draw-call estimate, and which loaders and decoders three.js needs for it (DRACOLoader, MeshoptDecoder, KTX2Loader) with the code to set them up. It also checks the project's code sets those decoders up. Read-only.",
+      inputSchema: { file: fileParam, detail: detailParam, path: pathParam },
+      annotations: READ,
+    },
+    async ({ file, detail, path }) =>
+      guard(() => {
+        const root = projectRootOf(where(path));
+        const info = inspectModel(resolve(root, file));
+        const problems = checkModelSetup(modelNeeds(info), collect(root).files.filter((f) => f.usesThree || /GLTFLoader|useGLTF/.test(f.text)).map((f) => f.text));
+        return text(`${formatModelInfo(info, detail ?? profile.detail)}\n${formatModelNeeds(modelNeeds(info))}${problems.length ? `\n${formatSetupProblems(problems)}` : ""}`, problems.length > 0);
       }),
   );
 
