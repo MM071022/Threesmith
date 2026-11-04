@@ -36,8 +36,26 @@ export interface Triage {
 }
 
 /** Rules whose findings mean the scene shows nothing (or nothing right). */
-const BLANK = new Set(["never-renders", "renderer-not-attached", "no-lights", "camera-near-zero", "resize-no-projection", "webgpu-no-init", "shadows-not-enabled"]);
-const SETUP = new Set(["types-mismatch", "cdn-unpinned", "unknown-symbol", "examples-js"]);
+const BLANK = new Set([
+  "never-renders",
+  "renderer-not-attached",
+  "no-lights",
+  "camera-near-zero",
+  "resize-no-projection",
+  "webgpu-no-init",
+  "shadows-not-enabled",
+  "render-args-swapped",
+  "add-gltf-result",
+  "shader-include-unknown",
+  "shader-glsl3-legacy",
+  "shader-raw-undeclared",
+  "webgpu-glsl-material",
+  "node-material-webgl",
+  "controls-document",
+  "decoder-not-attached",
+  "ktx2-no-detect-support",
+]);
+const SETUP = new Set(["types-mismatch", "cdn-unpinned", "unknown-symbol", "examples-js", "three-src-import", "importmap-missing", "tsl-import-path", "addon-path-extension"]);
 
 const RANK: Record<Severity, number> = { error: 0, warn: 1, info: 2 };
 const FIXABLE = new Set(FIXES.map((f) => f.rule));
