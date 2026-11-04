@@ -104,7 +104,6 @@ artifact. Commit the baseline images; update them with `threesmith check ... --u
   them (CI), with the default tolerance.
 - The API lookup parses the JSDoc in `three/src`. It is tested on r187; older releases have less complete JSDoc, so results there are thinner.
 - The browser check needs `playwright-core` and a Chromium (`npx playwright-core install chromium`).
-- Not yet published to npm: until then run it from this repo (`npm ci && npm run build`).
 
 ## Benchmarks
 
