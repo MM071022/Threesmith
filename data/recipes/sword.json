@@ -1,0 +1,1524 @@
+{
+ "version": 1,
+ "name": "sword",
+ "archetype": "prop.sword",
+ "description": "A medieval sword standing on its pommel with the point up: a tapering double-edged steel blade with a fuller, a crossguard (straight, curved or swept), a cord-wrapped leather grip with steel ferrules and a wheel, pear or ball pommel; a fantasy option gives a leaf blade with a glowing rune line and a gem.",
+ "params": [
+  {
+   "name": "bladeLength",
+   "type": "number",
+   "default": 0.76,
+   "min": 0.4,
+   "max": 1.1,
+   "description": "Length of the blade from the guard to the point, in metres (0.75 is an arming sword, 0.9-1.0 a longsword)."
+  },
+  {
+   "name": "bladeWidth",
+   "type": "number",
+   "default": 0.05,
+   "min": 0.03,
+   "max": 0.09,
+   "description": "Width of the blade at the guard."
+  },
+  {
+   "name": "gripLength",
+   "type": "number",
+   "default": 0.11,
+   "min": 0.08,
+   "max": 0.3,
+   "description": "Length of the grip between the guard and the pommel (0.1 one hand, 0.2-0.25 two hands)."
+  },
+  {
+   "name": "guardWidth",
+   "type": "number",
+   "default": 0.2,
+   "min": 0.1,
+   "max": 0.36,
+   "description": "Width of the crossguard."
+  },
+  {
+   "name": "guardStyle",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "0 = straight cross, 1 = quillons curved towards the blade, 2 = swept wings (fantasy)."
+  },
+  {
+   "name": "pommelStyle",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "0 = wheel (disc), 1 = scent stopper (pear), 2 = ball."
+  },
+  {
+   "name": "fantasy",
+   "type": "boolean",
+   "default": false,
+   "min": 0,
+   "max": 1,
+   "description": "A fantasy sword: a leaf shaped blade with a glowing rune line in the fuller and a gem in the guard."
+  },
+  {
+   "name": "wear",
+   "type": "number",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "description": "How worn the grip wrap is: 0 = new and tight, 1 = flattened."
+  }
+ ],
+ "materials": {
+  "blade_steel": {
+   "color": [
+    0.62,
+    0.63,
+    0.66
+   ],
+   "metallic": 1,
+   "roughness": 0.2
+  },
+  "guard_steel": {
+   "color": [
+    0.36,
+    0.36,
+    0.38
+   ],
+   "metallic": 1,
+   "roughness": 0.38
+  },
+  "leather": {
+   "color": [
+    0.05,
+    0.022,
+    0.011
+   ],
+   "metallic": 0,
+   "roughness": 0.72
+  },
+  "cord": {
+   "color": [
+    0.07,
+    0.035,
+    0.016
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "gem": {
+   "color": [
+    0.05,
+    0.25,
+    0.9
+   ],
+   "metallic": 0.1,
+   "roughness": 0.08,
+   "emissive": [
+    0.05,
+    0.3,
+    1
+   ]
+  },
+  "rune_glow": {
+   "color": [
+    0.3,
+    0.8,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    0.25,
+    0.75,
+    1
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "Sword",
+   "vars": {
+    "L": "$bladeLength",
+    "G": "$gripLength",
+    "T": "0.0042 + $bladeWidth * 0.06",
+    "gr": "0.0125 + $gripLength * 0.01",
+    "gq": "0.0062 + $guardWidth * 0.012",
+    "pH": "0.05",
+    "gy": "0.05 + $gripLength",
+    "by": "0.05 + $gripLength + 0.026"
+   },
+   "children": [
+    {
+     "name": "Pommel",
+     "children": [
+      {
+       "name": "Disc",
+       "shape": "cylinder",
+       "material": "guard_steel",
+       "axis": "z",
+       "segments": 28,
+       "bevel": 0.004,
+       "radius": "0.026 * (1 - min(abs($pommelStyle - 0), 1)) + 0.012 * (1 - (1 - min(abs($pommelStyle - 0), 1)))",
+       "height": "0.024 * (1 - min(abs($pommelStyle - 0), 1)) + 0.012 * (1 - (1 - min(abs($pommelStyle - 0), 1)))",
+       "at": [
+        0,
+        0.026,
+        0
+       ],
+       "children": [
+        {
+         "name": "DiscBoss",
+         "shape": "cylinder",
+         "material": "guard_steel",
+         "axis": "z",
+         "segments": 20,
+         "bevel": 0.002,
+         "radius": "0.013 * (1 - min(abs($pommelStyle - 0), 1)) + 0.006 * (1 - (1 - min(abs($pommelStyle - 0), 1)))",
+         "height": "0.032 * (1 - min(abs($pommelStyle - 0), 1)) + 0.008 * (1 - (1 - min(abs($pommelStyle - 0), 1)))"
+        }
+       ]
+      },
+      {
+       "name": "Knob",
+       "shape": "lathe",
+       "material": "guard_steel",
+       "segments": 24,
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         "0.008 * (1 - min(abs($pommelStyle - 1), 1)) + 0.012 * (1 - min(abs($pommelStyle - 2), 1)) + 0.004 * (1 - min(abs($pommelStyle - 0), 1))",
+         0
+        ],
+        [
+         "0.016 * (1 - min(abs($pommelStyle - 1), 1)) + 0.02 * (1 - min(abs($pommelStyle - 2), 1)) + 0.006 * (1 - min(abs($pommelStyle - 0), 1))",
+         0.006
+        ],
+        [
+         "0.021 * (1 - min(abs($pommelStyle - 1), 1)) + 0.024 * (1 - min(abs($pommelStyle - 2), 1)) + 0.008 * (1 - min(abs($pommelStyle - 0), 1))",
+         0.016
+        ],
+        [
+         "0.02 * (1 - min(abs($pommelStyle - 1), 1)) + 0.024 * (1 - min(abs($pommelStyle - 2), 1)) + 0.008 * (1 - min(abs($pommelStyle - 0), 1))",
+         0.026
+        ],
+        [
+         "0.014 * (1 - min(abs($pommelStyle - 1), 1)) + 0.019 * (1 - min(abs($pommelStyle - 2), 1)) + 0.007 * (1 - min(abs($pommelStyle - 0), 1))",
+         0.036
+        ],
+        [
+         "0.009 * (1 - min(abs($pommelStyle - 1), 1)) + 0.011 * (1 - min(abs($pommelStyle - 2), 1)) + 0.006 * (1 - min(abs($pommelStyle - 0), 1))",
+         0.043
+        ],
+        [
+         "0.008",
+         0.048
+        ],
+        [
+         "0.008",
+         0.052
+        ],
+        [
+         0,
+         0.052
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Grip",
+     "shape": "lathe",
+     "material": "leather",
+     "segments": 20,
+     "at": [
+      0,
+      "$pH",
+      0
+     ],
+     "profile": [
+      [
+       0,
+       0
+      ],
+      [
+       "$gr * 1.0",
+       0
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.0556))",
+       "$G * 0.0200"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.0556))",
+       "$G * 0.0556"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.0556))",
+       "$G * 0.0911"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.1667))",
+       "$G * 0.1311"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.1667))",
+       "$G * 0.1667"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.1667))",
+       "$G * 0.2022"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.2778))",
+       "$G * 0.2422"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.2778))",
+       "$G * 0.2778"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.2778))",
+       "$G * 0.3133"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.3889))",
+       "$G * 0.3533"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.3889))",
+       "$G * 0.3889"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.3889))",
+       "$G * 0.4244"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.5000))",
+       "$G * 0.4644"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.5000))",
+       "$G * 0.5000"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.5000))",
+       "$G * 0.5356"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.6111))",
+       "$G * 0.5756"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.6111))",
+       "$G * 0.6111"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.6111))",
+       "$G * 0.6467"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.7222))",
+       "$G * 0.6867"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.7222))",
+       "$G * 0.7222"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.7222))",
+       "$G * 0.7578"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.8333))",
+       "$G * 0.7978"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.8333))",
+       "$G * 0.8333"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.8333))",
+       "$G * 0.8689"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.9444))",
+       "$G * 0.9089"
+      ],
+      [
+       "$gr * (1.0 + 0.16 * (1 - $wear) + 0.08 * sin(pi * 0.9444))",
+       "$G * 0.9444"
+      ],
+      [
+       "$gr * (1.0 + 0.08 * (1 - $wear) + 0.02 * sin(pi * 0.9444))",
+       "$G * 0.9800"
+      ],
+      [
+       "$gr * 1.0",
+       "$G"
+      ],
+      [
+       0,
+       "$G"
+      ]
+     ],
+     "children": [
+      {
+       "name": "FerruleLow",
+       "shape": "cylinder",
+       "material": "guard_steel",
+       "radius": "$gr * 1.22",
+       "height": 0.008,
+       "segments": 20,
+       "bevel": 0.0015,
+       "at": [
+        0,
+        0.003,
+        0
+       ]
+      },
+      {
+       "name": "FerruleHigh",
+       "shape": "cylinder",
+       "material": "guard_steel",
+       "radius": "$gr * 1.22",
+       "height": 0.008,
+       "segments": 20,
+       "bevel": 0.0015,
+       "at": [
+        0,
+        "$G - 0.003",
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Guard",
+     "at": [
+      0,
+      "$gy",
+      0
+     ],
+     "children": [
+      {
+       "name": "Block",
+       "shape": "box",
+       "material": "guard_steel",
+       "size": [
+        "$bladeWidth * 0.72 + 0.012",
+        0.026,
+        "$T * 2.6 + 0.008"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.004
+      },
+      {
+       "name": "Arms",
+       "shape": "tube",
+       "material": "guard_steel",
+       "segments": 12,
+       "at": [
+        0,
+        0.013,
+        0
+       ],
+       "path": [
+        [
+         "$guardWidth / 2 * -1 * (1 - 0.140 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.1300 * (1 - min(abs($guardStyle - 1), 1)) + 0.2600 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * -0.82 * (1 - 0.115 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0776 * (1 - min(abs($guardStyle - 1), 1)) + 0.1680 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * -0.62 * (1 - 0.087 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0375 * (1 - min(abs($guardStyle - 1), 1)) + 0.0908 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * -0.4 * (1 - 0.056 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0120 * (1 - min(abs($guardStyle - 1), 1)) + 0.0346 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * -0.18 * (1 - 0.025 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0015 * (1 - min(abs($guardStyle - 1), 1)) + 0.0060 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * 0 * (1 - 0.000 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0000 * (1 - min(abs($guardStyle - 1), 1)) + 0.0000 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * 0.18 * (1 - 0.025 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0015 * (1 - min(abs($guardStyle - 1), 1)) + 0.0060 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * 0.4 * (1 - 0.056 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0120 * (1 - min(abs($guardStyle - 1), 1)) + 0.0346 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * 0.62 * (1 - 0.087 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0375 * (1 - min(abs($guardStyle - 1), 1)) + 0.0908 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * 0.82 * (1 - 0.115 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.0776 * (1 - min(abs($guardStyle - 1), 1)) + 0.1680 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ],
+        [
+         "$guardWidth / 2 * 1 * (1 - 0.140 * (1 - min(abs($guardStyle - 2), 1)))",
+         "$guardWidth * (0.1300 * (1 - min(abs($guardStyle - 1), 1)) + 0.2600 * (1 - min(abs($guardStyle - 2), 1)))",
+         0
+        ]
+       ],
+       "radii": [
+        "$gq * 0.85",
+        "$gq * 0.82",
+        "$gq * 0.86",
+        "$gq * 0.92",
+        "$gq * 1.0",
+        "$gq * 1.05",
+        "$gq * 1.0",
+        "$gq * 0.92",
+        "$gq * 0.86",
+        "$gq * 0.82",
+        "$gq * 0.85"
+       ]
+      },
+      {
+       "name": "Finial",
+       "shape": "ellipsoid",
+       "material": "guard_steel",
+       "segments": 14,
+       "at": [
+        "$guardWidth / 2 * 1 * (1 - 0.140 * (1 - min(abs($guardStyle - 2), 1)))",
+        "0.013 + $guardWidth * (0.1300 * (1 - min(abs($guardStyle - 1), 1)) + 0.2600 * (1 - min(abs($guardStyle - 2), 1)))",
+        0
+       ],
+       "radii": [
+        "$gq * 1.35",
+        "$gq * 1.35",
+        "$gq * 1.35"
+       ],
+       "mirror": "FinialR"
+      },
+      {
+       "name": "Langet",
+       "shape": "box",
+       "material": "guard_steel",
+       "size": [
+        "$bladeWidth * 0.36",
+        0.024,
+        "$T * 1.6 + 0.006"
+       ],
+       "anchor": "bottom",
+       "bevel": 0.003,
+       "at": [
+        0,
+        0.016,
+        0
+       ]
+      },
+      {
+       "name": "Gem",
+       "shape": "ellipsoid",
+       "material": "gem",
+       "segments": 14,
+       "at": [
+        0,
+        0.013,
+        0
+       ],
+       "radii": [
+        "0.004 + 0.008 * $fantasy",
+        "0.004 + 0.008 * $fantasy",
+        "$T * 1.3 + 0.002 + 0.004 * $fantasy"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Blade",
+     "shape": "loft",
+     "material": "blade_steel",
+     "at": [
+      0,
+      "$by - 0.006",
+      0
+     ],
+     "rotate": [
+      -90,
+      0,
+      0
+     ],
+     "sections": [
+      {
+       "z": "$L * 0.0",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.55 * $T * 1.0 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.55 * $T * 1.0 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.55 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.55 * $T * 1.0 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.03",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.55 * $T * 1.0 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.55 * $T * 1.0 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "0.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.55 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-1.0 * $T * 1.0 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.95 * $T * 1.0 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (1.0 * (1 - $fantasy) + 0.9 * $fantasy) / 2",
+         "-0.55 * $T * 1.0 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.2",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.0 * $T * 0.92 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.55 * $T * 0.92 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.95 * $T * 0.92 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.72 * $T * 0.92 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.5800000000000001 * $T * 0.92 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.55 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.5800000000000001 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.72 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.95 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.55 * $T * 0.92 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "0.0 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.55 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.95 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.72 * $T * 0.92 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.5800000000000001 * $T * 0.92 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.55 * $T * 0.92 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.5800000000000001 * $T * 0.92 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.72 * $T * 0.92 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.95 * $T * 0.92 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.94 * (1 - $fantasy) + 0.92 * $fantasy) / 2",
+         "-0.55 * $T * 0.92 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.4",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.0 * $T * 0.85 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.55 * $T * 0.85 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.95 * $T * 0.85 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.72 * $T * 0.85 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.5800000000000001 * $T * 0.85 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.55 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.5800000000000001 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.72 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.95 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.55 * $T * 0.85 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "0.0 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.55 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.95 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.72 * $T * 0.85 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.5800000000000001 * $T * 0.85 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.55 * $T * 0.85 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.5800000000000001 * $T * 0.85 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.72 * $T * 0.85 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.95 * $T * 0.85 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.86 * (1 - $fantasy) + 1.04 * $fantasy) / 2",
+         "-0.55 * $T * 0.85 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.55",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.0 * $T * 0.8 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.55 * $T * 0.8 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.95 * $T * 0.8 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.72 * $T * 0.8 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.5800000000000001 * $T * 0.8 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.55 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.5800000000000001 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.72 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.95 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.55 * $T * 0.8 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "0.0 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.55 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.95 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.72 * $T * 0.8 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.5800000000000001 * $T * 0.8 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.55 * $T * 0.8 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.5800000000000001 * $T * 0.8 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.72 * $T * 0.8 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.95 * $T * 0.8 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.79 * (1 - $fantasy) + 1.1 * $fantasy) / 2",
+         "-0.55 * $T * 0.8 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.7",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.0 * $T * 0.74 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.55 * $T * 0.74 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.95 * $T * 0.74 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.804 * $T * 0.74 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.706 * $T * 0.74 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.685 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.706 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.804 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.95 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.55 * $T * 0.74 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "0.0 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.55 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.95 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.804 * $T * 0.74 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.706 * $T * 0.74 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.685 * $T * 0.74 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.706 * $T * 0.74 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.804 * $T * 0.74 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.95 * $T * 0.74 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.69 * (1 - $fantasy) + 1.06 * $fantasy) / 2",
+         "-0.55 * $T * 0.74 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.82",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.0 * $T * 0.68 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.55 * $T * 0.68 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.95 * $T * 0.68 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.944 * $T * 0.68 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.916 * $T * 0.68 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.91 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.916 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.944 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.95 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.55 * $T * 0.68 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "0.0 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.55 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.95 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.944 * $T * 0.68 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.916 * $T * 0.68 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.91 * $T * 0.68 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.916 * $T * 0.68 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.944 * $T * 0.68 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.95 * $T * 0.68 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.56 * (1 - $fantasy) + 0.88 * $fantasy) / 2",
+         "-0.55 * $T * 0.68 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.9",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "0.0 * $T * 0.6 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "0.55 * $T * 0.6 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "0.95 * $T * 0.6 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "0.95 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "0.55 * $T * 0.6 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "0.0 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-0.55 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-0.95 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-1.0 * $T * 0.6 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-0.95 * $T * 0.6 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.42 * (1 - $fantasy) + 0.62 * $fantasy) / 2",
+         "-0.55 * $T * 0.6 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.96",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "0.0 * $T * 0.5 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "0.55 * $T * 0.5 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "0.95 * $T * 0.5 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "0.95 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "0.55 * $T * 0.5 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "0.0 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-0.55 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-0.95 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-1.0 * $T * 0.5 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-0.95 * $T * 0.5 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.24 * (1 - $fantasy) + 0.32 * $fantasy) / 2",
+         "-0.55 * $T * 0.5 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 0.99",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "0.0 * $T * 0.4 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "0.55 * $T * 0.4 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "0.95 * $T * 0.4 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "0.95 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "0.55 * $T * 0.4 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "0.0 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-0.55 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-0.95 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-1.0 * $T * 0.4 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-0.95 * $T * 0.4 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.08 * (1 - $fantasy) + 0.1 * $fantasy) / 2",
+         "-0.55 * $T * 0.4 / 2"
+        ]
+       ]
+      },
+      {
+       "z": "$L * 1.0",
+       "points": [
+        [
+         "1.0 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "0.0 * $T * 0.3 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "0.55 * $T * 0.3 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "0.95 * $T * 0.3 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "0.95 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "0.55 * $T * 0.3 / 2"
+        ],
+        [
+         "-1.0 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "0.0 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.72 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-0.55 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.42 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-0.95 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.3 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "-0.14 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "0.0 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "0.14 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "0.3 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-1.0 * $T * 0.3 / 2"
+        ],
+        [
+         "0.42 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-0.95 * $T * 0.3 / 2"
+        ],
+        [
+         "0.72 * $bladeWidth * (0.02 * (1 - $fantasy) + 0.02 * $fantasy) / 2",
+         "-0.55 * $T * 0.3 / 2"
+        ]
+       ]
+      }
+     ],
+     "children": [
+      {
+       "name": "Rune",
+       "shape": "box",
+       "material": "rune_glow",
+       "size": [
+        "$bladeWidth * 0.2",
+        "$T * (0.42 + 0.17 * $fantasy)",
+        "$L * 0.5"
+       ],
+       "at": [
+        0,
+        0,
+        "$L * 0.32"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
