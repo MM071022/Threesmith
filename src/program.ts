@@ -22,6 +22,7 @@ import { RULES } from "./review/rules.js";
 import { formatJournal, formatUndo, readJournal, undoJournal, writeFiles } from "./project/journal.js";
 import { applyFeedback, formatLearned } from "./learn/feedback.js";
 import { envFlag } from "./mcp/toolsets.js";
+import { checkTypes, formatTypes } from "./types/types.js";
 import { join, relative } from "node:path";
 import { statSync } from "node:fs";
 
@@ -258,6 +259,25 @@ export function buildProgram(): Command {
       }
       out(o.json ? JSON.stringify(data, null, 2) : parts.join("\n"));
       if (bad) process.exitCode = 1;
+    });
+
+  program
+    .command("types")
+    .description("Run the project's tsc --noEmit and explain the three.js type errors with the installed release (did you mean, import paths)")
+    .argument("[path]", "project directory", ".")
+    .option("--all", "also list type errors not about three")
+    .option("--json", "JSON output")
+    .action((path: string, o: { all?: boolean; json?: boolean }) => {
+      const root = projectRootOf(path);
+      let index;
+      try {
+        index = indexFor(root);
+      } catch {
+        index = undefined;
+      }
+      const r = checkTypes(root, { ...(index ? { index } : {}) });
+      out(o.json ? JSON.stringify(r, null, 2) : formatTypes(r, { ...(o.all ? { all: true } : {}) }));
+      if (!r.ran || r.errors.some((e) => e.three)) process.exitCode = 1;
     });
 
   program

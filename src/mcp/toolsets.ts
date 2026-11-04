@@ -10,6 +10,7 @@ export const TOOLSETS = {
     "three_api",
     "three_search",
     "three_review",
+    "three_types",
     "three_fix",
     "three_explain",
     "three_rules",

@@ -19,6 +19,7 @@ import { formatProjectMap, projectRootOf, scanProject } from "../scan/scan.js";
 import { checkAssets, formatAssets } from "../scan/assets.js";
 import { collect } from "../review/source.js";
 import { formatJournal, formatUndo, readJournal, undoJournal, writeFiles } from "../project/journal.js";
+import { checkTypes, formatTypes } from "../types/types.js";
 import { VERSION } from "../version.js";
 import { renderInstructions, type Tier } from "./instructions.js";
 import { CheckOutput, DoctorOutput, ReviewOutput, checkData, doctorData, reviewData } from "./structured.js";
@@ -201,6 +202,30 @@ export function createServer(options: ServerOptions = {}): McpServer {
         const note = formatLearned(learned);
         const shown = focus.length ? { ...r, findings: r.findings.filter((f) => focus.includes(f.file)) } : r;
         return result(note ? `${body}\n${note}` : body, reviewData(shown, cap, full || tier === "premium"), false);
+      }),
+  );
+
+  tool(
+    "three_types",
+    {
+      title: "Type-check a TypeScript three.js project",
+      description:
+        "Run the project's own TypeScript (`tsc --noEmit`) and return the type errors about three.js, each with the answer from the installed release: the member that does exist (did you mean), where a name is really exported from ('three' or 'three/addons/...'), removed paths, and a note when @types/three is a different release than three. `all: true` lists the other type errors too. Needs typescript and a tsconfig.json in the project; for JavaScript use three_review. Read-only (tsc runs with --noEmit).",
+      inputSchema: { path: pathParam, all: z.boolean().optional(), limit: z.number().int().min(1).max(200).optional(), three: threeParam },
+      annotations: READ,
+    },
+    async ({ path, all, limit, three }) =>
+      guard(() => {
+        const root = projectRootOf(where(path));
+        let index;
+        try {
+          index = indexFor(root, three);
+        } catch {
+          index = undefined;
+        }
+        const note = scanProject(root).notes.find((n) => n.includes("@types/three"));
+        const r = checkTypes(root, { ...(index ? { index } : {}) });
+        return text(formatTypes(r, { ...(all ? { all } : {}), limit: limit ?? profile.findings * 2, ...(note ? { typesNote: note } : {}) }), r.ran && r.errors.some((e) => e.three));
       }),
   );
 
