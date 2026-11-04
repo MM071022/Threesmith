@@ -26,6 +26,11 @@ describe.skipIf(!existsSync("dist/cli.js"))("built cli", () => {
     expect(r.stdout.toString()).toContain("geometry-class");
     const miss = spawnSync("node", ["dist/cli.js", "api", "Nope", "--three", THREE_DIR]);
     expect(miss.status).toBe(1);
+    // doctor and undo take the folder as an argument too, like review and scan
+    const pos = spawnSync("node", ["dist/cli.js", "doctor", "examples/agent-mistakes", "--no-env"]).stdout.toString();
+    expect(pos).toMatch(/^Threesmith doctor: \d+ error/);
+    expect(spawnSync("node", ["dist/cli.js", "doctor", "--path", "examples/agent-mistakes", "--no-env"]).stdout.toString()).toBe(pos);
+    expect(spawnSync("node", ["dist/cli.js", "undo", dir, "--list"]).stdout.toString()).toContain("No Threesmith writes");
   });
 });
 void join;

@@ -521,13 +521,15 @@ export function buildProgram(): Command {
   program
     .command("doctor")
     .description("What is wrong in this project and in which order to fix it (grouped by cause, with next steps), then what Threesmith needs here (Node, three, Playwright, Chromium with WebGL)")
+    .argument("[path]", "project directory (same as --path)")
     .option("-p, --path <dir>", "project directory", ".")
     .option("--three <dir>", "path to a three package")
     .option("--env", "only check the environment")
     .option("--no-env", "skip the environment check (no browser start)")
     .option("--full", "every cause and fix")
     .option("--json", "JSON output")
-    .action(async (o: { path: string; three?: string; env?: boolean; full?: boolean; json?: boolean }) => {
+    .action(async (dir: string | undefined, o: { path: string; three?: string; env?: boolean; full?: boolean; json?: boolean }) => {
+      if (dir) o.path = dir;
       const envOnly = process.argv.includes("--env");
       const parts: string[] = [];
       let bad = false;
@@ -638,11 +640,13 @@ export function buildProgram(): Command {
   program
     .command("undo")
     .description("Undo the last Threesmith writes (fix --write and others), newest first; files changed by hand since are left alone")
+    .argument("[path]", "project directory (same as --path)")
     .option("-p, --path <dir>", "project directory", ".")
     .option("--steps <n>", "how many writes to undo", "1")
     .option("--force", "also restore files changed since the write")
     .option("--list", "only show the journal")
-    .action((o: { path: string; steps: string; force?: boolean; list?: boolean }) => {
+    .action((dir: string | undefined, o: { path: string; steps: string; force?: boolean; list?: boolean }) => {
+      if (dir) o.path = dir;
       const root = projectRootOf(o.path);
       out(o.list ? formatJournal(readJournal(root)) : formatUndo(undoJournal(root, { steps: Number(o.steps), ...(o.force ? { force: true } : {}) })));
     });
