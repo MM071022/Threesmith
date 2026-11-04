@@ -361,5 +361,201 @@
    "The tower tapers: a straight cylinder looks cheap.",
    "Blades must spin about the horizontal axis through the nacelle, not the tower."
   ]
+ },
+ {
+  "id": "machine.vending-machine",
+  "name": "vending machine",
+  "description": "A free-standing snack or drinks vending machine: a tall cabinet with a glass front door showing rows of products on spiral trays, a payment and keypad column beside the glass, and a delivery bin at the bottom.",
+  "aliases": [
+   "vending machine",
+   "snack machine",
+   "snack vending machine",
+   "drinks machine",
+   "drink vending machine",
+   "soda machine",
+   "automaat",
+   "snoepautomaat",
+   "frisdrankautomaat",
+   "verkoopautomaat"
+  ],
+  "extends": "machine",
+  "hints": [
+   "snacks",
+   "snoep",
+   "coin slot",
+   "muntgleuf",
+   "keypad",
+   "spiral",
+   "drinks",
+   "candy",
+   "chips"
+  ],
+  "parts": [
+   {
+    "name": "Cabinet",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "cabinet",
+     "kast",
+     "housing",
+     "body"
+    ]
+   },
+   {
+    "name": "Door",
+    "role": "door",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "door",
+     "deur",
+     "front door"
+    ],
+    "note": "The whole glass front opens for loading; it hinges on one vertical edge."
+   },
+   {
+    "name": "Window",
+    "role": "glazing",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "window",
+     "glass",
+     "glazing",
+     "raam",
+     "ruit"
+    ]
+   },
+   {
+    "name": "Product",
+    "role": "product",
+    "required": true,
+    "count": [
+     1,
+     200
+    ],
+    "aliases": [
+     "product",
+     "products",
+     "snack",
+     "item",
+     "can",
+     "bottle",
+     "artikel"
+    ],
+    "note": "The goods on display, in rows behind the glass."
+   },
+   {
+    "name": "Tray",
+    "role": "shelf",
+    "required": false,
+    "count": [
+     1,
+     12
+    ],
+    "aliases": [
+     "tray",
+     "shelf",
+     "plank",
+     "lade"
+    ]
+   },
+   {
+    "name": "PaymentPanel",
+    "role": "control panel",
+    "required": true,
+    "count": [
+     1,
+     6
+    ],
+    "aliases": [
+     "payment panel",
+     "payment",
+     "coin slot",
+     "keypad",
+     "card reader",
+     "bill acceptor",
+     "betaalpaneel",
+     "toetsenbord"
+    ]
+   },
+   {
+    "name": "DeliveryFlap",
+    "role": "flap",
+    "required": false,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "delivery flap",
+     "delivery bin",
+     "flap",
+     "uitgifte",
+     "klep"
+    ],
+    "note": "The push flap in front of the bin swings in about its top edge."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.7,
+    1.0
+   ],
+   "width": [
+    0.7,
+    1.3
+   ],
+   "height": [
+    1.6,
+    2.0
+   ],
+   "source": "manufacturer data: AMS 39 snack machine 72 in high, 39 in wide, 35 in deep (1.83 x 0.99 x 0.89 m); Crane National 167 and drinks machines are 1.83 m high, 0.75 to 1.2 m wide",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "goods",
+    "options": [
+     "snacks",
+     "drinks",
+     "combo"
+    ]
+   },
+   {
+    "axis": "payment",
+    "options": [
+     "coins",
+     "notes",
+     "card"
+    ]
+   }
+  ],
+  "conventions": [
+   "The glass front faces +Z and the machine stands on its levelling feet on y = 0; the door hinges on the edge away from the payment column."
+  ],
+  "anticipate": [
+   "Products as separate nodes so a script can drop one into the delivery bin.",
+   "An emissive sign and interior light that read at night."
+  ],
+  "pitfalls": [
+   "A solid box for the cabinet hides the products: the glass needs an open, lit interior behind it."
+  ]
  }
 ]
