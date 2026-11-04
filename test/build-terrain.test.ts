@@ -1,0 +1,338 @@
+import { describe, expect, it, vi } from "vitest";
+import { loadLibrary } from "../src/archetype/library.js";
+import { buildGlb } from "../src/build/glb.js";
+import { buildKind } from "../src/build/generators/index.js";
+import { groundColor, lakeOf, noise2, riverOf, terrain, terrainHeight, TERRAIN_PARAMS } from "../src/build/generators/terrain.js";
+import { resolveParams } from "../src/build/params.js";
+import { lintModelFile } from "../src/model/lint.js";
+import { formatKinds } from "../src/model/index.js";
+import { sha, writeScene } from "./build-helpers.js";
+
+// Building and linting the detailed ready-made models takes a few seconds on a busy machine.
+vi.setConfig({ testTimeout: 30_000 });
+
+const library = loadLibrary();
+const RELIEFS = ["plains", "hills", "mountains", "island"];
+
+/** The vertices of the ground mesh of a terrain tile, as rows along x for each z. */
+function grid(input: Record<string, unknown>): { n: number; x: number[]; y: number[]; z: number[] } {
+  const scene = buildKind("terrain", input);
+  const surface = scene.nodes[0]!.children!.find((c) => c.name === "Surface")!;
+  const prim = surface.mesh!.prims.get("terrain_ground")!;
+  const n = Math.round(Math.sqrt(prim.positions.length / 3));
+  const pick = (k: number) => prim.positions.filter((_, i) => i % 3 === k);
+  return { n, x: pick(0), y: pick(1), z: pick(2) };
+}
+
+const problems = (kind: string, input: Record<string, unknown> = {}): string[] => {
+  const scene = buildKind(kind, input);
+  const report = lintModelFile(writeScene(scene), { archetype: library.resolve(scene.archetype!) });
+  return report.findings.filter((f) => f.severity !== "info").map((f) => `${f.rule} ${f.node ?? ""} ${f.message}`);
+};
+
+describe("the noise", () => {
+  it("is deterministic, bounded and smooth", () => {
+    expect(noise2(3.3, 7.7, 5)).toBe(noise2(3.3, 7.7, 5));
+    expect(noise2(3.3, 7.7, 5)).not.toBe(noise2(3.3, 7.7, 6));
+    let max = 0, jump = 0, last = noise2(0, 0, 1);
+    for (let i = 1; i <= 2000; i++) {
+      const v = noise2(i * 0.05, i * 0.031, 1);
+      max = Math.max(max, Math.abs(v));
+      jump = Math.max(jump, Math.abs(v - last));
+      last = v;
+    }
+    expect(max).toBeLessThanOrEqual(1.2);
+    expect(jump).toBeLessThan(0.25);
+  });
+});
+
+describe("terrain", () => {
+  it("builds a grid of resolution x resolution vertices with y up", () => {
+    const g = grid({ resolution: "65", tileSize: 128 });
+    expect(g.n).toBe(65);
+    expect(g.x.length).toBe(65 * 65);
+    expect(Math.min(...g.x)).toBeCloseTo(-64);
+    expect(Math.max(...g.x)).toBeCloseTo(64);
+    const scene = buildKind("terrain", { resolution: "33" });
+    const prim = scene.nodes[0]!.children![0]!.mesh!.prims.get("terrain_ground")!;
+    expect(prim.indices.length / 3).toBe(32 * 32 * 2);
+    expect(prim.normals.filter((_, i) => i % 3 === 1).every((v) => v > 0)).toBe(true);
+  });
+
+  it("colours the ground per vertex: grass on gentle slopes, rock on steep ones, sand at the water, snow on high peaks", () => {
+    const scene = buildKind("terrain", { resolution: "33" });
+    const prim = scene.nodes[0]!.children![0]!.mesh!.prims.get("terrain_ground")!;
+    expect(prim.colors!.length).toBe((prim.positions.length / 3) * 4);
+    expect(prim.colors!.every((c) => c >= 0 && c <= 1)).toBe(true);
+    const p = resolveParams(TERRAIN_PARAMS, { relief: "mountains", maxHeight: 100 }, "terrain");
+    const greenness = (c: number[]) => c[1]! - (c[0]! + c[2]!) / 2;
+    const flat = groundColor(p, 0, 0, 20, 1), steep = groundColor(p, 0, 0, 20, 0.6), shore = groundColor(p, 0, 0, 0.2, 1);
+    const peak = groundColor(p, 0, 0, 8 + 100, 1);
+    expect(greenness(flat)).toBeGreaterThan(0.03);
+    expect(greenness(steep)).toBeLessThan(0.02);
+    expect(shore[0]).toBeGreaterThan(flat[0]! * 2);
+    expect(Math.min(...peak)).toBeGreaterThan(0.6);
+    const json = JSON.parse(buildGlb(scene).subarray(20, 20 + buildGlb(scene).readUInt32LE(12)).toString()) as { meshes: { primitives: { attributes: Record<string, number> }[] }[] };
+    expect(Object.keys(json.meshes[0]!.primitives[0]!.attributes)).toContain("COLOR_0");
+  });
+
+  it("is deterministic, and a different seed gives a different landscape", () => {
+    expect(sha(buildGlb(buildKind("terrain", { resolution: "33" })))).toBe(sha(buildGlb(buildKind("terrain", { resolution: "33" }))));
+    expect(sha(buildGlb(buildKind("terrain", { resolution: "33", seed: 2 })))).not.toBe(sha(buildGlb(buildKind("terrain", { resolution: "33" }))));
+  });
+
+  for (const relief of RELIEFS) {
+    it(`${relief}: neighbouring tiles share their border heights exactly, along x and along z`, () => {
+      const base = { relief, resolution: "65", tileSize: 200, maxHeight: 120, seed: 9 };
+      const centre = grid({ ...base, tileX: 0, tileZ: 0 });
+      const east = grid({ ...base, tileX: 1, tileZ: 0 });
+      const south = grid({ ...base, tileX: 0, tileZ: 1 });
+      const n = centre.n;
+      for (let k = 0; k < n; k++) {
+        // The last column of a tile and the first column of its eastern neighbour: same z, same height.
+        expect(centre.y[k * n + (n - 1)], `${relief} east ${k}`).toBeCloseTo(east.y[k * n]!, 9);
+        expect(centre.z[k * n + (n - 1)]).toBeCloseTo(east.z[k * n]!, 9);
+        // The last row and the first row of the neighbour along z.
+        expect(centre.y[(n - 1) * n + k], `${relief} south ${k}`).toBeCloseTo(south.y[k]!, 9);
+      }
+    });
+
+    it(`${relief}: stays clean at the smallest and the largest tile and resolution`, () => {
+      for (const input of [{ tileSize: 64, resolution: "33", maxHeight: 5 }, { tileSize: 1024, resolution: "129", maxHeight: 1500, featureSize: 1000 }, { tileSize: 512, resolution: "257", featureSize: 20 }]) {
+        expect(problems("terrain", { relief, ...input }), JSON.stringify({ relief, ...input })).toEqual([]);
+      }
+    });
+  }
+
+  it("heights follow the parameters: the base level, the height scale and the island's coast", () => {
+    const p = resolveParams(TERRAIN_PARAMS, { relief: "hills", maxHeight: 40, baseLevel: 100 }, "terrain");
+    for (let i = 0; i < 50; i++) expect(Math.abs(terrainHeight(p, i * 13.7, i * 7.1) - 100)).toBeLessThanOrEqual(40 * 0.5 + 1e-9);
+    const island = grid({ relief: "island", resolution: "65", maxHeight: 60 });
+    expect(Math.max(...island.y)).toBeGreaterThan(5);
+    expect(Math.min(...island.y)).toBeLessThan(-5);
+    // The land is in the middle and the sea floor at the corners of the tile.
+    expect(island.y[Math.floor(island.y.length / 2)]!).toBeGreaterThan(0);
+    expect(island.y[0]!).toBeLessThan(0);
+  });
+
+  it("says that the tiles of one world share their grid, because the ground and the lakes depend on it", () => {
+    for (const name of ["tileSize", "resolution", "lakeRadius"]) {
+      expect(TERRAIN_PARAMS.find((d) => d.name === name)!.description, name).toMatch(/tileSize and resolution/);
+    }
+    expect(terrain.description).toMatch(/same seed, tileSize and resolution/);
+  });
+
+  it("rejects a resolution that is not a power of two plus one, and a tile outside the range", () => {
+    expect(() => buildKind("terrain", { resolution: "100" })).toThrow(/resolution/);
+    expect(() => buildKind("terrain", { tileSize: 5000 })).toThrow(/at most/);
+  });
+
+  it("is a sheet: the open border of the tile is fine, a hole in the middle is not", () => {
+    const scene = buildKind("terrain", { resolution: "33" });
+    const prim = scene.nodes[0]!.children![0]!.mesh!.prims.get("terrain_ground")!;
+    prim.indices.splice(500 * 3, 6);
+    const report = lintModelFile(writeScene(scene), { archetype: library.resolve("world.terrain") });
+    expect(report.findings.map((f) => f.rule)).toContain("model/open-edges");
+  });
+});
+
+describe("a lake in the terrain", () => {
+  const water = (input: Record<string, unknown>) => buildKind("terrain", input).nodes[0]!.children!.find((c) => c.name === "Water");
+  const lakeInput = { relief: "hills", resolution: "129", tileSize: 256, lakeRadius: 50, lakeDepth: 8, seed: 3 };
+
+  it("is absent by default and present when a radius is given, as a flat water surface under the rim of the lake", () => {
+    expect(water({})).toBeUndefined();
+    const node = water(lakeInput)!;
+    expect(node).toBeDefined();
+    const ys = new Set(node.mesh!.prims.get("lake_water")!.positions.filter((_, i) => i % 3 === 1));
+    expect(ys.size).toBe(1);
+    const p = resolveParams(TERRAIN_PARAMS, lakeInput, "terrain");
+    const lake = lakeOf(p)!;
+    expect([...ys][0]).toBeCloseTo(lake.level, 9);
+    // The water sits half a metre under the lowest point of the rim, so it never runs over.
+    for (let k = 0; k < 64; k++) {
+      const a = (k / 64) * Math.PI * 2;
+      expect(terrainHeight(p, lake.x + lake.radius * 1.05 * Math.cos(a), lake.z + lake.radius * 1.05 * Math.sin(a))).toBeGreaterThanOrEqual(lake.level - 1e-6);
+    }
+  });
+
+  it("sits half a metre under the lowest point of the rim, found on a dense reference ring", () => {
+    const cases = [
+      { relief: "hills", lakeRadius: 300, seed: 1, tileSize: 256, resolution: "129" },
+      { relief: "mountains", lakeRadius: 300, seed: 1, tileSize: 256, resolution: "129" },
+      { relief: "hills", lakeRadius: 400, seed: 5, tileSize: 1024, resolution: "33", featureSize: 20, maxHeight: 300 },
+    ];
+    for (const input of cases) {
+      const p = resolveParams(TERRAIN_PARAMS, input, "terrain");
+      const ground = resolveParams(TERRAIN_PARAMS, { ...input, lakeRadius: 0 }, "terrain");
+      const lake = lakeOf(p)!;
+      let lowest = Infinity;
+      for (let k = 0; k < 20000; k++) {
+        const a = (k / 20000) * Math.PI * 2;
+        lowest = Math.min(lowest, terrainHeight(ground, lake.x + lake.radius * Math.cos(a), lake.z + lake.radius * Math.sin(a)));
+      }
+      expect(lake.level, JSON.stringify(input)).toBeGreaterThan(lowest - 0.6);
+      expect(lake.level, JSON.stringify(input)).toBeLessThan(lowest - 0.4);
+    }
+  });
+
+  it("digs a basin: the ground at the centre is below the water, by about the depth", () => {
+    const p = resolveParams(TERRAIN_PARAMS, lakeInput, "terrain");
+    const lake = lakeOf(p)!;
+    expect(terrainHeight(p, lake.x, lake.z)).toBeCloseTo(lake.level - 8, 6);
+    expect(terrainHeight(p, lake.x + 25, lake.z)).toBeLessThan(lake.level);
+  });
+
+  it("draws no water outside the rim: the ground beyond it is dry, or would be a pool of its own", () => {
+    // The tile east of the lake: its ground dips under the water just outside the rim, at about 317 m from the centre.
+    const input = { relief: "hills", lakeRadius: 300, seed: 1, tileSize: 256, resolution: "129", tileX: 1, tileZ: 0 };
+    const lake = lakeOf(resolveParams(TERRAIN_PARAMS, input, "terrain"))!;
+    const prim = water(input)!.mesh!.prims.get("lake_water")!;
+    for (let v = 0; v < prim.positions.length; v += 3) {
+      const x = prim.positions[v]! + 256, z = prim.positions[v + 2]!;
+      expect(Math.hypot(x - lake.x, z - lake.z)).toBeLessThanOrEqual(lake.radius + 2 * (256 / 128));
+    }
+  });
+
+  it("is made of whole grid cells near the lake, and only there", () => {
+    const g = grid(lakeInput);
+    const prim = water(lakeInput)!.mesh!.prims.get("lake_water")!;
+    for (let v = 0; v < prim.positions.length; v += 3) expect(Math.hypot(prim.positions[v]!, prim.positions[v + 2]!)).toBeLessThan(50 * 1.1 + 2 * (256 / 128) + 1);
+    expect(prim.indices.length / 3).toBeGreaterThan(100);
+    expect(g.n).toBe(129);
+  });
+
+  it("carries on across a tile border: a lake on the border shows in both tiles and the heights match", () => {
+    const base = { ...lakeInput, lakeX: 128, lakeZ: 0 };
+    const west = grid({ ...base, tileX: 0, tileZ: 0 });
+    const east = grid({ ...base, tileX: 1, tileZ: 0 });
+    const n = west.n;
+    for (let k = 0; k < n; k++) expect(west.y[k * n + (n - 1)]).toBeCloseTo(east.y[k * n]!, 9);
+    expect(water({ ...base, tileX: 0, tileZ: 0 })).toBeDefined();
+    expect(water({ ...base, tileX: 1, tileZ: 0 })).toBeDefined();
+    // Every border vertex that lies under water has water in both tiles at the same place.
+    const level = lakeOf(resolveParams(TERRAIN_PARAMS, base, "terrain"))!.level;
+    const wetBorder = (tile: Record<string, unknown>, x: number) => {
+      const prim = water({ ...base, ...tile })!.mesh!.prims.get("lake_water")!;
+      const zs = new Set<number>();
+      for (let v = 0; v < prim.positions.length; v += 3) if (Math.abs(prim.positions[v]! - x) < 1e-6) zs.add(Math.round(prim.positions[v + 2]! * 1e6));
+      return zs;
+    };
+    const a = wetBorder({ tileX: 0 }, 128), b = wetBorder({ tileX: 1 }, -128);
+    // Low ground far from the lake is not lake, so look at the border near the lake only (z within 40 m of its centre).
+    let wet = 0;
+    for (let k = 0; k < n; k++) if (west.y[k * n + (n - 1)]! < level - 1e-6 && Math.abs(west.z[k * n + (n - 1)]!) <= 40) {
+      wet++;
+      const z = Math.round(west.z[k * n + (n - 1)]! * 1e6);
+      expect(a.has(z), `west ${k}`).toBe(true);
+      expect(b.has(z), `east ${k}`).toBe(true);
+    }
+    expect(wet).toBeGreaterThan(5);
+  });
+
+  it("stays clean as a model, at the smallest and the largest lake", () => {
+    for (const input of [{ lakeRadius: 5, lakeDepth: 0.5 }, { lakeRadius: 2000, lakeDepth: 100, tileSize: 1024 }, { lakeRadius: 40, lakeX: 30, lakeZ: -40, relief: "mountains" }, { lakeRadius: 60, relief: "plains", resolution: "65" }]) {
+      expect(problems("terrain", input), JSON.stringify(input)).toEqual([]);
+    }
+  });
+});
+
+describe("a river in the terrain", () => {
+  const riverInput = { relief: "hills", resolution: "129", tileSize: 256, riverWidth: 10, riverDepth: 3, riverZ: -128, riverLength: 256, meander: 30, seed: 4 };
+  const params = (input: Record<string, unknown>) => resolveParams(TERRAIN_PARAMS, input, "terrain");
+  const riverNode = (input: Record<string, unknown>) => buildKind("terrain", input).nodes[0]!.children!.find((c) => c.name === "River");
+
+  it("is absent by default, and a width under 2 m is refused", () => {
+    expect(riverNode({})).toBeUndefined();
+    expect(() => buildKind("terrain", { riverWidth: 1 })).toThrow(/at least 2 m/);
+  });
+
+  it("flows downhill: the water level never rises along the river, over its whole length and for several seeds", () => {
+    for (const seed of [1, 2, 3, 4, 5]) {
+      for (const relief of RELIEFS) {
+        const river = riverOf(params({ ...riverInput, seed, relief, riverLength: 2000, riverZ: -1000 }))!;
+        let last = Infinity;
+        for (let z = river.z0; z <= river.z1; z += 1) {
+          const level = river.level(z);
+          expect(level, `${relief} seed ${seed} z ${z}`).toBeLessThanOrEqual(last + 1e-9);
+          last = level;
+        }
+      }
+    }
+  });
+
+  it("lies below the ground beside it, and the channel is carved to the depth", () => {
+    const p = params(riverInput);
+    const river = riverOf(p)!;
+    for (let z = river.z0 + 60; z < river.z1 - 60; z += 7) {
+      const x = river.centre(z);
+      expect(terrainHeight(p, x, z), `bed at ${z}`).toBeCloseTo(river.level(z) - 3, 6);
+      for (const side of [-1, 1]) expect(terrainHeight(p, x + side * 1.6 * 10, z), `bank at ${z}`).toBeGreaterThan(river.level(z));
+    }
+  });
+
+  it("has water on every grid vertex that is under the water level near the river, and nowhere else", () => {
+    const g = grid(riverInput);
+    const prim = riverNode(riverInput)!.mesh!.prims.get("lake_water")!;
+    const wet = new Map<string, number>();
+    for (let v = 0; v < prim.positions.length; v += 3) wet.set(`${Math.round(prim.positions[v]! * 1e4)},${Math.round(prim.positions[v + 2]! * 1e4)}`, prim.positions[v + 1]!);
+    const river = riverOf(params(riverInput))!;
+    let under = 0;
+    for (let k = 0; k < g.y.length; k++) {
+      const z = g.z[k]!;
+      if (z <= river.z0 + 1 || z >= river.z1 - 1) continue;
+      if (g.y[k]! < river.level(z) - 1e-6 && Math.abs(g.x[k]! - river.centre(z)) < 1.5 * 10) {
+        under++;
+        expect(wet.has(`${Math.round(g.x[k]! * 1e4)},${Math.round(z * 1e4)}`), `vertex ${k}`).toBe(true);
+      }
+    }
+    expect(under).toBeGreaterThan(50);
+    for (let v = 0; v < prim.positions.length; v += 3) expect(Math.abs(prim.positions[v]! - river.centre(prim.positions[v + 2]!))).toBeLessThanOrEqual(1.5 * 10 + 2 * 2 + 1e-6);
+    // The surface falls along the flow, row by row.
+    const rows = [...wet].map(([key, y]) => [Number(key.split(",")[1]), y] as const).sort((a, b) => a[0] - b[0]);
+    for (let i = 1; i < rows.length; i++) expect(rows[i]![1]).toBeLessThanOrEqual(rows[i - 1]![1] + 1e-9);
+  });
+
+  it("carries on across a tile border: a river over the border of two tiles has the same heights on both sides, and water in both", () => {
+    const base = { ...riverInput, riverX: 128, riverZ: -128, riverLength: 256 };
+    const west = grid({ ...base, tileX: 0 });
+    const east = grid({ ...base, tileX: 1 });
+    const n = west.n;
+    for (let k = 0; k < n; k++) expect(west.y[k * n + (n - 1)]).toBeCloseTo(east.y[k * n]!, 9);
+    expect(riverNode({ ...base, tileX: 0 })).toBeDefined();
+    expect(riverNode({ ...base, tileX: 1 })).toBeDefined();
+  });
+
+  it("is deterministic and stays clean as a model at the narrowest and widest river, on every relief", () => {
+    expect(sha(buildGlb(buildKind("terrain", { ...riverInput, resolution: "33" })))).toBe(sha(buildGlb(buildKind("terrain", { ...riverInput, resolution: "33" }))));
+    for (const relief of RELIEFS) {
+      for (const input of [{ riverWidth: 2, riverDepth: 0.3, meander: 0 }, { riverWidth: 200, riverDepth: 20, meander: 150, tileSize: 1024 }, { riverWidth: 20, riverZ: -100, riverLength: 50 }]) {
+        expect(problems("terrain", { relief, ...input }), JSON.stringify({ relief, ...input })).toEqual([]);
+      }
+    }
+  }, 60_000);
+});
+
+describe("sea", () => {
+  it("is a flat water plane at y = 0 with a floor below, both clean", () => {
+    const scene = buildKind("sea", { size: 500, subdivisions: 16, depth: 30 });
+    const [surface, floor] = scene.nodes[0]!.children!;
+    expect(surface!.name).toBe("Surface");
+    expect(floor!.name).toBe("Floor");
+    const ys = surface!.mesh!.prims.get("sea_water")!.positions.filter((_, i) => i % 3 === 1);
+    expect(new Set(ys)).toEqual(new Set([0]));
+    expect(floor!.mesh!.prims.get("sea_floor")!.positions.filter((_, i) => i % 3 === 1).every((y) => y === -30)).toBe(true);
+    expect(surface!.mesh!.triangles).toBe(16 * 16 * 2);
+    for (const input of [{}, { size: 500, subdivisions: 4, depth: 5 }, { size: 20000, subdivisions: 256, depth: 200 }]) expect(problems("sea", input), JSON.stringify(input)).toEqual([]);
+  });
+});
+
+describe("kinds and the CLI", () => {
+  it("are listed with the archetype they are checked against", () => {
+    const text = formatKinds();
+    expect(text).toMatch(/terrain: A heightmap terrain tile/);
+    expect(text).toMatch(/sea: A sea/);
+    expect(library.get(buildKind("terrain", {}).archetype!)).toBeDefined();
+    expect(library.get(buildKind("sea", {}).archetype!)).toBeDefined();
+  });
+});
