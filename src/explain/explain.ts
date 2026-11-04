@@ -179,7 +179,7 @@ const PATTERNS: Pattern[] = [
   },
   {
     id: "webgpu-init",
-    re: /WebGPURenderer: \.render\(\) called before the backend is initialized|Renderer: \.render\(\) called before the backend is initialized|renderAsync|before the backend is initialized|has not been initialized/,
+    re: /called before the backend is initialized|"renderAsync\(\)" has been deprecated/,
     title: "WebGPURenderer used before init",
     cause: "WebGPURenderer initializes asynchronously; render() ran before that finished.",
     fix: "await renderer.init() before the first render(), or use renderer.setAnimationLoop(...), which waits for init.",
