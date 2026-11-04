@@ -5,8 +5,8 @@
 // It fails open: when threesmith cannot run, is too old to know the event, or takes too long, it prints nothing and
 // exits 0, so a hook never stands in the way.
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const event = process.argv[2];
@@ -19,15 +19,31 @@ try {
   process.exit(0);
 }
 
-// Only three.js-looking source files and three.js output are worth starting threesmith for.
+/**
+ * Whether a protection can apply: a protect setting, or a threesmith.json with "protect" at or above the file's folder
+ * (the places threesmith looks). Cheap, so most edits never start threesmith.
+ */
+function maybeProtected(file, cwd) {
+  const set = (v) => Boolean(v && v.trim() && !v.trim().startsWith("${"));
+  if (set(process.env.THREESMITH_PROTECT) || set(process.env.CLAUDE_PLUGIN_OPTION_PROTECT)) return true;
+  if (!file) return false;
+  for (let dir = dirname(resolve(cwd || process.cwd(), file)); ; dir = dirname(dir)) {
+    const config = join(dir, "threesmith.json");
+    if (existsSync(config) && readFileSync(config, "utf8").includes('"protect"')) return true;
+    if (dirname(dir) === dir) return false;
+  }
+}
+
+// Only protected paths, three.js-looking source files and three.js output are worth starting threesmith for.
 try {
   const data = JSON.parse(input || "{}");
   const file = String(data?.tool_input?.file_path ?? data?.tool_input?.notebook_path ?? "");
+  if (event === "pre-edit" && !maybeProtected(file, data?.cwd)) process.exit(0);
   if (event === "post-edit" && (!/\.(?:js|mjs|cjs|jsx|ts|tsx|html?|vue|svelte)$/.test(file) || /[\\/]node_modules[\\/]/.test(file))) process.exit(0);
   if (event === "post-bash") {
     const r = data?.tool_response;
     const text = typeof r === "string" ? r : `${r?.stdout ?? ""}\n${r?.stderr ?? ""}`;
-    if (!/THREE\.|Three\.js|three\/examples|does not provide an export named/.test(text)) process.exit(0);
+    if (!/THREE\.|Three\.js|three\/(?:examples|addons|webgpu|tsl)|does not provide an export named|GLTFLoader|DRACOLoader|KTX2Loader|WebGL|R3F:/.test(text)) process.exit(0);
   }
 } catch {
   process.exit(0);

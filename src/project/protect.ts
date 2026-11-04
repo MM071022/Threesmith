@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { isAbsolute, join, relative, resolve, sep } from "node:path";
+import { delimiter, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 /**
  * Protected paths: folders and files no Threesmith write may touch. They come from `"protect"` in the project's
@@ -49,10 +49,64 @@ export function protectFrom(root: string): string[] {
   return list;
 }
 
-function envList(): string[] {
-  const raw = process.env["THREESMITH_PROTECT"];
-  if (!raw) return [];
-  return raw.split(/[,:;]/).map((s) => s.trim()).filter(Boolean);
+/**
+ * The protect setting: $THREESMITH_PROTECT, or the Claude Code plugin option (CLAUDE_PLUGIN_OPTION_PROTECT), separated
+ * by commas or the path delimiter. An unfilled plugin placeholder ("${user_config.protect}") counts as empty.
+ */
+export function envList(env: NodeJS.ProcessEnv = process.env): string[] {
+  const out: string[] = [];
+  for (const raw of [env["THREESMITH_PROTECT"], env["CLAUDE_PLUGIN_OPTION_PROTECT"]]) {
+    if (!raw || raw.trim().startsWith("${")) continue;
+    out.push(...raw.split(new RegExp(`[,${delimiter === ";" ? ";" : ":"}]`)).map((s) => s.trim()).filter(Boolean));
+  }
+  return out;
+}
+
+export interface Protection {
+  /** The pattern that matched. */
+  pattern: string;
+  /** Where it was set: a threesmith.json, or the protect setting. */
+  source: string;
+  /** The write targets the protect list itself. */
+  list?: boolean;
+}
+
+/** The nearest folder at or above `dir` with a threesmith.json that has a "protect" list. */
+function configAbove(dir: string): string | undefined {
+  for (let d = resolve(dir); ; d = dirname(d)) {
+    if (protectFrom(d).length) return d;
+    if (dirname(d) === d) return undefined;
+  }
+}
+
+/**
+ * Why `file` may not be written, for an agent's own edits (the Claude Code pre-edit hook): a "protect" list in a
+ * threesmith.json at or above the file (patterns relative to that folder, and the list itself), or the protect setting
+ * (absolute, or relative to `cwd`, the folder the agent runs in).
+ */
+export function protectionOf(file: string, env: NodeJS.ProcessEnv = process.env, cwd: string = process.cwd()): Protection | undefined {
+  const full = resolve(cwd, file);
+  const root = configAbove(dirname(full));
+  if (root) {
+    const config = join(root, "threesmith.json");
+    if (full === config) return { pattern: "threesmith.json", source: config, list: true };
+    const rel = relative(root, full).split(sep).join("/");
+    for (const p of protectFrom(root)) {
+      if (isAbsolute(p) ? full === resolve(p) || full.startsWith(resolve(p) + sep) : toRegex(p).test(rel)) return { pattern: p, source: config };
+    }
+  }
+  for (const p of envList(env)) {
+    const abs = resolve(cwd, p);
+    if (full === abs || full.startsWith(abs + sep)) return { pattern: p, source: "the protect setting" };
+    if (/[*?]/.test(p) && toRegex(p).test(relative(cwd, full).split(sep).join("/"))) return { pattern: p, source: "the protect setting" };
+  }
+  return undefined;
+}
+
+export function protectionMessage(file: string, p: Protection): string {
+  return p.list
+    ? `${file} holds the protect list; Threesmith refuses edits to it from the agent. Change it by hand if you mean to.`
+    : `${file} is protected by "${p.pattern}" (${p.source}); it must stay byte-identical, so this edit is refused. Write somewhere else, or ask the user to change the protect list.`;
 }
 
 /** The pattern that protects `file` (absolute) in project `root`, or undefined when it may be written. */

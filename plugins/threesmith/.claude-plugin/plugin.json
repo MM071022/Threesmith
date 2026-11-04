@@ -6,7 +6,7 @@
     "name": "laaielichter",
     "url": "https://github.com/laaielichter"
   },
-  "homepage": "https://github.com/laaielichter/Threesmith",
+  "homepage": "https://laaielichter.github.io/Threesmith/",
   "repository": "https://github.com/laaielichter/Threesmith",
   "license": "MIT",
   "keywords": [
@@ -14,6 +14,8 @@
     "three.js",
     "webgl",
     "webgpu",
+    "react-three-fiber",
+    "gltf",
     "mcp",
     "3d"
   ],
@@ -23,6 +25,25 @@
       "title": "three.js project",
       "description": "The folder with the project's package.json (and node_modules/three). Tools use it when Claude does not pass a path. Empty: the folder Claude Code runs in.",
       "required": false
+    },
+    "protect": {
+      "type": "string",
+      "title": "Protected paths (optional)",
+      "description": "Folders or files that must stay byte-identical, separated by commas: Claude's file edits and Threesmith's writes refuse them. Absolute, or relative to the folder Claude Code runs in. A threesmith.json \"protect\" list does the same per project.",
+      "required": false
+    },
+    "tools": {
+      "type": "string",
+      "title": "Tool sets (optional)",
+      "description": "Which Threesmith tools Claude sees, comma separated: core, run, live, build, model, or tool names. Empty means all 31.",
+      "required": false
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Read-only",
+      "description": "Leave out the tools that always write and refuse write options on the others (dry runs still work).",
+      "required": false,
+      "default": false
     }
   }
 }

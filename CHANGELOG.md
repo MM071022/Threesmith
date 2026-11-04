@@ -38,7 +38,8 @@ agents get wrong in three.js.
 - **For agents and teams:** tool sets (`--tools core` loads 14 tools), `--tier cheap|premium`, `--read-only`,
   structured results, server instructions that name only loaded tools, an undo journal for every write
   (`three_undo`), protected paths, and false-alarm feedback that hides a finding on this machine.
-- **Plugin:** skills `debug`, `perf`, `review`, `upgrade`, `ship`, `model`, `learn`; a `three-debugger` subagent.
+- **Plugin:** a pre-edit hook that refuses Claude's edits into protected paths (and of the protect list); settings
+  for protected paths, tool sets and read-only; full-detail profile; an icon; passes `claude plugin validate`. Skills `debug`, `perf`, `review`, `upgrade`, `ship`, `model`, `learn`; a `three-debugger` subagent.
 - Fixed: the API lookup found no members for classes re-exported through a local export list (every material).
 
 ## 0.1.0

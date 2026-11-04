@@ -5,10 +5,15 @@
       "args": [
         "-y",
         "threesmith@0.1.0",
-        "mcp"
+        "mcp",
+        "--tier",
+        "premium"
       ],
       "env": {
-        "THREESMITH_PROJECT": "${user_config.project}"
+        "THREESMITH_PROJECT": "${user_config.project}",
+        "THREESMITH_PROTECT": "${user_config.protect}",
+        "THREESMITH_TOOLS": "${user_config.tools}",
+        "THREESMITH_READ_ONLY": "${user_config.read_only}"
       }
     }
   }

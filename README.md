@@ -76,7 +76,7 @@ brief of the project.
 
 | Client | How |
 | --- | --- |
-| **Claude Code** | `/plugin install threesmith@threesmith` after `/plugin marketplace add laaielichter/Threesmith` (MCP server, hooks, 8 skills, 2 subagents) |
+| **Claude Code** | `/plugin install threesmith@threesmith` after `/plugin marketplace add laaielichter/Threesmith` (MCP server, hooks incl. protected paths, 8 skills, 2 subagents, settings for tool sets and read-only) |
 | **Claude Code, MCP only** | `claude mcp add threesmith -- npx -y threesmith mcp` |
 | **Codex** | `codex mcp add threesmith -- npx -y threesmith mcp --tier premium` |
 | **Cursor, VS Code** | the buttons at the top |

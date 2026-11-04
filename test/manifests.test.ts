@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { ALL_TOOLS } from "../src/mcp/toolsets.js";
+import { HOOK_EVENTS } from "../src/hooks/hooks.js";
 
 const plugin = (dir: string): string[] => readdirSync(`plugins/threesmith/${dir}`).filter((f) => !f.startsWith("."));
 
@@ -25,7 +26,10 @@ describe("manifests", () => {
   it("keep hooks pointing at the runner and the skill front matter valid", () => {
     const hooks = json("plugins/threesmith/hooks/hooks.json");
     const cmds = JSON.stringify(hooks);
-    for (const e of ["post-edit", "post-bash", "stop", "session-start"]) expect(cmds).toContain(`run.mjs\\" ${e}`);
+    for (const e of HOOK_EVENTS) expect(cmds).toContain(`run.mjs\\" ${e}`);
+    const plugin = json("plugins/threesmith/.claude-plugin/plugin.json");
+    const env = json("plugins/threesmith/.mcp.json").mcpServers.threesmith.env;
+    for (const key of Object.keys(plugin.userConfig)) expect(JSON.stringify(env), key).toContain(`user_config.${key}`);
     const skill = readFileSync("plugins/threesmith/skills/threesmith/SKILL.md", "utf8");
     expect(skill).toMatch(/^---\nname: threesmith\ndescription: .+\n---/);
     expect(readFileSync("plugins/threesmith/agents/three-reviewer.md", "utf8")).toMatch(/^---\nname: three-reviewer\n/);

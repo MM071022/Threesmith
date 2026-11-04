@@ -11,6 +11,7 @@ import { checkAssets } from "../scan/assets.js";
 import { scanProject } from "../scan/scan.js";
 import { makeSourceFile } from "../review/source.js";
 import { lessonHintsForMessages } from "../lessons/hints.js";
+import { protectionMessage, protectionOf } from "../project/protect.js";
 
 /**
  * Hooks for coding agents (Claude Code's hook events), so Threesmith is in the agent's loop without the agent having to
@@ -34,10 +35,10 @@ export interface HookInput {
 export interface HookOutput {
   decision?: "block";
   reason?: string;
-  hookSpecificOutput?: { hookEventName: string; additionalContext?: string };
+  hookSpecificOutput?: { hookEventName: string; additionalContext?: string; permissionDecision?: "deny"; permissionDecisionReason?: string };
 }
 
-export const HOOK_EVENTS = ["post-edit", "post-bash", "stop", "session-start"] as const;
+export const HOOK_EVENTS = ["pre-edit", "post-edit", "post-bash", "stop", "session-start"] as const;
 export type HookEvent = (typeof HOOK_EVENTS)[number];
 
 /** Files whose edits are reviewed. */
@@ -51,6 +52,7 @@ interface SessionState {
 
 export interface HookContext {
   stateDir?: string;
+  env?: NodeJS.ProcessEnv;
 }
 
 /** A folder only this user can use: the system temp folder is shared, so the name carries the user id. */
@@ -130,6 +132,18 @@ function assetProblemsOf(root: string, file: string): string[] {
   } catch {
     return [];
   }
+}
+
+/**
+ * Before Write, Edit, MultiEdit or NotebookEdit: deny an edit into a protected path (a threesmith.json "protect" list,
+ * $THREESMITH_PROTECT or the plugin's protect option) with the reason. Any file type counts; Bash is not parsed.
+ */
+export function preEdit(input: HookInput, context: HookContext = {}): HookOutput | undefined {
+  const file = editedFile(input);
+  if (!file) return undefined;
+  const p = protectionOf(file, context.env ?? process.env, input.cwd ?? process.cwd());
+  if (!p) return undefined;
+  return { hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: protectionMessage(file, p) } };
 }
 
 /** After Edit, Write or MultiEdit of a source file that uses three.js: review it, send errors back, mention warnings. */
@@ -258,6 +272,8 @@ export function sessionStart(input: HookInput): HookOutput | undefined {
 
 export function runHook(event: HookEvent, input: HookInput, context: HookContext = {}): HookOutput | undefined {
   switch (event) {
+    case "pre-edit":
+      return preEdit(input, context);
     case "post-edit":
       return postEdit(input, context);
     case "post-bash":
