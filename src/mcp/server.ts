@@ -1,5 +1,5 @@
 import { readFileSync, statSync } from "node:fs";
-import { isAbsolute, join, relative, resolve, sep } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -26,6 +26,13 @@ import { findLesson, lessonsForError, lessonsForRule, searchLessons, type Lesson
 import { formatLesson, formatLessonList } from "../lessons/format.js";
 import { addLocalLesson, recordLessonFeedback, type LessonInput } from "../lessons/local.js";
 import { lessonHintsForMessages, lessonHintsForRules } from "../lessons/hints.js";
+import type { PageOptions } from "../check/page.js";
+import { parsePlaySteps } from "../check/steps.js";
+import { formatPlay, play, type PlayOptions } from "../check/play.js";
+import { formatScenarios, loadScenarios, runScenarios, saveScenario } from "../check/scenario.js";
+import { formatPerf, perf, type PerfBudget } from "../check/perf.js";
+import { formatLeaks, leaks, type LeakBudget } from "../check/leaks.js";
+import { buildCheck, formatBuild } from "../check/build.js";
 import { VERSION } from "../version.js";
 import { renderInstructions, type Tier } from "./instructions.js";
 import { CheckOutput, DoctorOutput, ReviewOutput, checkData, doctorData, reviewData } from "./structured.js";
@@ -443,6 +450,223 @@ export function createServer(options: ServerOptions = {}): McpServer {
         const content: Content[] = [{ type: "text", text: parts.join("\n") }];
         if (r.screenshot) content.push({ type: "image", data: readFileSync(r.screenshot).toString("base64"), mimeType: "image/png" });
         return { content };
+      }),
+  );
+
+  const playStep = z
+    .array(z.record(z.string(), z.unknown()))
+    .optional()
+    .describe(
+      'Steps in order: {"type":"click","selector":"#start"} or {x,y}, {"type":"press","key":"Space"}, {"type":"hold","key":"ArrowRight","ms":300}, {"type":"drag","from":[x,y],"to":[x,y]}, {"type":"wheel","deltaY":200}, {"type":"wait","ms":500}, {"type":"wait-for","selector":"canvas"}, {"type":"frames","n":10}, {"type":"eval","js":"app.start()"}, {"type":"until","js":"$(\'ball\').position.y < 0","timeout":5000}.',
+    );
+  const pageOpts = (a: { target: string; entry?: string | undefined; root?: string | undefined; width?: number | undefined; height?: number | undefined; webgpu?: boolean | undefined; ignore?: string[] | undefined }): PageOptions => ({
+    target: /^https?:/.test(a.target) ? a.target : where(a.target),
+    ...(a.entry ? { entry: a.entry } : {}),
+    ...(a.root ? { root: where(a.root) } : {}),
+    ...(a.width ? { width: a.width } : {}),
+    ...(a.height ? { height: a.height } : {}),
+    ...(a.webgpu ? { webgpu: true } : {}),
+    ...(a.ignore ? { ignore: a.ignore } : {}),
+  });
+  const pageParams = {
+    target: targetParam,
+    entry: z.string().optional(),
+    root: z.string().optional().describe("folder to serve when the page needs files above its own folder"),
+    width: z.number().int().optional(),
+    height: z.number().int().optional(),
+    webgpu: z.boolean().optional(),
+    ignore: z.array(z.string()).optional(),
+  };
+  /** Writes through the journal, so three_undo can take it back. */
+  const journalWriter = (tool: string, summary: string) => (absPath: string, data: string) => {
+    const root = projectRootOf(dirname(absPath));
+    writeFiles(root, tool, summary, [{ file: relative(root, absPath), data }]);
+  };
+  const claimParam = z
+    .array(z.union([z.string(), z.object({ js: z.string(), at: z.union([z.enum(["end", "any", "always"]), z.number()]).optional() })]))
+    .optional()
+    .describe('Claims about the scene: "$(\'player\').position.y > 1 @ end", "any: $(\'door\').rotation.y > 1", "always: info.render.calls < 200", "x @ step 2", or {js, at}.');
+
+  tool(
+    "three_play",
+    {
+      title: "Run steps and watch the scene",
+      description:
+        "Prove that a change does what it should. Open the page headless, run steps (click, press, hold, drag, wheel, wait, frames, eval, until) and read `watch` expressions in the live scene after every frame and step, with `scene`, `camera`, `renderer`, `info` (renderer.info), `$('name')` and `$$('Type')` in scope (window globals such as `app` work too). `expect` claims are judged at the end, at any moment or at every frame, each pass or fail with its value, time, frame and step. Watched values come back only where they changed. Also page and console errors with explanations, and a screenshot. When it passes, keep it with three_scenario op save.",
+      inputSchema: {
+        ...pageParams,
+        wait: z.number().int().min(0).max(30000).optional().describe("ms to let the scene run before the first step (default 1000)"),
+        steps: playStep,
+        watch: z.array(z.string()).optional().describe("JS expressions to follow, e.g. $('player').position, info.render.calls"),
+        expect: claimParam,
+        sample_ms: z.number().int().min(16).max(5000).optional(),
+        screenshot: z.boolean().optional(),
+      },
+      annotations: { ...WRITES, openWorldHint: true },
+    },
+    async (a) =>
+      guard(async () => {
+        const r = await play({
+          ...pageOpts(a),
+          ...(a.wait !== undefined ? { wait: a.wait } : {}),
+          ...(a.steps ? { steps: parsePlaySteps(a.steps) } : {}),
+          ...(a.watch ? { watch: a.watch } : {}),
+          ...(a.expect ? { expect: a.expect } : {}),
+          ...(a.sample_ms ? { sampleMs: a.sample_ms } : {}),
+        });
+        const content: Content[] = [{ type: "text", text: formatPlay(r) }];
+        if (r.screenshot && a.screenshot !== false && tier === "premium") content.push({ type: "image", data: readFileSync(r.screenshot).toString("base64"), mimeType: "image/png" });
+        return { content, ...(r.ok ? {} : { isError: true }) };
+      }),
+  );
+
+  tool(
+    "three_scenario",
+    {
+      title: "Keep and run regression scenarios",
+      description:
+        "Regression tests made from three_play runs, kept in the project as .threesmith/scenarios/<name>.json (commit them; threesmith ci runs them and writes JUnit). op save runs the play once more with the same arguments and keeps it only when it passes (undoable with three_undo); op list shows the kept ones; op run runs one (name) or all, with every failing claim, its value and frame.",
+      inputSchema: {
+        op: z.enum(["save", "list", "run"]),
+        name: z.string().optional().describe("scenario name (letters, digits, - and _); for run: exact or part of the name"),
+        path: pathParam,
+        overwrite: z.boolean().optional(),
+        target: targetParam.optional(),
+        entry: z.string().optional(),
+        root: z.string().optional(),
+        width: z.number().int().optional(),
+        height: z.number().int().optional(),
+        wait: z.number().int().min(0).max(30000).optional(),
+        steps: playStep,
+        watch: z.array(z.string()).optional(),
+        expect: claimParam,
+      },
+      annotations: { ...WRITES, openWorldHint: true },
+    },
+    async (a) =>
+      guard(async () => {
+        const project = projectRootOf(where(a.path ?? (a.target && !/^https?:/.test(a.target) ? a.target : undefined)));
+        if (a.op === "list") {
+          const list = loadScenarios(project);
+          return text(list.length ? list.map((s) => `${s.scenario.name} (${s.file}): ${s.scenario.steps.length} step(s), ${s.scenario.expect.length} claim(s)`).join("\n") : "No scenarios yet. Save a passing three_play run with op save.");
+        }
+        if (a.op === "run") {
+          const rs = await runScenarios(project, { ...(a.name ? { name: a.name } : {}) });
+          return text(rs.length ? formatScenarios(rs, { brief: tier === "cheap" }) : "No scenarios to run.", rs.some((r) => !r.ok));
+        }
+        if (!a.name || !a.target) return failure("op save needs name and target (and the steps, watch and expect of the play run).");
+        if (!a.expect?.length) return failure("op save needs at least one expect claim: a scenario without claims proves nothing.");
+        const opts: PlayOptions = {
+          ...pageOpts({ ...a, target: a.target }),
+          ...(a.wait !== undefined ? { wait: a.wait } : {}),
+          ...(a.steps ? { steps: parsePlaySteps(a.steps) } : {}),
+          ...(a.watch ? { watch: a.watch } : {}),
+          expect: a.expect,
+        };
+        const r = await saveScenario(project, a.name, opts, { write: journalWriter("three_scenario", `save scenario ${a.name}`), ...(a.overwrite ? { overwrite: true } : {}) });
+        return text(r.saved ? `saved ${r.file}: it passed (${r.result.claims.length} claim(s)). threesmith ci runs it.` : `not saved: ${r.reason}\n${formatPlay(r.result)}`, !r.saved);
+      }),
+  );
+
+  tool(
+    "three_perf",
+    {
+      title: "Measure frames, draw calls and GPU resources",
+      description:
+        "Measure a page for some seconds (after optional steps): draw calls and triangles per frame, shader programs, geometries and textures (exact, the same on every GPU), JS heap, and frame-time percentiles with the slowest frames and their cause (shader compile, GPU upload, draw calls, JS). Checks `budget` and compares with the last run of the same name (kept in .threesmith/perf/). Frame times come from software rendering: use them before/after on the same machine, not as real fps. Measure before and after every performance change.",
+      inputSchema: {
+        ...pageParams,
+        wait: z.number().int().min(0).max(30000).optional(),
+        steps: playStep,
+        seconds: z.number().min(0.5).max(60).optional().describe("how long to measure (default 5)"),
+        budget: z
+          .object({ frameMs: z.number().optional(), calls: z.number().optional(), triangles: z.number().optional(), textures: z.number().optional(), geometries: z.number().optional(), programs: z.number().optional() })
+          .optional()
+          .describe("limits: frameMs (p95), calls and triangles (max per frame), textures, geometries, programs"),
+        name: z.string().optional().describe("name of the measurement for the comparison (default: the entry file)"),
+        save: z.boolean().optional().describe("keep this run for the next comparison (default true)"),
+      },
+      annotations: { ...WRITES, openWorldHint: true },
+    },
+    async (a) =>
+      guard(async () => {
+        const r = await perf({
+          ...pageOpts(a),
+          ...(a.wait !== undefined ? { wait: a.wait } : {}),
+          ...(a.steps ? { steps: parsePlaySteps(a.steps) } : {}),
+          ...(a.seconds ? { seconds: a.seconds } : {}),
+          ...(a.budget ? { budget: a.budget as PerfBudget } : {}),
+          ...(a.name ? { name: a.name } : {}),
+          ...(a.save === false || options.readOnly ? { save: false } : {}),
+        });
+        return text(formatPerf(r), !r.ok);
+      }),
+  );
+
+  tool(
+    "three_leaks",
+    {
+      title: "Find what grows per cycle",
+      description:
+        "Repeat a `cycle` of steps (open and close a level, add and remove objects: e.g. {\"type\":\"eval\",\"js\":\"app.load(); app.unload()\"}) several times with garbage collection after each, and report what grows per cycle: GPU geometries, textures and programs, scene objects, scenes still alive, JS heap, and the resources that reached the GPU and were never disposed, by type (SphereGeometry, MeshStandardMaterial, Texture robot.png). Fails over the budget (default: no growth). Run it again after the fix to show 0 per cycle.",
+      inputSchema: {
+        ...pageParams,
+        wait: z.number().int().min(0).max(30000).optional(),
+        setup: playStep,
+        cycle: z.array(z.record(z.string(), z.unknown())).min(1).describe("the steps of one cycle (same step types as three_play)"),
+        cycles: z.number().int().min(2).max(50).optional().describe("default 5"),
+        warmup_cycles: z.number().int().min(0).max(10).optional().describe("cycles not counted (default 1)"),
+        budget: z
+          .object({ geometries: z.number().optional(), textures: z.number().optional(), programs: z.number().optional(), objects: z.number().optional(), scenes: z.number().optional(), undisposed: z.number().optional(), heapKb: z.number().optional() })
+          .optional()
+          .describe("growth allowed per cycle"),
+      },
+      annotations: { ...WRITES, openWorldHint: true },
+    },
+    async (a) =>
+      guard(async () => {
+        const r = await leaks({
+          ...pageOpts(a),
+          cycle: parsePlaySteps(a.cycle),
+          ...(a.setup ? { setup: parsePlaySteps(a.setup) } : {}),
+          ...(a.wait !== undefined ? { wait: a.wait } : {}),
+          ...(a.cycles ? { cycles: a.cycles } : {}),
+          ...(a.warmup_cycles !== undefined ? { warmupCycles: a.warmup_cycles } : {}),
+          ...(a.budget ? { budget: a.budget as LeakBudget } : {}),
+        });
+        return text(formatLeaks(r), !r.ok);
+      }),
+  );
+
+  tool(
+    "three_build",
+    {
+      title: "Build and check what will be deployed",
+      description:
+        "Run the project's own build script (npm/pnpm/yarn/bun run build; this runs the project's code), then check the output folder: how many copies of three are bundled and its size, assets the bundle or a .gltf refers to that are missing or differ in case, root-absolute URLs that break under a sub-path host such as GitHub Pages (with the base to set), Draco/KTX2 decoder files, then open the built page headless (served under its base). `build: false` checks the output that is already there. Use it before you call a page ready to deploy.",
+      inputSchema: {
+        path: pathParam,
+        script: z.string().optional().describe("package.json script (default build)"),
+        out_dir: z.string().optional().describe("output folder (default from the bundler config, else dist, build or out)"),
+        base: z.string().optional().describe('deploy base, e.g. "/repo/" for GitHub Pages (default from the config)'),
+        build: z.boolean().optional().describe("false: do not build, check the existing output"),
+        check: z.boolean().optional().describe("false: skip the headless check of the built page"),
+        timeout_s: z.number().int().min(10).max(1800).optional(),
+      },
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+    },
+    async (a) =>
+      guard(async () => {
+        const r = await buildCheck({
+          project: projectRootOf(where(a.path)),
+          ...(a.script ? { script: a.script } : {}),
+          ...(a.out_dir ? { outDir: a.out_dir } : {}),
+          ...(a.base ? { base: a.base } : {}),
+          ...(a.build === false ? { run: false as const } : {}),
+          ...(a.check === false ? { check: false as const } : {}),
+          ...(a.timeout_s ? { timeoutMs: a.timeout_s * 1000 } : {}),
+        });
+        return text(formatBuild(r), !r.ok);
       }),
   );
 

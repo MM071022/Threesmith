@@ -2,6 +2,7 @@ import { join, relative, resolve, sep } from "node:path";
 import { findChromium, loadPlaywright, WEBGL_ARGS, WEBGPU_ARGS } from "../check/browser.js";
 import { blankness } from "../check/diff.js";
 import { INSPECT_EVAL, INSPECT_INIT, formatScene, type SceneReport } from "../check/inspect.js";
+import { RUN_INIT } from "../check/runtime.js";
 import { decodePng } from "../check/png.js";
 import { serveStatic, type StaticServer } from "../check/server.js";
 import type { Step } from "../check/check.js";
@@ -52,11 +53,13 @@ interface Session {
 
 const sessions = new Map<string, Session>();
 
-/** Helpers every eval gets: scene, camera, renderer (the last ones rendered), $(name), $$(type), THREE (when global). */
+/**
+ * A richer view of values for eval answers than play's (objects with position, rotation, scale, material). Scene
+ * access (scene, camera, renderer, $, $$) comes from the shared runtime, RUN_INIT's window.__threesmith.
+ */
 const HELPERS = `(() => {
   const w = window;
-  if (w.__threesmith) return;
-  const last = () => (w.__tsScene && w.__tsScene.last) || {};
+  if (w.__tsLive) return;
   const round = (n) => (typeof n === 'number' && isFinite(n) ? Math.round(n * 1000) / 1000 : n);
   const plain = (v, depth, seen) => {
     if (v === null || v === undefined) return v;
@@ -92,14 +95,7 @@ const HELPERS = `(() => {
     for (const k of Object.keys(v)) { if (n++ >= 30) { out['…'] = Object.keys(v).length + ' keys'; break; } try { out[k] = plain(v[k], depth - 1, seen); } catch (e) { out[k] = '[unreadable]'; } }
     return out;
   };
-  w.__threesmith = {
-    get scene() { return last().scene || (w.__tsScene && w.__tsScene.scenes[0]); },
-    get camera() { return last().camera; },
-    get renderer() { return last().renderer || (w.__tsScene && w.__tsScene.renderers[0]); },
-    $(name) { const s = this.scene; return s ? s.getObjectByName(name) : undefined; },
-    $$(type) { const s = this.scene; const out = []; if (s) s.traverse((o) => { if (o.type === type || o.name === type) out.push(o); }); return out; },
-    plain: (v, depth) => plain(v, depth === undefined ? 2 : depth, new Set()),
-  };
+  w.__tsLive = { plain: (v, depth) => plain(v, depth === undefined ? 2 : depth, new Set()) };
 })();`;
 
 function expressionFor(js: string): string {
@@ -109,7 +105,7 @@ function expressionFor(js: string): string {
     const ts = window.__threesmith; const scene = ts.scene, camera = ts.camera, renderer = ts.renderer;
     const $ = (n) => ts.$(n), $$ = (t) => ts.$$(t);
     const THREE = window.THREE;
-    try { const v = await (async () => { ${body} })(); return { ok: true, value: ts.plain(v) }; }
+    try { const v = await (async () => { ${body} })(); return { ok: true, value: window.__tsLive.plain(v) }; }
     catch (e) { return { ok: false, error: String(e && e.stack || e).split('\\n').slice(0, 3).join('\\n') }; }
   })()`;
 }
@@ -166,6 +162,7 @@ export async function startSession(opts: SessionOptions, name = "main"): Promise
   });
   page.on("requestfailed", (r) => add("request-failed", `${r.url()} (${r.failure()?.errorText ?? "failed"})`));
   await page.addInitScript(INSPECT_INIT);
+  await page.addInitScript(RUN_INIT);
   await page.addInitScript(HELPERS);
   sessions.set(name, s);
   try {

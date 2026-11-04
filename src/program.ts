@@ -28,6 +28,13 @@ import { LESSON_TOPICS } from "./lessons/types.js";
 import { findLesson, lessonsForError, lessonsForRule, searchLessons } from "./lessons/search.js";
 import { formatLesson, formatLessonList } from "./lessons/format.js";
 import { recordLessonFeedback } from "./lessons/local.js";
+import type { PageOptions } from "./check/page.js";
+import { parsePlaySteps, type PlayStep } from "./check/steps.js";
+import { formatPlay, play, type PlayOptions } from "./check/play.js";
+import { formatJunit, formatScenarios, loadScenarios, runScenarios, saveScenario } from "./check/scenario.js";
+import { formatPerf, perf } from "./check/perf.js";
+import { formatLeaks, leaks } from "./check/leaks.js";
+import { buildCheck, formatBuild } from "./check/build.js";
 import { formatCompact } from "./review/compact.js";
 import { join, relative } from "node:path";
 import { statSync } from "node:fs";
@@ -206,6 +213,146 @@ export function buildProgram(): Command {
       if (!r.length) process.exitCode = 1;
     });
 
+  const stepsFrom = (list: string[] | undefined): PlayStep[] | undefined => {
+    if (!list?.length) return undefined;
+    const items = list.flatMap((s) => {
+      const text = s.trim().startsWith("[") || s.trim().startsWith("{") ? s : readFileSync(s, "utf8");
+      const v = JSON.parse(text) as unknown;
+      return Array.isArray(v) ? v : [v];
+    });
+    return parsePlaySteps(items);
+  };
+  const pageFrom = (target: string, o: { entry?: string; root?: string; width?: string; height?: string; webgpu?: boolean }): PageOptions => ({
+    target,
+    ...(o.entry ? { entry: o.entry } : {}),
+    ...(o.root ? { root: o.root } : {}),
+    ...(o.width ? { width: Number(o.width) } : {}),
+    ...(o.height ? { height: Number(o.height) } : {}),
+    ...(o.webgpu ? { webgpu: true } : {}),
+  });
+  const budgetFrom = (s: string | undefined): Record<string, number> | undefined =>
+    s ? Object.fromEntries(s.split(",").map((kv) => kv.split("=")).map(([k, v]) => [String(k).trim(), Number(v)])) : undefined;
+  const pageOptions = (c: Command): Command =>
+    c
+      .option("--entry <file>", "HTML file inside the folder", "index.html")
+      .option("--root <dir>", "folder to serve, when the page needs files above its own folder")
+      .option("--width <px>", "viewport width")
+      .option("--height <px>", "viewport height")
+      .option("--webgpu", "also enable WebGPU flags (best effort)");
+
+  pageOptions(
+    program
+      .command("play")
+      .description("Run steps in the page headless, watch values in the live scene and judge claims; --save keeps a passing run as a scenario")
+      .argument("<target>", "folder with the page, or an http(s) URL"),
+  )
+    .option("--step <json...>", 'steps as JSON (one step, an array, or a file), e.g. \'{"type":"press","key":"Space"}\'')
+    .option("--watch <js...>", "expressions to follow, e.g. \"$('player').position.y\"")
+    .option("--expect <claim...>", "claims, e.g. \"$('player').position.y > 1 @ end\", \"any: ...\", \"always: ...\"")
+    .option("--wait <ms>", "ms before the first step", "1000")
+    .option("--save <name>", "keep the run as .threesmith/scenarios/<name>.json when it passes")
+    .option("--overwrite", "replace a scenario with the same name")
+    .option("--json", "JSON output")
+    .action(async (target: string, o: { step?: string[]; watch?: string[]; expect?: string[]; wait: string; save?: string; overwrite?: boolean; json?: boolean } & Record<string, string | boolean | undefined>) => {
+      const steps = stepsFrom(o.step);
+      const opts: PlayOptions = { ...pageFrom(target, o as never), wait: Number(o.wait), ...(steps ? { steps } : {}), ...(o.watch ? { watch: o.watch } : {}), ...(o.expect ? { expect: o.expect } : {}) };
+      if (o.save) {
+        const project = projectRootOf(/^https?:/.test(target) ? "." : target);
+        const r = await saveScenario(project, o.save, opts, {
+          write: (abs, data) => {
+            writeFiles(project, "play --save", `save scenario ${o.save}`, [{ file: relative(project, abs), data }]);
+          },
+          ...(o.overwrite ? { overwrite: true } : {}),
+        });
+        out(o.json ? JSON.stringify(r, null, 2) : r.saved ? `saved ${r.file}` : `not saved: ${r.reason}\n${formatPlay(r.result)}`);
+        if (!r.saved) process.exitCode = 1;
+        return;
+      }
+      const r = await play(opts);
+      out(o.json ? JSON.stringify(r, null, 2) : formatPlay(r));
+      if (!r.ok) process.exitCode = 1;
+    });
+
+  program
+    .command("scenario")
+    .description("List or run the scenarios kept in .threesmith/scenarios (regression tests made from play runs)")
+    .argument("<op>", "list | run")
+    .argument("[name]", "for run: one scenario (exact or part of the name); default all")
+    .option("-p, --path <dir>", "project directory", ".")
+    .option("--junit <file>", "also write JUnit XML")
+    .option("--json", "JSON output")
+    .action(async (op: string, name: string | undefined, o: { path: string; junit?: string; json?: boolean }) => {
+      const project = projectRootOf(o.path);
+      if (op === "list") {
+        const list = loadScenarios(project);
+        out(o.json ? JSON.stringify(list, null, 2) : list.length ? list.map((s) => `${s.scenario.name} (${s.file})`).join("\n") : "No scenarios.");
+        return;
+      }
+      if (op !== "run") throw new Error("op must be list or run");
+      const rs = await runScenarios(project, { ...(name ? { name } : {}) });
+      if (o.junit) {
+        mkdirSync(dirname(o.junit), { recursive: true });
+        writeFileSync(o.junit, formatJunit(rs));
+      }
+      out(o.json ? JSON.stringify(rs.map(({ run: _r, ...x }) => x), null, 2) : rs.length ? formatScenarios(rs) : "No scenarios to run.");
+      if (rs.some((r) => !r.ok)) process.exitCode = 1;
+    });
+
+  pageOptions(
+    program
+      .command("perf")
+      .description("Measure draw calls, triangles, programs, textures and frame times against a budget and the last run")
+      .argument("<target>", "folder with the page, or an http(s) URL"),
+  )
+    .option("--step <json...>", "steps before measuring (see play)")
+    .option("--seconds <n>", "how long to measure", "5")
+    .option("--budget <list>", "limits, e.g. frameMs=20,calls=200,triangles=500000,textures=64")
+    .option("--name <name>", "name for the comparison with the last run")
+    .option("--no-save", "do not keep this run")
+    .option("--json", "JSON output")
+    .action(async (target: string, o: { step?: string[]; seconds: string; budget?: string; name?: string; save: boolean; json?: boolean } & Record<string, string | boolean | undefined>) => {
+      const steps = stepsFrom(o.step);
+      const budget = budgetFrom(o.budget);
+      const r = await perf({ ...pageFrom(target, o as never), seconds: Number(o.seconds), ...(steps ? { steps } : {}), ...(budget ? { budget } : {}), ...(o.name ? { name: o.name } : {}), save: o.save });
+      out(o.json ? JSON.stringify(r, null, 2) : formatPerf(r));
+      if (!r.ok) process.exitCode = 1;
+    });
+
+  pageOptions(
+    program
+      .command("leaks")
+      .description("Repeat a cycle of steps and report what grows per cycle (GPU resources never disposed, by type)")
+      .argument("<target>", "folder with the page, or an http(s) URL"),
+  )
+    .requiredOption("--cycle <json...>", "the steps of one cycle (see play)")
+    .option("--setup <json...>", "steps before the first cycle")
+    .option("--cycles <n>", "how many cycles", "5")
+    .option("--budget <list>", "growth allowed per cycle, e.g. geometries=0,textures=0,heapKb=200")
+    .option("--json", "JSON output")
+    .action(async (target: string, o: { cycle: string[]; setup?: string[]; cycles: string; budget?: string; json?: boolean } & Record<string, string | boolean | undefined>) => {
+      const setup = stepsFrom(o.setup);
+      const budget = budgetFrom(o.budget);
+      const r = await leaks({ ...pageFrom(target, o as never), cycle: stepsFrom(o.cycle) ?? [], ...(setup ? { setup } : {}), cycles: Number(o.cycles), ...(budget ? { budget } : {}) });
+      out(o.json ? JSON.stringify(r, null, 2) : formatLeaks(r));
+      if (!r.ok) process.exitCode = 1;
+    });
+
+  program
+    .command("build")
+    .description("Run the project's build, check the output (copies of three, missing assets, sub-path URLs, decoders) and open the built page headless")
+    .argument("[path]", "project directory", ".")
+    .option("--script <name>", "package.json script", "build")
+    .option("--out <dir>", "output folder (default from the bundler config)")
+    .option("--base <base>", 'deploy base, e.g. "/repo/"')
+    .option("--no-build", "check the existing output without building")
+    .option("--no-check", "skip the headless check of the built page")
+    .option("--json", "JSON output")
+    .action(async (path: string, o: { script: string; out?: string; base?: string; build: boolean; check: boolean; json?: boolean }) => {
+      const r = await buildCheck({ project: projectRootOf(path), script: o.script, ...(o.out ? { outDir: o.out } : {}), ...(o.base ? { base: o.base } : {}), ...(o.build ? {} : { run: false as const }), ...(o.check ? {} : { check: false as const }) });
+      out(o.json ? JSON.stringify({ ...r, check: r.check ? { ok: r.check.ok, issues: r.check.issues } : undefined }, null, 2) : formatBuild(r));
+      if (!r.ok) process.exitCode = 1;
+    });
+
   program
     .command("ci")
     .description("Review (and optionally the headless check) in one receipt, for CI and pull requests")
@@ -220,12 +367,16 @@ export function buildProgram(): Command {
     .option("--update-baseline", "overwrite the baseline")
     .option("--wait <ms>", "ms to run the scene for --check", "2000")
     .option("--disable <rules>", "comma separated rule ids to skip")
+    .option("--no-scenarios", "do not run the scenarios in .threesmith/scenarios")
+    .option("--junit <file>", "write the scenario results as JUnit XML")
+    .option("--sarif <file>", "write the review findings as SARIF 2.1.0")
     .option("--summary <file>", "append the markdown receipt to this file (use $GITHUB_STEP_SUMMARY)")
     .option("--out <file>", "write the markdown receipt to this file")
     .option("--json", "JSON output")
-    .action(async (path: string, o: { three?: string; minScore?: string; failOn: string; check?: string; entry: string; root?: string; baseline?: string; updateBaseline?: boolean; wait: string; disable?: string; summary?: string; out?: string; json?: boolean }) => {
+    .action(async (path: string, o: { three?: string; minScore?: string; failOn: string; check?: string; entry: string; root?: string; baseline?: string; updateBaseline?: boolean; wait: string; disable?: string; scenarios: boolean; junit?: string; sarif?: string; summary?: string; out?: string; json?: boolean }) => {
       const r = await ci({
         path,
+        scenarios: o.scenarios,
         failOn: o.failOn as Severity | "none",
         ...(o.three ? { three: o.three } : {}),
         ...(o.minScore !== undefined ? { minScore: Number(o.minScore) } : {}),
@@ -234,6 +385,14 @@ export function buildProgram(): Command {
           ? { check: { target: o.check, entry: o.entry, ...(o.root ? { root: o.root } : {}), wait: Number(o.wait), ...(o.baseline ? { baseline: o.baseline } : {}), ...(o.updateBaseline ? { updateBaseline: true } : {}) } }
           : {}),
       });
+      if (o.junit) {
+        mkdirSync(dirname(o.junit), { recursive: true });
+        writeFileSync(o.junit, formatJunit(r.scenarios ?? []));
+      }
+      if (o.sarif) {
+        mkdirSync(dirname(o.sarif), { recursive: true });
+        writeFileSync(o.sarif, JSON.stringify(toSarif(r.review), null, 1) + "\n");
+      }
       if (o.summary) appendFileSync(o.summary, r.markdown + "\n");
       if (o.out) {
         mkdirSync(dirname(o.out), { recursive: true });

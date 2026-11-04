@@ -20,9 +20,9 @@ export const TOOLSETS = {
     "three_undo",
     "three_version",
   ],
-  run: ["three_check", "three_inspect"],
+  run: ["three_check", "three_inspect", "three_play", "three_scenario", "three_perf", "three_leaks"],
   live: ["three_session", "three_page"],
-  build: ["three_assets"],
+  build: ["three_assets", "three_build"],
 } as const satisfies Record<string, readonly string[]>;
 
 export type Toolset = keyof typeof TOOLSETS;
@@ -55,7 +55,7 @@ export function enabledTools(list?: string | readonly string[]): Set<string> {
 }
 
 /** Tools a read-only server leaves out: they always change project files. */
-export const WRITE_ONLY_TOOLS: readonly string[] = ["three_undo"];
+export const WRITE_ONLY_TOOLS: readonly string[] = ["three_undo", "three_build"];
 
 const DRY_RUN_TOOLS = new Set(["three_fix"]);
 
@@ -65,6 +65,7 @@ export function readOnlyRefusal(tool: string, args: Record<string, unknown>): st
   if (WRITE_ONLY_TOOLS.includes(tool)) return no("writes files and");
   if (DRY_RUN_TOOLS.has(tool) && args["write"] === true) return no("with write: true") + " Leave write out to see the changes.";
   if ((tool === "three_check" || tool === "three_play") && (args["baseline"] !== undefined || args["update_baseline"] === true)) return no("with a baseline (it writes the picture into the project)");
+  if (tool === "three_scenario" && args["op"] === "save") return no("op save");
   return undefined;
 }
 
