@@ -2,17 +2,17 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.laaielichter/threesmith",
   "title": "Threesmith",
-  "description": "three.js for coding agents: version-pinned API lookup, scored review of outdated code, headless WebGL check with screenshots.",
+  "description": "three.js for coding agents: version-pinned API and review, assets, headless runs, perf, 3D models.",
   "repository": {
     "url": "https://github.com/laaielichter/Threesmith",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "threesmith",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "transport": {
         "type": "stdio"
       },

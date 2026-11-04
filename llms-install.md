@@ -37,7 +37,22 @@ Add this entry to the MCP settings (for Cline: `cline_mcp_settings.json`, under 
 Call `three_version` (which three release is installed), then `three_api` with `Mesh`, then `three_review` on the
 project. None of them needs a browser.
 
+Start with `three_doctor` in a project you do not know: it says what is wrong and in which order to fix it.
+
+## Options
+
+- `--tier cheap` (default): short output and step-by-step instructions. `--tier premium`: full detail for large models.
+- `--tools core,run`: load only some tool sets (`core`, `run`, `live`, `build`, `model`, `all`) or single tools.
+- `--read-only`: leave out the tools that always write and refuse write options (dry runs still work).
+- Environment: `THREESMITH_PROJECT`, `THREESMITH_TIER`, `THREESMITH_TOOLS`, `THREESMITH_READ_ONLY=1`,
+  `THREESMITH_PROTECT` (folders no write may touch), `THREESMITH_LEARN=0` (no local learning).
+- CLI output is plain ASCII on Windows when it is piped (PowerShell would garble UTF-8 symbols); `THREESMITH_ASCII=1`
+  forces that everywhere, `THREESMITH_ASCII=0` keeps the symbols.
+
 ## What it writes and sends
 
-The tools only read the project. `three_check` writes screenshots and baselines to `.threesmith/` in the folder it
-checks. It sends nothing: there is no telemetry. See [PRIVACY.md](PRIVACY.md).
+Most tools only read the project. Writes: `three_fix` with `write: true`, `three_model_build`, `three_scenario` op save
+(each undoable with `three_undo`), and local state in `.threesmith/` (screenshots, baselines, perf history, the undo
+journal, review memory; the local part is git-ignored). `three_build` runs the project's own build script. Lessons and
+false-alarm feedback live in `~/.threesmith` (or `$THREESMITH_HOME`), scrubbed of names, paths and code. Nothing is
+sent anywhere: there is no telemetry. See [PRIVACY.md](PRIVACY.md).

@@ -6,6 +6,12 @@ import { findThree } from "../api/install.js";
 import { review } from "../review/review.js";
 import type { Finding } from "../review/types.js";
 import { explain } from "../explain/explain.js";
+import { applyFeedback } from "../learn/feedback.js";
+import { checkAssets } from "../scan/assets.js";
+import { scanProject } from "../scan/scan.js";
+import { makeSourceFile } from "../review/source.js";
+import { lessonHintsForMessages } from "../lessons/hints.js";
+import { protectionMessage, protectionOf } from "../project/protect.js";
 
 /**
  * Hooks for coding agents (Claude Code's hook events), so Threesmith is in the agent's loop without the agent having to
@@ -29,10 +35,10 @@ export interface HookInput {
 export interface HookOutput {
   decision?: "block";
   reason?: string;
-  hookSpecificOutput?: { hookEventName: string; additionalContext?: string };
+  hookSpecificOutput?: { hookEventName: string; additionalContext?: string; permissionDecision?: "deny"; permissionDecisionReason?: string };
 }
 
-export const HOOK_EVENTS = ["post-edit", "post-bash", "stop", "session-start"] as const;
+export const HOOK_EVENTS = ["pre-edit", "post-edit", "post-bash", "stop", "session-start"] as const;
 export type HookEvent = (typeof HOOK_EVENTS)[number];
 
 /** Files whose edits are reviewed. */
@@ -46,6 +52,7 @@ interface SessionState {
 
 export interface HookContext {
   stateDir?: string;
+  env?: NodeJS.ProcessEnv;
 }
 
 /** A folder only this user can use: the system temp folder is shared, so the name carries the user id. */
@@ -113,7 +120,30 @@ const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" 
 
 function findingsOf(root: string, file: string): Finding[] {
   const rel = relative(root, file).split("\\").join("/");
-  return review({ path: root }).findings.filter((f) => f.file === rel);
+  return applyFeedback(review({ path: root })).review.findings.filter((f) => f.file === rel);
+}
+
+/** Asset paths in one edited file that do not resolve (missing, or only with other capitals). */
+function assetProblemsOf(root: string, file: string): string[] {
+  try {
+    const rel = relative(root, file).split("\\").join("/");
+    const r = checkAssets(root, [makeSourceFile(rel, readFileSync(file, "utf8"))]);
+    return r.problems.filter((p) => (p.kind === "missing" || p.kind === "case") && p.file === rel).slice(0, 4).map((p) => `  ${p.file}:${p.line} [asset-${p.kind}] ${p.message} Fix: ${p.fix}`);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Before Write, Edit, MultiEdit or NotebookEdit: deny an edit into a protected path (a threesmith.json "protect" list,
+ * $THREESMITH_PROTECT or the plugin's protect option) with the reason. Any file type counts; Bash is not parsed.
+ */
+export function preEdit(input: HookInput, context: HookContext = {}): HookOutput | undefined {
+  const file = editedFile(input);
+  if (!file) return undefined;
+  const p = protectionOf(file, context.env ?? process.env, input.cwd ?? process.cwd());
+  if (!p) return undefined;
+  return { hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: protectionMessage(file, p) } };
 }
 
 /** After Edit, Write or MultiEdit of a source file that uses three.js: review it, send errors back, mention warnings. */
@@ -125,6 +155,7 @@ export function postEdit(input: HookInput, context: HookContext = {}): HookOutpu
   const errors = mine.filter((f) => f.severity === "error");
   const warnings = mine.filter((f) => f.severity === "warn");
   const rel = relative(root, file);
+  const assets = assetProblemsOf(root, file);
 
   const state = readState(context, input.session_id);
   const before = state.files[file]?.errors ?? 0;
@@ -137,14 +168,16 @@ export function postEdit(input: HookInput, context: HookContext = {}): HookOutpu
       reason: [
         `Threesmith reviewed ${rel}: ${plural(errors.length, "error")}${warnings.length ? `, ${plural(warnings.length, "warning")}` : ""}. These break or outdate the scene:`,
         ...listFindings([...errors, ...warnings]),
+        ...(assets.length ? ["Asset paths that will not load:", ...assets] : []),
         "Next: fix the errors now (look names up with three_api; it reads the installed version). If a finding is a verified false alarm, say so in your answer and go on.",
       ].join("\n"),
     };
   }
-  if (warnings.length) {
+  if (warnings.length || assets.length) {
     return context_("PostToolUse", [
-      `Threesmith reviewed ${rel}: no errors, ${plural(warnings.length, "warning")}:`,
+      `Threesmith reviewed ${rel}: no errors${warnings.length ? `, ${plural(warnings.length, "warning")}:` : "."}`,
       ...listFindings(warnings),
+      ...(assets.length ? ["Asset paths that will not load (a 404 shows up as a parse error in the loader):", ...assets] : []),
       "Next: fix the warnings that touch what you are building now; mention the others to the user when you finish.",
     ]);
   }
@@ -169,9 +202,11 @@ export function postBash(input: HookInput): HookOutput | undefined {
   const m = THREE_MESSAGE.exec(text);
   const known = explain(text);
   if (!m && !(known.length && /three/i.test(text))) return undefined;
+  const lessons = lessonHintsForMessages([text.slice(-20_000)]);
   return context_("PostToolUse", [
     `Threesmith: the output above has a three.js problem${m ? ` ("${m[0].slice(0, 120)}")` : ""}.`,
     ...known.slice(0, 3).map((e) => `- ${e.title}: ${e.cause} Fix: ${e.fix}`),
+    ...lessons.map((l) => `- ${l}`),
     "Next: look names up with three_api (exact API of the installed version); three_explain with the full message, three_inspect when the scene looks wrong.",
   ]);
 }
@@ -215,16 +250,30 @@ export function sessionStart(input: HookInput): HookOutput | undefined {
     /* no package.json */
   }
   if (!install && !declared) return undefined;
+  const brief: string[] = [];
+  try {
+    const m = scanProject(root);
+    const s = m.stack;
+    brief.push(
+      `Stack: ${s.bundler}${s.framework.length ? ` + ${s.framework.join(", ")}` : ""}${s.typescript ? ", TypeScript" : ""}${Object.keys(s.libraries).length ? `; ${Object.keys(s.libraries).slice(0, 6).join(", ")}` : ""}. ${m.files.length} file(s) use three${m.files[0] ? ` (${m.files.slice(0, 4).map((f) => f.file).join(", ")}${m.files.length > 4 ? ", ..." : ""})` : ""}.`,
+    );
+    for (const n of m.notes.slice(0, 3)) brief.push(`Note: ${n}`);
+  } catch {
+    /* the brief is a bonus */
+  }
   return context_("SessionStart", [
     install
       ? `Threesmith: this project has three r${install.release} (${install.version}) installed.`
       : "Threesmith: this project depends on three, but it is not installed (npm install), so API lookups cannot run yet.",
-    "Every three.js file you edit is reviewed right after the edit; errors come back to you. Next: three_api before you use an API you are not sure of (three changes monthly; never write it from memory), three_review when you finish, three_check to open the page headless and look at the screenshot.",
+    ...brief,
+    "Every three.js file you edit is reviewed right after the edit; errors come back to you. Next: three_api before you use an API you are not sure of (three changes monthly; never write it from memory), three_review when you finish, three_check to open the page headless and look at the screenshot; three_doctor when something is broken and you do not know where to start.",
   ]);
 }
 
 export function runHook(event: HookEvent, input: HookInput, context: HookContext = {}): HookOutput | undefined {
   switch (event) {
+    case "pre-edit":
+      return preEdit(input, context);
     case "post-edit":
       return postEdit(input, context);
     case "post-bash":

@@ -108,3 +108,13 @@ describe("steps parsing", () => {
     expect(() => parseSteps("{}")).toThrow(/array/);
   });
 });
+
+describe("browser discovery", () => {
+  it("knows where Edge and Chrome install, Edge first-class on Windows", async () => {
+    const { systemBrowsers } = await import("../src/check/browser.js");
+    const win = systemBrowsers({ PROGRAMFILES: "C:\\Program Files", "PROGRAMFILES(X86)": "C:\\Program Files (x86)" }, "win32");
+    expect(win.some((p) => p.endsWith("msedge.exe"))).toBe(true);
+    expect(systemBrowsers({}, "darwin")[0]).toContain("Google Chrome");
+    expect(systemBrowsers({}, "linux")).toContain("/usr/bin/chromium");
+  });
+});

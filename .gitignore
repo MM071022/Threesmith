@@ -4,4 +4,4 @@ dist
 .threesmith/last.png
 .threesmith/diff
 *.log
-build
+/build

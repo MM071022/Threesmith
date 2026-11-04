@@ -18,7 +18,7 @@ const out = join(root, "build", "threesmith.mcpb");
 rmSync(stage, { recursive: true, force: true });
 mkdirSync(stage, { recursive: true });
 
-for (const item of ["dist", "package.json", "package-lock.json", "LICENSE", "PRIVACY.md"]) {
+for (const item of ["dist", "data", "package.json", "package-lock.json", "LICENSE", "PRIVACY.md"]) {
   cpSync(join(root, item), join(stage, item), { recursive: true });
 }
 cpSync(join(root, "mcpb", "icon.png"), join(stage, "icon.png"));

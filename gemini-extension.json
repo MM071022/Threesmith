@@ -1,13 +1,13 @@
 {
   "name": "threesmith",
-  "version": "0.1.0",
-  "description": "Makes Gemini CLI better at three.js: the exact API of the installed three version, a scored review of outdated or broken code, and a headless WebGL check with screenshots.",
+  "version": "0.2.0",
+  "description": "Makes Gemini CLI better at three.js: the API of your installed three version, a scored review pinned to it (97 rules incl. shaders and R3F), asset and decoder checks, the page run headless with the live scene read back, play with claims, perf and leak checks, build checks, and 3D models built without Blender.",
   "mcpServers": {
     "threesmith": {
       "command": "npx",
       "args": [
         "-y",
-        "threesmith@0.1.0",
+        "threesmith@0.2.0",
         "mcp"
       ]
     }

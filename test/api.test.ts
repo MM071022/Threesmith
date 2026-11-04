@@ -17,6 +17,14 @@ describe("api index (needs three in node_modules)", () => {
     expect(index?.exports.get("WebGPURenderer")?.importPath).toBe("three/webgpu");
     expect(index?.exports.get("OrbitControls")?.importPath).toBe("three/addons/controls/OrbitControls.js");
   });
+  it("resolves classes re-exported through a local export list (materials/Materials.js)", () => {
+    for (const name of ["MeshStandardMaterial", "MeshBasicMaterial", "ShaderMaterial", "Material"]) {
+      const e = index?.getEntry(name);
+      expect(e?.file, name).toMatch(new RegExp(`src/materials/${name}\\.js$`));
+    }
+    const r = lookup(index!, "MeshStandardMaterial.roughness");
+    expect(r.found).toBe(true);
+  });
   it("looks up a class with constructor and inheritance", () => {
     const r = lookup(index!, "Mesh");
     expect(r.found).toBe(true);

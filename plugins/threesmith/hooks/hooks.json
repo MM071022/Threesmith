@@ -1,21 +1,61 @@
 {
-  "description": "Threesmith reviews every three.js file Claude edits and sends the errors back, points at three_api when command output shows an outdated or wrongly imported three.js API, names review errors left open before Claude stops, and starts a session in a three.js project with the installed version. THREESMITH_HOOKS=0 turns them off.",
+  "description": "Threesmith refuses Claude's file edits into paths a threesmith.json \"protect\" list (or the protect setting) keeps byte-identical, reviews every three.js file Claude edits and sends errors and broken asset paths back, explains three.js problems in command output with lessons from real projects, names review errors left open before Claude stops, and starts a session in a three.js project with a short brief. Bash commands are not checked against protect. THREESMITH_HOOKS=0 turns them off.",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" pre-edit",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
-        "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" post-edit", "timeout": 120 }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" post-edit",
+            "timeout": 120
+          }
+        ]
       },
       {
         "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" post-bash", "timeout": 60 }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" post-bash",
+            "timeout": 60
+          }
+        ]
       }
     ],
     "Stop": [
-      { "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" stop", "timeout": 120 }] }
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" stop",
+            "timeout": 120
+          }
+        ]
+      }
     ],
     "SessionStart": [
-      { "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" session-start", "timeout": 60 }] }
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run.mjs\" session-start",
+            "timeout": 60
+          }
+        ]
+      }
     ]
   }
 }

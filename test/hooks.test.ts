@@ -2,7 +2,8 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { postBash, postEdit, runHook, sessionStart, stop } from "../src/hooks/hooks.js";
+import { postBash, postEdit, preEdit, runHook, sessionStart, stop } from "../src/hooks/hooks.js";
+import { resetProtect } from "../src/project/protect.js";
 import { formatDoctor } from "../src/doctor/doctor.js";
 import { project } from "./helpers.js";
 
@@ -51,6 +52,36 @@ describe("hooks", () => {
     const dir = project({ "package.json": JSON.stringify({ dependencies: { three: "^0.187.0" } }) });
     expect(sessionStart({ cwd: dir })?.hookSpecificOutput?.additionalContext).toContain("depends on three");
     expect(sessionStart({ cwd: process.cwd() })?.hookSpecificOutput?.additionalContext).toMatch(/three r\d+/);
+  });
+
+  it("names asset paths in the edited file that will not load", () => {
+    const dir = project({ "package.json": "{}", "public/Car.glb": "x", "main.js": "import * as THREE from 'three';\nnew THREE.Scene();\nloader.load('/car.glb');\nloader.load('/boat.glb');\n" });
+    const out = postEdit({ cwd: dir, tool_input: { file_path: join(dir, "main.js") } }, ctx());
+    const text = out?.hookSpecificOutput?.additionalContext ?? "";
+    expect(text).toContain("main.js:3 [asset-case]");
+    expect(text).toContain("main.js:4 [asset-missing]");
+  });
+
+  it("does not block on a finding marked as a false alarm", async () => {
+    const { recordFeedback } = await import("../src/learn/feedback.js");
+    const dir = project({ "package.json": "{}", "main.js": bad });
+    recordFeedback({ rule: "geometry-class", snippet: "const g = new THREE.Geometry();" }, "wrong");
+    expect(postEdit({ cwd: dir, tool_input: { file_path: join(dir, "main.js") } }, ctx())?.decision).toBeUndefined();
+    recordFeedback({ rule: "geometry-class", snippet: "const g = new THREE.Geometry();" }, "right");
+  });
+
+  it("denies edits into protected paths and of the protect list itself", () => {
+    const dir = project({ "package.json": "{}", "threesmith.json": JSON.stringify({ protect: ["vendor", "public/*.glb"] }), "src/a.js": "x" });
+    resetProtect();
+    const deny = (file: string, env: NodeJS.ProcessEnv = {}) => preEdit({ cwd: dir, tool_input: { file_path: join(dir, file) } }, { ...ctx(), env })?.hookSpecificOutput;
+    expect(deny("vendor/three.js")?.permissionDecision).toBe("deny");
+    expect(deny("vendor/three.js")?.permissionDecisionReason).toContain('"vendor"');
+    expect(deny("public/car.glb")?.permissionDecision).toBe("deny");
+    expect(deny("threesmith.json")?.permissionDecisionReason).toContain("protect list");
+    expect(deny("src/a.js")).toBeUndefined();
+    // the plugin option, relative to the folder Claude Code runs in; an unfilled placeholder is ignored
+    expect(deny("src/a.js", { CLAUDE_PLUGIN_OPTION_PROTECT: "src" })?.permissionDecision).toBe("deny");
+    expect(deny("src/a.js", { THREESMITH_PROTECT: "${user_config.protect}" })).toBeUndefined();
   });
 
   it("dispatches events", () => {

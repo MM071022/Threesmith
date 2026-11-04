@@ -1,0 +1,1232 @@
+[
+ {
+  "id": "aircraft",
+  "name": "aircraft",
+  "description": "Something that flies.",
+  "aliases": [
+   "aircraft",
+   "vliegtuig of helikopter",
+   "luchtvaartuig",
+   "flying machine",
+   "vlieger"
+  ],
+  "extends": "thing",
+  "hints": [
+   "fly",
+   "flying",
+   "vliegen",
+   "wing",
+   "wings",
+   "vleugel",
+   "sky",
+   "lucht",
+   "pilot",
+   "piloot"
+  ],
+  "anticipate": [
+   "A cockpit or pilot position, with glazing as a separate material.",
+   "Navigation lights: red on the left wingtip (+X), green on the right (-X), white at the tail.",
+   "Landing gear nodes that can retract (hinge) and a ground contact at y = 0."
+  ],
+  "pitfalls": [
+   "Wings and tail fused into one mesh cannot have moving surfaces."
+  ]
+ },
+ {
+  "id": "aircraft.fixed-wing",
+  "name": "fixed-wing aircraft",
+  "description": "An aircraft with fixed wings.",
+  "aliases": [
+   "fixed-wing aircraft",
+   "fixed wing",
+   "starrevleugelig vliegtuig"
+  ],
+  "extends": "aircraft",
+  "hints": [
+   "wing",
+   "runway",
+   "landingsbaan",
+   "propeller",
+   "jet"
+  ],
+  "parts": [
+   {
+    "name": "Fuselage",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "fuselage",
+     "body",
+     "romp",
+     "hull"
+    ]
+   },
+   {
+    "name": "WingLeft",
+    "role": "wing",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "wing left",
+     "left wing",
+     "linkervleugel",
+     "wing"
+    ],
+    "note": "The left wing is on the +X side when the nose faces +Z."
+   },
+   {
+    "name": "WingRight",
+    "role": "wing",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "wing right",
+     "right wing",
+     "rechtervleugel"
+    ]
+   },
+   {
+    "name": "Aileron",
+    "role": "control surface",
+    "required": false,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "aileron",
+     "rolroer"
+    ],
+    "note": "Hinged along the trailing edge of the wing."
+   },
+   {
+    "name": "Elevator",
+    "role": "control surface",
+    "required": false,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "elevator",
+     "hoogteroer"
+    ]
+   },
+   {
+    "name": "Rudder",
+    "role": "control surface",
+    "required": false,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "rudder",
+     "richtingsroer",
+     "seinroer"
+    ]
+   },
+   {
+    "name": "LandingGear",
+    "role": "gear",
+    "required": false,
+    "count": [
+     2,
+     3
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "landing gear",
+     "undercarriage",
+     "gear",
+     "landingsgestel",
+     "wiel"
+    ],
+    "note": "Retracts about a hinge at the top of the strut; wheels spin about x."
+   }
+  ],
+  "anticipate": [
+   "The nose points to +Z, the wings run along x, and the tail fin points up (+Y).",
+   "Control surfaces are separate nodes with the pivot on the hinge line."
+  ],
+  "pitfalls": [
+   "A symmetric aircraft with one wing slightly longer looks wrong: build one side and mirror it."
+  ]
+ },
+ {
+  "id": "aircraft.fixed-wing.airplane",
+  "name": "airplane",
+  "description": "An aeroplane, in general.",
+  "aliases": [
+   "airplane",
+   "aeroplane",
+   "plane",
+   "vliegtuig",
+   "aircraft plane"
+  ],
+  "extends": "aircraft.fixed-wing",
+  "scale": {
+   "length": [
+    6,
+    76
+   ],
+   "width": [
+    8,
+    80
+   ],
+   "height": [
+    2.5,
+    25
+   ],
+   "source": "wide: from a light aircraft to the largest airliners (manufacturer data for A320, 737, 777, A380)",
+   "confidence": "B"
+  }
+ },
+ {
+  "id": "aircraft.fixed-wing.airliner",
+  "name": "airliner",
+  "description": "A passenger jet.",
+  "aliases": [
+   "airliner",
+   "jet airliner",
+   "passenger jet",
+   "passagiersvliegtuig",
+   "boeing",
+   "airbus",
+   "jumbo",
+   "verkeersvliegtuig",
+   "737",
+   "a320",
+   "747",
+   "a380",
+   "777"
+  ],
+  "extends": "aircraft.fixed-wing.airplane",
+  "parts": [
+   {
+    "name": "Engine",
+    "role": "engine",
+    "required": true,
+    "count": [
+     2,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "engine",
+     "turbofan",
+     "motor",
+     "straalmotor"
+    ],
+    "note": "Under the wings; the fan spins about z."
+   }
+  ],
+  "scale": {
+   "length": [
+    28,
+    76
+   ],
+   "width": [
+    28,
+    80
+   ],
+   "height": [
+    10,
+    25
+   ],
+   "source": "manufacturer data for the A320 (37.6 x 35.8 x 11.8 m), 737-800 (39.5 x 35.8 x 12.5 m), 777-300ER (73.9 x 64.8 x 18.5 m) and A380 (72.7 x 79.8 x 24.1 m)",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "body",
+    "options": [
+     "narrow-body",
+     "wide-body"
+    ]
+   },
+   {
+    "axis": "engines",
+    "options": [
+     "2",
+     "4"
+    ]
+   }
+  ],
+  "pitfalls": [
+   "Wing sweep is about 25-35 degrees and the wing has dihedral of a few degrees: a flat straight wing looks like a toy."
+  ]
+ },
+ {
+  "id": "aircraft.fixed-wing.light-aircraft",
+  "name": "light aircraft",
+  "description": "A small propeller aeroplane.",
+  "aliases": [
+   "light aircraft",
+   "cessna",
+   "propeller plane",
+   "propellervliegtuig",
+   "sportvliegtuig",
+   "piper",
+   "prop plane",
+   "tweedekker",
+   "biplane"
+  ],
+  "extends": "aircraft.fixed-wing.airplane",
+  "parts": [
+   {
+    "name": "Propeller",
+    "role": "propeller",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "center",
+    "aliases": [
+     "propeller",
+     "prop",
+     "schroef"
+    ],
+    "note": "Spins about the nose axis (z); give it a blurred disc for fast spinning."
+   }
+  ],
+  "scale": {
+   "length": [
+    6,
+    10
+   ],
+   "width": [
+    8,
+    13
+   ],
+   "height": [
+    2,
+    3.6
+   ],
+   "source": "general knowledge: typical production range, not a standard; a Cessna 172 is about 8.3 x 11.0 x 2.7 m",
+   "confidence": "C"
+  }
+ },
+ {
+  "id": "aircraft.fixed-wing.glider",
+  "name": "glider",
+  "description": "An aeroplane without an engine: it flies on the lift of rising air.",
+  "aliases": [
+   "glider",
+   "zweefvliegtuig"
+  ],
+  "extends": "aircraft.fixed-wing.airplane"
+ },
+ {
+  "id": "aircraft.fixed-wing.fighter",
+  "name": "fighter jet",
+  "description": "A military jet.",
+  "aliases": [
+   "fighter",
+   "fighter jet",
+   "jet fighter",
+   "straaljager",
+   "jachtvliegtuig",
+   "f16",
+   "f35",
+   "f15",
+   "mig",
+   "su-27",
+   "warplane",
+   "gevechtsvliegtuig"
+  ],
+  "extends": "aircraft.fixed-wing.airplane",
+  "parts": [
+   {
+    "name": "Canopy",
+    "role": "glazing",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "canopy",
+     "cockpit",
+     "kap"
+    ],
+    "note": "Hinged at the rear edge; opens upwards or slides back."
+   },
+   {
+    "name": "Nozzle",
+    "role": "engine",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "nozzle",
+     "exhaust",
+     "uitlaat"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    13,
+    23
+   ],
+   "width": [
+    8,
+    15
+   ],
+   "height": [
+    4,
+    6.5
+   ],
+   "source": "general knowledge: typical production range, not a standard; public data for F-16 (15.0 x 9.96 x 4.9 m), F-15 (19.4 x 13.0 x 5.6 m)",
+   "confidence": "C"
+  }
+ },
+ {
+  "id": "aircraft.rotorcraft",
+  "name": "rotorcraft",
+  "description": "An aircraft lifted by rotors.",
+  "aliases": [
+   "rotorcraft",
+   "rotary wing",
+   "rotor aircraft"
+  ],
+  "extends": "aircraft",
+  "hints": [
+   "rotor",
+   "rotors",
+   "hover",
+   "zweven"
+  ]
+ },
+ {
+  "id": "aircraft.rotorcraft.helicopter",
+  "name": "helicopter",
+  "description": "A helicopter.",
+  "aliases": [
+   "helicopter",
+   "helicopters",
+   "helikopter",
+   "heli",
+   "chopper",
+   "rescue helicopter",
+   "traumahelikopter",
+   "black hawk",
+   "apache",
+   "huey"
+  ],
+  "extends": "aircraft.rotorcraft",
+  "hints": [
+   "rotor",
+   "hover",
+   "rescue",
+   "blades"
+  ],
+  "parts": [
+   {
+    "name": "Fuselage",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "fuselage",
+     "body",
+     "romp",
+     "cabin"
+    ]
+   },
+   {
+    "name": "MainRotor",
+    "role": "rotor",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "main rotor",
+     "rotor",
+     "hoofdrotor"
+    ],
+    "note": "Spins about the mast (y). Blades are children of the hub, so they can flap and pitch."
+   },
+   {
+    "name": "MainBlade",
+    "role": "blade",
+    "required": true,
+    "count": [
+     2,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "main blade",
+     "blade",
+     "rotorblad",
+     "bladen"
+    ],
+    "note": "Blade pivot at the root, on the hub."
+   },
+   {
+    "name": "TailRotor",
+    "role": "rotor",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "tail rotor",
+     "staartrotor",
+     "fenestron"
+    ],
+    "note": "Spins about a horizontal axis across the tail (x), often canted slightly."
+   },
+   {
+    "name": "TailBlade",
+    "role": "blade",
+    "required": false,
+    "count": [
+     2,
+     6
+    ],
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "tail blade",
+     "staartrotorblad",
+     "staartblad"
+    ],
+    "note": "Blade pivot at the root, on the tail rotor hub."
+   },
+   {
+    "name": "Skids",
+    "role": "gear",
+    "required": false,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "skids",
+     "landing gear",
+     "landingsgestel",
+     "wheels",
+     "gear",
+     "skid"
+    ],
+    "note": "Skids or wheels; both must touch y = 0."
+   },
+   {
+    "name": "Glass",
+    "role": "glazing",
+    "required": true,
+    "aliases": [
+     "glass",
+     "windshield",
+     "canopy",
+     "cockpit",
+     "ruiten"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    6,
+    30
+   ],
+   "width": [
+    1.3,
+    4.0
+   ],
+   "height": [
+    2.5,
+    6.0
+   ],
+   "source": "general knowledge: typical production range, not a standard; UH-60 fuselage 15.26 m long and 5.13 m high with rotors (U.S. Army drawings, class A for that type); rotor diameter 16.36 m",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "rotor layout",
+    "options": [
+     "single main + tail rotor",
+     "tandem (Chinook)",
+     "coaxial (Kamov)",
+     "NOTAR/Fenestron"
+    ]
+   },
+   {
+    "axis": "size",
+    "options": [
+     "light",
+     "medium",
+     "heavy"
+    ]
+   }
+  ],
+  "anticipate": [
+   "Rotor speed: blades spin fast, so give them a blur or a disc; the tail rotor spins about 4-5 times faster than the main rotor.",
+   "Main rotor diameter is about 10-17 m for a medium helicopter; the blades are 5-8 m long."
+  ],
+  "pitfalls": [
+   "The rotor mast must be exactly vertical in the model, or the blades wobble.",
+   "Blades merged into the fuselage cannot spin: MainRotor and TailRotor are separate nodes."
+  ]
+ },
+ {
+  "id": "aircraft.rotorcraft.drone",
+  "name": "drone",
+  "description": "A multirotor drone or quadcopter.",
+  "aliases": [
+   "drone",
+   "drones",
+   "quadcopter",
+   "multicopter",
+   "uav",
+   "quadrocopter",
+   "multirotor"
+  ],
+  "extends": "aircraft.rotorcraft",
+  "parts": [
+   {
+    "name": "Body",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "body",
+     "frame",
+     "hub"
+    ]
+   },
+   {
+    "name": "Arm",
+    "role": "frame",
+    "required": true,
+    "count": [
+     4,
+     8
+    ],
+    "aliases": [
+     "arm",
+     "boom"
+    ]
+   },
+   {
+    "name": "Propeller",
+    "role": "propeller",
+    "required": true,
+    "count": [
+     4,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "propeller",
+     "prop",
+     "rotor"
+    ],
+    "note": "Neighbouring propellers spin in opposite directions."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.15,
+    1.5
+   ],
+   "width": [
+    0.15,
+    1.5
+   ],
+   "height": [
+    0.05,
+    0.4
+   ],
+   "source": "general knowledge: typical production range, not a standard",
+   "confidence": "C"
+  }
+ },
+ {
+  "id": "aircraft.rotorcraft.tiltrotor",
+  "name": "tiltrotor",
+  "description": "An aircraft with two large proprotors on wingtip nacelles that tilt from vertical (hover) to horizontal (cruise).",
+  "aliases": [
+   "tiltrotor",
+   "tilt-rotor",
+   "tilt rotor aircraft",
+   "convertiplane",
+   "kantelrotor",
+   "kantelrotorvliegtuig"
+  ],
+  "extends": "aircraft.rotorcraft",
+  "hints": [
+   "nacelle",
+   "proprotor",
+   "conversion"
+  ],
+  "parts": [
+   {
+    "name": "Fuselage",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "fuselage",
+     "body",
+     "romp",
+     "cabin"
+    ]
+   },
+   {
+    "name": "Wing",
+    "role": "wing",
+    "required": true,
+    "aliases": [
+     "wing",
+     "vleugel"
+    ],
+    "note": "A high wing that carries both nacelles; often swivels along the fuselage for storage on ships."
+   },
+   {
+    "name": "Nacelle",
+    "role": "engine",
+    "required": true,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "nacelle",
+     "engine nacelle",
+     "gondel",
+     "motorgondel"
+    ],
+    "note": "Tilts about the wing's spanwise axis (x), from vertical in hover to horizontal in cruise."
+   },
+   {
+    "name": "Proprotor",
+    "role": "rotor",
+    "required": true,
+    "count": 2,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "proprotor",
+     "rotor",
+     "propeller",
+     "prop-rotor"
+    ],
+    "note": "Spins about the nacelle's own axis; the two turn in opposite directions."
+   },
+   {
+    "name": "ProprotorBlade",
+    "role": "blade",
+    "required": false,
+    "count": [
+     4,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "blade",
+     "rotor blade",
+     "rotorblad"
+    ]
+   },
+   {
+    "name": "Ramp",
+    "role": "door",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "ramp",
+     "rear ramp",
+     "laadklep",
+     "achterklep"
+    ]
+   },
+   {
+    "name": "LandingGear",
+    "role": "gear",
+    "required": false,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "landing gear",
+     "gear",
+     "landingsgestel",
+     "wheels"
+    ]
+   },
+   {
+    "name": "Glass",
+    "role": "glazing",
+    "required": true,
+    "aliases": [
+     "glass",
+     "windshield",
+     "cockpit",
+     "ruiten"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    14,
+    19
+   ],
+   "width": [
+    14,
+    26
+   ],
+   "height": [
+    5,
+    7
+   ],
+   "source": "general knowledge: medium tiltrotors are about 17.5 m long, about 25.8 m wide over both turning proprotors (11.6 m each) and 6.7 m high",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "role",
+    "options": [
+     "transport with rear ramp",
+     "civil passenger"
+    ]
+   }
+  ],
+  "anticipate": [
+   "Three flight modes: hover (nacelles vertical), conversion and aeroplane mode; the nacelle angle follows airspeed within a safe corridor.",
+   "Two rotor washes and two rotor discs: dust, spray and downwash effects follow both nacelles."
+  ],
+  "pitfalls": [
+   "At low nacelle angles on the ground the blade tips reach the ground or deck: block that range while landed.",
+   "In aeroplane mode an arcade stick should set a bank angle and level the aircraft when released, or turns end in the ground.",
+   "Much wider than a helicopter of the same weight: check deck and hangar sizes before allowing it somewhere."
+  ]
+ },
+ {
+  "id": "aircraft.rotorcraft.tandem-rotor",
+  "name": "tandem-rotor helicopter",
+  "description": "A transport helicopter with two counter-rotating main rotors, one at each end, and no tail rotor.",
+  "aliases": [
+   "tandem-rotor helicopter",
+   "tandem rotor",
+   "tandem helicopter",
+   "twin-rotor helicopter",
+   "chinook",
+   "tandemrotor",
+   "tandemhelikopter",
+   "tandemrotorhelikopter"
+  ],
+  "extends": "aircraft.rotorcraft.helicopter",
+  "parts": [
+   {
+    "name": "FrontRotor",
+    "role": "rotor",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "front rotor",
+     "forward rotor",
+     "voorrotor"
+    ],
+    "note": "On a pylon above the cockpit, a little lower than the aft rotor.",
+    "replaces": [
+     "MainRotor",
+     "TailRotor",
+     "TailBlade"
+    ]
+   },
+   {
+    "name": "AftRotor",
+    "role": "rotor",
+    "required": true,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "aft rotor",
+     "rear rotor",
+     "achterrotor"
+    ],
+    "note": "On the tall aft pylon; turns the other way than the front rotor."
+   },
+   {
+    "name": "Ramp",
+    "role": "door",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "ramp",
+     "rear ramp",
+     "laadklep",
+     "achterklep"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    15,
+    31
+   ],
+   "width": [
+    3.8,
+    18.3
+   ],
+   "height": [
+    5,
+    6
+   ],
+   "source": "general knowledge: heavy tandem-rotor helicopters have a fuselage of about 15.5 m, about 30 m length with both rotors turning, rotor diameter about 18.3 m and height about 5.7 m",
+   "confidence": "C"
+  },
+  "anticipate": [
+   "The two rotor discs overlap over the middle of the cabin, so blades of the two rotors must be timed (meshed) and never hit each other."
+  ],
+  "pitfalls": [
+   "There is no tail rotor: yaw comes from tilting the two rotor discs in opposite directions, so a single-rotor flight model needs its own mode without tail-rotor demand.",
+   "Check the sign of the ramp hinge: an open angle with the wrong sign lifts the ramp into the cabin.",
+   "People must stay outside both rotor discs, along the whole length of the aircraft."
+  ]
+ },
+ {
+  "id": "aircraft.fixed-wing.uav",
+  "name": "fixed-wing drone",
+  "description": "An unmanned aeroplane: a long-endurance surveillance drone or a flying-wing combat drone.",
+  "aliases": [
+   "fixed-wing drone",
+   "fixed-wing uav",
+   "unmanned aircraft",
+   "unmanned aerial vehicle",
+   "ucav",
+   "surveillance drone",
+   "reconnaissance drone",
+   "flying wing drone",
+   "stealth drone",
+   "onbemand vliegtuig",
+   "verkenningsdrone",
+   "onbemand gevechtsvliegtuig"
+  ],
+  "extends": "aircraft.fixed-wing",
+  "hints": [
+   "unmanned",
+   "onbemand",
+   "sensor",
+   "surveillance"
+  ],
+  "parts": [
+   {
+    "name": "SensorTurret",
+    "role": "sensor",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     },
+     {
+      "kind": "pitch",
+      "axis": "x"
+     }
+    ],
+    "pivot": "mount",
+    "aliases": [
+     "sensor turret",
+     "sensor ball",
+     "camera turret",
+     "eo/ir",
+     "sensorbol"
+    ],
+    "note": "Under the nose or belly; turns and tilts independently of the aircraft."
+   },
+   {
+    "name": "Propeller",
+    "role": "propeller",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "moves": [
+     {
+      "kind": "spin",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hub",
+    "aliases": [
+     "propeller",
+     "pusher propeller",
+     "propellor",
+     "schroef"
+    ],
+    "note": "Usually a pusher at the tail; jet types have a dorsal intake instead."
+   },
+   {
+    "name": "WeaponBay",
+    "role": "door",
+    "required": false,
+    "count": [
+     0,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "weapon bay",
+     "bay door",
+     "bommenruim"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    4,
+    15
+   ],
+   "width": [
+    10,
+    40
+   ],
+   "height": [
+    1.5,
+    5
+   ],
+   "source": "general knowledge: medium- and high-altitude long-endurance drones are about 10-15 m long with 20-40 m span; flying-wing combat drones about 8-12 m long and 10-20 m span",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "layout",
+    "options": [
+     "long thin wing with V-tail or inverted V-tail",
+     "flying wing"
+    ]
+   },
+   {
+    "axis": "engine",
+    "options": [
+     "pusher propeller",
+     "jet with dorsal intake"
+    ]
+   }
+  ],
+  "conventions": [
+   "There is no cockpit: the pilot's view is a nose camera, so effects that assume a cockpit camera (rain on glass, cabin light) must leave drone cameras out."
+  ],
+  "pitfalls": [
+   "Sensor and picture-in-picture views render to a WebGLRenderTarget: render them only while they are shown.",
+   "Long thin wings flex and their tips are far out: put navigation lights inside the tips and check the span against a reference.",
+   "Landing gear and stores must fit completely inside their bays; test both closed."
+  ]
+ },
+ {
+  "id": "aircraft.fixed-wing.bomber",
+  "name": "bomber",
+  "description": "A large military aeroplane that carries bombs and missiles in an internal bay and under its wings.",
+  "aliases": [
+   "bomber",
+   "bombers",
+   "strategic bomber",
+   "heavy bomber",
+   "bommenwerper",
+   "strategische bommenwerper"
+  ],
+  "extends": "aircraft.fixed-wing.airplane",
+  "parts": [
+   {
+    "name": "BombBay",
+    "role": "door",
+    "required": false,
+    "count": [
+     0,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "bomb bay",
+     "bomb bay door",
+     "bommenluik",
+     "bommenruim"
+    ],
+    "note": "Doors hinge along the fuselage (z)."
+   },
+   {
+    "name": "Engine",
+    "role": "engine",
+    "required": true,
+    "count": [
+     2,
+     8
+    ],
+    "aliases": [
+     "engine",
+     "engine pod",
+     "motor",
+     "straalmotor"
+    ]
+   },
+   {
+    "name": "Spoiler",
+    "role": "control surface",
+    "required": false,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "spoiler",
+     "spoilers"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    20,
+    50
+   ],
+   "width": [
+    30,
+    57
+   ],
+   "height": [
+    5,
+    15
+   ],
+   "source": "general knowledge: large strategic bombers are about 45-50 m long with 50-57 m span and 12-15 m high; smaller and flying-wing types are 20-25 m long",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Control surfaces on a swept wing turn about their own hinge line, not about the body's x axis.",
+   "A model this large needs its size checked against the reference after every build step; an offset applied twice makes it far too long."
+  ]
+ }
+]

@@ -1,7 +1,7 @@
 import { statSync } from "node:fs";
 import { buildIndex } from "../api/index-builder.js";
 import { findThree } from "../api/install.js";
-import { collect, lineOf, lineText } from "./source.js";
+import { collect, lineOf, lineText, makeSourceFile } from "./source.js";
 import { RULES } from "./rules.js";
 import type { Category, Ctx, Finding, Rule, Severity } from "./types.js";
 
@@ -12,6 +12,8 @@ export interface ReviewOptions {
   three?: string;
   /** Rule ids to skip. */
   disable?: string[];
+  /** Unsaved code to review in place of (or next to) the files on disk: path relative to the root -> source. */
+  overrides?: Record<string, string>;
 }
 
 export interface CategoryScore {
@@ -89,6 +91,13 @@ export function review(opts: ReviewOptions): ReviewResult {
   const install = findThree(isDir ? root : root + "/..", opts.three);
   const index = install ? buildIndex(install) : undefined;
   const collected = collect(root);
+  for (const [path, code] of Object.entries(opts.overrides ?? {})) {
+    const rel = path.replace(/\\/g, "/").replace(/^\.\//, "");
+    const i = collected.files.findIndex((f) => f.path === rel);
+    const file = makeSourceFile(rel, code);
+    if (i >= 0) collected.files[i] = file;
+    else collected.files.push(file);
+  }
   const three = collected.files.filter((f) => f.usesThree);
   const ctx: Ctx = {
     files: collected.files,

@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Social preview for docs/og.png: node scripts/og.mjs renders it at 1280x640. -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; width: 1280px; height: 640px; background: #0b1117; color: #e6edf3; font-family: "Space Grotesk", system-ui, sans-serif; overflow: hidden; position: relative; }
+body::before { content: ""; position: absolute; inset: 0; background: linear-gradient(#24323f 1px, transparent 1px) 0 0 / 40px 40px, linear-gradient(90deg, #24323f 1px, transparent 1px) 0 0 / 40px 40px; opacity: .45; mask-image: radial-gradient(ellipse at 25% 30%, #000 10%, transparent 75%); }
+.l { position: absolute; left: 72px; top: 70px; width: 600px; }
+.brand { display: flex; align-items: center; gap: 16px; font-size: 40px; font-weight: 700; }
+.brand img { width: 64px; height: 64px; }
+h1 { font-size: 58px; line-height: 1.05; margin: 40px 0 22px; letter-spacing: -1px; }
+h1 em { font-style: normal; color: #4fd1c5; }
+p { font: 22px/1.45 "JetBrains Mono", monospace; color: #93a3b3; margin: 0; }
+.chips { position: absolute; left: 72px; bottom: 62px; display: flex; gap: 10px; flex-wrap: wrap; width: 640px; }
+.chips span { font: 600 15px "JetBrains Mono", monospace; padding: 6px 11px; border-radius: 8px; border: 1px solid #2b3a49; background: #121c26; color: #c9d4de; }
+.r { position: absolute; right: 56px; top: 56px; width: 520px; display: grid; gap: 12px; }
+.r img { width: 100%; border-radius: 14px; border: 1px solid #24323f; display: block; }
+.term { background: #070b10; border: 1px solid #24323f; border-radius: 14px; padding: 16px 18px; font: 15px/1.7 "JetBrains Mono", monospace; color: #d6dee6; white-space: nowrap; }
+.e { color: #ff7b72; } .ok { color: #56d4a8; }
+</style></head>
+<body>
+<div class="l">
+  <div class="brand"><img src="../docs/logo.svg" alt="">Threesmith</div>
+  <h1>Your coding agent writes three.js.<br><em>Threesmith checks it.</em></h1>
+  <p>API of your installed three · 97-rule review<br>assets &amp; decoders · the live scene, headless<br>claims, perf, leaks · 3D models, no Blender</p>
+</div>
+<div class="chips"><span>MCP server</span><span>CLI</span><span>Claude Code plugin</span><span>Codex</span><span>Cursor</span><span>MIT</span></div>
+<div class="r">
+  <img src="../docs/after.jpg" alt="">
+  <div class="term"><span class="e">✖ main.js:27 [add-gltf-result]</span> use gltf.scene<br><span class="e">✖ main.js:26 [asset-case]</span> 404 on Linux hosts<br><span class="ok">review 100/100 · check PASS</span></div>
+</div>
+</body></html>

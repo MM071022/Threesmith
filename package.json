@@ -1,8 +1,8 @@
 {
   "name": "threesmith",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "mcpName": "io.github.laaielichter/threesmith",
-  "description": "MCP server and CLI that makes coding agents better at three.js: an offline API lookup pinned to your installed three version, a scored review that catches outdated code, a headless WebGL check with screenshot baselines, and a GitHub Action receipt.",
+  "description": "MCP server and CLI that makes coding agents better at three.js: the API of your installed three version, a scored review pinned to it (97 rules incl. shaders and R3F), asset and decoder checks, the page run headless with the live scene read back, play with claims, perf and leak checks, build checks, and 3D models built without Blender.",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -16,6 +16,7 @@
   },
   "files": [
     "dist",
+    "data",
     "plugins/threesmith/skills",
     "PRIVACY.md"
   ],
@@ -29,7 +30,8 @@
     "check": "npm run typecheck && npm test && npm run build",
     "prepare": "npm run build",
     "version": "node scripts/sync-version.mjs && git add server.json plugins/threesmith gemini-extension.json",
-    "build:mcpb": "node scripts/build-mcpb.mjs"
+    "build:mcpb": "node scripts/build-mcpb.mjs",
+    "plugin:local": "node scripts/plugin-local.mjs"
   },
   "keywords": [
     "threejs",
@@ -56,7 +58,7 @@
     "type": "git",
     "url": "git+https://github.com/laaielichter/Threesmith.git"
   },
-  "homepage": "https://github.com/laaielichter/Threesmith#readme",
+  "homepage": "https://laaielichter.github.io/Threesmith/",
   "bugs": {
     "url": "https://github.com/laaielichter/Threesmith/issues"
   },

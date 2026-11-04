@@ -2,6 +2,8 @@ import { check, type CheckOptions, type CheckResult } from "./check/check.js";
 import { formatMarkdown } from "./review/format.js";
 import { review, type ReviewResult } from "./review/review.js";
 import type { Severity } from "./review/types.js";
+import { loadScenarios, runScenarios, type ScenarioResult } from "./check/scenario.js";
+import { projectRootOf } from "./scan/scan.js";
 
 export interface CiOptions {
   path: string;
@@ -12,6 +14,8 @@ export interface CiOptions {
   /** Optional browser check. */
   check?: Omit<CheckOptions, "target"> & { target: string };
   disable?: string[];
+  /** Run the scenarios in .threesmith/scenarios (default true when there are any). */
+  scenarios?: boolean;
 }
 
 export interface CiResult {
@@ -19,6 +23,7 @@ export interface CiResult {
   reasons: string[];
   review: ReviewResult;
   check?: CheckResult;
+  scenarios?: ScenarioResult[];
   markdown: string;
 }
 
@@ -43,6 +48,19 @@ export async function ci(opts: CiOptions): Promise<CiResult> {
       reasons.push(`browser check could not run: ${(e as Error).message}`);
     }
   }
+  let scenarios: ScenarioResult[] | undefined;
+  if (opts.scenarios !== false) {
+    try {
+      const project = projectRootOf(opts.path);
+      if (loadScenarios(project).length) {
+        scenarios = await runScenarios(project);
+        const failed = scenarios.filter((s) => !s.ok).length;
+        if (failed) reasons.push(`${failed} of ${scenarios.length} scenario(s) failed`);
+      }
+    } catch (e) {
+      reasons.push(`scenarios could not run: ${(e as Error).message}`);
+    }
+  }
   const ok = reasons.length === 0;
   const lines = [`## Threesmith receipt: ${ok ? "✅ pass" : "❌ fail"}`, ""];
   if (reasons.length) lines.push(...reasons.map((x) => `- ${x}`), "");
@@ -58,6 +76,13 @@ export async function ci(opts: CiOptions): Promise<CiResult> {
       if (c.baseline) lines.push(`- baseline \`${c.baseline.name}\`: ${c.baseline.status}${c.baseline.ratio !== undefined ? ` (${(c.baseline.ratio * 100).toFixed(2)}% changed)` : ""}`);
     }
   }
+  if (scenarios?.length) {
+    lines.push("", `### Scenarios: ${scenarios.filter((s) => s.ok).length} of ${scenarios.length} passed`);
+    for (const s of scenarios) {
+      lines.push(`- ${s.ok ? "✔" : "✖"} \`${s.name}\` (${s.seconds.toFixed(1)} s)`);
+      for (const cl of s.claims.filter((x) => !x.ok)) lines.push(`  - ${cl.text.replace(/\|/g, "\\|")}: ${cl.message}`);
+    }
+  }
   lines.push("", "<sub>Made by [Threesmith](https://github.com/laaielichter/Threesmith)</sub>");
-  return { ok, reasons, review: r, ...(c ? { check: c } : {}), markdown: lines.join("\n") };
+  return { ok, reasons, review: r, ...(c ? { check: c } : {}), ...(scenarios ? { scenarios } : {}), markdown: lines.join("\n") };
 }

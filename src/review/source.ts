@@ -14,6 +14,8 @@ export interface SourceFile {
   /** Where the namespace came from: "three" or "three/webgpu". */
   namespaceFrom: Map<string, string>;
   usesThree: boolean;
+  /** The file imports React Three Fiber or drei (R3F creates the renderer, loop, resize and disposal itself). */
+  r3f: boolean;
 }
 
 const EXT = new Set([".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".html", ".htm", ".vue", ".svelte"]);
@@ -125,6 +127,11 @@ function parseImports(text: string, file: SourceFile): void {
     }
   }
   if (/from\s+['"]three\/(?:addons|examples)\//.test(text) || /['"]three\/addons\//.test(text)) file.usesThree = true;
+  if (/from\s+['"]three\/(?:tsl|src\/)/.test(text)) file.usesThree = true;
+  if (/from\s+['"]@react-three\/(?:fiber|drei)['"]/.test(text)) {
+    file.r3f = true;
+    file.usesThree = true;
+  }
 }
 
 export function makeSourceFile(path: string, raw: string): SourceFile {
@@ -136,6 +143,7 @@ export function makeSourceFile(path: string, raw: string): SourceFile {
     namespaces: new Set(),
     namespaceFrom: new Map(),
     usesThree: false,
+    r3f: false,
   };
   parseImports(file.text, file);
   return file;

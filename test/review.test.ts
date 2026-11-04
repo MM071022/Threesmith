@@ -4,6 +4,8 @@ import { formatMarkdown, formatText } from "../src/review/format.js";
 import { gradeOf, penaltyOf, score } from "../src/review/review.js";
 import { stripComments } from "../src/review/source.js";
 import { ids, reviewFiles } from "./helpers.js";
+import { CASES } from "./rules.cases.js";
+import { RULES } from "../src/review/rules.js";
 
 const modern = readFileSync("test/fixtures/modern.js", "utf8");
 const legacy = readFileSync("test/fixtures/legacy.js", "utf8");
@@ -41,6 +43,12 @@ describe("review", () => {
     }
     expect(r.score!).toBeLessThan(60);
     expect(r.counts.error).toBeGreaterThan(3);
+  });
+
+  it("reports renderer.outputEncoding = sRGBEncoding once, not also as a texture encoding", () => {
+    const r = reviewFiles({ "a.js": "import * as THREE from 'three';\nrenderer.outputEncoding = THREE.sRGBEncoding;\ntex.encoding = THREE.sRGBEncoding;\n" });
+    expect(r.findings.filter((f) => f.line === 2).map((f) => f.rule)).toEqual(["output-encoding"]);
+    expect(r.findings.filter((f) => f.line === 3).map((f) => f.rule)).toEqual(["texture-encoding"]);
   });
 
   it("explains unknown symbols with a suggestion and the right import path", () => {
@@ -93,6 +101,20 @@ describe("review", () => {
     const r = reviewFiles({ "main.js": legacy });
     expect(formatText(r)).toContain("/100");
     expect(formatMarkdown(r)).toContain("### Threesmith review");
+  });
+});
+
+describe("rules: each fires and has a quiet twin", () => {
+  for (const c of CASES) {
+    it(c.id, () => {
+      expect(ids(reviewFiles(c.fire)), "fires").toContain(c.id);
+      expect(ids(reviewFiles(c.quiet)), "stays quiet").not.toContain(c.id);
+    });
+  }
+  it("every case names a real rule, ids are unique", () => {
+    const known = new Set(RULES.map((r) => r.id));
+    expect(known.size).toBe(RULES.length);
+    for (const c of CASES) expect(known, c.id).toContain(c.id);
   });
 });
 

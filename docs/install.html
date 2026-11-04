@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Install Threesmith: Claude Code, Codex, Cursor, VS Code, Gemini CLI</title>
+<meta name="description" content="Add the Threesmith three.js MCP server to Claude Code, Codex, Cursor, VS Code, Gemini CLI, Cline, Windsurf, Zed or any MCP client, with tool sets, profiles and read-only mode.">
+<link rel="canonical" href="https://laaielichter.github.io/Threesmith/install.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0b1117">
+<meta property="og:title" content="Install Threesmith in your coding agent">
+<meta property="og:description" content="One command or one click for Claude Code, Codex, Cursor, VS Code, Gemini CLI and any MCP client.">
+<meta property="og:image" content="https://laaielichter.github.io/Threesmith/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="site.css">
+<style>
+.client { scroll-margin-top: 80px; }
+.client h3 { font: 600 1.2rem var(--display); margin: 0 0 6px; }
+.client p { color: var(--muted); margin: 0 0 12px; }
+pre.cfg { background: #070b10; color: #d6dee6; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; overflow: auto; margin: 0 0 6px; font-size: .84rem; }
+.stack { display: grid; gap: 14px; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+.toc a { font: 600 .85rem var(--body); text-decoration: none; background: var(--panel); border: 1px solid var(--line); color: var(--fg); padding: 6px 12px; border-radius: 999px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./"><img src="logo.svg" alt="" width="30" height="30">Threesmith</a>
+  <nav class="links">
+    <a href="./#how">How it works</a>
+    <a class="opt" href="./#tools">Tools</a>
+    <a class="opt" href="models.html">Models</a>
+    <a href="install.html">Install</a>
+    <a class="gh" href="https://github.com/laaielichter/Threesmith">GitHub</a>
+  </nav>
+</div></header>
+
+<div class="hero" style="padding-bottom:10px"><div class="wrap" style="display:block">
+  <span class="eyebrow">Node.js 22.12+ · three installed in the project</span>
+  <h1>Install Threesmith</h1>
+  <p class="lead">It runs locally over stdio with <code>npx</code>: nothing to clone or build, no API key. Run your agent from the project folder, or pass <code>--project &lt;path&gt;</code>.</p>
+  <div class="toc">
+    <a href="#claude-code">Claude Code</a><a href="#codex">Codex</a><a href="#cursor">Cursor</a><a href="#vscode">VS Code</a><a href="#gemini">Gemini CLI</a><a href="#other">Cline, Windsurf, Zed, others</a><a href="#options">Options</a><a href="#browser">Browser tools</a>
+  </div>
+</div></div>
+
+<section><div class="wrap stack">
+  <div class="card client" id="claude-code">
+    <h3>Claude Code: the plugin (recommended)</h3>
+    <p>The MCP server plus hooks (each edited three.js file is reviewed, broken asset paths named, errors in command output explained), 8 skills and 2 subagents.</p>
+    <pre class="cfg">/plugin marketplace add laaielichter/Threesmith
+/plugin install threesmith@threesmith</pre>
+    <p>MCP server only: <code>claude mcp add threesmith -- npx -y threesmith mcp</code>. Hooks off: <code>THREESMITH_HOOKS=0</code>.</p>
+  </div>
+  <div class="card client" id="codex">
+    <h3>Codex</h3>
+    <pre class="cfg">codex mcp add threesmith -- npx -y threesmith mcp --tier premium</pre>
+  </div>
+  <div class="card client" id="cursor">
+    <h3>Cursor</h3>
+    <p><a class="btn" href="https://cursor.com/en/install-mcp?name=threesmith&amp;config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsInRocmVlc21pdGgiLCJtY3AiXX0%3D">Add to Cursor</a></p>
+    <p>Or in <code>.cursor/mcp.json</code>:</p>
+    <pre class="cfg">{ "mcpServers": { "threesmith": { "command": "npx", "args": ["-y", "threesmith", "mcp"] } } }</pre>
+  </div>
+  <div class="card client" id="vscode">
+    <h3>VS Code (Copilot agent mode)</h3>
+    <p><a class="btn" href="https://vscode.dev/redirect/mcp/install?name=threesmith&amp;config=%7B%22name%22%3A%22threesmith%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22threesmith%22%2C%22mcp%22%5D%7D">Install in VS Code</a></p>
+    <p>Or in <code>.vscode/mcp.json</code>:</p>
+    <pre class="cfg">{ "servers": { "threesmith": { "command": "npx", "args": ["-y", "threesmith", "mcp"] } } }</pre>
+  </div>
+  <div class="card client" id="gemini">
+    <h3>Gemini CLI</h3>
+    <pre class="cfg">gemini extensions install https://github.com/laaielichter/Threesmith</pre>
+  </div>
+  <div class="card client" id="other">
+    <h3>Cline, Windsurf, Zed and any MCP client</h3>
+    <pre class="cfg">{
+  "mcpServers": {
+    "threesmith": {
+      "command": "npx",
+      "args": ["-y", "threesmith", "mcp", "--project", "/absolute/path/to/your/project"]
+    }
+  }
+}</pre>
+    <p>Agents that install servers themselves can follow <a href="https://github.com/laaielichter/Threesmith/blob/main/llms-install.md">llms-install.md</a>. Docker: the <code>Dockerfile</code> in the repository.</p>
+  </div>
+  <div class="card client" id="options">
+    <h3>Options</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Option</th><th>Environment</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>--tier cheap</code> | <code>premium</code></td><td><code>THREESMITH_TIER</code></td><td>cheap (default): short, capped output and numbered steps for small models; premium: full detail</td></tr>
+        <tr><td><code>--tools core,run</code></td><td><code>THREESMITH_TOOLS</code></td><td>load only these sets (<code>core</code>, <code>run</code>, <code>live</code>, <code>build</code>, <code>model</code>, <code>all</code>) or single tools</td></tr>
+        <tr><td><code>--read-only</code></td><td><code>THREESMITH_READ_ONLY=1</code></td><td>leave out tools that always write, refuse write options; dry runs still work</td></tr>
+        <tr><td><code>--project &lt;dir&gt;</code></td><td><code>THREESMITH_PROJECT</code></td><td>the folder tools use when no path is given</td></tr>
+        <tr><td>—</td><td><code>THREESMITH_PROTECT</code></td><td>folders no write may touch (also <code>"protect"</code> in <code>threesmith.json</code>)</td></tr>
+        <tr><td>—</td><td><code>THREESMITH_LEARN=0</code></td><td>no local learning (false-alarm feedback)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="card client" id="browser">
+    <h3>Browser tools</h3>
+    <p><code>three_check</code>, <code>three_inspect</code>, <code>three_play</code>, <code>three_perf</code>, <code>three_leaks</code>, <code>three_session</code> and <code>three_build</code> need <code>playwright-core</code> and a Chromium:</p>
+    <pre class="cfg">npm i -D playwright-core
+npx playwright-core install chromium
+npx threesmith doctor --env     # what is missing</pre>
+    <p>Or set <code>THREESMITH_CHROMIUM</code> to a Chromium binary. Everything else works without a browser.</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>Threesmith · made by laaielichter · MIT</span>
+  <span><a href="./">Home</a> · <a href="https://github.com/laaielichter/Threesmith">GitHub</a> · <a href="models.html">Models</a></span>
+</div></footer>
+</body>
+</html>

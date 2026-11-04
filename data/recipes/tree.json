@@ -1,0 +1,429 @@
+{
+ "version": 1,
+ "name": "tree",
+ "archetype": "plant.tree.broadleaf",
+ "description": "A broadleaf tree: a flared trunk with surface roots that forks into curving limbs, each with a side twig, and a domed crown of overlapping lumpy clusters of foliage at the limb and twig ends, in two shades of green. The branch count is a parameter.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 9,
+   "min": 4,
+   "max": 30,
+   "description": "Total height in metres."
+  },
+  {
+   "name": "crownRadius",
+   "type": "number",
+   "default": 3.2,
+   "min": 1.5,
+   "max": 10,
+   "description": "Radius of the crown."
+  },
+  {
+   "name": "trunkRadius",
+   "type": "number",
+   "default": 0.28,
+   "min": 0.1,
+   "max": 1.0,
+   "description": "Trunk radius at head height."
+  },
+  {
+   "name": "branches",
+   "type": "integer",
+   "default": 5,
+   "min": 3,
+   "max": 8,
+   "description": "Number of branches."
+  }
+ ],
+ "materials": {
+  "tree_leaf": {
+   "color": [
+    0.05,
+    0.13,
+    0.03,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8,
+   "texture": "leaf"
+  },
+  "tree_leaf_sun": {
+   "color": [
+    0.085,
+    0.185,
+    0.035,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.78,
+   "texture": "leaf"
+  }
+ },
+ "nodes": [
+  {
+   "name": "Tree",
+   "material": "bark",
+   "vars": {
+    "cr": "$crownRadius",
+    "tr": "$trunkRadius",
+    "ry": "min($crownRadius * 0.85, $height * 0.38)",
+    "yc": "$height - $ry",
+    "yb": "$height - 2 * $ry",
+    "hf": "max($height * 0.22, $yb - $ry * 0.55)",
+    "hspan": "max($ry * 0.35, $height * 0.04)",
+    "lp": "0.3 * min(1, 1.5 * $ry / $cr)"
+   },
+   "children": [
+    {
+     "name": "Trunk",
+     "shape": "tube",
+     "segments": 16,
+     "path": [
+      [
+       0,
+       0,
+       0
+      ],
+      [
+       0,
+       "$hf * 0.08",
+       0
+      ],
+      [
+       "$tr * 0.15",
+       "$hf * 0.4",
+       "$tr * 0.1"
+      ],
+      [
+       "-$tr * 0.1",
+       "$hf * 0.8",
+       "-$tr * 0.1"
+      ],
+      [
+       "$tr * 0.05",
+       "$hf * 1.05",
+       0
+      ],
+      [
+       "$tr * 0.25",
+       "$yc + $ry * 0.1",
+       "$tr * 0.2"
+      ],
+      [
+       "$tr * 0.1",
+       "$yc + $ry * 0.5",
+       "$tr * 0.1"
+      ]
+     ],
+     "radii": [
+      "$tr * 1.75",
+      "$tr * 1.22",
+      "$tr",
+      "$tr * 0.9",
+      "$tr * 0.76",
+      "$tr * 0.4",
+      "$tr * 0.16"
+     ],
+     "children": [
+      {
+       "name": "Root_{i}",
+       "shape": "tube",
+       "segments": 8,
+       "repeat": {
+        "count": 5,
+        "around": "y",
+        "phase": 17
+       },
+       "rotate": [
+        0,
+        "9 * sin($i * 3.1)",
+        0
+       ],
+       "path": [
+        [
+         "$tr * 0.3",
+         "$tr * 1.1",
+         0
+        ],
+        [
+         "$tr * 1.2",
+         "$tr * 0.6",
+         0
+        ],
+        [
+         "$tr * 1.9",
+         "$tr * 0.32",
+         "$tr * 0.08"
+        ],
+        [
+         "$tr * 2.6",
+         "$tr * 0.13",
+         "$tr * 0.05"
+        ]
+       ],
+       "radii": [
+        "$tr * 0.62",
+        "$tr * 0.5",
+        "$tr * 0.3",
+        "$tr * 0.12"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Branch_{i}",
+     "repeat": {
+      "count": "$branches",
+      "around": "y",
+      "phase": 23
+     },
+     "at": [
+      0,
+      "$hf + $hspan * (0.5 + 0.5 * sin($i * 1.71 + 0.9))",
+      0
+     ],
+     "rotate": [
+      0,
+      "14 * sin($i * 2.39 + 0.6)",
+      0
+     ],
+     "children": [
+      {
+       "name": "Bough",
+       "vars": {
+        "reach": "$cr * (0.48 + 0.12 * (0.5 + 0.5 * cos($i * 2.23 + 0.3)))",
+        "rise": "$yb + $ry * (0.4 + 0.14 * (0.5 + 0.5 * cos($i * 2.23 + 0.3))) - $hf - $hspan * (0.5 + 0.5 * sin($i * 1.71 + 0.9))",
+        "br": "$tr * 0.55",
+        "sz": "(0.82 + 0.3 * (0.5 + 0.5 * cos($i * 2.23 + 0.3)))",
+        "side": "(($i % 2) * 2 - 1)"
+       },
+       "children": [
+        {
+         "name": "Limb",
+         "shape": "tube",
+         "segments": 10,
+         "path": [
+          [
+           0,
+           "-$br",
+           0
+          ],
+          [
+           "$reach * 0.2",
+           "$rise * 0.3",
+           0
+          ],
+          [
+           "$reach * 0.5",
+           "$rise * 0.72",
+           "$side * $reach * 0.05"
+          ],
+          [
+           "$reach * 0.8",
+           "$rise * 0.93",
+           "$side * $reach * 0.02"
+          ],
+          [
+           "$reach",
+           "$rise",
+           "-$side * $reach * 0.04"
+          ]
+         ],
+         "radii": [
+          "$br",
+          "$br * 0.8",
+          "$br * 0.6",
+          "$br * 0.42",
+          "$br * 0.25"
+         ]
+        },
+        {
+         "name": "Twig",
+         "shape": "tube",
+         "segments": 8,
+         "path": [
+          [
+           "$reach * 0.45",
+           "$rise * 0.66",
+           "$side * $reach * 0.04"
+          ],
+          [
+           "$reach * 0.55",
+           "$rise * 0.95",
+           "$side * $reach * 0.22"
+          ],
+          [
+           "$reach * 0.55",
+           "$rise * 1.1 + $ry * 0.3",
+           "$side * $reach * 0.45"
+          ]
+         ],
+         "radii": [
+          "$br * 0.42",
+          "$br * 0.3",
+          "$br * 0.16"
+         ]
+        },
+        {
+         "name": "Leaves",
+         "shape": "ellipsoid",
+         "material": "tree_leaf",
+         "segments": 20,
+         "lumps": "$lp",
+         "seed": "$i * 7 + 3",
+         "at": [
+          "$reach * 1.05",
+          "$rise + $ry * 0.02",
+          "-$side * $reach * 0.05"
+         ],
+         "rotate": [
+          -18,
+          "37 - (23 + $i * 360 / $branches + 14 * sin($i * 2.39 + 0.6))",
+          0
+         ],
+         "radii": [
+          "$cr * 0.4 * $sz",
+          "$ry * 0.36 * $sz",
+          "$cr * 0.38 * $sz"
+         ]
+        },
+        {
+         "name": "LeavesTip",
+         "shape": "ellipsoid",
+         "material": "tree_leaf_sun",
+         "segments": 18,
+         "lumps": "$lp",
+         "seed": "$i * 5 + 29",
+         "at": [
+          "$reach * 1.22",
+          "$rise + $ry * 0.3",
+          "$side * $reach * 0.12"
+         ],
+         "rotate": [
+          -18,
+          "37 - (23 + $i * 360 / $branches + 14 * sin($i * 2.39 + 0.6))",
+          0
+         ],
+         "radii": [
+          "$cr * 0.3",
+          "$ry * 0.3",
+          "$cr * 0.3"
+         ]
+        },
+        {
+         "name": "LeavesTwig",
+         "shape": "ellipsoid",
+         "material": "tree_leaf_sun",
+         "segments": 20,
+         "lumps": "$lp",
+         "seed": "$i * 11 + 5",
+         "at": [
+          "$reach * 0.6",
+          "$rise * 1.1 + $ry * 0.42",
+          "$side * $reach * 0.5"
+         ],
+         "rotate": [
+          -18,
+          "37 - (23 + $i * 360 / $branches + 14 * sin($i * 2.39 + 0.6))",
+          0
+         ],
+         "radii": [
+          "$cr * 0.36 * (1.9 - $sz)",
+          "$ry * 0.34 * (1.9 - $sz)",
+          "$cr * 0.36 * (1.9 - $sz)"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Crown",
+     "at": [
+      0,
+      "$yc",
+      0
+     ],
+     "children": [
+      {
+       "name": "Heart",
+       "shape": "ellipsoid",
+       "material": "tree_leaf",
+       "segments": 24,
+       "lumps": "$lp",
+       "seed": 41,
+       "at": [
+        0,
+        "$ry * 0.05",
+        0
+       ],
+       "rotate": [
+        -18,
+        37,
+        0
+       ],
+       "radii": [
+        "$cr * 0.5",
+        "$ry * 0.5",
+        "$cr * 0.5"
+       ]
+      },
+      {
+       "name": "Top",
+       "shape": "ellipsoid",
+       "material": "tree_leaf_sun",
+       "segments": 24,
+       "lumps": "$lp",
+       "seed": 17,
+       "at": [
+        "$cr * 0.06",
+        "$ry * 0.5",
+        "-$cr * 0.04"
+       ],
+       "rotate": [
+        -18,
+        37,
+        0
+       ],
+       "radii": [
+        "$cr * 0.42",
+        "$ry * 0.42",
+        "$cr * 0.42"
+       ]
+      },
+      {
+       "name": "Cap_{i}",
+       "shape": "ellipsoid",
+       "material": "tree_leaf_sun",
+       "segments": 20,
+       "lumps": "$lp",
+       "seed": "$i * 13 + 61",
+       "repeat": {
+        "count": 3,
+        "around": "y",
+        "phase": 80
+       },
+       "at": [
+        "$cr * 0.36",
+        "$ry * 0.3",
+        0
+       ],
+       "rotate": [
+        -18,
+        "37 - (80 + $i * 120)",
+        0
+       ],
+       "radii": [
+        "$cr * 0.36",
+        "$ry * 0.36",
+        "$cr * 0.36"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
