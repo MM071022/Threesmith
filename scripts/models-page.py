@@ -19,7 +19,7 @@ page = f"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Threesmith models: 3D models for three.js without Blender</title>
-<meta name="description" content="{len(kinds)} ready-made kinds of 3D models (cars, aircraft, ships, buildings, trees, terrain) built as clean .glb files from code by Threesmith, viewed as text and linted for three.js.">
+<meta name="description" content="{len(kinds)} ready-made kinds of 3D models (vehicles, aircraft, ships, buildings, furniture, weapons, fantasy props, creatures, plants, terrain) built as clean .glb files from code by Threesmith, viewed as text and linted for three.js.">
 <link rel="canonical" href="https://laaielichter.github.io/Threesmith/models.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#0b1117">
