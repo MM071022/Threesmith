@@ -1,0 +1,1650 @@
+{
+ "version": 1,
+ "name": "arcade-cabinet",
+ "archetype": "machine.arcade-cabinet",
+ "description": "A classic upright arcade cabinet (a Midway Pac-Man is 1.73 x 0.64 x 0.86 m): plywood side panels with the stepped profile, side art and chrome T-molding, a lit marquee, a tilted monitor behind a black bezel with a maze game on screen and a speaker grille, a control panel with one or two joysticks (pivot at the base), fire and start buttons, and a coin door hinged on its left edge with coin mechanisms, reject buttons and a return cup; a service door and vents at the back. Three colour schemes. Faces +Z, stands on y = 0.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 1.73,
+   "min": 1.6,
+   "max": 1.95,
+   "description": "Height to the top of the marquee."
+  },
+  {
+   "name": "width",
+   "type": "number",
+   "default": 0.64,
+   "min": 0.55,
+   "max": 0.8,
+   "description": "Width over the side panels."
+  },
+  {
+   "name": "depth",
+   "type": "number",
+   "default": 0.86,
+   "min": 0.7,
+   "max": 0.95,
+   "description": "Depth from the back to the front edge of the control panel."
+  },
+  {
+   "name": "screenSize",
+   "type": "number",
+   "default": 0.48,
+   "min": 0.38,
+   "max": 0.6,
+   "description": "Monitor diagonal in metres (19 in is 0.48 m); it is kept inside the bezel."
+  },
+  {
+   "name": "panelDepth",
+   "type": "number",
+   "default": 0.2,
+   "min": 0.12,
+   "max": 0.3,
+   "description": "How far the control panel sticks out in front of the coin door."
+  },
+  {
+   "name": "players",
+   "type": "integer",
+   "default": 1,
+   "min": 1,
+   "max": 2,
+   "description": "Joystick and button sets on the control panel."
+  },
+  {
+   "name": "buttons",
+   "type": "integer",
+   "default": 2,
+   "min": 2,
+   "max": 6,
+   "description": "Fire buttons per player, in two staggered rows."
+  },
+  {
+   "name": "coinSlots",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 3,
+   "description": "Coin mechanisms in the coin door."
+  },
+  {
+   "name": "scheme",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "Colour scheme of the side art, control panel and marquee: 0 yellow, 1 blue, 2 red."
+  }
+ ],
+ "materials": {
+  "laminate": {
+   "color": [
+    0.025,
+    0.025,
+    0.028
+   ],
+   "metallic": 0,
+   "roughness": 0.55
+  },
+  "bezel": {
+   "color": [
+    0.01,
+    0.01,
+    0.012
+   ],
+   "metallic": 0,
+   "roughness": 0.08
+  },
+  "screen": {
+   "color": [
+    0.01,
+    0.01,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.05,
+   "emissive": [
+    0.01,
+    0.012,
+    0.05
+   ]
+  },
+  "maze": {
+   "color": [
+    0.15,
+    0.25,
+    1.0
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    0.2,
+    0.35,
+    1.0
+   ]
+  },
+  "sprite": {
+   "color": [
+    1.0,
+    0.85,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    1.0,
+    0.85,
+    0.05
+   ]
+  },
+  "dots": {
+   "color": [
+    1.0,
+    0.8,
+    0.7
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    1.0,
+    0.8,
+    0.65
+   ]
+  },
+  "tmolding": {
+   "color": [
+    0.8,
+    0.8,
+    0.82
+   ],
+   "metallic": 0.9,
+   "roughness": 0.25
+  },
+  "ball_red": {
+   "color": [
+    0.75,
+    0.03,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.25
+  },
+  "button_red": {
+   "color": [
+    0.7,
+    0.04,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.3
+  },
+  "button_blue": {
+   "color": [
+    0.03,
+    0.15,
+    0.7
+   ],
+   "metallic": 0,
+   "roughness": 0.3
+  },
+  "button_white": {
+   "color": [
+    0.85,
+    0.85,
+    0.82
+   ],
+   "metallic": 0,
+   "roughness": 0.3
+  },
+  "coin_metal": {
+   "color": [
+    0.6,
+    0.6,
+    0.62
+   ],
+   "metallic": 0.9,
+   "roughness": 0.35
+  },
+  "grille": {
+   "color": [
+    0.04,
+    0.04,
+    0.045
+   ],
+   "metallic": 0.5,
+   "roughness": 0.6
+  },
+  "vent": {
+   "color": [
+    0.01,
+    0.01,
+    0.01
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "decal_dark": {
+   "color": [
+    0.02,
+    0.02,
+    0.03
+   ],
+   "metallic": 0,
+   "roughness": 0.4
+  },
+  "decal_light": {
+   "color": [
+    0.9,
+    0.88,
+    0.8
+   ],
+   "metallic": 0,
+   "roughness": 0.4
+  },
+  "art_yellow": {
+   "color": [
+    0.85,
+    0.55,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.45
+  },
+  "marquee_yellow": {
+   "color": [
+    0.95,
+    0.7,
+    0.1
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    0.332,
+    0.245,
+    0.035
+   ]
+  },
+  "panel_yellow": {
+   "color": [
+    0.85,
+    0.55,
+    0.02
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  },
+  "art_blue": {
+   "color": [
+    0.04,
+    0.12,
+    0.6
+   ],
+   "metallic": 0,
+   "roughness": 0.45
+  },
+  "marquee_blue": {
+   "color": [
+    0.2,
+    0.45,
+    1.0
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    0.07,
+    0.158,
+    0.35
+   ]
+  },
+  "panel_blue": {
+   "color": [
+    0.04,
+    0.12,
+    0.6
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  },
+  "art_red": {
+   "color": [
+    0.6,
+    0.03,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.45
+  },
+  "marquee_red": {
+   "color": [
+    1.0,
+    0.25,
+    0.1
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    0.35,
+    0.087,
+    0.035
+   ]
+  },
+  "panel_red": {
+   "color": [
+    0.6,
+    0.03,
+    0.02
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  }
+ },
+ "nodes": [
+  {
+   "name": "ArcadeCabinet",
+   "vars": {
+    "H": "$height",
+    "W": "$width",
+    "D": "$depth",
+    "t": 0.019,
+    "pd": "$panelDepth",
+    "zb": "-$depth / 2",
+    "zf": "$depth / 2",
+    "zs": "$depth / 2 - $panelDepth",
+    "zt": "-$depth / 2 + 0.5 * $depth",
+    "mh": 0.2,
+    "ycp": "0.54 * $height",
+    "ysb": "0.54 * $height + 0.12",
+    "Wi": "$width - 2 * 0.019"
+   },
+   "children": [
+    {
+     "name": "Cabinet",
+     "material": "laminate",
+     "children": [
+      {
+       "name": "Side_L",
+       "shape": "extrude",
+       "plan": [
+        [
+         0,
+         "$zb"
+        ],
+        [
+         "$H",
+         "$zb"
+        ],
+        [
+         "$H",
+         "$zt"
+        ],
+        [
+         "$H - $mh",
+         "$zt"
+        ],
+        [
+         "$ysb",
+         "$zs - 0.02"
+        ],
+        [
+         "$ycp + 0.05",
+         "$zs - 0.02"
+        ],
+        [
+         "$ycp",
+         "$zf"
+        ],
+        [
+         "$ycp - 0.13",
+         "$zf"
+        ],
+        [
+         "$ycp - 0.17",
+         "$zs"
+        ],
+        [
+         0.03,
+         "$zs"
+        ],
+        [
+         0,
+         "$zs - 0.02"
+        ]
+       ],
+       "y0": "-$W / 2",
+       "y1": "-$W / 2 + $t",
+       "rotate": [
+        0,
+        0,
+        90
+       ],
+       "mirror": "Side_R"
+      },
+      {
+       "name": "Art_L",
+       "mirror": "Art_R",
+       "children": [
+        {
+         "name": "SideArt_yellow",
+         "shape": "extrude",
+         "plan": [
+          [
+           0.12,
+           "$zb + 0.05"
+          ],
+          [
+           "$H - 0.08",
+           "$zb + 0.05"
+          ],
+          [
+           "$H - 0.08",
+           "$zt - 0.04"
+          ],
+          [
+           "$H - $mh - 0.02",
+           "$zt - 0.04"
+          ],
+          [
+           "$ysb - 0.04",
+           "$zs - 0.07"
+          ],
+          [
+           "$ycp - 0.2",
+           "$zs - 0.06"
+          ],
+          [
+           0.12,
+           "$zs - 0.06"
+          ]
+         ],
+         "y0": "-$W / 2 - 0.002 + 0.012 * (1 - max(0, 1 - abs($scheme - 0)))",
+         "y1": "-$W / 2 + 0.004",
+         "rotate": [
+          0,
+          0,
+          90
+         ],
+         "material": "art_yellow"
+        },
+        {
+         "name": "SideArt_blue",
+         "shape": "extrude",
+         "plan": [
+          [
+           0.12,
+           "$zb + 0.05"
+          ],
+          [
+           "$H - 0.08",
+           "$zb + 0.05"
+          ],
+          [
+           "$H - 0.08",
+           "$zt - 0.04"
+          ],
+          [
+           "$H - $mh - 0.02",
+           "$zt - 0.04"
+          ],
+          [
+           "$ysb - 0.04",
+           "$zs - 0.07"
+          ],
+          [
+           "$ycp - 0.2",
+           "$zs - 0.06"
+          ],
+          [
+           0.12,
+           "$zs - 0.06"
+          ]
+         ],
+         "y0": "-$W / 2 - 0.002 + 0.012 * (1 - max(0, 1 - abs($scheme - 1)))",
+         "y1": "-$W / 2 + 0.004",
+         "rotate": [
+          0,
+          0,
+          90
+         ],
+         "material": "art_blue"
+        },
+        {
+         "name": "SideArt_red",
+         "shape": "extrude",
+         "plan": [
+          [
+           0.12,
+           "$zb + 0.05"
+          ],
+          [
+           "$H - 0.08",
+           "$zb + 0.05"
+          ],
+          [
+           "$H - 0.08",
+           "$zt - 0.04"
+          ],
+          [
+           "$H - $mh - 0.02",
+           "$zt - 0.04"
+          ],
+          [
+           "$ysb - 0.04",
+           "$zs - 0.07"
+          ],
+          [
+           "$ycp - 0.2",
+           "$zs - 0.06"
+          ],
+          [
+           0.12,
+           "$zs - 0.06"
+          ]
+         ],
+         "y0": "-$W / 2 - 0.002 + 0.012 * (1 - max(0, 1 - abs($scheme - 2)))",
+         "y1": "-$W / 2 + 0.004",
+         "rotate": [
+          0,
+          0,
+          90
+         ],
+         "material": "art_red"
+        },
+        {
+         "name": "Band",
+         "shape": "extrude",
+         "plan": [
+          [
+           "$ycp - 0.05",
+           "$zb + 0.05"
+          ],
+          [
+           "$ycp + 0.13",
+           "$zb + 0.05"
+          ],
+          [
+           "lerp($ysb - 0.04, $H - $mh - 0.02, 0.6)",
+           "lerp($zs - 0.07, $zt - 0.04, 0.6)"
+          ],
+          [
+           "lerp($ysb - 0.04, $H - $mh - 0.02, 0.25)",
+           "lerp($zs - 0.07, $zt - 0.04, 0.25)"
+          ]
+         ],
+         "y0": "-$W / 2 - 0.0035",
+         "y1": "-$W / 2 - 0.0015",
+         "rotate": [
+          0,
+          0,
+          90
+         ],
+         "material": "decal_dark"
+        },
+        {
+         "name": "Character",
+         "shape": "cylinder",
+         "radius": "min($depth * 0.16, 0.13)",
+         "height": 0.002,
+         "axis": "x",
+         "at": [
+          "-$W / 2 - 0.0035",
+          "$H * 0.3",
+          "($zb + $zs) / 2 - 0.02"
+         ],
+         "material": "decal_light",
+         "segments": 28,
+         "children": [
+          {
+           "name": "Eye",
+           "shape": "cylinder",
+           "radius": 0.016,
+           "height": 0.002,
+           "axis": "x",
+           "at": [
+            -0.001,
+            "min($depth * 0.16, 0.13) * 0.45",
+            "min($depth * 0.16, 0.13) * 0.1"
+           ],
+           "material": "decal_dark",
+           "segments": 12
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "TMolding_L",
+       "shape": "tube",
+       "path": [
+        [
+         "$W / 2 - $t / 2",
+         "$H",
+         "$zb + 0.01"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         "$H + 0.006",
+         "$zt"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         "$H - $mh",
+         "$zt + 0.006"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         "$ysb",
+         "$zs - 0.014"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         "$ycp + 0.056",
+         "$zs - 0.014"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         "$ycp + 0.006",
+         "$zf + 0.006"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         "$ycp - 0.13",
+         "$zf + 0.006"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         "$ycp - 0.172",
+         "$zs + 0.006"
+        ],
+        [
+         "$W / 2 - $t / 2",
+         0.03,
+         "$zs + 0.006"
+        ]
+       ],
+       "radius": 0.0095,
+       "material": "tmolding",
+       "segments": 8,
+       "mirror": "TMolding_R"
+      },
+      {
+       "name": "Back",
+       "shape": "box",
+       "size": [
+        "$Wi + 0.002",
+        "$H - 0.06",
+        "$t"
+       ],
+       "at": [
+        0,
+        "($H - 0.06) / 2 + 0.04",
+        "$zb + $t / 2"
+       ]
+      },
+      {
+       "name": "Top",
+       "shape": "box",
+       "size": [
+        "$Wi + 0.002",
+        "$t",
+        "$zt - $zb"
+       ],
+       "at": [
+        0,
+        "$H - $t / 2",
+        "($zt + $zb) / 2"
+       ]
+      },
+      {
+       "name": "LowerFront",
+       "shape": "box",
+       "size": [
+        "$Wi + 0.002",
+        "$ycp - 0.19",
+        "$t"
+       ],
+       "at": [
+        0,
+        "($ycp - 0.19) / 2 + 0.02",
+        "$zs - $t / 2"
+       ]
+      },
+      {
+       "name": "Plinth",
+       "shape": "box",
+       "size": [
+        "$Wi + 0.002",
+        0.06,
+        "$zs - $zb - 0.04"
+       ],
+       "at": [
+        0,
+        0.05,
+        "($zs + $zb) / 2"
+       ]
+      },
+      {
+       "name": "KickPlate",
+       "shape": "box",
+       "size": [
+        "$Wi - 0.02",
+        0.1,
+        0.004
+       ],
+       "at": [
+        0,
+        0.07,
+        "$zs + 0.002"
+       ],
+       "material": "coin_metal",
+       "bevel": 0.001
+      },
+      {
+       "name": "ServiceDoor",
+       "at": [
+        "-$Wi * 0.35",
+        "$H * 0.42",
+        "$zb - 0.004"
+       ],
+       "children": [
+        {
+         "name": "DoorPanel",
+         "shape": "box",
+         "size": [
+          "$Wi * 0.7",
+          "$H * 0.4",
+          0.008
+         ],
+         "at": [
+          "$Wi * 0.35",
+          0,
+          0
+         ],
+         "bevel": 0.003
+        },
+        {
+         "name": "Lock",
+         "shape": "cylinder",
+         "radius": 0.012,
+         "height": 0.01,
+         "axis": "z",
+         "at": [
+          "$Wi * 0.62",
+          "$H * 0.12",
+          -0.006
+         ],
+         "material": "coin_metal",
+         "segments": 12
+        },
+        {
+         "name": "Vent_{i}",
+         "shape": "box",
+         "size": [
+          0.012,
+          "$H * 0.08",
+          0.004
+         ],
+         "at": [
+          "$Wi * 0.12",
+          "-$H * 0.1",
+          -0.004
+         ],
+         "material": "vent",
+         "repeat": {
+          "count": 8,
+          "step": [
+           0.03,
+           0,
+           0
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "name": "PowerCord",
+       "shape": "tube",
+       "path": [
+        [
+         "$Wi * 0.3",
+         0.25,
+         "$zb - 0.004"
+        ],
+        [
+         "$Wi * 0.3",
+         0.25,
+         "$zb - 0.03"
+        ],
+        [
+         "$Wi * 0.3",
+         0.03,
+         "$zb - 0.04"
+        ],
+        [
+         "$Wi * 0.3 - 0.02",
+         0.007,
+         "$zb - 0.05"
+        ],
+        [
+         "$Wi * 0.1",
+         0.007,
+         "$zb - 0.06"
+        ]
+       ],
+       "radius": 0.006,
+       "material": "rubber",
+       "segments": 6
+      }
+     ]
+    },
+    {
+     "name": "Marquee",
+     "children": [
+      {
+       "name": "Lightbox",
+       "shape": "box",
+       "size": [
+        "$Wi",
+        "$mh - 0.01",
+        0.08
+       ],
+       "at": [
+        0,
+        "$H - $mh / 2 - 0.005",
+        "$zt - 0.045"
+       ],
+       "material": "laminate"
+      },
+      {
+       "name": "Plexi_yellow",
+       "shape": "box",
+       "size": [
+        "$Wi - 0.006",
+        "$mh - 0.03",
+        0.006
+       ],
+       "at": [
+        0,
+        "$H - $mh / 2 - 0.005",
+        "$zt - 0.003 - 0.02 * (1 - max(0, 1 - abs($scheme - 0)))"
+       ],
+       "material": "marquee_yellow"
+      },
+      {
+       "name": "Plexi_blue",
+       "shape": "box",
+       "size": [
+        "$Wi - 0.006",
+        "$mh - 0.03",
+        0.006
+       ],
+       "at": [
+        0,
+        "$H - $mh / 2 - 0.005",
+        "$zt - 0.003 - 0.02 * (1 - max(0, 1 - abs($scheme - 1)))"
+       ],
+       "material": "marquee_blue"
+      },
+      {
+       "name": "Plexi_red",
+       "shape": "box",
+       "size": [
+        "$Wi - 0.006",
+        "$mh - 0.03",
+        0.006
+       ],
+       "at": [
+        0,
+        "$H - $mh / 2 - 0.005",
+        "$zt - 0.003 - 0.02 * (1 - max(0, 1 - abs($scheme - 2)))"
+       ],
+       "material": "marquee_red"
+      },
+      {
+       "name": "Logo",
+       "shape": "box",
+       "size": [
+        "$Wi * 0.62",
+        "($mh - 0.03) * 0.42",
+        0.002
+       ],
+       "at": [
+        0,
+        "$H - $mh / 2 - 0.005",
+        "$zt + 0.001"
+       ],
+       "material": "decal_dark",
+       "bevel": 0.0008,
+       "children": [
+        {
+         "name": "LogoLine",
+         "shape": "box",
+         "size": [
+          "$Wi * 0.5",
+          "($mh - 0.03) * 0.1",
+          0.001
+         ],
+         "at": [
+          0,
+          0,
+          0.0012
+         ],
+         "material": "sprite"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Bezel",
+     "at": [
+      "0",
+      "($by0 + $by1) / 2",
+      "($bz0 + $bz1) / 2"
+     ],
+     "rotate": [
+      "deg(atan2($bz1 - $bz0, $by1 - $by0))",
+      0,
+      0
+     ],
+     "vars": {
+      "by0": "$ysb",
+      "bz0": "$zs - 0.035",
+      "by1": "$H - $mh",
+      "bz1": "$zt - 0.015"
+     },
+     "children": [
+      {
+       "name": "BezelPanel",
+       "shape": "box",
+       "size": [
+        "$Wi",
+        "hypot($by1 - $by0, $bz1 - $bz0)",
+        0.012
+       ],
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "material": "bezel"
+      },
+      {
+       "name": "Speaker",
+       "at": [
+        0,
+        "hypot($by1 - $by0, $bz1 - $bz0) / 2 - 0.045",
+        0.007
+       ],
+       "children": [
+        {
+         "name": "SpeakerGrille",
+         "shape": "box",
+         "size": [
+          "$Wi * 0.5",
+          0.05,
+          0.004
+         ],
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "material": "grille",
+         "children": [
+          {
+           "name": "Slot_{i}",
+           "shape": "box",
+           "size": [
+            0.006,
+            0.036,
+            0.003
+           ],
+           "at": [
+            "-$Wi * 0.2",
+            0,
+            0.002
+           ],
+           "material": "vent",
+           "repeat": {
+            "count": 11,
+            "step": [
+             "$Wi * 0.04",
+             0,
+             0
+            ]
+           }
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Screen",
+       "shape": "box",
+       "size": [
+        "min($screenSize * 0.8, $Wi - 0.1)",
+        "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14)",
+        0.006
+       ],
+       "at": [
+        0,
+        "-0.02",
+        0.007
+       ],
+       "material": "screen",
+       "bevel": 0.002,
+       "children": [
+        {
+         "name": "Wall_1",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.9",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.03",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.42",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_2",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.9",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.03",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * -0.42",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_3",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.03",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.85",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * -0.43",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_4",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.03",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.85",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.43",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_5",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.25",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.03",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * -0.2",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.15",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_6",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.25",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.03",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.2",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.15",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_7",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.35",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.03",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * -0.12",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_8",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.03",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.2",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * -0.2",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * -0.25",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Wall_9",
+         "shape": "box",
+         "size": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.03",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.2",
+          0.002
+         ],
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.2",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * -0.25",
+          0.002
+         ],
+         "material": "maze"
+        },
+        {
+         "name": "Dots_{i}",
+         "shape": "box",
+         "size": [
+          0.008,
+          0.008,
+          0.002
+         ],
+         "at": [
+          "-min($screenSize * 0.8, $Wi - 0.1) * 0.33",
+          "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.3",
+          0.002
+         ],
+         "material": "dots",
+         "repeat": {
+          "count": 7,
+          "step": [
+           "min($screenSize * 0.8, $Wi - 0.1) * 0.11",
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "Hero",
+         "shape": "cylinder",
+         "radius": "min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.045",
+         "height": 0.002,
+         "axis": "z",
+         "at": [
+          "min($screenSize * 0.8, $Wi - 0.1) * 0.05",
+          "-min($screenSize * 0.6, hypot($H - $mh - $ysb, $zt - $zs) - 0.14) * 0.28",
+          0.002
+         ],
+         "material": "sprite",
+         "segments": 16
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ControlPanel",
+     "children": [
+      {
+       "name": "PanelBox",
+       "shape": "extrude",
+       "plan": [
+        [
+         "$ycp + 0.05",
+         "$zs - 0.02"
+        ],
+        [
+         "$ycp",
+         "$zf - 0.005"
+        ],
+        [
+         "$ycp - 0.13",
+         "$zf - 0.005"
+        ],
+        [
+         "$ycp - 0.17",
+         "$zs - 0.02"
+        ]
+       ],
+       "y0": "-$Wi / 2",
+       "y1": "$Wi / 2",
+       "rotate": [
+        0,
+        0,
+        90
+       ],
+       "material": "laminate"
+      },
+      {
+       "name": "Deck",
+       "at": [
+        0,
+        "($ycp + 0.05 + $ycp) / 2 + 0.003",
+        "($zs - 0.02 + $zf) / 2"
+       ],
+       "rotate": [
+        "deg(atan2(0.05, $pd + 0.02))",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Overlay_yellow",
+         "shape": "box",
+         "size": [
+          "$Wi - 0.004",
+          0.003,
+          "hypot(0.05, $pd + 0.02) - 0.01"
+         ],
+         "at": [
+          0,
+          "-0.0015 - 0.006 * (1 - max(0, 1 - abs($scheme - 0)))",
+          0
+         ],
+         "material": "panel_yellow"
+        },
+        {
+         "name": "Overlay_blue",
+         "shape": "box",
+         "size": [
+          "$Wi - 0.004",
+          0.003,
+          "hypot(0.05, $pd + 0.02) - 0.01"
+         ],
+         "at": [
+          0,
+          "-0.0015 - 0.006 * (1 - max(0, 1 - abs($scheme - 1)))",
+          0
+         ],
+         "material": "panel_blue"
+        },
+        {
+         "name": "Overlay_red",
+         "shape": "box",
+         "size": [
+          "$Wi - 0.004",
+          0.003,
+          "hypot(0.05, $pd + 0.02) - 0.01"
+         ],
+         "at": [
+          0,
+          "-0.0015 - 0.006 * (1 - max(0, 1 - abs($scheme - 2)))",
+          0
+         ],
+         "material": "panel_red"
+        },
+        {
+         "name": "Player_{i}",
+         "at": [
+          "-$Wi / 2 + $Wi / $players * (0.5 + $i) - 0.01",
+          0,
+          0
+         ],
+         "repeat": {
+          "count": "$players",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "children": [
+          {
+           "name": "Joystick",
+           "at": [
+            "-min($Wi / $players * 0.3, 0.09) - 0.01",
+            0,
+            0.01
+           ],
+           "children": [
+            {
+             "name": "Shaft",
+             "shape": "cylinder",
+             "radius": 0.005,
+             "height": 0.07,
+             "at": [
+              0,
+              0.035,
+              0
+             ],
+             "material": "coin_metal",
+             "segments": 10
+            },
+            {
+             "name": "Ball",
+             "shape": "ellipsoid",
+             "radii": [
+              0.018,
+              0.018,
+              0.018
+             ],
+             "at": [
+              0,
+              0.078,
+              0
+             ],
+             "material": "ball_red",
+             "segments": 16
+            },
+            {
+             "name": "DustWasher",
+             "shape": "cylinder",
+             "radius": 0.025,
+             "height": 0.003,
+             "at": [
+              0,
+              0.0015,
+              0
+             ],
+             "material": "laminate",
+             "segments": 16
+            }
+           ]
+          },
+          {
+           "name": "Buttons",
+           "at": [
+            0,
+            0,
+            0
+           ],
+           "children": [
+            {
+             "name": "Button_A{i}",
+             "shape": "cylinder",
+             "radius": 0.014,
+             "height": 0.016,
+             "at": [
+              "0",
+              0.008,
+              -0.028
+             ],
+             "material": "button_red",
+             "segments": 16,
+             "bevel": 0.004,
+             "repeat": {
+              "count": "ceil($buttons / 2)",
+              "step": [
+               0.04,
+               0,
+               0
+              ]
+             },
+             "children": [
+              {
+               "name": "Bezel",
+               "shape": "cylinder",
+               "radius": 0.018,
+               "height": 0.006,
+               "at": [
+                0,
+                -0.005,
+                0
+               ],
+               "material": "button_white",
+               "segments": 16
+              }
+             ]
+            },
+            {
+             "name": "Button_B{i}",
+             "shape": "cylinder",
+             "radius": 0.014,
+             "height": 0.016,
+             "at": [
+              "0.012",
+              0.008,
+              0.018
+             ],
+             "material": "button_red",
+             "segments": 16,
+             "bevel": 0.004,
+             "repeat": {
+              "count": "floor($buttons / 2)",
+              "step": [
+               0.04,
+               0,
+               0
+              ]
+             },
+             "children": [
+              {
+               "name": "Bezel",
+               "shape": "cylinder",
+               "radius": 0.018,
+               "height": 0.006,
+               "at": [
+                0,
+                -0.005,
+                0
+               ],
+               "material": "button_white",
+               "segments": 16
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "name": "StartButton",
+           "shape": "cylinder",
+           "radius": 0.011,
+           "height": 0.012,
+           "at": [
+            "-min($Wi / $players * 0.3, 0.09) + 0.07",
+            0.006,
+            0.06
+           ],
+           "material": "button_white",
+           "segments": 14,
+           "bevel": 0.003
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "FrontRail",
+       "shape": "box",
+       "size": [
+        "$Wi",
+        0.02,
+        0.012
+       ],
+       "at": [
+        0,
+        "$ycp - 0.01",
+        "$zf"
+       ],
+       "material": "tmolding",
+       "bevel": 0.004
+      }
+     ]
+    },
+    {
+     "name": "CoinDoor",
+     "at": [
+      "-min(0.3, $Wi - 0.1) / 2",
+      "0.17 + min(0.4, $ycp - 0.17 - 0.32) / 2",
+      "$zs + 0.004"
+     ],
+     "children": [
+      {
+       "name": "DoorPlate",
+       "shape": "box",
+       "size": [
+        "min(0.3, $Wi - 0.1)",
+        "min(0.4, $ycp - 0.17 - 0.32)",
+        0.008
+       ],
+       "at": [
+        "min(0.3, $Wi - 0.1) / 2",
+        0,
+        0
+       ],
+       "material": "coin_metal",
+       "bevel": 0.004
+      },
+      {
+       "name": "CoinMech_{i}",
+       "at": [
+        "min(0.3, $Wi - 0.1) / 2 - ($coinSlots - 1) * 0.035 + $i * 0.07",
+        "min(0.4, $ycp - 0.17 - 0.32) * 0.18",
+        0
+       ],
+       "repeat": {
+        "count": "$coinSlots",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "Insert",
+         "shape": "box",
+         "size": [
+          0.05,
+          0.09,
+          0.012
+         ],
+         "at": [
+          0,
+          0,
+          0.008
+         ],
+         "material": "laminate",
+         "bevel": 0.004
+        },
+        {
+         "name": "Slot",
+         "shape": "box",
+         "size": [
+          0.004,
+          0.03,
+          0.004
+         ],
+         "at": [
+          0,
+          0.02,
+          0.015
+         ],
+         "material": "vent"
+        },
+        {
+         "name": "Reject",
+         "shape": "box",
+         "size": [
+          0.03,
+          0.025,
+          0.012
+         ],
+         "at": [
+          0,
+          -0.025,
+          0.014
+         ],
+         "material": "light_red",
+         "bevel": 0.004
+        }
+       ]
+      },
+      {
+       "name": "ReturnCup",
+       "shape": "box",
+       "size": [
+        0.08,
+        0.05,
+        0.03
+       ],
+       "at": [
+        "min(0.3, $Wi - 0.1) / 2",
+        "-min(0.4, $ycp - 0.17 - 0.32) * 0.28",
+        0.015
+       ],
+       "material": "laminate",
+       "bevel": 0.008
+      },
+      {
+       "name": "Lock",
+       "shape": "cylinder",
+       "radius": 0.012,
+       "height": 0.012,
+       "axis": "z",
+       "at": [
+        "min(0.3, $Wi - 0.1) * 0.85",
+        "-min(0.4, $ycp - 0.17 - 0.32) * 0.05",
+        0.008
+       ],
+       "material": "tmolding",
+       "segments": 12
+      }
+     ]
+    },
+    {
+     "name": "Feet",
+     "children": [
+      {
+       "name": "Foot_FL",
+       "shape": "cylinder",
+       "radius": 0.02,
+       "height": 0.025,
+       "at": [
+        "$W / 2 - 0.05",
+        0.0125,
+        "$zs - 0.05"
+       ],
+       "material": "rubber",
+       "segments": 12,
+       "mirror": "Foot_FR"
+      },
+      {
+       "name": "Foot_BL",
+       "shape": "cylinder",
+       "radius": 0.02,
+       "height": 0.025,
+       "at": [
+        "$W / 2 - 0.05",
+        0.0125,
+        "$zb + 0.05"
+       ],
+       "material": "rubber",
+       "segments": 12,
+       "mirror": "Foot_BR"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

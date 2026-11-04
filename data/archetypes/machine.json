@@ -557,5 +557,204 @@
   "pitfalls": [
    "A solid box for the cabinet hides the products: the glass needs an open, lit interior behind it."
   ]
+ },
+ {
+  "id": "machine.arcade-cabinet",
+  "name": "arcade cabinet",
+  "description": "A coin-operated video game cabinet, the classic upright: side panels with the stepped profile, a lit marquee on top, a tilted monitor behind a bezel, a control panel with joysticks and buttons, and a coin door below.",
+  "aliases": [
+   "arcade cabinet",
+   "arcade machine",
+   "arcade game",
+   "upright arcade",
+   "arcade kast",
+   "arcadekast",
+   "speelautomaat",
+   "arcadekast upright",
+   "coin-op",
+   "video arcade cabinet"
+  ],
+  "extends": "machine",
+  "hints": [
+   "arcade",
+   "joystick",
+   "retro game",
+   "pac-man",
+   "space invaders",
+   "galaga",
+   "coin",
+   "high score",
+   "8-bit"
+  ],
+  "parts": [
+   {
+    "name": "Cabinet",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "cabinet",
+     "kast",
+     "side panel",
+     "body"
+    ]
+   },
+   {
+    "name": "Screen",
+    "role": "display",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "screen",
+     "monitor",
+     "display",
+     "crt",
+     "scherm"
+    ],
+    "note": "Tilted back behind the bezel, emissive so it reads as switched on."
+   },
+   {
+    "name": "ControlPanel",
+    "role": "control panel",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "control panel",
+     "controls",
+     "bedieningspaneel"
+    ]
+   },
+   {
+    "name": "Joystick",
+    "role": "control",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     },
+     {
+      "kind": "hinge",
+      "axis": "z"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "joystick",
+     "stick",
+     "knuppel"
+    ],
+    "note": "Pivots about its base on the panel."
+   },
+   {
+    "name": "Button",
+    "role": "control",
+    "required": true,
+    "count": [
+     1,
+     24
+    ],
+    "aliases": [
+     "button",
+     "buttons",
+     "knop",
+     "knoppen",
+     "start button"
+    ]
+   },
+   {
+    "name": "Marquee",
+    "role": "sign",
+    "required": false,
+    "count": 1,
+    "aliases": [
+     "marquee",
+     "header",
+     "lichtbak"
+    ]
+   },
+   {
+    "name": "CoinDoor",
+    "role": "door",
+    "required": false,
+    "count": 1,
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "coin door",
+     "muntdeur",
+     "coin slot",
+     "muntgleuf"
+    ]
+   },
+   {
+    "name": "Speaker",
+    "role": "speaker",
+    "required": false,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "speaker",
+     "speaker grille",
+     "luidspreker"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    0.7,
+    0.95
+   ],
+   "width": [
+    0.55,
+    0.8
+   ],
+   "height": [
+    1.6,
+    1.95
+   ],
+   "source": "manufacturer manuals: Midway Pac-Man upright 68 x 25 x 34 in (1.73 x 0.64 x 0.86 m); most uprights of the era are 1.65-1.9 m high and 0.6-0.75 m wide",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "form",
+    "options": [
+     "upright",
+     "cabaret",
+     "cocktail table",
+     "sit-down"
+    ]
+   },
+   {
+    "axis": "players",
+    "options": [
+     "1",
+     "2",
+     "4"
+    ]
+   }
+  ],
+  "conventions": [
+   "The screen and controls face +Z; the cabinet stands on y = 0 with the coin door at the front."
+  ],
+  "anticipate": [
+   "An emissive screen material (or a mesh to put a video or canvas texture on).",
+   "A joystick node that tilts about its base and buttons that press in along their axis."
+  ],
+  "pitfalls": [
+   "A flat front without the stepped side profile reads as a fridge, not an arcade cabinet."
+  ]
  }
 ]
