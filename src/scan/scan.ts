@@ -226,7 +226,8 @@ export function scanProject(path: string): ProjectMap {
     const tr = Number(/^0\.(\d+)/.exec(String(typesPkg["version"] ?? ""))?.[1]);
     if (tr && tr !== install.release) notes.push(`@types/three is r${tr} but three is r${install.release}: types and runtime disagree.`);
   }
-  if (webgpu && /from\s+['"]three['"]/.test(all)) notes.push("Both 'three' and 'three/webgpu' are imported: with WebGPURenderer import everything from 'three/webgpu' (and TSL from 'three/tsl'), or two copies of three get loaded.");
+  if (webgpu && /from\s+['"]three['"]/.test(all))
+    notes.push("Both 'three' and 'three/webgpu' are imported. They share one core, so core classes match, but WebGPURenderer, node materials and post-processing come only from 'three/webgpu' and TSL from 'three/tsl'; importing everything from 'three/webgpu' keeps it simple.");
   if (libraries["@react-three/fiber"]) notes.push("React Three Fiber project: the scene lives in JSX under <Canvas>; per-frame code goes in useFrame (no setState there, no new objects per frame).");
   if (!files.some((f) => f.loop !== undefined) && files.length && !libraries["@react-three/fiber"]) notes.push("No animation loop found (setAnimationLoop / requestAnimationFrame): the scene renders once at most.");
   const errors = assets.problems.filter((p) => p.severity === "error").length;

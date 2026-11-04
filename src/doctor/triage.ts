@@ -103,7 +103,7 @@ export function triage(path: string, opts: { three?: string; disable?: string[] 
     if (g.items.length) groups.push({ ...g, severity: g.severity ?? "warn" });
   };
 
-  const setupNotes = map.notes.filter((n) => /not installed|disagree|two copies|CDN/.test(n));
+  const setupNotes = map.notes.filter((n) => /not installed|disagree|CDN/.test(n));
   const setup = groupFindings(r.findings, (f) => SETUP.has(f.rule));
   add({
     id: "setup",

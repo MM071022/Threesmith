@@ -104,9 +104,9 @@ describe("scan", () => {
     expect(text).toContain("src/main.js (9 lines): WebGLRenderer PerspectiveCamera OrbitControls; loop at 8");
   });
 
-  it("warns about three and three/webgpu together", () => {
+  it("notes three and three/webgpu together", () => {
     const m = scanProject(project({ "package.json": "{}", "a.js": "import * as THREE from 'three';\nimport { WebGPURenderer } from 'three/webgpu';\nnew WebGPURenderer();\n" }));
-    expect(m.notes.join(" ")).toContain("two copies");
+    expect(m.notes.join(" ")).toContain("share one core");
   });
 });
 
