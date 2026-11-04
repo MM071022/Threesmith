@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 The agent-first toolkit of Godotwright (the same project for Godot), ported to three.js and extended with what coding
 agents get wrong in three.js.
