@@ -1,0 +1,1111 @@
+{
+ "version": 1,
+ "name": "bus-stop",
+ "archetype": "infrastructure.bus-stop",
+ "description": "A roadside bus shelter open to the road at +Z: a metal frame of back and front posts with rails, glass back panes with a white manifestation band, optional glass end panes and a lit advertising case at one end, a flat canopy with fascias and an LED strip, a cantilever bench with wooden slats and a backrest, a timetable in the shelter, and a separate bus stop pole beside it with a round flag sign and a timetable case.",
+ "params": [
+  {
+   "name": "width",
+   "type": "number",
+   "default": 3.6,
+   "min": 2.4,
+   "max": 6,
+   "description": "Length of the shelter along the kerb (x) in metres."
+  },
+  {
+   "name": "depth",
+   "type": "number",
+   "default": 1.4,
+   "min": 1,
+   "max": 2,
+   "description": "Depth of the shelter (z)."
+  },
+  {
+   "name": "height",
+   "type": "number",
+   "default": 2.5,
+   "min": 2.2,
+   "max": 3,
+   "description": "Height of the canopy."
+  },
+  {
+   "name": "bays",
+   "type": "integer",
+   "default": 3,
+   "min": 2,
+   "max": 5,
+   "description": "Number of glass bays in the back wall."
+  },
+  {
+   "name": "sides",
+   "type": "integer",
+   "default": 1,
+   "min": 0,
+   "max": 2,
+   "description": "Glass end panes: 0 none, 1 at the +x end, 2 at both ends (the advertising case takes the -x end when it is on)."
+  },
+  {
+   "name": "advert",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A lit advertising case at the -x end."
+  },
+  {
+   "name": "benchLength",
+   "type": "number",
+   "default": 1.8,
+   "min": 0.8,
+   "max": 3,
+   "description": "Length of the bench (kept inside the shelter)."
+  },
+  {
+   "name": "frameColour",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "Frame colour: 0 silver aluminium, 1 anthracite, 2 green."
+  },
+  {
+   "name": "signHeight",
+   "type": "number",
+   "default": 2.8,
+   "min": 2.2,
+   "max": 3.4,
+   "description": "Height of the bus stop pole."
+  }
+ ],
+ "materials": {
+  "shelter_glass": {
+   "color": [
+    0.6,
+    0.72,
+    0.78,
+    0.22
+   ],
+   "metallic": 0,
+   "roughness": 0.04,
+   "alpha": "BLEND"
+  },
+  "shelter_roof": {
+   "color": [
+    0.12,
+    0.125,
+    0.13
+   ],
+   "metallic": 0.6,
+   "roughness": 0.4
+  },
+  "bench_steel": {
+   "color": [
+    0.45,
+    0.47,
+    0.49
+   ],
+   "metallic": 0.85,
+   "roughness": 0.35
+  },
+  "bench_wood": {
+   "color": [
+    0.26,
+    0.14,
+    0.06
+   ],
+   "metallic": 0,
+   "roughness": 0.65,
+   "texture": "wood"
+  },
+  "sign_yellow": {
+   "color": [
+    0.85,
+    0.6,
+    0.02
+   ],
+   "metallic": 0.1,
+   "roughness": 0.4
+  },
+  "sign_green": {
+   "color": [
+    0.02,
+    0.2,
+    0.08
+   ],
+   "metallic": 0.1,
+   "roughness": 0.4
+  },
+  "sign_white": {
+   "color": [
+    0.85,
+    0.85,
+    0.83
+   ],
+   "metallic": 0,
+   "roughness": 0.4
+  },
+  "sign_dark": {
+   "color": [
+    0.03,
+    0.03,
+    0.035
+   ],
+   "metallic": 0.2,
+   "roughness": 0.5
+  },
+  "poster": {
+   "color": [
+    0.55,
+    0.42,
+    0.3
+   ],
+   "metallic": 0,
+   "roughness": 0.3,
+   "emissive": [
+    0.45,
+    0.38,
+    0.3
+   ]
+  },
+  "timetable": {
+   "color": [
+    0.8,
+    0.8,
+    0.78
+   ],
+   "metallic": 0,
+   "roughness": 0.5,
+   "emissive": [
+    0.25,
+    0.25,
+    0.24
+   ]
+  },
+  "pole_grey": {
+   "color": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "metallic": 0.8,
+   "roughness": 0.45
+  },
+  "dot_white": {
+   "color": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "metallic": 0,
+   "roughness": 0.5
+  },
+  "kerb_concrete": {
+   "color": [
+    0.25,
+    0.245,
+    0.235
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "concrete"
+  },
+  "frame_silver": {
+   "color": [
+    0.6,
+    0.62,
+    0.64
+   ],
+   "metallic": 0.85,
+   "roughness": 0.3
+  },
+  "frame_anthracite": {
+   "color": [
+    0.035,
+    0.038,
+    0.042
+   ],
+   "metallic": 0.5,
+   "roughness": 0.45
+  },
+  "frame_green": {
+   "color": [
+    0.02,
+    0.11,
+    0.06
+   ],
+   "metallic": 0.4,
+   "roughness": 0.4
+  }
+ },
+ "nodes": [
+  {
+   "name": "BusStop",
+   "vars": {
+    "W": "$width",
+    "D": "$depth",
+    "H": "$height",
+    "nb": "$bays",
+    "zb": "-$depth / 2 + 0.05",
+    "zf": "$depth / 2 - 0.12",
+    "bl": "min($benchLength, $width - 0.8)",
+    "sx": "$width / 2 + 0.5",
+    "sh": "$signHeight",
+    "fc0": "max(0.015, max(0, 1 - min(1, abs($frameColour - 0))))",
+    "fc1": "max(0.015, max(0, 1 - min(1, abs($frameColour - 1))))",
+    "fc2": "max(0.015, max(0, 1 - min(1, abs($frameColour - 2))))",
+    "fsl": "max(0.02, min(1, $sides))",
+    "fsr": "max(0.02, max(0, $sides - 1) * (1 - $advert))",
+    "fad": "max(0.02, $advert)"
+   },
+   "children": [
+    {
+     "name": "Shelter",
+     "children": [
+      {
+       "name": "Structure",
+       "material": "frame_silver",
+       "children": [
+        {
+         "name": "BackPost_{i}",
+         "shape": "box",
+         "size": [
+          "0.08 * $fc0",
+          "($H - 0.1) * $fc0",
+          "0.08 * $fc0"
+         ],
+         "at": [
+          "(-$W / 2 + 0.04) * $fc0",
+          "(($H - 0.1) / 2) * $fc0",
+          "($zb) * $fc0"
+         ],
+         "bevel": "0.008 * $fc0",
+         "repeat": {
+          "count": "$nb + 1",
+          "step": [
+           "(($W - 0.08) / $nb) * $fc0",
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "FrontPost_L",
+         "shape": "box",
+         "size": [
+          "0.08 * $fc0",
+          "($H - 0.1) * $fc0",
+          "0.08 * $fc0"
+         ],
+         "at": [
+          "($W / 2 - 0.04) * $fc0",
+          "(($H - 0.1) / 2) * $fc0",
+          "($zf) * $fc0"
+         ],
+         "bevel": "0.008 * $fc0",
+         "mirror": "FrontPost_R"
+        },
+        {
+         "name": "SideRail_L",
+         "shape": "box",
+         "size": [
+          "0.06 * $fc0",
+          "0.06 * $fc0",
+          "($zf - $zb) * $fc0"
+         ],
+         "at": [
+          "($W / 2 - 0.04) * $fc0",
+          "0.12 * $fc0",
+          "(($zf + $zb) / 2) * $fc0"
+         ],
+         "mirror": "SideRail_R"
+        },
+        {
+         "name": "BackRail",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) * $fc0",
+          "0.06 * $fc0",
+          "0.06 * $fc0"
+         ],
+         "at": [
+          0,
+          "0.12 * $fc0",
+          "($zb) * $fc0"
+         ]
+        },
+        {
+         "name": "TopRail",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) * $fc0",
+          "0.08 * $fc0",
+          "0.07 * $fc0"
+         ],
+         "at": [
+          0,
+          "($H - 0.3) * $fc0",
+          "($zb) * $fc0"
+         ]
+        },
+        {
+         "name": "Fascia",
+         "shape": "box",
+         "size": [
+          "($W + 0.24) * $fc0",
+          "0.16 * $fc0",
+          "0.05 * $fc0"
+         ],
+         "at": [
+          0,
+          "($H - 0.02) * $fc0",
+          "($D / 2 + 0.1) * $fc0"
+         ],
+         "bevel": "0.01 * $fc0"
+        },
+        {
+         "name": "FasciaBack",
+         "shape": "box",
+         "size": [
+          "($W + 0.24) * $fc0",
+          "0.16 * $fc0",
+          "0.05 * $fc0"
+         ],
+         "at": [
+          0,
+          "($H - 0.02) * $fc0",
+          "(-$D / 2 - 0.08) * $fc0"
+         ],
+         "bevel": "0.01 * $fc0"
+        },
+        {
+         "name": "FasciaSide_L",
+         "shape": "box",
+         "size": [
+          "0.05 * $fc0",
+          "0.16 * $fc0",
+          "($D + 0.23) * $fc0"
+         ],
+         "at": [
+          "($W / 2 + 0.115) * $fc0",
+          "($H - 0.02) * $fc0",
+          "0.01 * $fc0"
+         ],
+         "bevel": "0.01 * $fc0",
+         "mirror": "FasciaSide_R"
+        }
+       ],
+       "at": [
+        0,
+        "$H - 0.03 + ((0) - ($H - 0.03)) * $fc0",
+        0
+       ]
+      },
+      {
+       "name": "StructureAnthracite",
+       "material": "frame_anthracite",
+       "children": [
+        {
+         "name": "BackPostAnthracite_{i}",
+         "shape": "box",
+         "size": [
+          "0.08 * $fc1",
+          "($H - 0.1) * $fc1",
+          "0.08 * $fc1"
+         ],
+         "at": [
+          "(-$W / 2 + 0.04) * $fc1",
+          "(($H - 0.1) / 2) * $fc1",
+          "($zb) * $fc1"
+         ],
+         "bevel": "0.008 * $fc1",
+         "repeat": {
+          "count": "$nb + 1",
+          "step": [
+           "(($W - 0.08) / $nb) * $fc1",
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "FrontPostAnthracite_L",
+         "shape": "box",
+         "size": [
+          "0.08 * $fc1",
+          "($H - 0.1) * $fc1",
+          "0.08 * $fc1"
+         ],
+         "at": [
+          "($W / 2 - 0.04) * $fc1",
+          "(($H - 0.1) / 2) * $fc1",
+          "($zf) * $fc1"
+         ],
+         "bevel": "0.008 * $fc1",
+         "mirror": "FrontPostAnthracite_R"
+        },
+        {
+         "name": "SideRailAnthracite_L",
+         "shape": "box",
+         "size": [
+          "0.06 * $fc1",
+          "0.06 * $fc1",
+          "($zf - $zb) * $fc1"
+         ],
+         "at": [
+          "($W / 2 - 0.04) * $fc1",
+          "0.12 * $fc1",
+          "(($zf + $zb) / 2) * $fc1"
+         ],
+         "mirror": "SideRailAnthracite_R"
+        },
+        {
+         "name": "BackRailAnthracite",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) * $fc1",
+          "0.06 * $fc1",
+          "0.06 * $fc1"
+         ],
+         "at": [
+          0,
+          "0.12 * $fc1",
+          "($zb) * $fc1"
+         ]
+        },
+        {
+         "name": "TopRailAnthracite",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) * $fc1",
+          "0.08 * $fc1",
+          "0.07 * $fc1"
+         ],
+         "at": [
+          0,
+          "($H - 0.3) * $fc1",
+          "($zb) * $fc1"
+         ]
+        },
+        {
+         "name": "FasciaAnthracite",
+         "shape": "box",
+         "size": [
+          "($W + 0.24) * $fc1",
+          "0.16 * $fc1",
+          "0.05 * $fc1"
+         ],
+         "at": [
+          0,
+          "($H - 0.02) * $fc1",
+          "($D / 2 + 0.1) * $fc1"
+         ],
+         "bevel": "0.01 * $fc1"
+        },
+        {
+         "name": "FasciaBackAnthracite",
+         "shape": "box",
+         "size": [
+          "($W + 0.24) * $fc1",
+          "0.16 * $fc1",
+          "0.05 * $fc1"
+         ],
+         "at": [
+          0,
+          "($H - 0.02) * $fc1",
+          "(-$D / 2 - 0.08) * $fc1"
+         ],
+         "bevel": "0.01 * $fc1"
+        },
+        {
+         "name": "FasciaSideAnthracite_L",
+         "shape": "box",
+         "size": [
+          "0.05 * $fc1",
+          "0.16 * $fc1",
+          "($D + 0.23) * $fc1"
+         ],
+         "at": [
+          "($W / 2 + 0.115) * $fc1",
+          "($H - 0.02) * $fc1",
+          "0.01 * $fc1"
+         ],
+         "bevel": "0.01 * $fc1",
+         "mirror": "FasciaSideAnthracite_R"
+        }
+       ],
+       "at": [
+        0,
+        "$H - 0.03 + ((0) - ($H - 0.03)) * $fc1",
+        0
+       ]
+      },
+      {
+       "name": "StructureGreen",
+       "material": "frame_green",
+       "children": [
+        {
+         "name": "BackPostGreen_{i}",
+         "shape": "box",
+         "size": [
+          "0.08 * $fc2",
+          "($H - 0.1) * $fc2",
+          "0.08 * $fc2"
+         ],
+         "at": [
+          "(-$W / 2 + 0.04) * $fc2",
+          "(($H - 0.1) / 2) * $fc2",
+          "($zb) * $fc2"
+         ],
+         "bevel": "0.008 * $fc2",
+         "repeat": {
+          "count": "$nb + 1",
+          "step": [
+           "(($W - 0.08) / $nb) * $fc2",
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "FrontPostGreen_L",
+         "shape": "box",
+         "size": [
+          "0.08 * $fc2",
+          "($H - 0.1) * $fc2",
+          "0.08 * $fc2"
+         ],
+         "at": [
+          "($W / 2 - 0.04) * $fc2",
+          "(($H - 0.1) / 2) * $fc2",
+          "($zf) * $fc2"
+         ],
+         "bevel": "0.008 * $fc2",
+         "mirror": "FrontPostGreen_R"
+        },
+        {
+         "name": "SideRailGreen_L",
+         "shape": "box",
+         "size": [
+          "0.06 * $fc2",
+          "0.06 * $fc2",
+          "($zf - $zb) * $fc2"
+         ],
+         "at": [
+          "($W / 2 - 0.04) * $fc2",
+          "0.12 * $fc2",
+          "(($zf + $zb) / 2) * $fc2"
+         ],
+         "mirror": "SideRailGreen_R"
+        },
+        {
+         "name": "BackRailGreen",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) * $fc2",
+          "0.06 * $fc2",
+          "0.06 * $fc2"
+         ],
+         "at": [
+          0,
+          "0.12 * $fc2",
+          "($zb) * $fc2"
+         ]
+        },
+        {
+         "name": "TopRailGreen",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) * $fc2",
+          "0.08 * $fc2",
+          "0.07 * $fc2"
+         ],
+         "at": [
+          0,
+          "($H - 0.3) * $fc2",
+          "($zb) * $fc2"
+         ]
+        },
+        {
+         "name": "FasciaGreen",
+         "shape": "box",
+         "size": [
+          "($W + 0.24) * $fc2",
+          "0.16 * $fc2",
+          "0.05 * $fc2"
+         ],
+         "at": [
+          0,
+          "($H - 0.02) * $fc2",
+          "($D / 2 + 0.1) * $fc2"
+         ],
+         "bevel": "0.01 * $fc2"
+        },
+        {
+         "name": "FasciaBackGreen",
+         "shape": "box",
+         "size": [
+          "($W + 0.24) * $fc2",
+          "0.16 * $fc2",
+          "0.05 * $fc2"
+         ],
+         "at": [
+          0,
+          "($H - 0.02) * $fc2",
+          "(-$D / 2 - 0.08) * $fc2"
+         ],
+         "bevel": "0.01 * $fc2"
+        },
+        {
+         "name": "FasciaSideGreen_L",
+         "shape": "box",
+         "size": [
+          "0.05 * $fc2",
+          "0.16 * $fc2",
+          "($D + 0.23) * $fc2"
+         ],
+         "at": [
+          "($W / 2 + 0.115) * $fc2",
+          "($H - 0.02) * $fc2",
+          "0.01 * $fc2"
+         ],
+         "bevel": "0.01 * $fc2",
+         "mirror": "FasciaSideGreen_R"
+        }
+       ],
+       "at": [
+        0,
+        "$H - 0.03 + ((0) - ($H - 0.03)) * $fc2",
+        0
+       ]
+      },
+      {
+       "name": "Glazing",
+       "material": "shelter_glass",
+       "children": [
+        {
+         "name": "BackPane_{i}",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) / $nb - 0.1",
+          "$H - 0.62",
+          0.012
+         ],
+         "at": [
+          "-$W / 2 + 0.04 + ($W - 0.08) / $nb / 2",
+          "0.17 + ($H - 0.62) / 2",
+          "$zb"
+         ],
+         "repeat": {
+          "count": "$nb",
+          "step": [
+           "($W - 0.08) / $nb",
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "SidePane_L",
+         "shape": "box",
+         "size": [
+          "0.012 * $fsl",
+          "($H - 0.62) * $fsl",
+          "($zf - $zb - 0.1) * $fsl"
+         ],
+         "at": [
+          "$W / 2 - 0.04 + (($W / 2 - 0.04) - ($W / 2 - 0.04)) * $fsl",
+          "$H - 0.03 + ((0.17 + ($H - 0.62) / 2) - ($H - 0.03)) * $fsl",
+          "(($zf + $zb) / 2) * $fsl"
+         ]
+        },
+        {
+         "name": "SidePane_R",
+         "shape": "box",
+         "size": [
+          "0.012 * $fsr",
+          "($H - 0.62) * $fsr",
+          "($zf - $zb - 0.1) * $fsr"
+         ],
+         "at": [
+          "-$W / 2 + 0.04 + ((-$W / 2 + 0.04) - (-$W / 2 + 0.04)) * $fsr",
+          "$H - 0.03 + ((0.17 + ($H - 0.62) / 2) - ($H - 0.03)) * $fsr",
+          "(($zf + $zb) / 2) * $fsr"
+         ]
+        },
+        {
+         "name": "Dots_{i}",
+         "shape": "box",
+         "size": [
+          "($W - 0.08) / $nb - 0.12",
+          0.05,
+          0.016
+         ],
+         "at": [
+          "-$W / 2 + 0.04 + ($W - 0.08) / $nb / 2",
+          1.45,
+          "$zb"
+         ],
+         "repeat": {
+          "count": "$nb",
+          "step": [
+           "($W - 0.08) / $nb",
+           0,
+           0
+          ]
+         },
+         "material": "dot_white"
+        }
+       ]
+      },
+      {
+       "name": "AdPanel",
+       "at": [
+        "-$W / 2 + 0.04 + ((-$W / 2 + 0.04) - (-$W / 2 + 0.04)) * $fad",
+        "$H - 0.03 + ((0) - ($H - 0.03)) * $fad",
+        "(($zf + $zb) / 2) * $fad"
+       ],
+       "children": [
+        {
+         "name": "Case",
+         "shape": "box",
+         "size": [
+          "0.2 * $fad",
+          "($H - 0.45) * $fad",
+          "($zf - $zb - 0.05) * $fad"
+         ],
+         "at": [
+          0,
+          "(0.12 + ($H - 0.45) / 2) * $fad",
+          0
+         ],
+         "bevel": "0.02 * $fad",
+         "material": "sign_dark"
+        },
+        {
+         "name": "Poster_L",
+         "shape": "box",
+         "size": [
+          "0.21 * $fad",
+          "($H - 0.65) * $fad",
+          "($zf - $zb - 0.25) * $fad"
+         ],
+         "at": [
+          0,
+          "(0.12 + ($H - 0.45) / 2) * $fad",
+          0
+         ],
+         "material": "poster"
+        }
+       ]
+      },
+      {
+       "name": "Timetable",
+       "shape": "box",
+       "size": [
+        0.5,
+        0.7,
+        0.03
+       ],
+       "at": [
+        "$W / 2 - 0.5",
+        1.35,
+        "$zb + 0.03"
+       ],
+       "bevel": 0.008,
+       "material": "timetable",
+       "children": [
+        {
+         "name": "TimetableBezel",
+         "shape": "box",
+         "size": [
+          0.54,
+          0.74,
+          0.02
+         ],
+         "at": [
+          0,
+          0,
+          -0.012
+         ],
+         "material": "sign_dark"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Roof",
+     "children": [
+      {
+       "name": "Canopy",
+       "shape": "box",
+       "size": [
+        "$W + 0.2",
+        0.1,
+        "$D + 0.2"
+       ],
+       "at": [
+        0,
+        "$H - 0.03",
+        0.01
+       ],
+       "material": "shelter_roof"
+      },
+      {
+       "name": "Light",
+       "shape": "box",
+       "size": [
+        "$W * 0.6",
+        0.02,
+        0.08
+       ],
+       "at": [
+        0,
+        "$H - 0.09",
+        "$D / 2 - 0.15"
+       ],
+       "material": "light"
+      }
+     ]
+    },
+    {
+     "name": "Bench",
+     "at": [
+      0,
+      0,
+      "$zb"
+     ],
+     "children": [
+      {
+       "name": "Bracket_L",
+       "shape": "box",
+       "size": [
+        0.06,
+        0.06,
+        0.42
+       ],
+       "at": [
+        "$bl / 2 - 0.15",
+        0.43,
+        0.24
+       ],
+       "material": "bench_steel",
+       "mirror": "Bracket_R"
+      },
+      {
+       "name": "Leg_L",
+       "shape": "box",
+       "size": [
+        0.05,
+        0.43,
+        0.05
+       ],
+       "at": [
+        "$bl / 2 - 0.15",
+        0.215,
+        0.38
+       ],
+       "material": "bench_steel",
+       "mirror": "Leg_R"
+      },
+      {
+       "name": "Slat_{i}",
+       "shape": "box",
+       "size": [
+        "$bl",
+        0.03,
+        0.09
+       ],
+       "at": [
+        0,
+        0.475,
+        0.1
+       ],
+       "bevel": 0.008,
+       "repeat": {
+        "count": 4,
+        "step": [
+         0,
+         0,
+         0.105
+        ]
+       },
+       "material": "bench_wood"
+      },
+      {
+       "name": "Backrest_{i}",
+       "shape": "box",
+       "size": [
+        "$bl",
+        0.09,
+        0.025
+       ],
+       "at": [
+        0,
+        0.62,
+        0.05
+       ],
+       "bevel": 0.008,
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0.12,
+         0
+        ]
+       },
+       "material": "bench_wood"
+      }
+     ]
+    },
+    {
+     "name": "Sign",
+     "at": [
+      "$sx",
+      0,
+      "$zf + 0.45"
+     ],
+     "children": [
+      {
+       "name": "Footing",
+       "shape": "cylinder",
+       "radius": 0.12,
+       "height": 0.04,
+       "at": [
+        0,
+        0.02,
+        0
+       ],
+       "segments": 16,
+       "material": "kerb_concrete"
+      },
+      {
+       "name": "Pole",
+       "shape": "cylinder",
+       "radius": 0.04,
+       "height": "$sh",
+       "anchor": "base",
+       "segments": 16,
+       "material": "pole_grey"
+      },
+      {
+       "name": "PoleCap",
+       "shape": "cylinder",
+       "radius": 0.045,
+       "height": 0.03,
+       "at": [
+        0,
+        "$sh",
+        0
+       ],
+       "segments": 16,
+       "bevel": 0.01,
+       "material": "pole_grey"
+      },
+      {
+       "name": "Flag",
+       "shape": "cylinder",
+       "radius": 0.3,
+       "height": 0.025,
+       "at": [
+        0,
+        "$sh - 0.32",
+        0
+       ],
+       "axis": "z",
+       "segments": 32,
+       "bevel": 0.008,
+       "material": "sign_yellow",
+       "children": [
+        {
+         "name": "FlagRing",
+         "shape": "cylinder",
+         "radius": 0.27,
+         "height": 0.03,
+         "axis": "z",
+         "segments": 32,
+         "material": "sign_green"
+        },
+        {
+         "name": "FlagCentre",
+         "shape": "cylinder",
+         "radius": 0.22,
+         "height": 0.034,
+         "axis": "z",
+         "segments": 32,
+         "material": "sign_white"
+        },
+        {
+         "name": "FlagBar",
+         "shape": "box",
+         "size": [
+          0.36,
+          0.1,
+          0.038
+         ],
+         "material": "sign_green"
+        }
+       ]
+      },
+      {
+       "name": "Clamp_{i}",
+       "shape": "box",
+       "size": [
+        0.1,
+        0.05,
+        0.1
+       ],
+       "at": [
+        0,
+        "$sh - 0.5",
+        0
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0.36,
+         0
+        ]
+       },
+       "material": "pole_grey"
+      },
+      {
+       "name": "TimetableCase",
+       "shape": "box",
+       "size": [
+        0.36,
+        0.5,
+        0.06
+       ],
+       "at": [
+        0,
+        "min(1.5, $sh - 0.92)",
+        0.06
+       ],
+       "bevel": 0.01,
+       "material": "sign_dark",
+       "children": [
+        {
+         "name": "Sheet",
+         "shape": "box",
+         "size": [
+          0.3,
+          0.42,
+          0.065
+         ],
+         "at": [
+          0,
+          0,
+          0.002
+         ],
+         "material": "timetable"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

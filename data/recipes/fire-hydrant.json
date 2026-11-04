@@ -1,0 +1,2973 @@
+{
+ "version": 1,
+ "name": "fire-hydrant",
+ "archetype": "infrastructure.fire-hydrant",
+ "description": "A pillar fire hydrant: a cast barrel on a bolted ground flange with a raised nozzle section, two hose outlets at the sides and a larger pumper outlet facing +Z, each with a threaded neck, a lugged cap, a pentagon nut and a hanging cap chain, and a domed bonnet with flange bolts, a weather shield and a pentagon operating nut on top. The barrel colour and the bonnet and cap colour (the flow-class code) are separate options.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 0.8,
+   "min": 0.6,
+   "max": 1.1,
+   "description": "Height above the ground in metres (most pillar hydrants are 0.7-0.9)."
+  },
+  {
+   "name": "radius",
+   "type": "number",
+   "default": 0.115,
+   "min": 0.08,
+   "max": 0.16,
+   "description": "Radius of the barrel in metres."
+  },
+  {
+   "name": "outlets",
+   "type": "integer",
+   "default": 3,
+   "min": 1,
+   "max": 3,
+   "description": "1 = only the pumper outlet at the front, 2 = two hose outlets at the sides, 3 = both hose outlets and the pumper."
+  },
+  {
+   "name": "colour",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 3,
+   "description": "Barrel colour: 0 red, 1 yellow, 2 silver, 3 white."
+  },
+  {
+   "name": "topColour",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 6,
+   "description": "Bonnet and cap colour: 0 red, 1 yellow, 2 silver, 3 white, 4 blue, 5 green, 6 orange (in the US the bonnet colour marks the flow class: blue, green, orange, red)."
+  },
+  {
+   "name": "chains",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "Chains that keep the caps on the barrel."
+  }
+ ],
+ "materials": {
+  "hydrant_red": {
+   "color": [
+    0.5,
+    0.025,
+    0.018
+   ],
+   "metallic": 0.25,
+   "roughness": 0.42
+  },
+  "hydrant_yellow": {
+   "color": [
+    0.78,
+    0.5,
+    0.02
+   ],
+   "metallic": 0.25,
+   "roughness": 0.42
+  },
+  "hydrant_silver": {
+   "color": [
+    0.55,
+    0.56,
+    0.58
+   ],
+   "metallic": 0.75,
+   "roughness": 0.38
+  },
+  "hydrant_white": {
+   "color": [
+    0.78,
+    0.78,
+    0.75
+   ],
+   "metallic": 0.25,
+   "roughness": 0.42
+  },
+  "hydrant_blue": {
+   "color": [
+    0.02,
+    0.09,
+    0.42
+   ],
+   "metallic": 0.25,
+   "roughness": 0.42
+  },
+  "hydrant_green": {
+   "color": [
+    0.03,
+    0.26,
+    0.06
+   ],
+   "metallic": 0.25,
+   "roughness": 0.42
+  },
+  "hydrant_orange": {
+   "color": [
+    0.85,
+    0.22,
+    0.02
+   ],
+   "metallic": 0.25,
+   "roughness": 0.42
+  },
+  "cast_iron": {
+   "color": [
+    0.07,
+    0.07,
+    0.075
+   ],
+   "metallic": 0.6,
+   "roughness": 0.6
+  },
+  "chain_steel": {
+   "color": [
+    0.42,
+    0.43,
+    0.45
+   ],
+   "metallic": 0.9,
+   "roughness": 0.45
+  },
+  "hydrant_bronze": {
+   "color": [
+    0.55,
+    0.38,
+    0.18
+   ],
+   "metallic": 0.9,
+   "roughness": 0.4
+  },
+  "cast_iron_paint": {
+   "color": [
+    0.11,
+    0.1,
+    0.1
+   ],
+   "metallic": 0.45,
+   "roughness": 0.55
+  }
+ },
+ "nodes": [
+  {
+   "name": "Hydrant",
+   "material": "cast_iron",
+   "vars": {
+    "R": "$radius",
+    "yb": 0.04,
+    "bh": "clamp($height * 0.15, 0.09, 0.15)",
+    "yt": "$height - 0.035 - clamp($height * 0.15, 0.09, 0.15)",
+    "yn": "min($height * 0.6, $height - 0.035 - clamp($height * 0.15, 0.09, 0.15) - 0.15)",
+    "fb0": "max(0.12, max(0, 1 - min(1, abs($colour - 0))))",
+    "fb1": "max(0.12, max(0, 1 - min(1, abs($colour - 1))))",
+    "fb2": "max(0.12, max(0, 1 - min(1, abs($colour - 2))))",
+    "fb3": "max(0.12, max(0, 1 - min(1, abs($colour - 3))))",
+    "ft0": "max(0.12, max(0, 1 - min(1, abs($topColour - 0))))",
+    "ft1": "max(0.12, max(0, 1 - min(1, abs($topColour - 1))))",
+    "ft2": "max(0.12, max(0, 1 - min(1, abs($topColour - 2))))",
+    "ft3": "max(0.12, max(0, 1 - min(1, abs($topColour - 3))))",
+    "ft4": "max(0.12, max(0, 1 - min(1, abs($topColour - 4))))",
+    "ft5": "max(0.12, max(0, 1 - min(1, abs($topColour - 5))))",
+    "ft6": "max(0.12, max(0, 1 - min(1, abs($topColour - 6))))",
+    "fside": "max(0.12, min(1, max(0, $outlets - 1)))",
+    "fpump": "max(0.12, 1 - max(0, 1 - min(1, abs($outlets - 2))))",
+    "fchain": "max(0.12, $chains)"
+   },
+   "children": [
+    {
+     "name": "Base",
+     "children": [
+      {
+       "name": "Flange",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         "$R + 0.06",
+         0
+        ],
+        [
+         "$R + 0.065",
+         0.006
+        ],
+        [
+         "$R + 0.065",
+         0.03
+        ],
+        [
+         "$R + 0.058",
+         "$yb"
+        ],
+        [
+         0,
+         "$yb"
+        ]
+       ],
+       "segments": 24,
+       "material": "cast_iron_paint"
+      },
+      {
+       "name": "Bolt_{i}",
+       "shape": "cylinder",
+       "radius": 0.013,
+       "height": 0.014,
+       "at": [
+        "$R + 0.04",
+        "$yb + 0.004",
+        0
+       ],
+       "repeat": {
+        "count": 8,
+        "around": "y",
+        "phase": 22.5
+       },
+       "segments": 6,
+       "bevel": 0.002,
+       "material": "cast_iron"
+      }
+     ]
+    },
+    {
+     "name": "Barrel",
+     "children": [
+      {
+       "name": "CoatRed",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         "($yb - 0.005) * $fb0"
+        ],
+        [
+         "($R + 0.022) * $fb0",
+         "($yb - 0.005) * $fb0"
+        ],
+        [
+         "($R + 0.022) * $fb0",
+         "($yb + 0.022) * $fb0"
+        ],
+        [
+         "($R + 0.006) * $fb0",
+         "($yb + 0.03) * $fb0"
+        ],
+        [
+         "($R) * $fb0",
+         "($yb + 0.05) * $fb0"
+        ],
+        [
+         "($R * 0.95) * $fb0",
+         "($yn - 0.1) * $fb0"
+        ],
+        [
+         "($R * 0.97) * $fb0",
+         "($yn - 0.09) * $fb0"
+        ],
+        [
+         "($R + 0.028) * $fb0",
+         "($yn - 0.075) * $fb0"
+        ],
+        [
+         "($R + 0.032) * $fb0",
+         "($yn - 0.06) * $fb0"
+        ],
+        [
+         "($R + 0.032) * $fb0",
+         "($yn + 0.06) * $fb0"
+        ],
+        [
+         "($R + 0.028) * $fb0",
+         "($yn + 0.075) * $fb0"
+        ],
+        [
+         "($R * 0.97) * $fb0",
+         "($yn + 0.09) * $fb0"
+        ],
+        [
+         "($R * 0.95) * $fb0",
+         "($yn + 0.1) * $fb0"
+        ],
+        [
+         "($R * 0.95) * $fb0",
+         "($yt - 0.035) * $fb0"
+        ],
+        [
+         "($R + 0.004) * $fb0",
+         "($yt - 0.02) * $fb0"
+        ],
+        [
+         "($R + 0.024) * $fb0",
+         "($yt - 0.016) * $fb0"
+        ],
+        [
+         "($R + 0.024) * $fb0",
+         "($yt + 0.004) * $fb0"
+        ],
+        [
+         0,
+         "($yt + 0.004) * $fb0"
+        ]
+       ],
+       "material": "hydrant_red",
+       "segments": 24,
+       "at": [
+        0,
+        "$yt * 0.5 + ((0) - ($yt * 0.5)) * $fb0",
+        0
+       ]
+      },
+      {
+       "name": "CoatYellow",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         "($yb - 0.005) * $fb1"
+        ],
+        [
+         "($R + 0.022) * $fb1",
+         "($yb - 0.005) * $fb1"
+        ],
+        [
+         "($R + 0.022) * $fb1",
+         "($yb + 0.022) * $fb1"
+        ],
+        [
+         "($R + 0.006) * $fb1",
+         "($yb + 0.03) * $fb1"
+        ],
+        [
+         "($R) * $fb1",
+         "($yb + 0.05) * $fb1"
+        ],
+        [
+         "($R * 0.95) * $fb1",
+         "($yn - 0.1) * $fb1"
+        ],
+        [
+         "($R * 0.97) * $fb1",
+         "($yn - 0.09) * $fb1"
+        ],
+        [
+         "($R + 0.028) * $fb1",
+         "($yn - 0.075) * $fb1"
+        ],
+        [
+         "($R + 0.032) * $fb1",
+         "($yn - 0.06) * $fb1"
+        ],
+        [
+         "($R + 0.032) * $fb1",
+         "($yn + 0.06) * $fb1"
+        ],
+        [
+         "($R + 0.028) * $fb1",
+         "($yn + 0.075) * $fb1"
+        ],
+        [
+         "($R * 0.97) * $fb1",
+         "($yn + 0.09) * $fb1"
+        ],
+        [
+         "($R * 0.95) * $fb1",
+         "($yn + 0.1) * $fb1"
+        ],
+        [
+         "($R * 0.95) * $fb1",
+         "($yt - 0.035) * $fb1"
+        ],
+        [
+         "($R + 0.004) * $fb1",
+         "($yt - 0.02) * $fb1"
+        ],
+        [
+         "($R + 0.024) * $fb1",
+         "($yt - 0.016) * $fb1"
+        ],
+        [
+         "($R + 0.024) * $fb1",
+         "($yt + 0.004) * $fb1"
+        ],
+        [
+         0,
+         "($yt + 0.004) * $fb1"
+        ]
+       ],
+       "material": "hydrant_yellow",
+       "segments": 24,
+       "at": [
+        0,
+        "$yt * 0.5 + ((0) - ($yt * 0.5)) * $fb1",
+        0
+       ]
+      },
+      {
+       "name": "CoatSilver",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         "($yb - 0.005) * $fb2"
+        ],
+        [
+         "($R + 0.022) * $fb2",
+         "($yb - 0.005) * $fb2"
+        ],
+        [
+         "($R + 0.022) * $fb2",
+         "($yb + 0.022) * $fb2"
+        ],
+        [
+         "($R + 0.006) * $fb2",
+         "($yb + 0.03) * $fb2"
+        ],
+        [
+         "($R) * $fb2",
+         "($yb + 0.05) * $fb2"
+        ],
+        [
+         "($R * 0.95) * $fb2",
+         "($yn - 0.1) * $fb2"
+        ],
+        [
+         "($R * 0.97) * $fb2",
+         "($yn - 0.09) * $fb2"
+        ],
+        [
+         "($R + 0.028) * $fb2",
+         "($yn - 0.075) * $fb2"
+        ],
+        [
+         "($R + 0.032) * $fb2",
+         "($yn - 0.06) * $fb2"
+        ],
+        [
+         "($R + 0.032) * $fb2",
+         "($yn + 0.06) * $fb2"
+        ],
+        [
+         "($R + 0.028) * $fb2",
+         "($yn + 0.075) * $fb2"
+        ],
+        [
+         "($R * 0.97) * $fb2",
+         "($yn + 0.09) * $fb2"
+        ],
+        [
+         "($R * 0.95) * $fb2",
+         "($yn + 0.1) * $fb2"
+        ],
+        [
+         "($R * 0.95) * $fb2",
+         "($yt - 0.035) * $fb2"
+        ],
+        [
+         "($R + 0.004) * $fb2",
+         "($yt - 0.02) * $fb2"
+        ],
+        [
+         "($R + 0.024) * $fb2",
+         "($yt - 0.016) * $fb2"
+        ],
+        [
+         "($R + 0.024) * $fb2",
+         "($yt + 0.004) * $fb2"
+        ],
+        [
+         0,
+         "($yt + 0.004) * $fb2"
+        ]
+       ],
+       "material": "hydrant_silver",
+       "segments": 24,
+       "at": [
+        0,
+        "$yt * 0.5 + ((0) - ($yt * 0.5)) * $fb2",
+        0
+       ]
+      },
+      {
+       "name": "CoatWhite",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         "($yb - 0.005) * $fb3"
+        ],
+        [
+         "($R + 0.022) * $fb3",
+         "($yb - 0.005) * $fb3"
+        ],
+        [
+         "($R + 0.022) * $fb3",
+         "($yb + 0.022) * $fb3"
+        ],
+        [
+         "($R + 0.006) * $fb3",
+         "($yb + 0.03) * $fb3"
+        ],
+        [
+         "($R) * $fb3",
+         "($yb + 0.05) * $fb3"
+        ],
+        [
+         "($R * 0.95) * $fb3",
+         "($yn - 0.1) * $fb3"
+        ],
+        [
+         "($R * 0.97) * $fb3",
+         "($yn - 0.09) * $fb3"
+        ],
+        [
+         "($R + 0.028) * $fb3",
+         "($yn - 0.075) * $fb3"
+        ],
+        [
+         "($R + 0.032) * $fb3",
+         "($yn - 0.06) * $fb3"
+        ],
+        [
+         "($R + 0.032) * $fb3",
+         "($yn + 0.06) * $fb3"
+        ],
+        [
+         "($R + 0.028) * $fb3",
+         "($yn + 0.075) * $fb3"
+        ],
+        [
+         "($R * 0.97) * $fb3",
+         "($yn + 0.09) * $fb3"
+        ],
+        [
+         "($R * 0.95) * $fb3",
+         "($yn + 0.1) * $fb3"
+        ],
+        [
+         "($R * 0.95) * $fb3",
+         "($yt - 0.035) * $fb3"
+        ],
+        [
+         "($R + 0.004) * $fb3",
+         "($yt - 0.02) * $fb3"
+        ],
+        [
+         "($R + 0.024) * $fb3",
+         "($yt - 0.016) * $fb3"
+        ],
+        [
+         "($R + 0.024) * $fb3",
+         "($yt + 0.004) * $fb3"
+        ],
+        [
+         0,
+         "($yt + 0.004) * $fb3"
+        ]
+       ],
+       "material": "hydrant_white",
+       "segments": 24,
+       "at": [
+        0,
+        "$yt * 0.5 + ((0) - ($yt * 0.5)) * $fb3",
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Bonnet",
+     "children": [
+      {
+       "name": "BonnetPaint",
+       "children": [
+        {
+         "name": "BonnetRed",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "($yt) * $ft0"
+          ],
+          [
+           "($R + 0.024) * $ft0",
+           "($yt) * $ft0"
+          ],
+          [
+           "($R + 0.024) * $ft0",
+           "($yt + 0.022) * $ft0"
+          ],
+          [
+           "($R + 0.004) * $ft0",
+           "($yt + 0.03) * $ft0"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.9659) * $ft0",
+           "($yt + 0.03 + ($bh - 0.03) * 0.2588) * $ft0"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.866) * $ft0",
+           "($yt + 0.03 + ($bh - 0.03) * 0.5) * $ft0"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.7071) * $ft0",
+           "($yt + 0.03 + ($bh - 0.03) * 0.7071) * $ft0"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.5) * $ft0",
+           "($yt + 0.03 + ($bh - 0.03) * 0.866) * $ft0"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.2588) * $ft0",
+           "($yt + 0.03 + ($bh - 0.03) * 0.9659) * $ft0"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.0) * $ft0",
+           "($yt + 0.03 + ($bh - 0.03) * 1.0) * $ft0"
+          ],
+          [
+           0,
+           "($yt + $bh) * $ft0"
+          ]
+         ],
+         "material": "hydrant_red",
+         "segments": 24,
+         "at": [
+          0,
+          "$yt + 0.04 + ((0) - ($yt + 0.04)) * $ft0",
+          0
+         ]
+        },
+        {
+         "name": "BonnetYellow",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "($yt) * $ft1"
+          ],
+          [
+           "($R + 0.024) * $ft1",
+           "($yt) * $ft1"
+          ],
+          [
+           "($R + 0.024) * $ft1",
+           "($yt + 0.022) * $ft1"
+          ],
+          [
+           "($R + 0.004) * $ft1",
+           "($yt + 0.03) * $ft1"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.9659) * $ft1",
+           "($yt + 0.03 + ($bh - 0.03) * 0.2588) * $ft1"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.866) * $ft1",
+           "($yt + 0.03 + ($bh - 0.03) * 0.5) * $ft1"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.7071) * $ft1",
+           "($yt + 0.03 + ($bh - 0.03) * 0.7071) * $ft1"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.5) * $ft1",
+           "($yt + 0.03 + ($bh - 0.03) * 0.866) * $ft1"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.2588) * $ft1",
+           "($yt + 0.03 + ($bh - 0.03) * 0.9659) * $ft1"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.0) * $ft1",
+           "($yt + 0.03 + ($bh - 0.03) * 1.0) * $ft1"
+          ],
+          [
+           0,
+           "($yt + $bh) * $ft1"
+          ]
+         ],
+         "material": "hydrant_yellow",
+         "segments": 24,
+         "at": [
+          0,
+          "$yt + 0.04 + ((0) - ($yt + 0.04)) * $ft1",
+          0
+         ]
+        },
+        {
+         "name": "BonnetSilver",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "($yt) * $ft2"
+          ],
+          [
+           "($R + 0.024) * $ft2",
+           "($yt) * $ft2"
+          ],
+          [
+           "($R + 0.024) * $ft2",
+           "($yt + 0.022) * $ft2"
+          ],
+          [
+           "($R + 0.004) * $ft2",
+           "($yt + 0.03) * $ft2"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.9659) * $ft2",
+           "($yt + 0.03 + ($bh - 0.03) * 0.2588) * $ft2"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.866) * $ft2",
+           "($yt + 0.03 + ($bh - 0.03) * 0.5) * $ft2"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.7071) * $ft2",
+           "($yt + 0.03 + ($bh - 0.03) * 0.7071) * $ft2"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.5) * $ft2",
+           "($yt + 0.03 + ($bh - 0.03) * 0.866) * $ft2"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.2588) * $ft2",
+           "($yt + 0.03 + ($bh - 0.03) * 0.9659) * $ft2"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.0) * $ft2",
+           "($yt + 0.03 + ($bh - 0.03) * 1.0) * $ft2"
+          ],
+          [
+           0,
+           "($yt + $bh) * $ft2"
+          ]
+         ],
+         "material": "hydrant_silver",
+         "segments": 24,
+         "at": [
+          0,
+          "$yt + 0.04 + ((0) - ($yt + 0.04)) * $ft2",
+          0
+         ]
+        },
+        {
+         "name": "BonnetWhite",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "($yt) * $ft3"
+          ],
+          [
+           "($R + 0.024) * $ft3",
+           "($yt) * $ft3"
+          ],
+          [
+           "($R + 0.024) * $ft3",
+           "($yt + 0.022) * $ft3"
+          ],
+          [
+           "($R + 0.004) * $ft3",
+           "($yt + 0.03) * $ft3"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.9659) * $ft3",
+           "($yt + 0.03 + ($bh - 0.03) * 0.2588) * $ft3"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.866) * $ft3",
+           "($yt + 0.03 + ($bh - 0.03) * 0.5) * $ft3"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.7071) * $ft3",
+           "($yt + 0.03 + ($bh - 0.03) * 0.7071) * $ft3"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.5) * $ft3",
+           "($yt + 0.03 + ($bh - 0.03) * 0.866) * $ft3"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.2588) * $ft3",
+           "($yt + 0.03 + ($bh - 0.03) * 0.9659) * $ft3"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.0) * $ft3",
+           "($yt + 0.03 + ($bh - 0.03) * 1.0) * $ft3"
+          ],
+          [
+           0,
+           "($yt + $bh) * $ft3"
+          ]
+         ],
+         "material": "hydrant_white",
+         "segments": 24,
+         "at": [
+          0,
+          "$yt + 0.04 + ((0) - ($yt + 0.04)) * $ft3",
+          0
+         ]
+        },
+        {
+         "name": "BonnetBlue",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "($yt) * $ft4"
+          ],
+          [
+           "($R + 0.024) * $ft4",
+           "($yt) * $ft4"
+          ],
+          [
+           "($R + 0.024) * $ft4",
+           "($yt + 0.022) * $ft4"
+          ],
+          [
+           "($R + 0.004) * $ft4",
+           "($yt + 0.03) * $ft4"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.9659) * $ft4",
+           "($yt + 0.03 + ($bh - 0.03) * 0.2588) * $ft4"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.866) * $ft4",
+           "($yt + 0.03 + ($bh - 0.03) * 0.5) * $ft4"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.7071) * $ft4",
+           "($yt + 0.03 + ($bh - 0.03) * 0.7071) * $ft4"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.5) * $ft4",
+           "($yt + 0.03 + ($bh - 0.03) * 0.866) * $ft4"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.2588) * $ft4",
+           "($yt + 0.03 + ($bh - 0.03) * 0.9659) * $ft4"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.0) * $ft4",
+           "($yt + 0.03 + ($bh - 0.03) * 1.0) * $ft4"
+          ],
+          [
+           0,
+           "($yt + $bh) * $ft4"
+          ]
+         ],
+         "material": "hydrant_blue",
+         "segments": 24,
+         "at": [
+          0,
+          "$yt + 0.04 + ((0) - ($yt + 0.04)) * $ft4",
+          0
+         ]
+        },
+        {
+         "name": "BonnetGreen",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "($yt) * $ft5"
+          ],
+          [
+           "($R + 0.024) * $ft5",
+           "($yt) * $ft5"
+          ],
+          [
+           "($R + 0.024) * $ft5",
+           "($yt + 0.022) * $ft5"
+          ],
+          [
+           "($R + 0.004) * $ft5",
+           "($yt + 0.03) * $ft5"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.9659) * $ft5",
+           "($yt + 0.03 + ($bh - 0.03) * 0.2588) * $ft5"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.866) * $ft5",
+           "($yt + 0.03 + ($bh - 0.03) * 0.5) * $ft5"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.7071) * $ft5",
+           "($yt + 0.03 + ($bh - 0.03) * 0.7071) * $ft5"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.5) * $ft5",
+           "($yt + 0.03 + ($bh - 0.03) * 0.866) * $ft5"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.2588) * $ft5",
+           "($yt + 0.03 + ($bh - 0.03) * 0.9659) * $ft5"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.0) * $ft5",
+           "($yt + 0.03 + ($bh - 0.03) * 1.0) * $ft5"
+          ],
+          [
+           0,
+           "($yt + $bh) * $ft5"
+          ]
+         ],
+         "material": "hydrant_green",
+         "segments": 24,
+         "at": [
+          0,
+          "$yt + 0.04 + ((0) - ($yt + 0.04)) * $ft5",
+          0
+         ]
+        },
+        {
+         "name": "BonnetOrange",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "($yt) * $ft6"
+          ],
+          [
+           "($R + 0.024) * $ft6",
+           "($yt) * $ft6"
+          ],
+          [
+           "($R + 0.024) * $ft6",
+           "($yt + 0.022) * $ft6"
+          ],
+          [
+           "($R + 0.004) * $ft6",
+           "($yt + 0.03) * $ft6"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.9659) * $ft6",
+           "($yt + 0.03 + ($bh - 0.03) * 0.2588) * $ft6"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.866) * $ft6",
+           "($yt + 0.03 + ($bh - 0.03) * 0.5) * $ft6"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.7071) * $ft6",
+           "($yt + 0.03 + ($bh - 0.03) * 0.7071) * $ft6"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.5) * $ft6",
+           "($yt + 0.03 + ($bh - 0.03) * 0.866) * $ft6"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.2588) * $ft6",
+           "($yt + 0.03 + ($bh - 0.03) * 0.9659) * $ft6"
+          ],
+          [
+           "(0.03 + ($R + 0.004 - 0.03) * 0.0) * $ft6",
+           "($yt + 0.03 + ($bh - 0.03) * 1.0) * $ft6"
+          ],
+          [
+           0,
+           "($yt + $bh) * $ft6"
+          ]
+         ],
+         "material": "hydrant_orange",
+         "segments": 24,
+         "at": [
+          0,
+          "$yt + 0.04 + ((0) - ($yt + 0.04)) * $ft6",
+          0
+         ]
+        }
+       ]
+      },
+      {
+       "name": "BonnetBolt_{i}",
+       "shape": "cylinder",
+       "radius": 0.01,
+       "height": 0.012,
+       "at": [
+        "$R + 0.013",
+        "$yt + 0.026",
+        0
+       ],
+       "repeat": {
+        "count": 6,
+        "around": "y",
+        "phase": 30
+       },
+       "segments": 6,
+       "material": "cast_iron"
+      }
+     ]
+    },
+    {
+     "name": "Cap",
+     "at": [
+      0,
+      "$yt + $bh - 0.004",
+      0
+     ],
+     "children": [
+      {
+       "name": "WeatherShield",
+       "shape": "cylinder",
+       "radius": 0.05,
+       "height": 0.012,
+       "at": [
+        0,
+        0.006,
+        0
+       ],
+       "segments": 24,
+       "bevel": 0.003,
+       "material": "cast_iron_paint"
+      },
+      {
+       "name": "OperatingNut",
+       "shape": "cylinder",
+       "radius": 0.026,
+       "height": 0.036,
+       "at": [
+        0,
+        0.03,
+        0
+       ],
+       "segments": 5,
+       "bevel": 0.003,
+       "material": "cast_iron"
+      }
+     ]
+    },
+    {
+     "name": "Outlet_L",
+     "at": [
+      "$R * 0.4 + (($R + 0.012) - ($R * 0.4)) * $fside",
+      "$yn + (($yn) - ($yn)) * $fside",
+      0
+     ],
+     "children": [
+      {
+       "name": "NeckL",
+       "shape": "cylinder",
+       "radius": "(0.042 * 0.78) * $fside",
+       "height": "0.07 * $fside",
+       "at": [
+        "0.025 * $fside",
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 20,
+       "material": "cast_iron_paint"
+      },
+      {
+       "name": "ThreadL",
+       "shape": "cylinder",
+       "radius": "(0.042 * 0.86) * $fside",
+       "height": "0.016 * $fside",
+       "at": [
+        "0.062 * $fside",
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 20,
+       "bevel": "0.003 * $fside",
+       "material": "hydrant_bronze"
+      },
+      {
+       "name": "CapL",
+       "at": [
+        "0.068 * $fside",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "PaintL",
+         "children": [
+          {
+           "name": "CoatRedL",
+           "children": [
+            {
+             "name": "CupRedL",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft0) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft0) * $fside",
+               "(0.004 * $ft0) * $fside"
+              ],
+              [
+               "(0.042 * $ft0) * $fside",
+               "((0.045 - 0.006) * $ft0) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft0) * $fside",
+               "(0.045 * $ft0) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft0) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_red"
+            },
+            {
+             "name": "Lug_TRedL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft0) * $fside",
+              "(0.02 * $ft0) * $fside",
+              "(0.018 * $ft0) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft0) * $fside",
+              "((0.042 + 0.006) * $ft0) * $fside",
+              0
+             ],
+             "material": "hydrant_red"
+            },
+            {
+             "name": "Lug_BRedL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft0) * $fside",
+              "(0.02 * $ft0) * $fside",
+              "(0.018 * $ft0) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft0) * $fside",
+              "((-0.042 - 0.006) * $ft0) * $fside",
+              0
+             ],
+             "material": "hydrant_red"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft0) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatYellowL",
+           "children": [
+            {
+             "name": "CupYellowL",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft1) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft1) * $fside",
+               "(0.004 * $ft1) * $fside"
+              ],
+              [
+               "(0.042 * $ft1) * $fside",
+               "((0.045 - 0.006) * $ft1) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft1) * $fside",
+               "(0.045 * $ft1) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft1) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_yellow"
+            },
+            {
+             "name": "Lug_TYellowL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft1) * $fside",
+              "(0.02 * $ft1) * $fside",
+              "(0.018 * $ft1) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft1) * $fside",
+              "((0.042 + 0.006) * $ft1) * $fside",
+              0
+             ],
+             "material": "hydrant_yellow"
+            },
+            {
+             "name": "Lug_BYellowL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft1) * $fside",
+              "(0.02 * $ft1) * $fside",
+              "(0.018 * $ft1) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft1) * $fside",
+              "((-0.042 - 0.006) * $ft1) * $fside",
+              0
+             ],
+             "material": "hydrant_yellow"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft1) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatSilverL",
+           "children": [
+            {
+             "name": "CupSilverL",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft2) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft2) * $fside",
+               "(0.004 * $ft2) * $fside"
+              ],
+              [
+               "(0.042 * $ft2) * $fside",
+               "((0.045 - 0.006) * $ft2) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft2) * $fside",
+               "(0.045 * $ft2) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft2) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_silver"
+            },
+            {
+             "name": "Lug_TSilverL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft2) * $fside",
+              "(0.02 * $ft2) * $fside",
+              "(0.018 * $ft2) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft2) * $fside",
+              "((0.042 + 0.006) * $ft2) * $fside",
+              0
+             ],
+             "material": "hydrant_silver"
+            },
+            {
+             "name": "Lug_BSilverL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft2) * $fside",
+              "(0.02 * $ft2) * $fside",
+              "(0.018 * $ft2) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft2) * $fside",
+              "((-0.042 - 0.006) * $ft2) * $fside",
+              0
+             ],
+             "material": "hydrant_silver"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft2) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatWhiteL",
+           "children": [
+            {
+             "name": "CupWhiteL",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft3) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft3) * $fside",
+               "(0.004 * $ft3) * $fside"
+              ],
+              [
+               "(0.042 * $ft3) * $fside",
+               "((0.045 - 0.006) * $ft3) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft3) * $fside",
+               "(0.045 * $ft3) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft3) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_white"
+            },
+            {
+             "name": "Lug_TWhiteL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft3) * $fside",
+              "(0.02 * $ft3) * $fside",
+              "(0.018 * $ft3) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft3) * $fside",
+              "((0.042 + 0.006) * $ft3) * $fside",
+              0
+             ],
+             "material": "hydrant_white"
+            },
+            {
+             "name": "Lug_BWhiteL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft3) * $fside",
+              "(0.02 * $ft3) * $fside",
+              "(0.018 * $ft3) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft3) * $fside",
+              "((-0.042 - 0.006) * $ft3) * $fside",
+              0
+             ],
+             "material": "hydrant_white"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft3) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatBlueL",
+           "children": [
+            {
+             "name": "CupBlueL",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft4) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft4) * $fside",
+               "(0.004 * $ft4) * $fside"
+              ],
+              [
+               "(0.042 * $ft4) * $fside",
+               "((0.045 - 0.006) * $ft4) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft4) * $fside",
+               "(0.045 * $ft4) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft4) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_blue"
+            },
+            {
+             "name": "Lug_TBlueL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft4) * $fside",
+              "(0.02 * $ft4) * $fside",
+              "(0.018 * $ft4) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft4) * $fside",
+              "((0.042 + 0.006) * $ft4) * $fside",
+              0
+             ],
+             "material": "hydrant_blue"
+            },
+            {
+             "name": "Lug_BBlueL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft4) * $fside",
+              "(0.02 * $ft4) * $fside",
+              "(0.018 * $ft4) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft4) * $fside",
+              "((-0.042 - 0.006) * $ft4) * $fside",
+              0
+             ],
+             "material": "hydrant_blue"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft4) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatGreenL",
+           "children": [
+            {
+             "name": "CupGreenL",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft5) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft5) * $fside",
+               "(0.004 * $ft5) * $fside"
+              ],
+              [
+               "(0.042 * $ft5) * $fside",
+               "((0.045 - 0.006) * $ft5) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft5) * $fside",
+               "(0.045 * $ft5) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft5) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_green"
+            },
+            {
+             "name": "Lug_TGreenL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft5) * $fside",
+              "(0.02 * $ft5) * $fside",
+              "(0.018 * $ft5) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft5) * $fside",
+              "((0.042 + 0.006) * $ft5) * $fside",
+              0
+             ],
+             "material": "hydrant_green"
+            },
+            {
+             "name": "Lug_BGreenL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft5) * $fside",
+              "(0.02 * $ft5) * $fside",
+              "(0.018 * $ft5) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft5) * $fside",
+              "((-0.042 - 0.006) * $ft5) * $fside",
+              0
+             ],
+             "material": "hydrant_green"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft5) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatOrangeL",
+           "children": [
+            {
+             "name": "CupOrangeL",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft6) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft6) * $fside",
+               "(0.004 * $ft6) * $fside"
+              ],
+              [
+               "(0.042 * $ft6) * $fside",
+               "((0.045 - 0.006) * $ft6) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft6) * $fside",
+               "(0.045 * $ft6) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft6) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_orange"
+            },
+            {
+             "name": "Lug_TOrangeL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft6) * $fside",
+              "(0.02 * $ft6) * $fside",
+              "(0.018 * $ft6) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft6) * $fside",
+              "((0.042 + 0.006) * $ft6) * $fside",
+              0
+             ],
+             "material": "hydrant_orange"
+            },
+            {
+             "name": "Lug_BOrangeL",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft6) * $fside",
+              "(0.02 * $ft6) * $fside",
+              "(0.018 * $ft6) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft6) * $fside",
+              "((-0.042 - 0.006) * $ft6) * $fside",
+              0
+             ],
+             "material": "hydrant_orange"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft6) * $fside",
+            0,
+            0
+           ]
+          }
+         ]
+        },
+        {
+         "name": "NutL",
+         "shape": "cylinder",
+         "radius": "(0.042 * 0.42) * $fside",
+         "height": "0.026 * $fside",
+         "at": [
+          "(0.045 + 0.011) * $fside",
+          0,
+          0
+         ],
+         "axis": "x",
+         "segments": 5,
+         "bevel": "0.002 * $fside",
+         "material": "cast_iron"
+        }
+       ]
+      },
+      {
+       "name": "ChainL",
+       "shape": "tube",
+       "path": [
+        [
+         "0.072 * $fside",
+         "(-0.042 * 0.85) * $fside",
+         0
+        ],
+        [
+         "0.055 * $fside",
+         "(-0.042 - 0.05) * $fside",
+         "0.004 * $fside"
+        ],
+        [
+         "0.03 * $fside",
+         "(-0.042 - 0.07) * $fside",
+         "0.006 * $fside"
+        ],
+        [
+         "0.012 * $fside",
+         "(-0.042 - 0.035) * $fside",
+         "0.006 * $fside"
+        ]
+       ],
+       "radius": "0.0045 * $fside",
+       "segments": 6,
+       "material": "chain_steel"
+      }
+     ]
+    },
+    {
+     "name": "Outlet_R",
+     "at": [
+      "-$R * 0.4 + ((-$R - 0.012) - (-$R * 0.4)) * $fside",
+      "$yn + (($yn) - ($yn)) * $fside",
+      0
+     ],
+     "rotate": [
+      0,
+      180,
+      0
+     ],
+     "children": [
+      {
+       "name": "NeckR",
+       "shape": "cylinder",
+       "radius": "(0.042 * 0.78) * $fside",
+       "height": "0.07 * $fside",
+       "at": [
+        "0.025 * $fside",
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 20,
+       "material": "cast_iron_paint"
+      },
+      {
+       "name": "ThreadR",
+       "shape": "cylinder",
+       "radius": "(0.042 * 0.86) * $fside",
+       "height": "0.016 * $fside",
+       "at": [
+        "0.062 * $fside",
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 20,
+       "bevel": "0.003 * $fside",
+       "material": "hydrant_bronze"
+      },
+      {
+       "name": "CapR",
+       "at": [
+        "0.068 * $fside",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "PaintR",
+         "children": [
+          {
+           "name": "CoatRedR",
+           "children": [
+            {
+             "name": "CupRedR",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft0) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft0) * $fside",
+               "(0.004 * $ft0) * $fside"
+              ],
+              [
+               "(0.042 * $ft0) * $fside",
+               "((0.045 - 0.006) * $ft0) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft0) * $fside",
+               "(0.045 * $ft0) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft0) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_red"
+            },
+            {
+             "name": "Lug_TRedR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft0) * $fside",
+              "(0.02 * $ft0) * $fside",
+              "(0.018 * $ft0) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft0) * $fside",
+              "((0.042 + 0.006) * $ft0) * $fside",
+              0
+             ],
+             "material": "hydrant_red"
+            },
+            {
+             "name": "Lug_BRedR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft0) * $fside",
+              "(0.02 * $ft0) * $fside",
+              "(0.018 * $ft0) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft0) * $fside",
+              "((-0.042 - 0.006) * $ft0) * $fside",
+              0
+             ],
+             "material": "hydrant_red"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft0) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatYellowR",
+           "children": [
+            {
+             "name": "CupYellowR",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft1) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft1) * $fside",
+               "(0.004 * $ft1) * $fside"
+              ],
+              [
+               "(0.042 * $ft1) * $fside",
+               "((0.045 - 0.006) * $ft1) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft1) * $fside",
+               "(0.045 * $ft1) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft1) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_yellow"
+            },
+            {
+             "name": "Lug_TYellowR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft1) * $fside",
+              "(0.02 * $ft1) * $fside",
+              "(0.018 * $ft1) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft1) * $fside",
+              "((0.042 + 0.006) * $ft1) * $fside",
+              0
+             ],
+             "material": "hydrant_yellow"
+            },
+            {
+             "name": "Lug_BYellowR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft1) * $fside",
+              "(0.02 * $ft1) * $fside",
+              "(0.018 * $ft1) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft1) * $fside",
+              "((-0.042 - 0.006) * $ft1) * $fside",
+              0
+             ],
+             "material": "hydrant_yellow"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft1) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatSilverR",
+           "children": [
+            {
+             "name": "CupSilverR",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft2) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft2) * $fside",
+               "(0.004 * $ft2) * $fside"
+              ],
+              [
+               "(0.042 * $ft2) * $fside",
+               "((0.045 - 0.006) * $ft2) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft2) * $fside",
+               "(0.045 * $ft2) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft2) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_silver"
+            },
+            {
+             "name": "Lug_TSilverR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft2) * $fside",
+              "(0.02 * $ft2) * $fside",
+              "(0.018 * $ft2) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft2) * $fside",
+              "((0.042 + 0.006) * $ft2) * $fside",
+              0
+             ],
+             "material": "hydrant_silver"
+            },
+            {
+             "name": "Lug_BSilverR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft2) * $fside",
+              "(0.02 * $ft2) * $fside",
+              "(0.018 * $ft2) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft2) * $fside",
+              "((-0.042 - 0.006) * $ft2) * $fside",
+              0
+             ],
+             "material": "hydrant_silver"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft2) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatWhiteR",
+           "children": [
+            {
+             "name": "CupWhiteR",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft3) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft3) * $fside",
+               "(0.004 * $ft3) * $fside"
+              ],
+              [
+               "(0.042 * $ft3) * $fside",
+               "((0.045 - 0.006) * $ft3) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft3) * $fside",
+               "(0.045 * $ft3) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft3) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_white"
+            },
+            {
+             "name": "Lug_TWhiteR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft3) * $fside",
+              "(0.02 * $ft3) * $fside",
+              "(0.018 * $ft3) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft3) * $fside",
+              "((0.042 + 0.006) * $ft3) * $fside",
+              0
+             ],
+             "material": "hydrant_white"
+            },
+            {
+             "name": "Lug_BWhiteR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft3) * $fside",
+              "(0.02 * $ft3) * $fside",
+              "(0.018 * $ft3) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft3) * $fside",
+              "((-0.042 - 0.006) * $ft3) * $fside",
+              0
+             ],
+             "material": "hydrant_white"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft3) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatBlueR",
+           "children": [
+            {
+             "name": "CupBlueR",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft4) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft4) * $fside",
+               "(0.004 * $ft4) * $fside"
+              ],
+              [
+               "(0.042 * $ft4) * $fside",
+               "((0.045 - 0.006) * $ft4) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft4) * $fside",
+               "(0.045 * $ft4) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft4) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_blue"
+            },
+            {
+             "name": "Lug_TBlueR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft4) * $fside",
+              "(0.02 * $ft4) * $fside",
+              "(0.018 * $ft4) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft4) * $fside",
+              "((0.042 + 0.006) * $ft4) * $fside",
+              0
+             ],
+             "material": "hydrant_blue"
+            },
+            {
+             "name": "Lug_BBlueR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft4) * $fside",
+              "(0.02 * $ft4) * $fside",
+              "(0.018 * $ft4) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft4) * $fside",
+              "((-0.042 - 0.006) * $ft4) * $fside",
+              0
+             ],
+             "material": "hydrant_blue"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft4) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatGreenR",
+           "children": [
+            {
+             "name": "CupGreenR",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft5) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft5) * $fside",
+               "(0.004 * $ft5) * $fside"
+              ],
+              [
+               "(0.042 * $ft5) * $fside",
+               "((0.045 - 0.006) * $ft5) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft5) * $fside",
+               "(0.045 * $ft5) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft5) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_green"
+            },
+            {
+             "name": "Lug_TGreenR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft5) * $fside",
+              "(0.02 * $ft5) * $fside",
+              "(0.018 * $ft5) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft5) * $fside",
+              "((0.042 + 0.006) * $ft5) * $fside",
+              0
+             ],
+             "material": "hydrant_green"
+            },
+            {
+             "name": "Lug_BGreenR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft5) * $fside",
+              "(0.02 * $ft5) * $fside",
+              "(0.018 * $ft5) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft5) * $fside",
+              "((-0.042 - 0.006) * $ft5) * $fside",
+              0
+             ],
+             "material": "hydrant_green"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft5) * $fside",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatOrangeR",
+           "children": [
+            {
+             "name": "CupOrangeR",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.042 - 0.004) * $ft6) * $fside",
+               0
+              ],
+              [
+               "(0.042 * $ft6) * $fside",
+               "(0.004 * $ft6) * $fside"
+              ],
+              [
+               "(0.042 * $ft6) * $fside",
+               "((0.045 - 0.006) * $ft6) * $fside"
+              ],
+              [
+               "((0.042 - 0.006) * $ft6) * $fside",
+               "(0.045 * $ft6) * $fside"
+              ],
+              [
+               0,
+               "(0.045 * $ft6) * $fside"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_orange"
+            },
+            {
+             "name": "Lug_TOrangeR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft6) * $fside",
+              "(0.02 * $ft6) * $fside",
+              "(0.018 * $ft6) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft6) * $fside",
+              "((0.042 + 0.006) * $ft6) * $fside",
+              0
+             ],
+             "material": "hydrant_orange"
+            },
+            {
+             "name": "Lug_BOrangeR",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft6) * $fside",
+              "(0.02 * $ft6) * $fside",
+              "(0.018 * $ft6) * $fside"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft6) * $fside",
+              "((-0.042 - 0.006) * $ft6) * $fside",
+              0
+             ],
+             "material": "hydrant_orange"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft6) * $fside",
+            0,
+            0
+           ]
+          }
+         ]
+        },
+        {
+         "name": "NutR",
+         "shape": "cylinder",
+         "radius": "(0.042 * 0.42) * $fside",
+         "height": "0.026 * $fside",
+         "at": [
+          "(0.045 + 0.011) * $fside",
+          0,
+          0
+         ],
+         "axis": "x",
+         "segments": 5,
+         "bevel": "0.002 * $fside",
+         "material": "cast_iron"
+        }
+       ]
+      },
+      {
+       "name": "ChainR",
+       "shape": "tube",
+       "path": [
+        [
+         "0.072 * $fside",
+         "(-0.042 * 0.85) * $fside",
+         0
+        ],
+        [
+         "0.055 * $fside",
+         "(-0.042 - 0.05) * $fside",
+         "0.004 * $fside"
+        ],
+        [
+         "0.03 * $fside",
+         "(-0.042 - 0.07) * $fside",
+         "0.006 * $fside"
+        ],
+        [
+         "0.012 * $fside",
+         "(-0.042 - 0.035) * $fside",
+         "0.006 * $fside"
+        ]
+       ],
+       "radius": "0.0045 * $fside",
+       "segments": 6,
+       "material": "chain_steel"
+      }
+     ]
+    },
+    {
+     "name": "Outlet_F",
+     "at": [
+      0,
+      "$yn + (($yn) - ($yn)) * $fpump",
+      "$R * 0.4 + (($R + 0.012) - ($R * 0.4)) * $fpump"
+     ],
+     "rotate": [
+      0,
+      -90,
+      0
+     ],
+     "children": [
+      {
+       "name": "NeckF",
+       "shape": "cylinder",
+       "radius": "(0.068 * 0.78) * $fpump",
+       "height": "0.07 * $fpump",
+       "at": [
+        "0.025 * $fpump",
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 20,
+       "material": "cast_iron_paint"
+      },
+      {
+       "name": "ThreadF",
+       "shape": "cylinder",
+       "radius": "(0.068 * 0.86) * $fpump",
+       "height": "0.016 * $fpump",
+       "at": [
+        "0.062 * $fpump",
+        0,
+        0
+       ],
+       "axis": "x",
+       "segments": 20,
+       "bevel": "0.003 * $fpump",
+       "material": "hydrant_bronze"
+      },
+      {
+       "name": "CapF",
+       "at": [
+        "0.068 * $fpump",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "PaintF",
+         "children": [
+          {
+           "name": "CoatRedF",
+           "children": [
+            {
+             "name": "CupRedF",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.068 - 0.004) * $ft0) * $fpump",
+               0
+              ],
+              [
+               "(0.068 * $ft0) * $fpump",
+               "(0.004 * $ft0) * $fpump"
+              ],
+              [
+               "(0.068 * $ft0) * $fpump",
+               "((0.045 - 0.006) * $ft0) * $fpump"
+              ],
+              [
+               "((0.068 - 0.006) * $ft0) * $fpump",
+               "(0.045 * $ft0) * $fpump"
+              ],
+              [
+               0,
+               "(0.045 * $ft0) * $fpump"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_red"
+            },
+            {
+             "name": "Lug_TRedF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft0) * $fpump",
+              "(0.02 * $ft0) * $fpump",
+              "(0.018 * $ft0) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft0) * $fpump",
+              "((0.068 + 0.006) * $ft0) * $fpump",
+              0
+             ],
+             "material": "hydrant_red"
+            },
+            {
+             "name": "Lug_BRedF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft0) * $fpump",
+              "(0.02 * $ft0) * $fpump",
+              "(0.018 * $ft0) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft0) * $fpump",
+              "((-0.068 - 0.006) * $ft0) * $fpump",
+              0
+             ],
+             "material": "hydrant_red"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft0) * $fpump",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatYellowF",
+           "children": [
+            {
+             "name": "CupYellowF",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.068 - 0.004) * $ft1) * $fpump",
+               0
+              ],
+              [
+               "(0.068 * $ft1) * $fpump",
+               "(0.004 * $ft1) * $fpump"
+              ],
+              [
+               "(0.068 * $ft1) * $fpump",
+               "((0.045 - 0.006) * $ft1) * $fpump"
+              ],
+              [
+               "((0.068 - 0.006) * $ft1) * $fpump",
+               "(0.045 * $ft1) * $fpump"
+              ],
+              [
+               0,
+               "(0.045 * $ft1) * $fpump"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_yellow"
+            },
+            {
+             "name": "Lug_TYellowF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft1) * $fpump",
+              "(0.02 * $ft1) * $fpump",
+              "(0.018 * $ft1) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft1) * $fpump",
+              "((0.068 + 0.006) * $ft1) * $fpump",
+              0
+             ],
+             "material": "hydrant_yellow"
+            },
+            {
+             "name": "Lug_BYellowF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft1) * $fpump",
+              "(0.02 * $ft1) * $fpump",
+              "(0.018 * $ft1) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft1) * $fpump",
+              "((-0.068 - 0.006) * $ft1) * $fpump",
+              0
+             ],
+             "material": "hydrant_yellow"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft1) * $fpump",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatSilverF",
+           "children": [
+            {
+             "name": "CupSilverF",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.068 - 0.004) * $ft2) * $fpump",
+               0
+              ],
+              [
+               "(0.068 * $ft2) * $fpump",
+               "(0.004 * $ft2) * $fpump"
+              ],
+              [
+               "(0.068 * $ft2) * $fpump",
+               "((0.045 - 0.006) * $ft2) * $fpump"
+              ],
+              [
+               "((0.068 - 0.006) * $ft2) * $fpump",
+               "(0.045 * $ft2) * $fpump"
+              ],
+              [
+               0,
+               "(0.045 * $ft2) * $fpump"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_silver"
+            },
+            {
+             "name": "Lug_TSilverF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft2) * $fpump",
+              "(0.02 * $ft2) * $fpump",
+              "(0.018 * $ft2) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft2) * $fpump",
+              "((0.068 + 0.006) * $ft2) * $fpump",
+              0
+             ],
+             "material": "hydrant_silver"
+            },
+            {
+             "name": "Lug_BSilverF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft2) * $fpump",
+              "(0.02 * $ft2) * $fpump",
+              "(0.018 * $ft2) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft2) * $fpump",
+              "((-0.068 - 0.006) * $ft2) * $fpump",
+              0
+             ],
+             "material": "hydrant_silver"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft2) * $fpump",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatWhiteF",
+           "children": [
+            {
+             "name": "CupWhiteF",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.068 - 0.004) * $ft3) * $fpump",
+               0
+              ],
+              [
+               "(0.068 * $ft3) * $fpump",
+               "(0.004 * $ft3) * $fpump"
+              ],
+              [
+               "(0.068 * $ft3) * $fpump",
+               "((0.045 - 0.006) * $ft3) * $fpump"
+              ],
+              [
+               "((0.068 - 0.006) * $ft3) * $fpump",
+               "(0.045 * $ft3) * $fpump"
+              ],
+              [
+               0,
+               "(0.045 * $ft3) * $fpump"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_white"
+            },
+            {
+             "name": "Lug_TWhiteF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft3) * $fpump",
+              "(0.02 * $ft3) * $fpump",
+              "(0.018 * $ft3) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft3) * $fpump",
+              "((0.068 + 0.006) * $ft3) * $fpump",
+              0
+             ],
+             "material": "hydrant_white"
+            },
+            {
+             "name": "Lug_BWhiteF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft3) * $fpump",
+              "(0.02 * $ft3) * $fpump",
+              "(0.018 * $ft3) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft3) * $fpump",
+              "((-0.068 - 0.006) * $ft3) * $fpump",
+              0
+             ],
+             "material": "hydrant_white"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft3) * $fpump",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatBlueF",
+           "children": [
+            {
+             "name": "CupBlueF",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.068 - 0.004) * $ft4) * $fpump",
+               0
+              ],
+              [
+               "(0.068 * $ft4) * $fpump",
+               "(0.004 * $ft4) * $fpump"
+              ],
+              [
+               "(0.068 * $ft4) * $fpump",
+               "((0.045 - 0.006) * $ft4) * $fpump"
+              ],
+              [
+               "((0.068 - 0.006) * $ft4) * $fpump",
+               "(0.045 * $ft4) * $fpump"
+              ],
+              [
+               0,
+               "(0.045 * $ft4) * $fpump"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_blue"
+            },
+            {
+             "name": "Lug_TBlueF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft4) * $fpump",
+              "(0.02 * $ft4) * $fpump",
+              "(0.018 * $ft4) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft4) * $fpump",
+              "((0.068 + 0.006) * $ft4) * $fpump",
+              0
+             ],
+             "material": "hydrant_blue"
+            },
+            {
+             "name": "Lug_BBlueF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft4) * $fpump",
+              "(0.02 * $ft4) * $fpump",
+              "(0.018 * $ft4) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft4) * $fpump",
+              "((-0.068 - 0.006) * $ft4) * $fpump",
+              0
+             ],
+             "material": "hydrant_blue"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft4) * $fpump",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatGreenF",
+           "children": [
+            {
+             "name": "CupGreenF",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.068 - 0.004) * $ft5) * $fpump",
+               0
+              ],
+              [
+               "(0.068 * $ft5) * $fpump",
+               "(0.004 * $ft5) * $fpump"
+              ],
+              [
+               "(0.068 * $ft5) * $fpump",
+               "((0.045 - 0.006) * $ft5) * $fpump"
+              ],
+              [
+               "((0.068 - 0.006) * $ft5) * $fpump",
+               "(0.045 * $ft5) * $fpump"
+              ],
+              [
+               0,
+               "(0.045 * $ft5) * $fpump"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_green"
+            },
+            {
+             "name": "Lug_TGreenF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft5) * $fpump",
+              "(0.02 * $ft5) * $fpump",
+              "(0.018 * $ft5) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft5) * $fpump",
+              "((0.068 + 0.006) * $ft5) * $fpump",
+              0
+             ],
+             "material": "hydrant_green"
+            },
+            {
+             "name": "Lug_BGreenF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft5) * $fpump",
+              "(0.02 * $ft5) * $fpump",
+              "(0.018 * $ft5) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft5) * $fpump",
+              "((-0.068 - 0.006) * $ft5) * $fpump",
+              0
+             ],
+             "material": "hydrant_green"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft5) * $fpump",
+            0,
+            0
+           ]
+          },
+          {
+           "name": "CoatOrangeF",
+           "children": [
+            {
+             "name": "CupOrangeF",
+             "shape": "lathe",
+             "profile": [
+              [
+               0,
+               0
+              ],
+              [
+               "((0.068 - 0.004) * $ft6) * $fpump",
+               0
+              ],
+              [
+               "(0.068 * $ft6) * $fpump",
+               "(0.004 * $ft6) * $fpump"
+              ],
+              [
+               "(0.068 * $ft6) * $fpump",
+               "((0.045 - 0.006) * $ft6) * $fpump"
+              ],
+              [
+               "((0.068 - 0.006) * $ft6) * $fpump",
+               "(0.045 * $ft6) * $fpump"
+              ],
+              [
+               0,
+               "(0.045 * $ft6) * $fpump"
+              ]
+             ],
+             "segments": 16,
+             "rotate": [
+              0,
+              0,
+              -90
+             ],
+             "material": "hydrant_orange"
+            },
+            {
+             "name": "Lug_TOrangeF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft6) * $fpump",
+              "(0.02 * $ft6) * $fpump",
+              "(0.018 * $ft6) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft6) * $fpump",
+              "((0.068 + 0.006) * $ft6) * $fpump",
+              0
+             ],
+             "material": "hydrant_orange"
+            },
+            {
+             "name": "Lug_BOrangeF",
+             "shape": "box",
+             "size": [
+              "((0.045 * 0.8) * $ft6) * $fpump",
+              "(0.02 * $ft6) * $fpump",
+              "(0.018 * $ft6) * $fpump"
+             ],
+             "at": [
+              "((0.045 / 2) * $ft6) * $fpump",
+              "((-0.068 - 0.006) * $ft6) * $fpump",
+              0
+             ],
+             "material": "hydrant_orange"
+            }
+           ],
+           "at": [
+            "(0.0225 + -0.0225 * $ft6) * $fpump",
+            0,
+            0
+           ]
+          }
+         ]
+        },
+        {
+         "name": "NutF",
+         "shape": "cylinder",
+         "radius": "(0.068 * 0.42) * $fpump",
+         "height": "0.026 * $fpump",
+         "at": [
+          "(0.045 + 0.011) * $fpump",
+          0,
+          0
+         ],
+         "axis": "x",
+         "segments": 5,
+         "bevel": "0.002 * $fpump",
+         "material": "cast_iron"
+        }
+       ]
+      },
+      {
+       "name": "ChainF",
+       "shape": "tube",
+       "path": [
+        [
+         "0.072 * $fpump",
+         "(-0.068 * 0.85) * $fpump",
+         0
+        ],
+        [
+         "0.055 * $fpump",
+         "(-0.068 - 0.05) * $fpump",
+         "0.004 * $fpump"
+        ],
+        [
+         "0.03 * $fpump",
+         "(-0.068 - 0.07) * $fpump",
+         "0.006 * $fpump"
+        ],
+        [
+         "0.012 * $fpump",
+         "(-0.068 - 0.035) * $fpump",
+         "0.006 * $fpump"
+        ]
+       ],
+       "radius": "0.0045 * $fpump",
+       "segments": 6,
+       "material": "chain_steel"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

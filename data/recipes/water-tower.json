@@ -1,0 +1,1703 @@
+{
+ "version": 1,
+ "name": "water-tower",
+ "archetype": "building.water-tower",
+ "description": "An elevated water tower: a steel tank with a rounded bottom, stiffening hoops, a conical roof with a vent and a red aviation light on a finial, a central riser pipe and a balcony with brackets and railings. It stands either on splayed steel legs with concrete footings, horizontal struts and X-bracing rods, with a ladder up the front leg, or on a tapering concrete column with a flared head, a door at its foot facing +Z and slit windows.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 24,
+   "min": 10,
+   "max": 45,
+   "description": "Height of the bottom of the tank above the ground in metres."
+  },
+  {
+   "name": "tankRadius",
+   "type": "number",
+   "default": 5,
+   "min": 3,
+   "max": 9,
+   "description": "Radius of the tank."
+  },
+  {
+   "name": "tankHeight",
+   "type": "number",
+   "default": 6,
+   "min": 3,
+   "max": 12,
+   "description": "Height of the straight wall of the tank."
+  },
+  {
+   "name": "style",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 = steel legs with bracing, 1 = a concrete column."
+  },
+  {
+   "name": "legs",
+   "type": "integer",
+   "default": 6,
+   "min": 3,
+   "max": 10,
+   "description": "Number of legs (style 0)."
+  },
+  {
+   "name": "roofRise",
+   "type": "number",
+   "default": 0.4,
+   "min": 0.1,
+   "max": 0.8,
+   "description": "Rise of the conical roof as a share of the tank radius."
+  },
+  {
+   "name": "balcony",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A balcony with railings around the foot of the tank."
+  },
+  {
+   "name": "ladder",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A ladder up the front leg (style 0 only)."
+  }
+ ],
+ "materials": {
+  "wt_paint": {
+   "color": [
+    0.26,
+    0.36,
+    0.42
+   ],
+   "metallic": 0.55,
+   "roughness": 0.42
+  },
+  "wt_steel": {
+   "color": [
+    0.3,
+    0.34,
+    0.37
+   ],
+   "metallic": 0.7,
+   "roughness": 0.45
+  },
+  "wt_dark": {
+   "color": [
+    0.04,
+    0.045,
+    0.05
+   ],
+   "metallic": 0.6,
+   "roughness": 0.5
+  },
+  "wt_concrete": {
+   "color": [
+    0.19,
+    0.18,
+    0.17
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "concrete"
+  },
+  "wt_brick": {
+   "color": [
+    0.25,
+    0.09,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "brick"
+  },
+  "wt_window": {
+   "color": [
+    0.02,
+    0.025,
+    0.03
+   ],
+   "metallic": 0.2,
+   "roughness": 0.15
+  },
+  "wt_door": {
+   "color": [
+    0.05,
+    0.12,
+    0.1
+   ],
+   "metallic": 0.4,
+   "roughness": 0.5
+  },
+  "wt_light": {
+   "color": [
+    0.6,
+    0.02,
+    0.01
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    0.6,
+    0.02,
+    0.01
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "WaterTower",
+   "vars": {
+    "Hb": "$height",
+    "Rt": "$tankRadius",
+    "Ht": "$tankHeight",
+    "nl": "$legs",
+    "bw": "$tankRadius * 0.35",
+    "Hl": "$height + $tankRadius * 0.35",
+    "Rl": "$tankRadius * 0.92",
+    "Rf": "$tankRadius * 0.92 + ($height + $tankRadius * 0.35) * 0.09",
+    "lr": "0.12 + $tankRadius * 0.03",
+    "np": "max(2, round(($height + $tankRadius * 0.35) / 8))",
+    "Rc": "max(1.6, $tankRadius * 0.38)",
+    "flegs": "max(0.03, 1 - $style)",
+    "fcol": "max(0.03, $style)",
+    "fbal": "max(0.03, $balcony)",
+    "flad": "max(0.03, (1 - $style) * $ladder)"
+   },
+   "children": [
+    {
+     "name": "Tank",
+     "material": "wt_paint",
+     "children": [
+      {
+       "name": "Vessel",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         "$Hb"
+        ],
+        [
+         "$Rt * 0.2588",
+         "$Hb + $bw * 0.0341"
+        ],
+        [
+         "$Rt * 0.5",
+         "$Hb + $bw * 0.134"
+        ],
+        [
+         "$Rt * 0.7071",
+         "$Hb + $bw * 0.2929"
+        ],
+        [
+         "$Rt * 0.866",
+         "$Hb + $bw * 0.5"
+        ],
+        [
+         "$Rt * 0.9659",
+         "$Hb + $bw * 0.7412"
+        ],
+        [
+         "$Rt * 1.0",
+         "$Hb + $bw * 1.0"
+        ],
+        [
+         "$Rt",
+         "$Hb + $bw + $Ht"
+        ],
+        [
+         0,
+         "$Hb + $bw + $Ht"
+        ]
+       ],
+       "segments": 40
+      },
+      {
+       "name": "Hoop_{i}",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$Rt - 0.05",
+         "$Hb + $bw + $Ht * ($i + 1) / 4 - 0.06"
+        ],
+        [
+         "$Rt + 0.05",
+         "$Hb + $bw + $Ht * ($i + 1) / 4 - 0.06"
+        ],
+        [
+         "$Rt + 0.05",
+         "$Hb + $bw + $Ht * ($i + 1) / 4 + 0.06"
+        ],
+        [
+         "$Rt - 0.05",
+         "$Hb + $bw + $Ht * ($i + 1) / 4 + 0.06"
+        ],
+        [
+         "$Rt - 0.05",
+         "$Hb + $bw + $Ht * ($i + 1) / 4 - 0.06"
+        ]
+       ],
+       "segments": 40,
+       "caps": false,
+       "repeat": {
+        "count": 3,
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "material": "wt_steel"
+      },
+      {
+       "name": "Roof",
+       "children": [
+        {
+         "name": "Cone",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           "$Hb + $bw + $Ht - 0.05"
+          ],
+          [
+           "$Rt + 0.25",
+           "$Hb + $bw + $Ht - 0.05"
+          ],
+          [
+           "$Rt + 0.25",
+           "$Hb + $bw + $Ht + 0.15"
+          ],
+          [
+           0.6,
+           "$Hb + $bw + $Ht + 0.15 + ($Rt + 0.25) * $roofRise"
+          ],
+          [
+           0,
+           "$Hb + $bw + $Ht + 0.15 + ($Rt + 0.25) * $roofRise"
+          ]
+         ],
+         "segments": 40,
+         "material": "wt_steel"
+        },
+        {
+         "name": "Vent",
+         "shape": "cylinder",
+         "radius": 0.45,
+         "height": 0.6,
+         "at": [
+          0,
+          "$Hb + $bw + $Ht + 0.1 + ($Rt + 0.25) * $roofRise",
+          0
+         ],
+         "anchor": "base",
+         "segments": 16,
+         "material": "wt_paint"
+        },
+        {
+         "name": "VentCap",
+         "shape": "cylinder",
+         "radius": 0.7,
+         "height": 0.15,
+         "at": [
+          0,
+          "$Hb + $bw + $Ht + 0.7 + ($Rt + 0.25) * $roofRise",
+          0
+         ],
+         "anchor": "base",
+         "segments": 16,
+         "bevel": 0.04,
+         "material": "wt_steel"
+        },
+        {
+         "name": "AntennaMast",
+         "shape": "cylinder",
+         "radius": 0.06,
+         "height": 1.6,
+         "at": [
+          0,
+          "$Hb + $bw + $Ht + 0.8 + ($Rt + 0.25) * $roofRise",
+          0
+         ],
+         "anchor": "base",
+         "segments": 8,
+         "material": "wt_dark"
+        },
+        {
+         "name": "BeaconLight",
+         "shape": "ellipsoid",
+         "radii": [
+          0.16,
+          0.16,
+          0.16
+         ],
+         "at": [
+          0,
+          "$Hb + $bw + $Ht + 2.45 + ($Rt + 0.25) * $roofRise",
+          0
+         ],
+         "segments": 12,
+         "material": "wt_light"
+        }
+       ]
+      },
+      {
+       "name": "Riser",
+       "shape": "cylinder",
+       "radius": 0.55,
+       "height": "$Hb + 0.3",
+       "anchor": "base",
+       "segments": 16,
+       "material": "wt_steel"
+      }
+     ]
+    },
+    {
+     "name": "Legs",
+     "material": "wt_paint",
+     "children": [
+      {
+       "name": "Leg_{i}",
+       "shape": "tube",
+       "path": [
+        [
+         "($Rf - ($Rf - $Rl) * 0.3 / $Hl) * $flegs",
+         "0.3 * $flegs",
+         0
+        ],
+        [
+         "($Rl) * $flegs",
+         "($Hl) * $flegs",
+         0
+        ]
+       ],
+       "radius": "($lr) * $flegs",
+       "segments": 16,
+       "repeat": {
+        "count": "$nl",
+        "around": "y",
+        "phase": -90
+       }
+      },
+      {
+       "name": "Footing_{i}",
+       "shape": "cylinder",
+       "radius": "($lr * 2.4) * $flegs",
+       "height": "0.5 * $flegs",
+       "at": [
+        "($Rf) * $flegs",
+        0,
+        0
+       ],
+       "anchor": "base",
+       "segments": 16,
+       "bevel": "0.05 * $flegs",
+       "repeat": {
+        "count": "$nl",
+        "around": "y",
+        "phase": -90
+       },
+       "material": "wt_concrete"
+      },
+      {
+       "name": "Bay_{i}",
+       "repeat": {
+        "count": "$nl",
+        "around": "y",
+        "phase": -90
+       },
+       "children": [
+        {
+         "name": "Level_{i}",
+         "repeat": {
+          "count": "$np - 1",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "children": [
+          {
+           "name": "Strut",
+           "shape": "tube",
+           "path": [
+            [
+             "(($Rf + ($Rl - $Rf) * ($yk) / $Hl)) * $flegs",
+             "($yk) * $flegs",
+             0
+            ],
+            [
+             "(($Rf + ($Rl - $Rf) * ($yk) / $Hl) * cos(rad(360 / $nl))) * $flegs",
+             "($yk) * $flegs",
+             "(-($Rf + ($Rl - $Rf) * ($yk) / $Hl) * sin(rad(360 / $nl))) * $flegs"
+            ]
+           ],
+           "radius": "0.13 * $flegs",
+           "segments": 8,
+           "vars": {
+            "yk": "$Hl * ($i + 1) / $np"
+           }
+          }
+         ]
+        },
+        {
+         "name": "Panel_{i}",
+         "repeat": {
+          "count": "$np",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "children": [
+          {
+           "name": "RodA",
+           "shape": "tube",
+           "path": [
+            [
+             "(($Rf + ($Rl - $Rf) * ($ya) / $Hl)) * $flegs",
+             "($ya) * $flegs",
+             0
+            ],
+            [
+             "(($Rf + ($Rl - $Rf) * ($yb) / $Hl) * cos(rad(360 / $nl))) * $flegs",
+             "($yb) * $flegs",
+             "(-($Rf + ($Rl - $Rf) * ($yb) / $Hl) * sin(rad(360 / $nl))) * $flegs"
+            ]
+           ],
+           "radius": "0.05 * $flegs",
+           "segments": 6,
+           "vars": {
+            "ya": "$Hl * $i / $np + 0.4",
+            "yb": "$Hl * ($i + 1) / $np - 0.4"
+           },
+           "material": "wt_steel"
+          },
+          {
+           "name": "RodB",
+           "shape": "tube",
+           "path": [
+            [
+             "(($Rf + ($Rl - $Rf) * ($yb) / $Hl)) * $flegs",
+             "($yb) * $flegs",
+             0
+            ],
+            [
+             "(($Rf + ($Rl - $Rf) * ($ya) / $Hl) * cos(rad(360 / $nl))) * $flegs",
+             "($ya) * $flegs",
+             "(-($Rf + ($Rl - $Rf) * ($ya) / $Hl) * sin(rad(360 / $nl))) * $flegs"
+            ]
+           ],
+           "radius": "0.05 * $flegs",
+           "segments": 6,
+           "vars": {
+            "ya": "$Hl * $i / $np + 0.4",
+            "yb": "$Hl * ($i + 1) / $np - 0.4"
+           },
+           "material": "wt_steel"
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "at": [
+      0,
+      "$Hb + $bw + $Ht / 2 + ((0) - ($Hb + $bw + $Ht / 2)) * $flegs",
+      0
+     ]
+    },
+    {
+     "name": "Column",
+     "children": [
+      {
+       "name": "Pedestal",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         "($Rc + 0.5) * $fcol",
+         0
+        ],
+        [
+         "($Rc + 0.5) * $fcol",
+         "0.8 * $fcol"
+        ],
+        [
+         "($Rc + 0.2) * $fcol",
+         "1.0 * $fcol"
+        ],
+        [
+         "($Rc) * $fcol",
+         "1.2 * $fcol"
+        ],
+        [
+         "($Rc * 0.92) * $fcol",
+         "($Hb * 0.8) * $fcol"
+        ],
+        [
+         "($Rc * 1.15) * $fcol",
+         "($Hb * 0.92) * $fcol"
+        ],
+        [
+         "($Rt * 0.8) * $fcol",
+         "($Hb + $bw * 0.6) * $fcol"
+        ],
+        [
+         "($Rt * 0.8) * $fcol",
+         "($Hb + $bw + 0.2) * $fcol"
+        ],
+        [
+         0,
+         "($Hb + $bw + 0.2) * $fcol"
+        ]
+       ],
+       "segments": 40,
+       "material": "wt_concrete"
+      },
+      {
+       "name": "Door",
+       "at": [
+        "-0.6 * $fcol",
+        "0.8 * $fcol",
+        "($Rc + 0.18) * $fcol"
+       ],
+       "children": [
+        {
+         "name": "Leaf",
+         "shape": "box",
+         "size": [
+          "1.2 * $fcol",
+          "2.3 * $fcol",
+          "0.08 * $fcol"
+         ],
+         "at": [
+          "0.6 * $fcol",
+          "1.15 * $fcol",
+          0
+         ],
+         "bevel": "0.01 * $fcol",
+         "material": "wt_door"
+        }
+       ]
+      },
+      {
+       "name": "DoorFrame",
+       "shape": "box",
+       "size": [
+        "1.6 * $fcol",
+        "2.7 * $fcol",
+        "0.3 * $fcol"
+       ],
+       "at": [
+        0,
+        "2.05 * $fcol",
+        "($Rc + 0.05) * $fcol"
+       ],
+       "bevel": "0.03 * $fcol",
+       "material": "wt_concrete"
+      },
+      {
+       "name": "Window_{i}",
+       "shape": "box",
+       "size": [
+        "0.35 * $fcol",
+        "1.6 * $fcol",
+        "0.3 * $fcol"
+       ],
+       "at": [
+        0,
+        "(4.5 + $i * 4) * $fcol",
+        "($Rc * 0.94) * $fcol"
+       ],
+       "repeat": {
+        "count": "max(1, floor(($Hb * 0.8 - 5) / 4))",
+        "step": [
+         0,
+         "4 * $fcol",
+         "(-$Rc * 0.08 * 4 / ($Hb * 0.8)) * $fcol"
+        ]
+       },
+       "material": "wt_window"
+      }
+     ],
+     "at": [
+      0,
+      "$Hb + $bw + $Ht / 2 + ((0) - ($Hb + $bw + $Ht / 2)) * $fcol",
+      0
+     ]
+    },
+    {
+     "name": "Balcony",
+     "at": [
+      0,
+      "$Hb + $bw + $Ht / 2 + (($Hb + $bw) - ($Hb + $bw + $Ht / 2)) * $fbal",
+      0
+     ],
+     "children": [
+      {
+       "name": "Deck",
+       "shape": "lathe",
+       "profile": [
+        [
+         "($Rt - 0.2) * $fbal",
+         "-0.12 * $fbal"
+        ],
+        [
+         "($Rt + 1.0) * $fbal",
+         "-0.12 * $fbal"
+        ],
+        [
+         "($Rt + 1.0) * $fbal",
+         0
+        ],
+        [
+         "($Rt - 0.2) * $fbal",
+         0
+        ],
+        [
+         "($Rt - 0.2) * $fbal",
+         "-0.12 * $fbal"
+        ]
+       ],
+       "segments": 40,
+       "caps": false,
+       "material": "wt_steel"
+      },
+      {
+       "name": "Bracket_{i}",
+       "shape": "box",
+       "size": [
+        "1.2 * $fbal",
+        "0.5 * $fbal",
+        "0.1 * $fbal"
+       ],
+       "at": [
+        "($Rt + 0.4) * $fbal",
+        "-0.36 * $fbal",
+        0
+       ],
+       "repeat": {
+        "count": 12,
+        "around": "y",
+        "phase": 15
+       },
+       "material": "wt_steel"
+      },
+      {
+       "name": "Stanchion_{i}",
+       "shape": "cylinder",
+       "radius": "0.03 * $fbal",
+       "height": "1.1 * $fbal",
+       "at": [
+        "($Rt + 0.96) * $fbal",
+        0,
+        0
+       ],
+       "anchor": "base",
+       "segments": 6,
+       "repeat": {
+        "count": "round(2 * pi * ($Rt + 1) / 1.2)",
+        "around": "y"
+       },
+       "material": "wt_dark"
+      },
+      {
+       "name": "Handrail",
+       "shape": "lathe",
+       "profile": [
+        [
+         "($Rt + 0.93) * $fbal",
+         "1.06 * $fbal"
+        ],
+        [
+         "($Rt + 0.99) * $fbal",
+         "1.06 * $fbal"
+        ],
+        [
+         "($Rt + 0.99) * $fbal",
+         "1.12 * $fbal"
+        ],
+        [
+         "($Rt + 0.93) * $fbal",
+         "1.12 * $fbal"
+        ],
+        [
+         "($Rt + 0.93) * $fbal",
+         "1.06 * $fbal"
+        ]
+       ],
+       "segments": 40,
+       "caps": false,
+       "material": "wt_dark"
+      },
+      {
+       "name": "Kneerail",
+       "shape": "lathe",
+       "profile": [
+        [
+         "($Rt + 0.94) * $fbal",
+         "0.54 * $fbal"
+        ],
+        [
+         "($Rt + 0.98) * $fbal",
+         "0.54 * $fbal"
+        ],
+        [
+         "($Rt + 0.98) * $fbal",
+         "0.58 * $fbal"
+        ],
+        [
+         "($Rt + 0.94) * $fbal",
+         "0.58 * $fbal"
+        ],
+        [
+         "($Rt + 0.94) * $fbal",
+         "0.54 * $fbal"
+        ]
+       ],
+       "segments": 40,
+       "caps": false,
+       "material": "wt_dark"
+      }
+     ]
+    },
+    {
+     "name": "Ladder",
+     "rotate": [
+      0,
+      -90,
+      0
+     ],
+     "material": "wt_dark",
+     "children": [
+      {
+       "name": "Rail_L",
+       "shape": "tube",
+       "path": [
+        [
+         "($Rf + 0.45) * $flad",
+         "0.5 * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rl + 0.45) * $flad",
+         "($Hl + 1.1) * $flad",
+         "0.25 * $flad"
+        ]
+       ],
+       "radius": "0.035 * $flad",
+       "segments": 6,
+       "mirror": "Rail_R"
+      },
+      {
+       "name": "Rungs",
+       "shape": "tube",
+       "path": [
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 0 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 0 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 0 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 0 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 1 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 1 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 1 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 1 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 2 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 2 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 2 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 2 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 3 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 3 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 3 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 3 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 4 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 4 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 4 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 4 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 5 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 5 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 5 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 5 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 6 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 6 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 6 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 6 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 7 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 7 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 7 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 7 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 8 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 8 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 8 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 8 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 9 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 9 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 9 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 9 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 10 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 10 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 10 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 10 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 11 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 11 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 11 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 11 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 12 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 12 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 12 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 12 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 13 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 13 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 13 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 13 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 14 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 14 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 14 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 14 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 15 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 15 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 15 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 15 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 16 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 16 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 16 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 16 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 17 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 17 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 17 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 17 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 18 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 18 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 18 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 18 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 19 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 19 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 19 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 19 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 20 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 20 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 20 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 20 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 21 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 21 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 21 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 21 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 22 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 22 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 22 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 22 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 23 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 23 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 23 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 23 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 24 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 24 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 24 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 24 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 25 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 25 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 25 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 25 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 26 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 26 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 26 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 26 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 27 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 27 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 27 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 27 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 28 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 28 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 28 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 28 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 29 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 29 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 29 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 29 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 30 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 30 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 30 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 30 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 31 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 31 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 31 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 31 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 32 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 32 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 32 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 32 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 33 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 33 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 33 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 33 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 34 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 34 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 34 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 34 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 35 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 35 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 35 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 35 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 36 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 36 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 36 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 36 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 37 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 37 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 37 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 37 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 38 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 38 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 38 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 38 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 39 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 39 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 39 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 39 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 40 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 40 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 40 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 40 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 41 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 41 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 41 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 41 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 42 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 42 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 42 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 42 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 43 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 43 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 43 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 43 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 44 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 44 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 44 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 44 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 45 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 45 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 45 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 45 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 46 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 46 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 46 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 46 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 47 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 47 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 47 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 47 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 48 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 48 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 48 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 48 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 49 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 49 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 49 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 49 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 50 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 50 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 50 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 50 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 51 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 51 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 51 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 51 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 52 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 52 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 52 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 52 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 53 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 53 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 53 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 53 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 54 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 54 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 54 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 54 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 55 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 55 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 55 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 55 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 56 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 56 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 56 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 56 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 57 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 57 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 57 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 57 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 58 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 58 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 58 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 58 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 59 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 59 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 59 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 59 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 60 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 60 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 60 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 60 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 61 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 61 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 61 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 61 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 62 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 62 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 62 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 62 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 63 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 63 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 63 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 63 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 64 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 64 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 64 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 64 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 65 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 65 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 65 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 65 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 66 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 66 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 66 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 66 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 67 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 67 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 67 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 67 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 68 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 68 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 68 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 68 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 69 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 69 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 69 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 69 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 70 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 70 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 70 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 70 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 71 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 71 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 71 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 71 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 72 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 72 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 72 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 72 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 73 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 73 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 73 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 73 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 74 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 74 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 74 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 74 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 75 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 75 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 75 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 75 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 76 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 76 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 76 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 76 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 77 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 77 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 77 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 77 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 78 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 78 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 78 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 78 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 79 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 79 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 79 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 79 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 80 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 80 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 80 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 80 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 81 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 81 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 81 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 81 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 82 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 82 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 82 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 82 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 83 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 83 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 83 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 83 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 84 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 84 * ($Hl - 0.3) / 85) * $flad",
+         "-0.25 * $flad"
+        ],
+        [
+         "($Rf + 0.45 + ($Rl - $Rf) * (0.8 + 84 * ($Hl - 0.3) / 85) / $Hl) * $flad",
+         "(0.8 + 84 * ($Hl - 0.3) / 85) * $flad",
+         "0.25 * $flad"
+        ]
+       ],
+       "radius": "0.02 * $flad",
+       "segments": 4
+      },
+      {
+       "name": "Stay_{i}",
+       "shape": "tube",
+       "path": [
+        [
+         "($Rf + 0.47) * $flad",
+         "2.5 * $flad",
+         "0.25 * $flad"
+        ],
+        [
+         "($Rf) * $flad",
+         "2.5 * $flad",
+         "0.25 * $flad"
+        ]
+       ],
+       "radius": "0.03 * $flad",
+       "at": [
+        "(($Rl - $Rf) * 0.0) * $flad",
+        0,
+        0
+       ],
+       "segments": 6,
+       "repeat": {
+        "count": "max(1, floor($Hl / 5))",
+        "step": [
+         "(($Rl - $Rf) * 5 / $Hl) * $flad",
+         "5 * $flad",
+         0
+        ]
+       }
+      }
+     ],
+     "at": [
+      0,
+      "$Hb + $bw + $Ht / 2 + ((0) - ($Hb + $bw + $Ht / 2)) * $flad",
+      0
+     ]
+    }
+   ]
+  }
+ ]
+}

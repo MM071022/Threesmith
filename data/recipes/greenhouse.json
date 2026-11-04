@@ -1,0 +1,1330 @@
+{
+ "version": 1,
+ "name": "greenhouse",
+ "archetype": "building.greenhouse",
+ "description": "A garden greenhouse with its door at the +Z gable: a brick base wall with a concrete floor and path, an aluminium frame of studs, sills, eaves and transoms with glass side walls, a gable roof (glass slopes, rafters and a ridge bar) or an arched roof (a curved glass shell on hoops), glazed gable ends, a sliding glass door on a track, hinged roof vents that open about the ridge, and staging with a shelf and potted plants along one side.",
+ "params": [
+  {
+   "name": "length",
+   "type": "number",
+   "default": 3.8,
+   "min": 1.9,
+   "max": 12,
+   "description": "Length from the door to the back (z) in metres."
+  },
+  {
+   "name": "width",
+   "type": "number",
+   "default": 2.5,
+   "min": 1.9,
+   "max": 4.5,
+   "description": "Width (x)."
+  },
+  {
+   "name": "eaveHeight",
+   "type": "number",
+   "default": 1.6,
+   "min": 1.4,
+   "max": 2.4,
+   "description": "Height of the eaves."
+  },
+  {
+   "name": "roofPitch",
+   "type": "number",
+   "default": 28,
+   "min": 18,
+   "max": 40,
+   "description": "Pitch of the roof in degrees (the arched roof rises as much)."
+  },
+  {
+   "name": "roofStyle",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 = a gable roof, 1 = an arched roof."
+  },
+  {
+   "name": "baseHeight",
+   "type": "number",
+   "default": 0.3,
+   "min": 0.05,
+   "max": 0.7,
+   "description": "Height of the brick base wall."
+  },
+  {
+   "name": "vents",
+   "type": "integer",
+   "default": 1,
+   "min": 1,
+   "max": 4,
+   "description": "Roof vents on the +x side (they fit the length)."
+  },
+  {
+   "name": "ventOpen",
+   "type": "number",
+   "default": 15,
+   "min": 0,
+   "max": 45,
+   "description": "How far the vents are open, in degrees."
+  },
+  {
+   "name": "doorOpen",
+   "type": "number",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "description": "0 = door closed, 1 = slid fully open to +x."
+  },
+  {
+   "name": "staging",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "Staging with potted plants along the -x side."
+  }
+ ],
+ "materials": {
+  "gh_alu": {
+   "color": [
+    0.62,
+    0.64,
+    0.66
+   ],
+   "metallic": 0.9,
+   "roughness": 0.3
+  },
+  "gh_glass": {
+   "color": [
+    0.7,
+    0.8,
+    0.82,
+    0.18
+   ],
+   "metallic": 0,
+   "roughness": 0.03,
+   "alpha": "BLEND",
+   "doubleSided": true
+  },
+  "gh_brick": {
+   "color": [
+    0.22,
+    0.08,
+    0.045
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "brick"
+  },
+  "gh_coping": {
+   "color": [
+    0.2,
+    0.19,
+    0.18
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "gh_staging": {
+   "color": [
+    0.16,
+    0.1,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  },
+  "gh_pot": {
+   "color": [
+    0.36,
+    0.12,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "gh_soil": {
+   "color": [
+    0.06,
+    0.04,
+    0.025
+   ],
+   "metallic": 0,
+   "roughness": 1
+  },
+  "gh_leaf": {
+   "color": [
+    0.06,
+    0.2,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.7,
+   "texture": "leaf"
+  },
+  "gh_floor": {
+   "color": [
+    0.12,
+    0.115,
+    0.11
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "gh_rubber": {
+   "color": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.8
+  }
+ },
+ "nodes": [
+  {
+   "name": "Greenhouse",
+   "vars": {
+    "L": "$length",
+    "W": "$width",
+    "He": "$eaveHeight",
+    "hb": "$baseHeight",
+    "rise": "$width / 2 * tan(rad($roofPitch))",
+    "yr": "$eaveHeight + $width / 2 * tan(rad($roofPitch))",
+    "Ra": "(pow($width / 2, 2) + pow($width / 2 * tan(rad($roofPitch)), 2)) / (2 * $width / 2 * tan(rad($roofPitch)))",
+    "yc": "$eaveHeight + $width / 2 * tan(rad($roofPitch)) - (pow($width / 2, 2) + pow($width / 2 * tan(rad($roofPitch)), 2)) / (2 * $width / 2 * tan(rad($roofPitch)))",
+    "th": "asin(($width / 2) / ((pow($width / 2, 2) + pow($width / 2 * tan(rad($roofPitch)), 2)) / (2 * $width / 2 * tan(rad($roofPitch)))))",
+    "nb": "max(3, round($length / 0.62))",
+    "s": "$length / max(3, round($length / 0.62))",
+    "vs": "max(1, floor((max(3, round($length / 0.62)) - 2) / max(1, $vents - 1)))",
+    "dw": "min(0.75, $width * 0.3)",
+    "vl": "min(0.7, $width * 0.25)",
+    "sa": "(1 - $roofStyle) * $roofPitch + $roofStyle * deg(min(0.7, $width * 0.25) / 2 / ((pow($width / 2, 2) + pow($width / 2 * tan(rad($roofPitch)), 2)) / (2 * $width / 2 * tan(rad($roofPitch)))))",
+    "fg": "max(0.005, 1 - $roofStyle)",
+    "fa": "max(0.005, $roofStyle)",
+    "fst": "max(0.005, $staging)"
+   },
+   "children": [
+    {
+     "name": "Base",
+     "children": [
+      {
+       "name": "WallSide_L",
+       "shape": "box",
+       "size": [
+        0.11,
+        "$hb",
+        "$L + 0.11"
+       ],
+       "at": [
+        "$W / 2",
+        "$hb / 2",
+        0
+       ],
+       "material": "gh_brick",
+       "mirror": "WallSide_R"
+      },
+      {
+       "name": "WallBack",
+       "shape": "box",
+       "size": [
+        "$W - 0.11",
+        "$hb",
+        0.11
+       ],
+       "at": [
+        0,
+        "$hb / 2",
+        "-$L / 2"
+       ],
+       "material": "gh_brick"
+      },
+      {
+       "name": "WallFront_L",
+       "shape": "box",
+       "size": [
+        "($W - $dw) / 2 - 0.08",
+        "$hb",
+        0.11
+       ],
+       "at": [
+        "($W + $dw) / 4 + 0.02",
+        "$hb / 2",
+        "$L / 2"
+       ],
+       "material": "gh_brick",
+       "mirror": "WallFront_R"
+      },
+      {
+       "name": "Threshold",
+       "shape": "box",
+       "size": [
+        "$dw + 0.1",
+        0.03,
+        0.14
+       ],
+       "at": [
+        0,
+        0.015,
+        "$L / 2"
+       ],
+       "material": "gh_coping"
+      },
+      {
+       "name": "Floor",
+       "shape": "box",
+       "size": [
+        "$W - 0.11",
+        0.03,
+        "$L - 0.11"
+       ],
+       "at": [
+        0,
+        0.015,
+        0
+       ],
+       "material": "gh_floor"
+      },
+      {
+       "name": "Path",
+       "shape": "box",
+       "size": [
+        "$dw",
+        0.04,
+        "$L - 0.12"
+       ],
+       "at": [
+        0,
+        0.02,
+        0
+       ],
+       "material": "gh_coping"
+      }
+     ]
+    },
+    {
+     "name": "Frame",
+     "material": "gh_alu",
+     "children": [
+      {
+       "name": "Stud_L_{i}",
+       "shape": "box",
+       "size": [
+        0.04,
+        "$He - $hb + 0.02",
+        0.05
+       ],
+       "at": [
+        "$W / 2",
+        "($He + $hb) / 2",
+        "-$L / 2 + $i * $s"
+       ],
+       "repeat": {
+        "count": "$nb + 1",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "mirror": "Stud_R_{i}"
+      },
+      {
+       "name": "Eave_L",
+       "shape": "box",
+       "size": [
+        0.06,
+        0.06,
+        "$L + 0.04"
+       ],
+       "at": [
+        "$W / 2",
+        "$He",
+        0
+       ],
+       "bevel": 0.008,
+       "mirror": "Eave_R"
+      },
+      {
+       "name": "Sill_L",
+       "shape": "box",
+       "size": [
+        0.06,
+        0.04,
+        "$L + 0.04"
+       ],
+       "at": [
+        "$W / 2",
+        "$hb + 0.02",
+        0
+       ],
+       "mirror": "Sill_R"
+      },
+      {
+       "name": "Transom_L",
+       "shape": "box",
+       "size": [
+        0.03,
+        0.03,
+        "$L"
+       ],
+       "at": [
+        "$W / 2 + 0.005",
+        "$hb + ($He - $hb) * 0.55",
+        0
+       ],
+       "mirror": "Transom_R"
+      },
+      {
+       "name": "SillFront",
+       "shape": "box",
+       "size": [
+        "$W",
+        0.04,
+        0.06
+       ],
+       "at": [
+        0,
+        "$hb + 0.02",
+        "$L / 2"
+       ]
+      },
+      {
+       "name": "SillBack",
+       "shape": "box",
+       "size": [
+        "$W",
+        0.04,
+        0.06
+       ],
+       "at": [
+        0,
+        "$hb + 0.02",
+        "-$L / 2"
+       ]
+      },
+      {
+       "name": "EaveFront",
+       "shape": "box",
+       "size": [
+        "$W",
+        0.05,
+        0.05
+       ],
+       "at": [
+        0,
+        "$He",
+        "$L / 2"
+       ]
+      },
+      {
+       "name": "EaveBack",
+       "shape": "box",
+       "size": [
+        "$W",
+        0.05,
+        0.05
+       ],
+       "at": [
+        0,
+        "$He",
+        "-$L / 2"
+       ]
+      },
+      {
+       "name": "DoorPost_L",
+       "shape": "box",
+       "size": [
+        0.05,
+        "$He - $hb",
+        0.06
+       ],
+       "at": [
+        "$dw / 2 + 0.03",
+        "($He + $hb) / 2",
+        "$L / 2"
+       ],
+       "mirror": "DoorPost_R"
+      },
+      {
+       "name": "BackStud_L",
+       "shape": "box",
+       "size": [
+        0.04,
+        "$He - $hb",
+        0.05
+       ],
+       "at": [
+        "$W / 4",
+        "($He + $hb) / 2",
+        "-$L / 2"
+       ],
+       "mirror": "BackStud_R"
+      }
+     ]
+    },
+    {
+     "name": "Glazing",
+     "material": "gh_glass",
+     "children": [
+      {
+       "name": "SidePane_L",
+       "shape": "box",
+       "size": [
+        0.008,
+        "$He - $hb",
+        "$L - 0.02"
+       ],
+       "at": [
+        "$W / 2 - 0.01",
+        "($He + $hb) / 2",
+        0
+       ],
+       "mirror": "SidePane_R"
+      }
+     ]
+    },
+    {
+     "name": "Roof",
+     "children": [
+      {
+       "name": "GableTop",
+       "children": [
+        {
+         "name": "RidgeBar",
+         "shape": "box",
+         "size": [
+          "0.05 * $fg",
+          "0.08 * $fg",
+          "($L + 0.08) * $fg"
+         ],
+         "at": [
+          0,
+          "($yr + 0.01) * $fg",
+          0
+         ],
+         "material": "gh_alu"
+        },
+        {
+         "name": "PaneRoof_L",
+         "shape": "box",
+         "size": [
+          "(($W / 2 + 0.06) / cos(rad($roofPitch))) * $fg",
+          "0.008 * $fg",
+          "($L) * $fg"
+         ],
+         "at": [
+          "(($W / 2 + 0.06) / cos(rad($roofPitch)) / 2 * cos(rad($roofPitch))) * $fg",
+          "($yr - ($W / 2 + 0.06) / cos(rad($roofPitch)) / 2 * sin(rad($roofPitch)) + 0.02) * $fg",
+          0
+         ],
+         "rotate": [
+          0,
+          0,
+          "-$roofPitch"
+         ],
+         "material": "gh_glass",
+         "mirror": "PaneRoof_R"
+        },
+        {
+         "name": "Rafter_{i}",
+         "shape": "tube",
+         "path": [
+          [
+           "($W / 2) * $fg",
+           "($He) * $fg",
+           "(-$L / 2 + $i * $s) * $fg"
+          ],
+          [
+           0,
+           "($yr + 0.01) * $fg",
+           "(-$L / 2 + $i * $s) * $fg"
+          ],
+          [
+           "(-$W / 2) * $fg",
+           "($He) * $fg",
+           "(-$L / 2 + $i * $s) * $fg"
+          ]
+         ],
+         "radius": "0.022 * $fg",
+         "segments": 6,
+         "repeat": {
+          "count": "$nb + 1",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "material": "gh_alu"
+        },
+        {
+         "name": "GableFront",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": "($L / 2 - 0.012) * $fg",
+           "points": [
+            [
+             "(-$W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($He) * $fg"
+            ],
+            [
+             0,
+             "($yr) * $fg"
+            ],
+            [
+             "(-$W / 2) * $fg",
+             "($He) * $fg"
+            ]
+           ]
+          },
+          {
+           "z": "($L / 2 - 0.004) * $fg",
+           "points": [
+            [
+             "(-$W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($He) * $fg"
+            ],
+            [
+             0,
+             "($yr) * $fg"
+            ],
+            [
+             "(-$W / 2) * $fg",
+             "($He) * $fg"
+            ]
+           ]
+          }
+         ],
+         "material": "gh_glass"
+        },
+        {
+         "name": "GableBack",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": "(-$L / 2 + 0.004) * $fg",
+           "points": [
+            [
+             "(-$W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($He) * $fg"
+            ],
+            [
+             0,
+             "($yr) * $fg"
+            ],
+            [
+             "(-$W / 2) * $fg",
+             "($He) * $fg"
+            ]
+           ]
+          },
+          {
+           "z": "(-$L / 2 + 0.012) * $fg",
+           "points": [
+            [
+             "(-$W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($hb) * $fg"
+            ],
+            [
+             "($W / 2) * $fg",
+             "($He) * $fg"
+            ],
+            [
+             0,
+             "($yr) * $fg"
+            ],
+            [
+             "(-$W / 2) * $fg",
+             "($He) * $fg"
+            ]
+           ]
+          }
+         ],
+         "material": "gh_glass"
+        }
+       ],
+       "at": [
+        "$W / 2 + ((0) - ($W / 2)) * $fg",
+        "$hb / 2 + ((0) - ($hb / 2)) * $fg",
+        0
+       ]
+      },
+      {
+       "name": "ArchTop",
+       "children": [
+        {
+         "name": "PaneArch_{i}",
+         "shape": "box",
+         "size": [
+          "(2 * $Ra * sin($th / 8) + 0.012) * $fa",
+          "0.008 * $fa",
+          "($L) * $fa"
+         ],
+         "at": [
+          "($Ra * cos($th / 8) * sin($th * (($i + 0.5) / 4 - 1))) * $fa",
+          "($yc + $Ra * cos($th / 8) * cos($th * (($i + 0.5) / 4 - 1))) * $fa",
+          0
+         ],
+         "rotate": [
+          0,
+          0,
+          "-deg($th * (($i + 0.5) / 4 - 1))"
+         ],
+         "repeat": {
+          "count": 8,
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "material": "gh_glass"
+        },
+        {
+         "name": "Hoop_{i}",
+         "shape": "tube",
+         "path": [
+          [
+           "(($Ra - -0.015) * sin($th * (0 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (0 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (1 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (1 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (2 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (2 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (3 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (3 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (4 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (4 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (5 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (5 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (6 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (6 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (7 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (7 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ],
+          [
+           "(($Ra - -0.015) * sin($th * (8 / 4.0 - 1))) * $fa",
+           "($yc + ($Ra - -0.015) * cos($th * (8 / 4.0 - 1))) * $fa",
+           "(-$L / 2 + $i * $s) * $fa"
+          ]
+         ],
+         "radius": "0.022 * $fa",
+         "segments": 6,
+         "repeat": {
+          "count": "$nb + 1",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         },
+         "material": "gh_alu"
+        },
+        {
+         "name": "RidgeBar",
+         "shape": "box",
+         "size": [
+          "0.06 * $fa",
+          "0.04 * $fa",
+          "($L + 0.08) * $fa"
+         ],
+         "at": [
+          0,
+          "($yr + 0.03) * $fa",
+          0
+         ],
+         "material": "gh_alu"
+        },
+        {
+         "name": "ArchFront",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": "($L / 2 - 0.012) * $fa",
+           "points": [
+            [
+             "(-$W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "($W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (8 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (8 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (7 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (7 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (6 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (6 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (5 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (5 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (4 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (4 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (3 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (3 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (2 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (2 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (1 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (1 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (0 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (0 / 4.0 - 1))) * $fa"
+            ]
+           ]
+          },
+          {
+           "z": "($L / 2 - 0.004) * $fa",
+           "points": [
+            [
+             "(-$W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "($W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (8 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (8 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (7 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (7 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (6 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (6 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (5 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (5 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (4 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (4 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (3 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (3 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (2 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (2 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (1 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (1 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (0 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (0 / 4.0 - 1))) * $fa"
+            ]
+           ]
+          }
+         ],
+         "material": "gh_glass"
+        },
+        {
+         "name": "ArchBack",
+         "shape": "loft",
+         "sections": [
+          {
+           "z": "(-$L / 2 + 0.004) * $fa",
+           "points": [
+            [
+             "(-$W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "($W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (8 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (8 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (7 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (7 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (6 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (6 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (5 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (5 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (4 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (4 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (3 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (3 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (2 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (2 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (1 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (1 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (0 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (0 / 4.0 - 1))) * $fa"
+            ]
+           ]
+          },
+          {
+           "z": "(-$L / 2 + 0.012) * $fa",
+           "points": [
+            [
+             "(-$W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "($W / 2) * $fa",
+             "($hb) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (8 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (8 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (7 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (7 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (6 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (6 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (5 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (5 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (4 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (4 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (3 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (3 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (2 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (2 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (1 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (1 / 4.0 - 1))) * $fa"
+            ],
+            [
+             "(($Ra - 0) * sin($th * (0 / 4.0 - 1))) * $fa",
+             "($yc + ($Ra - 0) * cos($th * (0 / 4.0 - 1))) * $fa"
+            ]
+           ]
+          }
+         ],
+         "material": "gh_glass"
+        }
+       ],
+       "at": [
+        "$W / 2 + ((0) - ($W / 2)) * $fa",
+        "$hb / 2 + ((0) - ($hb / 2)) * $fa",
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Vent_{i}",
+     "at": [
+      0.03,
+      "$yr + 0.03",
+      "-$L / 2 + $s * (1 + $i * $vs)"
+     ],
+     "rotate": [
+      0,
+      0,
+      "-$sa - $ventOpen"
+     ],
+     "repeat": {
+      "count": "min($vents, $nb - 2)",
+      "step": [
+       0,
+       0,
+       0
+      ]
+     },
+     "children": [
+      {
+       "name": "VentPane",
+       "shape": "box",
+       "size": [
+        "$vl",
+        0.012,
+        "$s - 0.06"
+       ],
+       "at": [
+        "$vl / 2",
+        -0.01,
+        "$s / 2"
+       ],
+       "material": "gh_glass"
+      },
+      {
+       "name": "VentFrame",
+       "shape": "box",
+       "size": [
+        "$vl",
+        0.03,
+        0.03
+       ],
+       "at": [
+        "$vl / 2",
+        -0.005,
+        0.02
+       ],
+       "material": "gh_alu"
+      },
+      {
+       "name": "VentFrameB",
+       "shape": "box",
+       "size": [
+        "$vl",
+        0.03,
+        0.03
+       ],
+       "at": [
+        "$vl / 2",
+        -0.005,
+        "$s - 0.04"
+       ],
+       "material": "gh_alu"
+      },
+      {
+       "name": "VentArm",
+       "shape": "box",
+       "size": [
+        0.25,
+        0.015,
+        0.015
+       ],
+       "at": [
+        "$vl - 0.05",
+        -0.03,
+        "$s / 2"
+       ],
+       "rotate": [
+        0,
+        0,
+        -30
+       ],
+       "material": "gh_alu"
+      }
+     ]
+    },
+    {
+     "name": "Door",
+     "at": [
+      "$dw * $doorOpen",
+      "$hb",
+      "$L / 2 + 0.05"
+     ],
+     "children": [
+      {
+       "name": "DoorPane",
+       "shape": "box",
+       "size": [
+        "$dw",
+        "$He - $hb - 0.08",
+        0.008
+       ],
+       "at": [
+        0,
+        "($He - $hb) / 2",
+        0
+       ],
+       "material": "gh_glass"
+      },
+      {
+       "name": "DoorStile_L",
+       "shape": "box",
+       "size": [
+        0.04,
+        "$He - $hb - 0.04",
+        0.03
+       ],
+       "at": [
+        "$dw / 2",
+        "($He - $hb) / 2",
+        0
+       ],
+       "material": "gh_alu",
+       "mirror": "DoorStile_R"
+      },
+      {
+       "name": "DoorRail_{i}",
+       "shape": "box",
+       "size": [
+        "$dw",
+        0.04,
+        0.03
+       ],
+       "at": [
+        0,
+        0.04,
+        0
+       ],
+       "repeat": {
+        "count": 3,
+        "step": [
+         0,
+         "($He - $hb - 0.12) / 2",
+         0
+        ]
+       },
+       "material": "gh_alu"
+      },
+      {
+       "name": "DoorHandle",
+       "shape": "box",
+       "size": [
+        0.02,
+        0.18,
+        0.04
+       ],
+       "at": [
+        "-$dw / 2 + 0.08",
+        "($He - $hb) * 0.5",
+        0.03
+       ],
+       "material": "gh_rubber"
+      }
+     ]
+    },
+    {
+     "name": "DoorTrack",
+     "shape": "box",
+     "size": [
+      "$dw * 2 + 0.2",
+      0.05,
+      0.05
+     ],
+     "at": [
+      "$dw / 2",
+      "$He - 0.03",
+      "$L / 2 + 0.06"
+     ],
+     "material": "gh_alu"
+    },
+    {
+     "name": "Staging",
+     "at": [
+      "-$W / 2 + ((-$W / 2 + 0.35) - (-$W / 2)) * $fst",
+      "$hb / 2 + ((0) - ($hb / 2)) * $fst",
+      0
+     ],
+     "children": [
+      {
+       "name": "BenchTop",
+       "shape": "box",
+       "size": [
+        "0.55 * $fst",
+        "0.035 * $fst",
+        "($L - 0.5) * $fst"
+       ],
+       "at": [
+        0,
+        "0.78 * $fst",
+        0
+       ],
+       "material": "gh_staging"
+      },
+      {
+       "name": "BenchLeg_{i}",
+       "shape": "box",
+       "size": [
+        "0.04 * $fst",
+        "0.76 * $fst",
+        "0.04 * $fst"
+       ],
+       "at": [
+        "0.22 * $fst",
+        "0.38 * $fst",
+        "(-$L / 2 + 0.3) * $fst"
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         "($L - 0.6) * $fst"
+        ]
+       },
+       "material": "gh_staging",
+       "mirror": "BenchLegIn_{i}"
+      },
+      {
+       "name": "Shelf",
+       "shape": "box",
+       "size": [
+        "0.5 * $fst",
+        "0.025 * $fst",
+        "($L - 0.55) * $fst"
+       ],
+       "at": [
+        0,
+        "0.3 * $fst",
+        0
+       ],
+       "material": "gh_staging"
+      },
+      {
+       "name": "Pot_{i}",
+       "at": [
+        0,
+        "0.8 * $fst",
+        "(-$L / 2 + 0.5) * $fst"
+       ],
+       "repeat": {
+        "count": "max(2, floor(($L - 0.8) / 0.4))",
+        "step": [
+         0,
+         0,
+         "(($L - 1) / max(1, floor(($L - 0.8) / 0.4) - 1)) * $fst"
+        ]
+       },
+       "children": [
+        {
+         "name": "Pot",
+         "shape": "lathe",
+         "profile": [
+          [
+           0,
+           0
+          ],
+          [
+           "0.07 * $fst",
+           0
+          ],
+          [
+           "0.1 * $fst",
+           "0.15 * $fst"
+          ],
+          [
+           "0.105 * $fst",
+           "0.16 * $fst"
+          ],
+          [
+           "0.09 * $fst",
+           "0.16 * $fst"
+          ],
+          [
+           "0.088 * $fst",
+           "0.13 * $fst"
+          ],
+          [
+           0,
+           "0.13 * $fst"
+          ]
+         ],
+         "segments": 12,
+         "material": "gh_pot"
+        },
+        {
+         "name": "Plant",
+         "shape": "ellipsoid",
+         "radii": [
+          "0.13 * $fst",
+          "0.15 * $fst",
+          "0.13 * $fst"
+         ],
+         "at": [
+          0,
+          "0.25 * $fst",
+          0
+         ],
+         "lumps": 0.5,
+         "segments": 10,
+         "material": "gh_leaf"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1051 @@
+{
+ "version": 1,
+ "name": "lighthouse",
+ "archetype": "building.lighthouse",
+ "description": "A coastal lighthouse: a tapering round tower on a stone plinth with entrance steps, painted in red, black or no bands, small windows that climb in a spiral with the stair inside, a corbelled gallery with railings, a glazed lantern room with astragals, a glowing lens on a pedestal, a green domed cap with a vent ball and lightning rod, and an optional keeper's house with a tiled roof and chimney beside it. The door faces +Z.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 26,
+   "min": 12,
+   "max": 60,
+   "description": "Height of the tower up to the gallery in metres."
+  },
+  {
+   "name": "radius",
+   "type": "number",
+   "default": 3,
+   "min": 1.8,
+   "max": 5,
+   "description": "Radius of the tower at its foot."
+  },
+  {
+   "name": "taper",
+   "type": "number",
+   "default": 0.65,
+   "min": 0.45,
+   "max": 1,
+   "description": "Top radius as a share of the foot radius (1 = a straight tower)."
+  },
+  {
+   "name": "paint",
+   "type": "integer",
+   "default": 1,
+   "min": 0,
+   "max": 2,
+   "description": "Bands on the white tower: 0 none, 1 red, 2 black."
+  },
+  {
+   "name": "bands",
+   "type": "integer",
+   "default": 3,
+   "min": 1,
+   "max": 6,
+   "description": "How many coloured bands."
+  },
+  {
+   "name": "keeper",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A keeper's house beside the tower (at -x)."
+  },
+  {
+   "name": "lanternHeight",
+   "type": "number",
+   "default": 2.6,
+   "min": 1.6,
+   "max": 4,
+   "description": "Height of the glazing of the lantern room."
+  }
+ ],
+ "materials": {
+  "lh_white": {
+   "color": [
+    0.72,
+    0.71,
+    0.67
+   ],
+   "metallic": 0,
+   "roughness": 0.7,
+   "texture": "plaster"
+  },
+  "lh_red": {
+   "color": [
+    0.42,
+    0.03,
+    0.02
+   ],
+   "metallic": 0,
+   "roughness": 0.6
+  },
+  "lh_black": {
+   "color": [
+    0.03,
+    0.03,
+    0.032
+   ],
+   "metallic": 0,
+   "roughness": 0.6
+  },
+  "lh_stone": {
+   "color": [
+    0.17,
+    0.16,
+    0.145
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "stone"
+  },
+  "lh_iron": {
+   "color": [
+    0.03,
+    0.035,
+    0.035
+   ],
+   "metallic": 0.6,
+   "roughness": 0.45
+  },
+  "lh_dome": {
+   "color": [
+    0.06,
+    0.16,
+    0.12
+   ],
+   "metallic": 0.5,
+   "roughness": 0.45
+  },
+  "lh_glass": {
+   "color": [
+    0.6,
+    0.72,
+    0.75,
+    0.25
+   ],
+   "metallic": 0,
+   "roughness": 0.03,
+   "alpha": "BLEND"
+  },
+  "lh_lens": {
+   "color": [
+    1,
+    0.95,
+    0.75
+   ],
+   "metallic": 0,
+   "roughness": 0.1,
+   "emissive": [
+    1,
+    0.9,
+    0.6
+   ]
+  },
+  "lh_window": {
+   "color": [
+    0.02,
+    0.025,
+    0.03
+   ],
+   "metallic": 0.2,
+   "roughness": 0.15
+  },
+  "lh_door": {
+   "color": [
+    0.03,
+    0.12,
+    0.08
+   ],
+   "metallic": 0.1,
+   "roughness": 0.5
+  },
+  "house_wall": {
+   "color": [
+    0.7,
+    0.68,
+    0.62
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "texture": "plaster"
+  },
+  "house_roof": {
+   "color": [
+    0.32,
+    0.07,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.75,
+   "texture": "roof_tile"
+  },
+  "house_brick": {
+   "color": [
+    0.26,
+    0.09,
+    0.05
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  }
+ },
+ "nodes": [
+  {
+   "name": "Lighthouse",
+   "vars": {
+    "H": "$height",
+    "R": "$radius",
+    "Rt": "$radius * $taper",
+    "Rg": "$radius * $taper + 0.9",
+    "Rl": "min($radius * $taper * 0.72, 2.4)",
+    "hl": "$lanternHeight",
+    "hb": "($height - 1) / (2 * $bands + 1)",
+    "nw": "max(2, floor(($height - 6) / 3.5))",
+    "wy0": 5,
+    "wdy": "($height - 8) / max(2, floor(($height - 6) / 3.5))",
+    "nr": "max(16, round(2 * pi * ($radius * $taper + 0.9) / 0.5))",
+    "kw": 5.2,
+    "fred": "max(0.05, max(0, 1 - min(1, abs($paint - 1))))",
+    "fblack": "max(0.05, max(0, 1 - min(1, abs($paint - 2))))",
+    "fkeeper": "max(0.05, $keeper)"
+   },
+   "children": [
+    {
+     "name": "Plinth",
+     "material": "lh_stone",
+     "children": [
+      {
+       "name": "Base",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         "$R + 0.7",
+         0
+        ],
+        [
+         "$R + 0.7",
+         0.35
+        ],
+        [
+         "$R + 0.4",
+         0.4
+        ],
+        [
+         "$R + 0.4",
+         0.7
+        ],
+        [
+         "$R - 0.1",
+         0.75
+        ],
+        [
+         0,
+         0.75
+        ]
+       ],
+       "segments": 32
+      },
+      {
+       "name": "Step_{i}",
+       "shape": "box",
+       "size": [
+        1.8,
+        0.18,
+        0.4
+       ],
+       "at": [
+        0,
+        "0.09 + $i * 0.18",
+        "$R + 0.7 + 0.2 - $i * 0.4"
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0.18,
+         -0.4
+        ]
+       },
+       "bevel": 0.02
+      }
+     ]
+    },
+    {
+     "name": "Shaft",
+     "children": [
+      {
+       "name": "Tower",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         0.6
+        ],
+        [
+         "$R",
+         0.6
+        ],
+        [
+         "$Rt",
+         "$H"
+        ],
+        [
+         0,
+         "$H"
+        ]
+       ],
+       "segments": 32,
+       "material": "lh_white"
+      },
+      {
+       "name": "BandsRed",
+       "children": [
+        {
+         "name": "BandRed_{i}",
+         "shape": "lathe",
+         "profile": [
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 1) - 0.6) / ($H - 0.6)) - 0.06) * $fred",
+           "($hb * (2 * $i + 1)) * $fred"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 1) - 0.6) / ($H - 0.6)) + 0.012) * $fred",
+           "($hb * (2 * $i + 1)) * $fred"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 2) - 0.6) / ($H - 0.6)) + 0.012) * $fred",
+           "($hb * (2 * $i + 2)) * $fred"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 2) - 0.6) / ($H - 0.6)) - 0.06) * $fred",
+           "($hb * (2 * $i + 2)) * $fred"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 1) - 0.6) / ($H - 0.6)) - 0.06) * $fred",
+           "($hb * (2 * $i + 1)) * $fred"
+          ]
+         ],
+         "segments": 32,
+         "caps": false,
+         "material": "lh_red",
+         "repeat": {
+          "count": "$bands",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         }
+        }
+       ],
+       "at": [
+        0,
+        "$H / 2 + ((0) - ($H / 2)) * $fred",
+        0
+       ]
+      },
+      {
+       "name": "BandsBlack",
+       "children": [
+        {
+         "name": "BandBlack_{i}",
+         "shape": "lathe",
+         "profile": [
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 1) - 0.6) / ($H - 0.6)) - 0.06) * $fblack",
+           "($hb * (2 * $i + 1)) * $fblack"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 1) - 0.6) / ($H - 0.6)) + 0.012) * $fblack",
+           "($hb * (2 * $i + 1)) * $fblack"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 2) - 0.6) / ($H - 0.6)) + 0.012) * $fblack",
+           "($hb * (2 * $i + 2)) * $fblack"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 2) - 0.6) / ($H - 0.6)) - 0.06) * $fblack",
+           "($hb * (2 * $i + 2)) * $fblack"
+          ],
+          [
+           "(($R + ($Rt - $R) * ($hb * (2 * $i + 1) - 0.6) / ($H - 0.6)) - 0.06) * $fblack",
+           "($hb * (2 * $i + 1)) * $fblack"
+          ]
+         ],
+         "segments": 32,
+         "caps": false,
+         "material": "lh_black",
+         "repeat": {
+          "count": "$bands",
+          "step": [
+           0,
+           0,
+           0
+          ]
+         }
+        }
+       ],
+       "at": [
+        0,
+        "$H / 2 + ((0) - ($H / 2)) * $fblack",
+        0
+       ]
+      },
+      {
+       "name": "Window_{i}",
+       "at": [
+        0,
+        "$wy0 + $i * $wdy",
+        "($R + ($Rt - $R) * ($wy0 + $i * $wdy - 0.6) / ($H - 0.6)) - 0.05"
+       ],
+       "repeat": {
+        "count": "$nw",
+        "around": "y",
+        "phase": 140
+       },
+       "children": [
+        {
+         "name": "Reveal",
+         "shape": "box",
+         "size": [
+          0.75,
+          1.15,
+          0.2
+         ],
+         "material": "lh_white",
+         "bevel": 0.03
+        },
+        {
+         "name": "Glass",
+         "shape": "box",
+         "size": [
+          0.5,
+          0.85,
+          0.22
+         ],
+         "material": "lh_window"
+        },
+        {
+         "name": "Sill",
+         "shape": "box",
+         "size": [
+          0.8,
+          0.08,
+          0.3
+         ],
+         "at": [
+          0,
+          -0.6,
+          0.02
+         ],
+         "material": "lh_stone"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Entrance",
+     "at": [
+      0,
+      0.75,
+      "$R - 0.06"
+     ],
+     "children": [
+      {
+       "name": "Portal",
+       "shape": "box",
+       "size": [
+        1.6,
+        2.7,
+        0.4
+       ],
+       "at": [
+        0,
+        1.35,
+        0.12
+       ],
+       "bevel": 0.04,
+       "material": "lh_stone"
+      },
+      {
+       "name": "Pediment",
+       "shape": "box",
+       "size": [
+        1.9,
+        0.35,
+        0.55
+       ],
+       "at": [
+        0,
+        2.8,
+        0.18
+       ],
+       "bevel": 0.05,
+       "material": "lh_stone"
+      },
+      {
+       "name": "Recess",
+       "shape": "box",
+       "size": [
+        1.0,
+        2.15,
+        0.42
+       ],
+       "at": [
+        0,
+        1.075,
+        0.12
+       ],
+       "material": "lh_window"
+      },
+      {
+       "name": "Door",
+       "at": [
+        -0.48,
+        0,
+        0.36
+       ],
+       "children": [
+        {
+         "name": "Leaf",
+         "shape": "box",
+         "size": [
+          0.96,
+          2.12,
+          0.06
+         ],
+         "at": [
+          0.48,
+          1.06,
+          0
+         ],
+         "bevel": 0.01,
+         "material": "lh_door"
+        },
+        {
+         "name": "Handle",
+         "shape": "box",
+         "size": [
+          0.04,
+          0.16,
+          0.06
+         ],
+         "at": [
+          0.86,
+          1.0,
+          0.05
+         ],
+         "material": "lh_iron"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Gallery",
+     "at": [
+      0,
+      "$H",
+      0
+     ],
+     "children": [
+      {
+       "name": "Corbel",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         -0.9
+        ],
+        [
+         "$Rt",
+         -0.9
+        ],
+        [
+         "$Rt + 0.15",
+         -0.6
+        ],
+        [
+         "$Rt + 0.5",
+         -0.3
+        ],
+        [
+         "$Rg",
+         -0.1
+        ],
+        [
+         "$Rg",
+         0.12
+        ],
+        [
+         0,
+         0.12
+        ]
+       ],
+       "segments": 32,
+       "material": "lh_white"
+      },
+      {
+       "name": "Deck",
+       "shape": "cylinder",
+       "radius": "$Rg + 0.05",
+       "height": 0.06,
+       "at": [
+        0,
+        0.15,
+        0
+       ],
+       "segments": 32,
+       "material": "lh_iron"
+      },
+      {
+       "name": "RailPost_{i}",
+       "shape": "cylinder",
+       "radius": 0.03,
+       "height": 1.0,
+       "at": [
+        "$Rg - 0.04",
+        0.18,
+        0
+       ],
+       "anchor": "base",
+       "segments": 6,
+       "repeat": {
+        "count": "$nr",
+        "around": "y"
+       },
+       "material": "lh_iron"
+      },
+      {
+       "name": "TopRail",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$Rg - 0.075",
+         1.14
+        ],
+        [
+         "$Rg - 0.005",
+         1.14
+        ],
+        [
+         "$Rg - 0.005",
+         1.2
+        ],
+        [
+         "$Rg - 0.075",
+         1.2
+        ],
+        [
+         "$Rg - 0.075",
+         1.14
+        ]
+       ],
+       "segments": 32,
+       "caps": false,
+       "material": "lh_iron"
+      },
+      {
+       "name": "MidRail",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$Rg - 0.06",
+         0.62
+        ],
+        [
+         "$Rg - 0.02",
+         0.62
+        ],
+        [
+         "$Rg - 0.02",
+         0.66
+        ],
+        [
+         "$Rg - 0.06",
+         0.66
+        ],
+        [
+         "$Rg - 0.06",
+         0.62
+        ]
+       ],
+       "segments": 32,
+       "caps": false,
+       "material": "lh_iron"
+      }
+     ]
+    },
+    {
+     "name": "Lantern",
+     "at": [
+      0,
+      "$H + 0.18",
+      0
+     ],
+     "children": [
+      {
+       "name": "Parapet",
+       "shape": "cylinder",
+       "radius": "$Rl + 0.08",
+       "height": 0.9,
+       "anchor": "base",
+       "segments": 32,
+       "material": "lh_white",
+       "bevel": 0.03
+      },
+      {
+       "name": "Glazing",
+       "shape": "cylinder",
+       "radius": "$Rl",
+       "height": "$hl",
+       "at": [
+        0,
+        0.9,
+        0
+       ],
+       "anchor": "base",
+       "segments": 12,
+       "material": "lh_glass"
+      },
+      {
+       "name": "Astragal_{i}",
+       "shape": "box",
+       "size": [
+        0.07,
+        "$hl",
+        0.07
+       ],
+       "at": [
+        "$Rl * 0.99",
+        "0.9 + $hl / 2",
+        0
+       ],
+       "repeat": {
+        "count": 12,
+        "around": "y",
+        "phase": 15
+       },
+       "material": "lh_iron"
+      },
+      {
+       "name": "Ring",
+       "shape": "lathe",
+       "profile": [
+        [
+         "$Rl - 0.06",
+         "0.9 + $hl * 0.5 - 0.03"
+        ],
+        [
+         "$Rl + 0.03",
+         "0.9 + $hl * 0.5 - 0.03"
+        ],
+        [
+         "$Rl + 0.03",
+         "0.9 + $hl * 0.5 + 0.03"
+        ],
+        [
+         "$Rl - 0.06",
+         "0.9 + $hl * 0.5 + 0.03"
+        ],
+        [
+         "$Rl - 0.06",
+         "0.9 + $hl * 0.5 - 0.03"
+        ]
+       ],
+       "segments": 12,
+       "caps": false,
+       "material": "lh_iron"
+      },
+      {
+       "name": "Pedestal",
+       "shape": "cylinder",
+       "radius": 0.25,
+       "height": "0.4 + $hl * 0.25",
+       "at": [
+        0,
+        0.9,
+        0
+       ],
+       "anchor": "base",
+       "segments": 12,
+       "material": "lh_iron"
+      },
+      {
+       "name": "Lens",
+       "shape": "ellipsoid",
+       "radii": [
+        "$Rl * 0.45",
+        "$hl * 0.3",
+        "$Rl * 0.45"
+       ],
+       "at": [
+        0,
+        "0.9 + $hl * 0.55",
+        0
+       ],
+       "segments": 16,
+       "material": "lh_lens"
+      },
+      {
+       "name": "Dome",
+       "shape": "lathe",
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         "$Rl + 0.25",
+         0
+        ],
+        [
+         "$Rl + 0.25",
+         0.08
+        ],
+        [
+         "($Rl + 0.1) * 1.0",
+         "0.08 + $Rl * 0.75 * 0.0"
+        ],
+        [
+         "($Rl + 0.1) * 0.9659",
+         "0.08 + $Rl * 0.75 * 0.2588"
+        ],
+        [
+         "($Rl + 0.1) * 0.866",
+         "0.08 + $Rl * 0.75 * 0.5"
+        ],
+        [
+         "($Rl + 0.1) * 0.7071",
+         "0.08 + $Rl * 0.75 * 0.7071"
+        ],
+        [
+         "($Rl + 0.1) * 0.5",
+         "0.08 + $Rl * 0.75 * 0.866"
+        ],
+        [
+         "($Rl + 0.1) * 0.2588",
+         "0.08 + $Rl * 0.75 * 0.9659"
+        ],
+        [
+         "($Rl + 0.1) * 0.0",
+         "0.08 + $Rl * 0.75 * 1.0"
+        ],
+        [
+         0,
+         "0.08 + $Rl * 0.75"
+        ]
+       ],
+       "at": [
+        0,
+        "0.9 + $hl",
+        0
+       ],
+       "segments": 32,
+       "material": "lh_dome"
+      },
+      {
+       "name": "VentBall",
+       "shape": "ellipsoid",
+       "radii": [
+        0.3,
+        0.3,
+        0.3
+       ],
+       "at": [
+        0,
+        "0.9 + $hl + $Rl * 0.75 + 0.3",
+        0
+       ],
+       "segments": 16,
+       "material": "lh_dome"
+      },
+      {
+       "name": "LightningMast",
+       "shape": "cylinder",
+       "radius": 0.025,
+       "height": 1.0,
+       "at": [
+        0,
+        "0.9 + $hl + $Rl * 0.75 + 0.55",
+        0
+       ],
+       "anchor": "base",
+       "segments": 6,
+       "material": "lh_iron"
+      }
+     ]
+    },
+    {
+     "name": "KeepersHouse",
+     "at": [
+      "(-$R - 0.2 - $kw / 2) * $fkeeper",
+      "1.5 + -1.5 * $fkeeper",
+      "-0.3 * $fkeeper"
+     ],
+     "children": [
+      {
+       "name": "HouseWalls",
+       "shape": "box",
+       "size": [
+        "($kw) * $fkeeper",
+        "3.0 * $fkeeper",
+        "4.6 * $fkeeper"
+       ],
+       "at": [
+        0,
+        "1.5 * $fkeeper",
+        0
+       ],
+       "material": "house_wall"
+      },
+      {
+       "name": "HousePlinth",
+       "shape": "box",
+       "size": [
+        "($kw + 0.12) * $fkeeper",
+        "0.4 * $fkeeper",
+        "4.72 * $fkeeper"
+       ],
+       "at": [
+        0,
+        "0.2 * $fkeeper",
+        0
+       ],
+       "material": "lh_stone"
+      },
+      {
+       "name": "HouseTiles",
+       "shape": "roof",
+       "x0": "(-$kw / 2 - 0.35) * $fkeeper",
+       "x1": "($kw / 2 + 0.2) * $fkeeper",
+       "z0": "-2.65 * $fkeeper",
+       "z1": "2.65 * $fkeeper",
+       "y": "3.0 * $fkeeper",
+       "rise": "2.3 * $fkeeper",
+       "kind": "gable",
+       "material": "house_roof"
+      },
+      {
+       "name": "Chimney",
+       "shape": "box",
+       "size": [
+        "0.6 * $fkeeper",
+        "1.8 * $fkeeper",
+        "0.6 * $fkeeper"
+       ],
+       "at": [
+        "(-$kw / 2 + 0.9) * $fkeeper",
+        "4.1 * $fkeeper",
+        "-0.6 * $fkeeper"
+       ],
+       "material": "house_brick",
+       "children": [
+        {
+         "name": "ChimneyCap",
+         "shape": "box",
+         "size": [
+          "0.75 * $fkeeper",
+          "0.12 * $fkeeper",
+          "0.75 * $fkeeper"
+         ],
+         "at": [
+          0,
+          "0.95 * $fkeeper",
+          0
+         ],
+         "material": "lh_stone"
+        }
+       ]
+      },
+      {
+       "name": "HouseDoorway",
+       "shape": "box",
+       "size": [
+        "0.95 * $fkeeper",
+        "2.05 * $fkeeper",
+        "0.08 * $fkeeper"
+       ],
+       "at": [
+        "($kw / 2 - 1.2) * $fkeeper",
+        "1.03 * $fkeeper",
+        "2.32 * $fkeeper"
+       ],
+       "material": "lh_door"
+      },
+      {
+       "name": "HouseWindow_{i}",
+       "shape": "box",
+       "size": [
+        "0.9 * $fkeeper",
+        "1.1 * $fkeeper",
+        "0.08 * $fkeeper"
+       ],
+       "at": [
+        "(-$kw / 2 + 1.0) * $fkeeper",
+        "1.75 * $fkeeper",
+        "2.32 * $fkeeper"
+       ],
+       "repeat": {
+        "count": "max(1, floor(($kw - 2.2) / 1.5))",
+        "step": [
+         "1.5 * $fkeeper",
+         0,
+         0
+        ]
+       },
+       "material": "lh_window",
+       "children": [
+        {
+         "name": "HouseWindowFrame",
+         "shape": "box",
+         "size": [
+          "1.04 * $fkeeper",
+          "1.24 * $fkeeper",
+          "0.06 * $fkeeper"
+         ],
+         "at": [
+          0,
+          0,
+          "-0.02 * $fkeeper"
+         ],
+         "material": "lh_white"
+        }
+       ]
+      },
+      {
+       "name": "HouseWindowBack_{i}",
+       "shape": "box",
+       "size": [
+        "0.9 * $fkeeper",
+        "1.1 * $fkeeper",
+        "0.08 * $fkeeper"
+       ],
+       "at": [
+        "(-$kw / 2 + 1.0) * $fkeeper",
+        "1.75 * $fkeeper",
+        "-2.32 * $fkeeper"
+       ],
+       "repeat": {
+        "count": "max(1, floor(($kw - 1.4) / 1.5))",
+        "step": [
+         "1.5 * $fkeeper",
+         0,
+         0
+        ]
+       },
+       "material": "lh_window"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

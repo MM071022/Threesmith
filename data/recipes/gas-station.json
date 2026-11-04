@@ -1,0 +1,1415 @@
+{
+ "version": 1,
+ "name": "gas-station",
+ "archetype": "building.gas-station",
+ "description": "A fuel station facing +Z: a concrete forecourt, raised pump islands with rounded noses, yellow bollards and columns, fuel dispensers with screens, price displays, keypads, holsters and hoses on both sides, a flat canopy with a white fascia, a lit brand stripe and downlights in the soffit, a shop behind it with a glazed front, door, canopy over the door, roof units and a brand band, and a price pylon at the front corner.",
+ "params": [
+  {
+   "name": "islands",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 4,
+   "description": "Number of pump islands side by side (7.5 m apart)."
+  },
+  {
+   "name": "pumps",
+   "type": "integer",
+   "default": 2,
+   "min": 1,
+   "max": 3,
+   "description": "Dispensers on each island."
+  },
+  {
+   "name": "canopyHeight",
+   "type": "number",
+   "default": 4.8,
+   "min": 4.3,
+   "max": 6,
+   "description": "Clear height under the canopy in metres."
+  },
+  {
+   "name": "canopyDepth",
+   "type": "number",
+   "default": 11,
+   "min": 8,
+   "max": 16,
+   "description": "Depth of the canopy (z); it grows to cover long islands."
+  },
+  {
+   "name": "shop",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A shop behind the canopy."
+  },
+  {
+   "name": "shopWidth",
+   "type": "number",
+   "default": 12,
+   "min": 6,
+   "max": 20,
+   "description": "Width of the shop."
+  },
+  {
+   "name": "pylon",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A price pylon at the front corner."
+  },
+  {
+   "name": "pylonHeight",
+   "type": "number",
+   "default": 7,
+   "min": 5,
+   "max": 10,
+   "description": "Height of the price pylon."
+  },
+  {
+   "name": "brand",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 3,
+   "description": "Brand colour of the stripe, pylon head and shop band: 0 red, 1 green, 2 blue, 3 yellow."
+  }
+ ],
+ "materials": {
+  "gs_white": {
+   "color": [
+    0.8,
+    0.8,
+    0.79
+   ],
+   "metallic": 0.2,
+   "roughness": 0.35
+  },
+  "gs_grey": {
+   "color": [
+    0.3,
+    0.31,
+    0.32
+   ],
+   "metallic": 0.5,
+   "roughness": 0.45
+  },
+  "gs_dark": {
+   "color": [
+    0.03,
+    0.03,
+    0.035
+   ],
+   "metallic": 0.3,
+   "roughness": 0.4
+  },
+  "gs_screen": {
+   "color": [
+    0.02,
+    0.05,
+    0.08
+   ],
+   "metallic": 0,
+   "roughness": 0.1,
+   "emissive": [
+    0.05,
+    0.15,
+    0.25
+   ]
+  },
+  "gs_digits": {
+   "color": [
+    0.9,
+    0.4,
+    0.04
+   ],
+   "metallic": 0,
+   "roughness": 0.2,
+   "emissive": [
+    0.9,
+    0.4,
+    0.04
+   ]
+  },
+  "gs_downlight": {
+   "color": [
+    0.95,
+    0.95,
+    0.9
+   ],
+   "metallic": 0,
+   "roughness": 0.1,
+   "emissive": [
+    1,
+    1,
+    0.92
+   ]
+  },
+  "gs_concrete": {
+   "color": [
+    0.11,
+    0.108,
+    0.104
+   ],
+   "metallic": 0,
+   "roughness": 0.9,
+   "texture": "concrete"
+  },
+  "gs_asphalt": {
+   "color": [
+    0.025,
+    0.025,
+    0.028
+   ],
+   "metallic": 0,
+   "roughness": 0.9
+  },
+  "gs_kerb": {
+   "color": [
+    0.45,
+    0.44,
+    0.42
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "gs_hose": {
+   "color": [
+    0.02,
+    0.02,
+    0.022
+   ],
+   "metallic": 0,
+   "roughness": 0.7
+  },
+  "gs_glass": {
+   "color": [
+    0.35,
+    0.5,
+    0.55,
+    0.35
+   ],
+   "metallic": 0,
+   "roughness": 0.05,
+   "alpha": "BLEND"
+  },
+  "gs_wall": {
+   "color": [
+    0.28,
+    0.27,
+    0.25
+   ],
+   "metallic": 0,
+   "roughness": 0.8,
+   "texture": "plaster"
+  },
+  "gs_bollard": {
+   "color": [
+    0.75,
+    0.55,
+    0.02
+   ],
+   "metallic": 0.2,
+   "roughness": 0.4
+  },
+  "brand_red": {
+   "color": [
+    0.5,
+    0.02,
+    0.015
+   ],
+   "metallic": 0.2,
+   "roughness": 0.35,
+   "emissive": [
+    0.2,
+    0.008,
+    0.006
+   ]
+  },
+  "brand_green": {
+   "color": [
+    0.02,
+    0.28,
+    0.08
+   ],
+   "metallic": 0.2,
+   "roughness": 0.35,
+   "emissive": [
+    0.008,
+    0.11200000000000002,
+    0.032
+   ]
+  },
+  "brand_blue": {
+   "color": [
+    0.02,
+    0.1,
+    0.45
+   ],
+   "metallic": 0.2,
+   "roughness": 0.35,
+   "emissive": [
+    0.008,
+    0.04000000000000001,
+    0.18000000000000002
+   ]
+  },
+  "brand_yellow": {
+   "color": [
+    0.85,
+    0.55,
+    0.01
+   ],
+   "metallic": 0.2,
+   "roughness": 0.35,
+   "emissive": [
+    0.34,
+    0.22000000000000003,
+    0.004
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "GasStation",
+   "vars": {
+    "ni": "$islands",
+    "np": "$pumps",
+    "Hc": "$canopyHeight",
+    "IL": "$pumps * 3.2 + 0.6",
+    "CW": "$islands * 7.5 + 2",
+    "CD": "max($canopyDepth, $pumps * 3.2 + 4)",
+    "iz": 0,
+    "SW": "$shopWidth",
+    "sz": "-max($canopyDepth, $pumps * 3.2 + 4) / 2 - 6",
+    "ph": "$pylonHeight",
+    "fb0": "max(0.01, max(0, 1 - min(1, abs($brand - 0))))",
+    "fb1": "max(0.01, max(0, 1 - min(1, abs($brand - 1))))",
+    "fb2": "max(0.01, max(0, 1 - min(1, abs($brand - 2))))",
+    "fb3": "max(0.01, max(0, 1 - min(1, abs($brand - 3))))",
+    "fh0": "max(0.01, max(0, 1 - min(1, abs($brand - 0))) * $pylon)",
+    "fh1": "max(0.01, max(0, 1 - min(1, abs($brand - 1))) * $pylon)",
+    "fh2": "max(0.01, max(0, 1 - min(1, abs($brand - 2))) * $pylon)",
+    "fh3": "max(0.01, max(0, 1 - min(1, abs($brand - 3))) * $pylon)",
+    "fs0": "max(0.01, max(0, 1 - min(1, abs($brand - 0))) * $shop)",
+    "fs1": "max(0.01, max(0, 1 - min(1, abs($brand - 1))) * $shop)",
+    "fs2": "max(0.01, max(0, 1 - min(1, abs($brand - 2))) * $shop)",
+    "fs3": "max(0.01, max(0, 1 - min(1, abs($brand - 3))) * $shop)",
+    "fshop": "max(0.01, $shop)",
+    "fpylon": "max(0.01, $pylon)"
+   },
+   "children": [
+    {
+     "name": "Forecourt",
+     "children": [
+      {
+       "name": "Slab",
+       "shape": "box",
+       "size": [
+        "$CW + 9",
+        0.06,
+        "$CD + 4"
+       ],
+       "at": [
+        0,
+        0.03,
+        0
+       ],
+       "material": "gs_concrete"
+      },
+      {
+       "name": "Apron",
+       "shape": "box",
+       "size": [
+        "$CW + 9",
+        0.05,
+        10
+       ],
+       "at": [
+        0,
+        0.025,
+        "-$CD / 2 - 5"
+       ],
+       "material": "gs_asphalt"
+      }
+     ]
+    },
+    {
+     "name": "Island_{i}",
+     "at": [
+      "($i - ($ni - 1) / 2) * 7.5",
+      0,
+      "$iz"
+     ],
+     "repeat": {
+      "count": "$ni",
+      "step": [
+       0,
+       0,
+       0
+      ]
+     },
+     "children": [
+      {
+       "name": "Kerb",
+       "shape": "box",
+       "size": [
+        1.3,
+        0.18,
+        "$IL"
+       ],
+       "at": [
+        0,
+        0.09,
+        0
+       ],
+       "bevel": 0.04,
+       "material": "gs_kerb"
+      },
+      {
+       "name": "NoseFront",
+       "shape": "box",
+       "size": [
+        1.3,
+        0.18,
+        0.65
+       ],
+       "at": [
+        0,
+        0.09,
+        "$IL / 2 + 0.3"
+       ],
+       "bevel": 0.25,
+       "material": "gs_kerb"
+      },
+      {
+       "name": "NoseBack",
+       "shape": "box",
+       "size": [
+        1.3,
+        0.18,
+        0.65
+       ],
+       "at": [
+        0,
+        0.09,
+        "-$IL / 2 - 0.3"
+       ],
+       "bevel": 0.25,
+       "material": "gs_kerb"
+      },
+      {
+       "name": "Bollard_F",
+       "shape": "cylinder",
+       "radius": 0.1,
+       "height": 1.0,
+       "at": [
+        0,
+        0.18,
+        "$IL / 2 + 0.25"
+       ],
+       "anchor": "base",
+       "segments": 12,
+       "bevel": 0.03,
+       "material": "gs_bollard"
+      },
+      {
+       "name": "Bollard_B",
+       "shape": "cylinder",
+       "radius": 0.1,
+       "height": 1.0,
+       "at": [
+        0,
+        0.18,
+        "-$IL / 2 - 0.25"
+       ],
+       "anchor": "base",
+       "segments": 12,
+       "bevel": 0.03,
+       "material": "gs_bollard"
+      },
+      {
+       "name": "Column_{i}",
+       "shape": "box",
+       "size": [
+        0.5,
+        "$Hc - 0.18",
+        0.5
+       ],
+       "at": [
+        0,
+        "0.18 + ($Hc - 0.18) / 2",
+        "-$IL / 2 + 0.45"
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         "$IL - 0.9"
+        ]
+       },
+       "bevel": 0.03,
+       "material": "gs_grey"
+      },
+      {
+       "name": "Pump_{i}",
+       "at": [
+        0,
+        0.18,
+        "($i - ($np - 1) / 2) * 3.2"
+       ],
+       "repeat": {
+        "count": "$np",
+        "step": [
+         0,
+         0,
+         0
+        ]
+       },
+       "children": [
+        {
+         "name": "PumpPlinth",
+         "shape": "box",
+         "size": [
+          0.95,
+          0.12,
+          1.3
+         ],
+         "at": [
+          0,
+          0.06,
+          0
+         ],
+         "material": "gs_grey"
+        },
+        {
+         "name": "Cabinet",
+         "shape": "box",
+         "size": [
+          0.7,
+          1.75,
+          1.15
+         ],
+         "at": [
+          0,
+          0.995,
+          0
+         ],
+         "bevel": 0.04,
+         "material": "gs_white"
+        },
+        {
+         "name": "Header",
+         "shape": "box",
+         "size": [
+          0.78,
+          0.4,
+          1.25
+         ],
+         "at": [
+          0,
+          2.05,
+          0
+         ],
+         "bevel": 0.04,
+         "material": "gs_dark"
+        },
+        {
+         "name": "Screen_L",
+         "shape": "box",
+         "size": [
+          0.74,
+          0.32,
+          0.42
+         ],
+         "at": [
+          0,
+          1.45,
+          0.25
+         ],
+         "material": "gs_screen"
+        },
+        {
+         "name": "Display_L",
+         "shape": "box",
+         "size": [
+          0.74,
+          0.22,
+          0.42
+         ],
+         "at": [
+          0,
+          2.05,
+          0.18
+         ],
+         "material": "gs_digits"
+        },
+        {
+         "name": "Keypad",
+         "shape": "box",
+         "size": [
+          0.74,
+          0.18,
+          0.2
+         ],
+         "at": [
+          0,
+          1.18,
+          0.28
+         ],
+         "material": "gs_grey"
+        },
+        {
+         "name": "Holster_L",
+         "shape": "box",
+         "size": [
+          0.86,
+          0.22,
+          0.1
+         ],
+         "at": [
+          0,
+          1.05,
+          -0.32
+         ],
+         "material": "gs_dark"
+        },
+        {
+         "name": "Holster_M",
+         "shape": "box",
+         "size": [
+          0.86,
+          0.22,
+          0.1
+         ],
+         "at": [
+          0,
+          1.05,
+          -0.14
+         ],
+         "material": "gs_dark"
+        },
+        {
+         "name": "Hose_L",
+         "shape": "tube",
+         "path": [
+          [
+           0.36,
+           1.12,
+           -0.32
+          ],
+          [
+           0.48,
+           0.8,
+           -0.34
+          ],
+          [
+           0.5,
+           0.35,
+           -0.3
+          ],
+          [
+           0.42,
+           0.25,
+           -0.1
+          ],
+          [
+           0.36,
+           0.6,
+           0.05
+          ],
+          [
+           0.36,
+           1.4,
+           0.0
+          ]
+         ],
+         "radius": 0.022,
+         "segments": 6,
+         "material": "gs_hose"
+        },
+        {
+         "name": "Hose_R",
+         "shape": "tube",
+         "path": [
+          [
+           -0.36,
+           1.12,
+           -0.14
+          ],
+          [
+           -0.48,
+           0.8,
+           -0.16
+          ],
+          [
+           -0.5,
+           0.35,
+           -0.12
+          ],
+          [
+           -0.42,
+           0.25,
+           0.08
+          ],
+          [
+           -0.36,
+           0.6,
+           0.15
+          ],
+          [
+           -0.36,
+           1.4,
+           0.1
+          ]
+         ],
+         "radius": 0.022,
+         "segments": 6,
+         "material": "gs_hose"
+        }
+       ]
+      },
+      {
+       "name": "Downlight_{i}",
+       "shape": "box",
+       "size": [
+        1.0,
+        0.04,
+        1.0
+       ],
+       "at": [
+        -1.9,
+        "$Hc - 0.02",
+        "-$np * 1.6 + 1.6"
+       ],
+       "repeat": {
+        "count": "$np",
+        "step": [
+         0,
+         0,
+         3.2
+        ]
+       },
+       "material": "gs_downlight"
+      },
+      {
+       "name": "DownlightR_{i}",
+       "shape": "box",
+       "size": [
+        1.0,
+        0.04,
+        1.0
+       ],
+       "at": [
+        1.9,
+        "$Hc - 0.02",
+        "-$np * 1.6 + 1.6"
+       ],
+       "repeat": {
+        "count": "$np",
+        "step": [
+         0,
+         0,
+         3.2
+        ]
+       },
+       "material": "gs_downlight"
+      }
+     ]
+    },
+    {
+     "name": "Canopy",
+     "children": [
+      {
+       "name": "Deck",
+       "shape": "box",
+       "size": [
+        "$CW - 0.1",
+        0.3,
+        "$CD - 0.1"
+       ],
+       "at": [
+        0,
+        "$Hc + 0.25",
+        0
+       ],
+       "material": "gs_dark"
+      },
+      {
+       "name": "Soffit",
+       "shape": "box",
+       "size": [
+        "$CW - 0.1",
+        0.05,
+        "$CD - 0.1"
+       ],
+       "at": [
+        0,
+        "$Hc + 0.075",
+        0
+       ],
+       "material": "gs_white"
+      },
+      {
+       "name": "FasciaFront",
+       "shape": "box",
+       "size": [
+        "$CW",
+        1.0,
+        0.12
+       ],
+       "at": [
+        0,
+        "$Hc + 0.5",
+        "$CD / 2 - 0.06"
+       ],
+       "bevel": 0.02,
+       "material": "gs_white"
+      },
+      {
+       "name": "FasciaBack",
+       "shape": "box",
+       "size": [
+        "$CW",
+        1.0,
+        0.12
+       ],
+       "at": [
+        0,
+        "$Hc + 0.5",
+        "-$CD / 2 + 0.06"
+       ],
+       "bevel": 0.02,
+       "material": "gs_white"
+      },
+      {
+       "name": "FasciaSide_L",
+       "shape": "box",
+       "size": [
+        0.12,
+        1.0,
+        "$CD"
+       ],
+       "at": [
+        "$CW / 2 - 0.06",
+        "$Hc + 0.5",
+        0
+       ],
+       "bevel": 0.02,
+       "material": "gs_white",
+       "mirror": "FasciaSide_R"
+      }
+     ]
+    },
+    {
+     "name": "Livery",
+     "children": [
+      {
+       "name": "LiveryRed",
+       "material": "brand_red",
+       "children": [
+        {
+         "name": "StripeFrontRed",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb0",
+          "0.35 * $fb0",
+          "0.06 * $fb0"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb0",
+          "($CD / 2 + 0.02) * $fb0"
+         ]
+        },
+        {
+         "name": "StripeBackRed",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb0",
+          "0.35 * $fb0",
+          "0.06 * $fb0"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb0",
+          "(-$CD / 2 - 0.02) * $fb0"
+         ]
+        },
+        {
+         "name": "StripeSideRed_L",
+         "shape": "box",
+         "size": [
+          "0.06 * $fb0",
+          "0.35 * $fb0",
+          "($CD + 0.08) * $fb0"
+         ],
+         "at": [
+          "($CW / 2 + 0.02) * $fb0",
+          "($Hc + 0.55) * $fb0",
+          0
+         ],
+         "mirror": "StripeSideRed_R"
+        }
+       ],
+       "at": [
+        0,
+        "$Hc + 0.55 + ((0) - ($Hc + 0.55)) * $fb0",
+        0
+       ]
+      },
+      {
+       "name": "LiveryGreen",
+       "material": "brand_green",
+       "children": [
+        {
+         "name": "StripeFrontGreen",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb1",
+          "0.35 * $fb1",
+          "0.06 * $fb1"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb1",
+          "($CD / 2 + 0.02) * $fb1"
+         ]
+        },
+        {
+         "name": "StripeBackGreen",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb1",
+          "0.35 * $fb1",
+          "0.06 * $fb1"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb1",
+          "(-$CD / 2 - 0.02) * $fb1"
+         ]
+        },
+        {
+         "name": "StripeSideGreen_L",
+         "shape": "box",
+         "size": [
+          "0.06 * $fb1",
+          "0.35 * $fb1",
+          "($CD + 0.08) * $fb1"
+         ],
+         "at": [
+          "($CW / 2 + 0.02) * $fb1",
+          "($Hc + 0.55) * $fb1",
+          0
+         ],
+         "mirror": "StripeSideGreen_R"
+        }
+       ],
+       "at": [
+        0,
+        "$Hc + 0.55 + ((0) - ($Hc + 0.55)) * $fb1",
+        0
+       ]
+      },
+      {
+       "name": "LiveryBlue",
+       "material": "brand_blue",
+       "children": [
+        {
+         "name": "StripeFrontBlue",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb2",
+          "0.35 * $fb2",
+          "0.06 * $fb2"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb2",
+          "($CD / 2 + 0.02) * $fb2"
+         ]
+        },
+        {
+         "name": "StripeBackBlue",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb2",
+          "0.35 * $fb2",
+          "0.06 * $fb2"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb2",
+          "(-$CD / 2 - 0.02) * $fb2"
+         ]
+        },
+        {
+         "name": "StripeSideBlue_L",
+         "shape": "box",
+         "size": [
+          "0.06 * $fb2",
+          "0.35 * $fb2",
+          "($CD + 0.08) * $fb2"
+         ],
+         "at": [
+          "($CW / 2 + 0.02) * $fb2",
+          "($Hc + 0.55) * $fb2",
+          0
+         ],
+         "mirror": "StripeSideBlue_R"
+        }
+       ],
+       "at": [
+        0,
+        "$Hc + 0.55 + ((0) - ($Hc + 0.55)) * $fb2",
+        0
+       ]
+      },
+      {
+       "name": "LiveryYellow",
+       "material": "brand_yellow",
+       "children": [
+        {
+         "name": "StripeFrontYellow",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb3",
+          "0.35 * $fb3",
+          "0.06 * $fb3"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb3",
+          "($CD / 2 + 0.02) * $fb3"
+         ]
+        },
+        {
+         "name": "StripeBackYellow",
+         "shape": "box",
+         "size": [
+          "($CW + 0.08) * $fb3",
+          "0.35 * $fb3",
+          "0.06 * $fb3"
+         ],
+         "at": [
+          0,
+          "($Hc + 0.55) * $fb3",
+          "(-$CD / 2 - 0.02) * $fb3"
+         ]
+        },
+        {
+         "name": "StripeSideYellow_L",
+         "shape": "box",
+         "size": [
+          "0.06 * $fb3",
+          "0.35 * $fb3",
+          "($CD + 0.08) * $fb3"
+         ],
+         "at": [
+          "($CW / 2 + 0.02) * $fb3",
+          "($Hc + 0.55) * $fb3",
+          0
+         ],
+         "mirror": "StripeSideYellow_R"
+        }
+       ],
+       "at": [
+        0,
+        "$Hc + 0.55 + ((0) - ($Hc + 0.55)) * $fb3",
+        0
+       ]
+      },
+      {
+       "name": "PylonHeadRed",
+       "shape": "box",
+       "size": [
+        "1.9 * $fh0",
+        "1.7 * $fh0",
+        "0.6 * $fh0"
+       ],
+       "at": [
+        "($CW / 2 + 3) * $fh0",
+        "$Hc + 0.25 + (($ph - 0.85) - ($Hc + 0.25)) * $fh0",
+        "($CD / 2 + 2) * $fh0"
+       ],
+       "bevel": "0.05 * $fh0",
+       "material": "brand_red"
+      },
+      {
+       "name": "PylonHeadGreen",
+       "shape": "box",
+       "size": [
+        "1.9 * $fh1",
+        "1.7 * $fh1",
+        "0.6 * $fh1"
+       ],
+       "at": [
+        "($CW / 2 + 3) * $fh1",
+        "$Hc + 0.25 + (($ph - 0.85) - ($Hc + 0.25)) * $fh1",
+        "($CD / 2 + 2) * $fh1"
+       ],
+       "bevel": "0.05 * $fh1",
+       "material": "brand_green"
+      },
+      {
+       "name": "PylonHeadBlue",
+       "shape": "box",
+       "size": [
+        "1.9 * $fh2",
+        "1.7 * $fh2",
+        "0.6 * $fh2"
+       ],
+       "at": [
+        "($CW / 2 + 3) * $fh2",
+        "$Hc + 0.25 + (($ph - 0.85) - ($Hc + 0.25)) * $fh2",
+        "($CD / 2 + 2) * $fh2"
+       ],
+       "bevel": "0.05 * $fh2",
+       "material": "brand_blue"
+      },
+      {
+       "name": "PylonHeadYellow",
+       "shape": "box",
+       "size": [
+        "1.9 * $fh3",
+        "1.7 * $fh3",
+        "0.6 * $fh3"
+       ],
+       "at": [
+        "($CW / 2 + 3) * $fh3",
+        "$Hc + 0.25 + (($ph - 0.85) - ($Hc + 0.25)) * $fh3",
+        "($CD / 2 + 2) * $fh3"
+       ],
+       "bevel": "0.05 * $fh3",
+       "material": "brand_yellow"
+      },
+      {
+       "name": "ShopBandRed",
+       "shape": "box",
+       "size": [
+        "($SW + 0.1) * $fs0",
+        "0.7 * $fs0",
+        "0.08 * $fs0"
+       ],
+       "at": [
+        0,
+        "$Hc + 0.25 + ((4.15) - ($Hc + 0.25)) * $fs0",
+        "($sz + 4.05) * $fs0"
+       ],
+       "material": "brand_red"
+      },
+      {
+       "name": "ShopBandGreen",
+       "shape": "box",
+       "size": [
+        "($SW + 0.1) * $fs1",
+        "0.7 * $fs1",
+        "0.08 * $fs1"
+       ],
+       "at": [
+        0,
+        "$Hc + 0.25 + ((4.15) - ($Hc + 0.25)) * $fs1",
+        "($sz + 4.05) * $fs1"
+       ],
+       "material": "brand_green"
+      },
+      {
+       "name": "ShopBandBlue",
+       "shape": "box",
+       "size": [
+        "($SW + 0.1) * $fs2",
+        "0.7 * $fs2",
+        "0.08 * $fs2"
+       ],
+       "at": [
+        0,
+        "$Hc + 0.25 + ((4.15) - ($Hc + 0.25)) * $fs2",
+        "($sz + 4.05) * $fs2"
+       ],
+       "material": "brand_blue"
+      },
+      {
+       "name": "ShopBandYellow",
+       "shape": "box",
+       "size": [
+        "($SW + 0.1) * $fs3",
+        "0.7 * $fs3",
+        "0.08 * $fs3"
+       ],
+       "at": [
+        0,
+        "$Hc + 0.25 + ((4.15) - ($Hc + 0.25)) * $fs3",
+        "($sz + 4.05) * $fs3"
+       ],
+       "material": "brand_yellow"
+      }
+     ]
+    },
+    {
+     "name": "Shop",
+     "at": [
+      0,
+      "$Hc + 0.25 + ((0) - ($Hc + 0.25)) * $fshop",
+      "($sz) * $fshop"
+     ],
+     "children": [
+      {
+       "name": "ShopWalls",
+       "shape": "box",
+       "size": [
+        "($SW) * $fshop",
+        "3.8 * $fshop",
+        "8 * $fshop"
+       ],
+       "at": [
+        0,
+        "1.9 * $fshop",
+        0
+       ],
+       "material": "gs_wall"
+      },
+      {
+       "name": "ShopTopSlab",
+       "shape": "box",
+       "size": [
+        "($SW + 0.3) * $fshop",
+        "0.25 * $fshop",
+        "8.3 * $fshop"
+       ],
+       "at": [
+        0,
+        "3.9 * $fshop",
+        0
+       ],
+       "material": "gs_grey"
+      },
+      {
+       "name": "Parapet",
+       "shape": "box",
+       "size": [
+        "($SW + 0.3) * $fshop",
+        "0.8 * $fshop",
+        "0.2 * $fshop"
+       ],
+       "at": [
+        0,
+        "4.15 * $fshop",
+        "4.05 * $fshop"
+       ],
+       "material": "gs_white"
+      },
+      {
+       "name": "Shopfront",
+       "shape": "box",
+       "size": [
+        "($SW * 0.7) * $fshop",
+        "2.7 * $fshop",
+        "0.1 * $fshop"
+       ],
+       "at": [
+        "(-$SW * 0.1) * $fshop",
+        "1.55 * $fshop",
+        "4.0 * $fshop"
+       ],
+       "material": "gs_glass"
+      },
+      {
+       "name": "Mullion_{i}",
+       "shape": "box",
+       "size": [
+        "0.08 * $fshop",
+        "2.7 * $fshop",
+        "0.14 * $fshop"
+       ],
+       "at": [
+        "(-$SW * 0.45) * $fshop",
+        "1.55 * $fshop",
+        "4.0 * $fshop"
+       ],
+       "repeat": {
+        "count": "max(2, round($SW * 0.7 / 1.5) + 1)",
+        "step": [
+         "($SW * 0.7 / max(1, round($SW * 0.7 / 1.5))) * $fshop",
+         0,
+         0
+        ]
+       },
+       "material": "gs_dark"
+      },
+      {
+       "name": "ShopDoor",
+       "shape": "box",
+       "size": [
+        "1.8 * $fshop",
+        "2.3 * $fshop",
+        "0.12 * $fshop"
+       ],
+       "at": [
+        "($SW * 0.35) * $fshop",
+        "1.15 * $fshop",
+        "4.0 * $fshop"
+       ],
+       "material": "gs_glass",
+       "children": [
+        {
+         "name": "DoorFrame",
+         "shape": "box",
+         "size": [
+          "1.95 * $fshop",
+          "2.4 * $fshop",
+          "0.08 * $fshop"
+         ],
+         "at": [
+          0,
+          "0.05 * $fshop",
+          "-0.03 * $fshop"
+         ],
+         "material": "gs_dark"
+        }
+       ]
+      },
+      {
+       "name": "DoorHood",
+       "shape": "box",
+       "size": [
+        "3.0 * $fshop",
+        "0.15 * $fshop",
+        "1.2 * $fshop"
+       ],
+       "at": [
+        "($SW * 0.35) * $fshop",
+        "2.65 * $fshop",
+        "4.6 * $fshop"
+       ],
+       "material": "gs_grey"
+      },
+      {
+       "name": "Step",
+       "shape": "box",
+       "size": [
+        "($SW) * $fshop",
+        "0.12 * $fshop",
+        "1.2 * $fshop"
+       ],
+       "at": [
+        0,
+        "0.06 * $fshop",
+        "4.6 * $fshop"
+       ],
+       "material": "gs_kerb"
+      },
+      {
+       "name": "AirCon_{i}",
+       "shape": "box",
+       "size": [
+        "1.0 * $fshop",
+        "0.6 * $fshop",
+        "0.8 * $fshop"
+       ],
+       "at": [
+        "(-$SW / 2 + 1.2) * $fshop",
+        "4.32 * $fshop",
+        "-1.5 * $fshop"
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         "1.6 * $fshop",
+         0,
+         0
+        ]
+       },
+       "bevel": "0.04 * $fshop",
+       "material": "gs_grey"
+      }
+     ]
+    },
+    {
+     "name": "PriceSign",
+     "at": [
+      "($CW / 2 + 3) * $fpylon",
+      "$Hc + 0.25 + ((0) - ($Hc + 0.25)) * $fpylon",
+      "($CD / 2 + 2) * $fpylon"
+     ],
+     "children": [
+      {
+       "name": "PylonBase",
+       "shape": "box",
+       "size": [
+        "2.2 * $fpylon",
+        "0.5 * $fpylon",
+        "0.8 * $fpylon"
+       ],
+       "at": [
+        0,
+        "0.25 * $fpylon",
+        0
+       ],
+       "bevel": "0.04 * $fpylon",
+       "material": "gs_concrete"
+      },
+      {
+       "name": "Mast",
+       "shape": "box",
+       "size": [
+        "1.6 * $fpylon",
+        "($ph - 1.7) * $fpylon",
+        "0.45 * $fpylon"
+       ],
+       "at": [
+        0,
+        "(($ph - 1.7) / 2) * $fpylon",
+        0
+       ],
+       "material": "gs_white"
+      },
+      {
+       "name": "PricePanel_{i}",
+       "shape": "box",
+       "size": [
+        "1.3 * $fpylon",
+        "0.55 * $fpylon",
+        "0.5 * $fpylon"
+       ],
+       "at": [
+        0,
+        "($ph - 2.3) * $fpylon",
+        0
+       ],
+       "repeat": {
+        "count": 4,
+        "step": [
+         0,
+         "-0.7 * $fpylon",
+         0
+        ]
+       },
+       "material": "gs_dark",
+       "children": [
+        {
+         "name": "Digits",
+         "shape": "box",
+         "size": [
+          "1.0 * $fpylon",
+          "0.32 * $fpylon",
+          "0.52 * $fpylon"
+         ],
+         "at": [
+          "0.1 * $fpylon",
+          0,
+          0
+         ],
+         "material": "gs_digits"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
