@@ -747,6 +747,7 @@
       ],
       "errors": [
         "origin 'null' has been blocked",
+        "Cross origin requests are only supported for protocol schemes",
         "URL scheme \"file\" is not supported",
         "HTTP Status 0 received",
         "ERR_FILE_NOT_FOUND"
@@ -771,7 +772,8 @@
         "has been blocked by CORS policy",
         "contains cross-origin data",
         "No 'Access-Control-Allow-Origin' header",
-        "Tainted canvases"
+        "Tainted canvases",
+        "tainted by cross-origin data"
       ]
     },
     {
@@ -1107,14 +1109,18 @@
       "errors": [
         "THREE.OrbitControls is not a constructor",
         "THREE.GLTFLoader is not a constructor",
-        "THREE is not defined"
+        "THREE is not defined",
+        "specifier in \"three\" package",
+        "is not exported under the conditions",
+        "is not defined by \"exports\"",
+        "ERR_PACKAGE_PATH_NOT_EXPORTED"
       ]
     },
     {
       "id": "imports/missing-js-extension",
       "topic": "imports",
       "title": "Addon imports need the .js extension",
-      "symptom": "The bundler or Node says the subpath is missing or not exported by three.",
+      "symptom": "Node says it cannot find the addon module, although the file is there with a .js extension. Vite adds the extension itself, so the same path may work in the dev server.",
       "cause": "The exports map of three maps three/addons/* to files, so the path must name the file with its extension.",
       "fix": "Write three/addons/controls/OrbitControls.js, not three/addons/controls/OrbitControls.",
       "tags": [
@@ -1124,11 +1130,6 @@
         "vite",
         "node",
         "import path"
-      ],
-      "errors": [
-        "specifier in \"three\" package",
-        "is not defined by \"exports\"",
-        "ERR_PACKAGE_PATH_NOT_EXPORTED"
       ],
       "rules": [
         "addon-path-extension"
@@ -1768,7 +1769,8 @@
         "fallback"
       ],
       "errors": [
-        "A component suspended while responding to synchronous input"
+        "A component suspended while responding to synchronous input",
+        "Minified React error #426;"
       ]
     },
     {

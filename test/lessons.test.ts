@@ -98,6 +98,42 @@ describe("error messages", () => {
     expect(top("TypeError: Cannot read properties of undefined (reading 'ReactCurrentOwner')")).toBe("r3f/react-version");
   });
 
+  it("find the lesson for the real texts of browsers, bundlers, Node and React", () => {
+    // Captured in headless Chromium, Node 22 / Node 18, Vite 5.4, 6.4, 7.3 and 8.3, react-dom 18.3 and fiber 8.
+    const real: [string, string][] = [
+      ["WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost", "rendering/context-lost"],
+      ["[.WebGL-0x3d4c001a3200] GL_INVALID_OPERATION: glDrawElements: Feedback loop formed between Framebuffer and active Texture.", "rendering/feedback-loop"],
+      ["CompileError: WebAssembly.instantiate(): expected magic word 00 61 73 6d, found 3c 21 44 4f @+0", "loading/decoder-path-wrong"],
+      ["TypeError: Failed to execute 'compile' on 'WebAssembly': Incorrect response MIME type. Expected 'application/wasm'.", "loading/decoder-path-wrong"],
+      ["SyntaxError: Unexpected token < in JSON at position 0", "loading/html-instead-of-asset"],
+      ["SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data", "loading/html-instead-of-asset"],
+      ["Access to fetch at 'file:///app/model.glb' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemes: chrome, chrome-extension, chrome-untrusted, data, http, https, isolated-app.", "loading/file-protocol"],
+      ["Fetch API cannot load file:///app/model.glb. URL scheme \"file\" is not supported.", "loading/file-protocol"],
+      ["THREE.FileLoader: HTTP Status 0 received.", "loading/file-protocol"],
+      ["Failed to load resource: net::ERR_FILE_NOT_FOUND", "loading/file-protocol"],
+      ["Access to image at 'http://localhost:5402/img.png' from origin 'http://localhost:5401' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.", "loading/cross-origin-texture"],
+      ["SecurityError: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported.", "loading/cross-origin-texture"],
+      ["SecurityError: Failed to execute 'getImageData' on 'CanvasRenderingContext2D': The canvas has been tainted by cross-origin data.", "loading/cross-origin-texture"],
+      ["THREE.WebGLState: SecurityError: Failed to execute 'texSubImage2D' on 'WebGL2RenderingContext': The image element contains cross-origin data, and may not be loaded.", "loading/cross-origin-texture"],
+      ["THREE.GLTFLoader: Couldn't load texture blob:http://localhost/1", "loading/texture-load-error"],
+      ['[commonjs--resolver] Missing "./examples/js/controls/OrbitControls.js" specifier in "three" package', "imports/examples-js-removed"],
+      ['Error: "./examples/js/controls/OrbitControls.js" is not exported under the conditions ["module", "browser", "development", "import"] from package /app/node_modules/three (see exports field in /app/node_modules/three/package.json)', "imports/examples-js-removed"],
+      ["Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './examples/js/controls/OrbitControls.js' is not defined by \"exports\" in /app/node_modules/three/package.json imported from /app/main.js", "imports/examples-js-removed"],
+      ["SyntaxError: Cannot use import statement outside a module", "imports/script-not-module"],
+      ["ReferenceError: THREE is not defined", "imports/examples-js-removed"],
+      ["ReferenceError: OrbitControls is not defined", "imports/addons-not-in-core"],
+      ["ReferenceError: document is not defined", "build/ssr-window"],
+      ["ReferenceError: self is not defined", "build/ssr-window"],
+      ["No available adapters.", "webgpu/fallback-webgl"],
+      ["THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.", "webgpu/fallback-webgl"],
+      ["Error: R3F: Div is not part of the THREE namespace! Did you forget to extend? See: https://docs.pmnd.rs/react-three-fiber/api/objects#using-3rd-party-objects-declaratively", "r3f/dom-in-canvas"],
+      ["Error: A component suspended while responding to synchronous input. This will cause the UI to be replaced with a loading indicator. To fix, updates that suspend should be wrapped with startTransition.", "r3f/suspense-for-loaders"],
+      ["Error: Minified React error #426; visit https://reactjs.org/docs/error-decoder.html?invariant=426 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", "r3f/suspense-for-loaders"],
+    ];
+    for (const [msg, id] of real) expect(top(msg), msg).toBe(id);
+    expect(top("Error: Minified React error #4260; visit")).toBeUndefined();
+  });
+
   it("rank the more specific fragment first, and find nothing for unrelated messages", () => {
     const ids = lessonsForError("Uncaught TypeError: THREE.OrbitControls is not a constructor").map((h) => h.lesson.id);
     expect(ids).toEqual(["imports/examples-js-removed", "imports/addons-not-in-core"]);
