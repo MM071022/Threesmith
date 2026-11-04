@@ -1,0 +1,3819 @@
+{
+ "version": 1,
+ "name": "fire-truck",
+ "archetype": "vehicle.wheeled.fire-engine",
+ "description": "A European fire engine (a pumper): a forward-control crew cab with a raked windscreen, light bar, grille, mirrors, steps, glazed doors and seats inside; an equipment body with roller-shutter lockers along both sides, low lockers by the rear wheels, a rear pump compartment, hose reels, a roof deck with railings, an access ladder and reflective stripes; underneath the frame, axles, pump, tank and exhaust on truck wheels, twin at the rear. The ladder is an extension ladder on a roof rack or a turntable aerial ladder with four outriggers; red, lime-yellow or white.",
+ "params": [
+  {
+   "name": "length",
+   "type": "number",
+   "default": 8.5,
+   "min": 7.0,
+   "max": 11.0,
+   "description": "Overall length in metres (a two-axle pumper is about 7.5-9 m)."
+  },
+  {
+   "name": "width",
+   "type": "number",
+   "default": 2.5,
+   "min": 2.4,
+   "max": 2.55,
+   "description": "Body width (EU maximum 2.55 m)."
+  },
+  {
+   "name": "height",
+   "type": "number",
+   "default": 3.2,
+   "min": 2.9,
+   "max": 3.5,
+   "description": "Roof height of the equipment body above the ground."
+  },
+  {
+   "name": "wheelRadius",
+   "type": "number",
+   "default": 0.5,
+   "min": 0.45,
+   "max": 0.56,
+   "description": "Tyre radius."
+  },
+  {
+   "name": "ladder",
+   "type": "integer",
+   "default": 1,
+   "min": 0,
+   "max": 2,
+   "description": "0 = no ladder, 1 = an extension ladder on the roof rack, 2 = a turntable aerial ladder with outriggers (a quint)."
+  },
+  {
+   "name": "colour",
+   "type": "integer",
+   "default": 0,
+   "min": 0,
+   "max": 2,
+   "description": "0 = fire-engine red with white stripes, 1 = lime-yellow with red stripes, 2 = white with red stripes."
+  },
+  {
+   "name": "lockersPerSide",
+   "type": "integer",
+   "default": 3,
+   "min": 2,
+   "max": 5,
+   "description": "Roller-shutter lockers along each side of the body."
+  },
+  {
+   "name": "crewCab",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "A crew cab with a second row of doors (for 6-9 firefighters) instead of a single cab."
+  }
+ ],
+ "materials": {
+  "paint_red": {
+   "color": [
+    0.5,
+    0.008,
+    0.008
+   ],
+   "metallic": 0.3,
+   "roughness": 0.28
+  },
+  "paint_lime": {
+   "color": [
+    0.55,
+    0.72,
+    0.0
+   ],
+   "metallic": 0.2,
+   "roughness": 0.3
+  },
+  "paint_white": {
+   "color": [
+    0.82,
+    0.82,
+    0.8
+   ],
+   "metallic": 0.2,
+   "roughness": 0.3
+  },
+  "reflect_white": {
+   "color": [
+    0.86,
+    0.86,
+    0.84
+   ],
+   "metallic": 0.0,
+   "roughness": 0.3
+  },
+  "reflect_red": {
+   "color": [
+    0.6,
+    0.01,
+    0.015
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  },
+  "reflect_yellow": {
+   "color": [
+    0.85,
+    0.62,
+    0.0
+   ],
+   "metallic": 0.1,
+   "roughness": 0.35
+  },
+  "shutter": {
+   "color": [
+    0.7,
+    0.71,
+    0.73
+   ],
+   "metallic": 0.85,
+   "roughness": 0.35
+  },
+  "trim_black": {
+   "color": [
+    0.018,
+    0.018,
+    0.02
+   ],
+   "metallic": 0.1,
+   "roughness": 0.45
+  },
+  "frame_black": {
+   "color": [
+    0.03,
+    0.03,
+    0.032
+   ],
+   "metallic": 0.4,
+   "roughness": 0.55
+  },
+  "bumper": {
+   "color": [
+    0.08,
+    0.08,
+    0.085
+   ],
+   "metallic": 0.1,
+   "roughness": 0.55
+  },
+  "lamp_bezel": {
+   "color": [
+    0.06,
+    0.06,
+    0.065
+   ],
+   "metallic": 1.0,
+   "roughness": 0.12
+  },
+  "wheel_paint": {
+   "color": [
+    0.6,
+    0.6,
+    0.62
+   ],
+   "metallic": 0.6,
+   "roughness": 0.35
+  },
+  "wheel_dark": {
+   "color": [
+    0.01,
+    0.01,
+    0.012
+   ],
+   "metallic": 0.0,
+   "roughness": 0.9
+  },
+  "upholstery": {
+   "color": [
+    0.035,
+    0.034,
+    0.036
+   ],
+   "metallic": 0.0,
+   "roughness": 0.9
+  },
+  "light_blue": {
+   "color": [
+    0.02,
+    0.08,
+    0.85
+   ],
+   "metallic": 0.0,
+   "roughness": 0.15,
+   "emissive": [
+    0.05,
+    0.25,
+    1.0
+   ]
+  },
+  "ladder_alu": {
+   "color": [
+    0.78,
+    0.79,
+    0.8
+   ],
+   "metallic": 0.9,
+   "roughness": 0.3
+  },
+  "hose": {
+   "color": [
+    0.7,
+    0.66,
+    0.55
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85
+  }
+ },
+ "nodes": [
+  {
+   "name": "FireTruck",
+   "material": "paint_red",
+   "vars": {
+    "L2": "$length / 2",
+    "zf": "$length / 2",
+    "zr": "-$length / 2",
+    "W2": "$width / 2",
+    "cw": "$width - 0.05",
+    "c2": "($width - 0.05) / 2",
+    "cab": "1.95 + 1.0 * $crewCab",
+    "zb": "$length / 2 - (1.95 + 1.0 * $crewCab) - 0.08",
+    "zbr": "-$length / 2 + 0.06",
+    "blen": "$length - (1.95 + 1.0 * $crewCab) - 0.08 - 0.06",
+    "zbm": "($length / 2 - (1.95 + 1.0 * $crewCab) - 0.08 - $length / 2 + 0.06) / 2",
+    "H": "$height",
+    "yb": 1.08,
+    "yc0": 1.08,
+    "ych": 3.0,
+    "r": "$wheelRadius",
+    "tw": 0.3,
+    "zFA": "$length / 2 - 1.35",
+    "zRA": "$length / 2 - 1.35 - (0.5 * $length - 0.3)",
+    "aer": "$ladder * ($ladder - 1) / 2",
+    "roofl": "$ladder * (2 - $ladder)",
+    "kOn": "(0.02 + 0.98 * ($ladder * (3 - $ladder) / 2))",
+    "kAer": "(0.02 + 0.98 * ($ladder * ($ladder - 1) / 2))",
+    "kCrew": "(0.02 + 0.98 * ($crewCab))",
+    "kRed": "(0.02 + 0.98 * ((1 - $colour) * (2 - $colour) / 2))",
+    "kLime": "(0.02 + 0.98 * ($colour * (2 - $colour)))",
+    "kWhite": "(0.02 + 0.98 * ($colour * ($colour - 1) / 2))",
+    "nl": "$lockersPerSide"
+   },
+   "children": [
+    {
+     "name": "Paint_Red",
+     "at": [
+      0,
+      1.8,
+      0
+     ],
+     "children": [
+      {
+       "name": "CabShell",
+       "shape": "loft",
+       "material": "paint_red",
+       "sections": [
+        {
+         "z": "($zf - 0.0) * $kRed",
+         "superellipse": {
+          "width": "($cw - 0.16) * $kRed",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kRed",
+          "n": 6,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kRed"
+         }
+        },
+        {
+         "z": "($zf - 0.06) * $kRed",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kRed",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kRed",
+          "n": 8,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kRed"
+         }
+        },
+        {
+         "z": "($zf - 0.2) * $kRed",
+         "superellipse": {
+          "width": "($cw) * $kRed",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kRed",
+          "n": 9,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kRed"
+         }
+        },
+        {
+         "z": "($zb + 0.12) * $kRed",
+         "superellipse": {
+          "width": "($cw) * $kRed",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kRed",
+          "n": 9,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kRed"
+         }
+        }
+       ]
+      },
+      {
+       "name": "CabRoof",
+       "shape": "loft",
+       "material": "paint_red",
+       "sections": [
+        {
+         "z": "($zf - 0.17) * $kRed",
+         "superellipse": {
+          "width": "($cw - 0.14) * $kRed",
+          "height": "((2.82 - 1.8) - (2.76 - 1.8)) * $kRed",
+          "n": 4,
+          "count": 32,
+          "cy": "(((2.76 - 1.8) + (2.82 - 1.8)) / 2) * $kRed"
+         }
+        },
+        {
+         "z": "($zf - 0.24) * $kRed",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kRed",
+          "height": "(($ych - 1.8) - (2.72 - 1.8)) * $kRed",
+          "n": 6,
+          "count": 32,
+          "cy": "(((2.72 - 1.8) + ($ych - 1.8)) / 2) * $kRed"
+         }
+        },
+        {
+         "z": "($zb + 0.12) * $kRed",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kRed",
+          "height": "(($ych - 1.8) - (2.72 - 1.8)) * $kRed",
+          "n": 6,
+          "count": 32,
+          "cy": "(((2.72 - 1.8) + ($ych - 1.8)) / 2) * $kRed"
+         }
+        }
+       ]
+      },
+      {
+       "name": "PillarA_L",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "($c2 - 0.04) * $kRed",
+        "(2.37 - 1.8) * $kRed",
+        "($zf - 0.17) * $kRed"
+       ],
+       "rotate": [
+        -8,
+        0,
+        0
+       ],
+       "mirror": "PillarA_R",
+       "size": [
+        "0.09 * $kRed",
+        "0.82 * $kRed",
+        "0.1 * $kRed"
+       ]
+      },
+      {
+       "name": "PillarB_L",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "($c2 - 0.035) * $kRed",
+        "(2.37 - 1.8) * $kRed",
+        "($zf - 1.37) * $kRed"
+       ],
+       "mirror": "PillarB_R",
+       "size": [
+        "0.08 * $kRed",
+        "0.8 * $kRed",
+        "0.14 * $kRed"
+       ]
+      },
+      {
+       "name": "PillarC_L",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "($c2 - 0.035) * $kRed",
+        "(2.37 - 1.8) * $kRed",
+        "($zb + 0.2) * $kRed"
+       ],
+       "mirror": "PillarC_R",
+       "size": [
+        "0.08 * $kRed",
+        "0.8 * $kRed",
+        "0.2 * $kRed"
+       ]
+      },
+      {
+       "name": "Header",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        0,
+        "(2.73 - 1.8) * $kRed",
+        "($zf - 0.21) * $kRed"
+       ],
+       "size": [
+        "($cw - 0.1) * $kRed",
+        "0.1 * $kRed",
+        "0.08 * $kRed"
+       ]
+      },
+      {
+       "name": "Body",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        0,
+        "($yb - 1.8) * $kRed",
+        "($zbm) * $kRed"
+       ],
+       "size": [
+        "($width) * $kRed",
+        "($H - $yb) * $kRed",
+        "($blen) * $kRed"
+       ],
+       "bevel": "0.05 * $kRed",
+       "anchor": "bottom"
+      },
+      {
+       "name": "RoofEdge_L",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "($W2 - 0.04) * $kRed",
+        "($H + 0.02 - 1.8) * $kRed",
+        "($zbm) * $kRed"
+       ],
+       "mirror": "RoofEdge_R",
+       "size": [
+        "0.08 * $kRed",
+        "0.14 * $kRed",
+        "($blen) * $kRed"
+       ],
+       "bevel": "0.02 * $kRed"
+      },
+      {
+       "name": "SideboxFront_L",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "($W2 - 0.25) * $kRed",
+        "(0.58 - 1.8) * $kRed",
+        "(($zb + $zRA + $r + 0.18) / 2) * $kRed"
+       ],
+       "mirror": "SideboxFront_R",
+       "size": [
+        "0.5 * $kRed",
+        "0.52 * $kRed",
+        "($zb - $zRA - $r - 0.22) * $kRed"
+       ],
+       "bevel": "0.03 * $kRed",
+       "anchor": "bottom"
+      },
+      {
+       "name": "SideboxRear_L",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "($W2 - 0.25) * $kRed",
+        "(0.58 - 1.8) * $kRed",
+        "(($zRA - $r - 0.18 + $zbr) / 2) * $kRed"
+       ],
+       "mirror": "SideboxRear_R",
+       "size": [
+        "0.5 * $kRed",
+        "0.52 * $kRed",
+        "($zRA - $r - 0.22 - $zbr) * $kRed"
+       ],
+       "bevel": "0.03 * $kRed",
+       "anchor": "bottom"
+      },
+      {
+       "name": "Stripe_L",
+       "shape": "box",
+       "material": "reflect_white",
+       "at": [
+        "($W2 + 0.006) * $kRed",
+        "($yb + 0.08 - 1.8) * $kRed",
+        "($zbm) * $kRed"
+       ],
+       "mirror": "Stripe_R",
+       "size": [
+        "0.012 * $kRed",
+        "0.16 * $kRed",
+        "($blen - 0.1) * $kRed"
+       ]
+      },
+      {
+       "name": "StripeHigh_L",
+       "shape": "box",
+       "material": "reflect_white",
+       "at": [
+        "($W2 + 0.006) * $kRed",
+        "($H - 0.12 - 1.8) * $kRed",
+        "($zbm) * $kRed"
+       ],
+       "mirror": "StripeHigh_R",
+       "size": [
+        "0.012 * $kRed",
+        "0.1 * $kRed",
+        "($blen - 0.1) * $kRed"
+       ]
+      },
+      {
+       "name": "StripeCab_L",
+       "shape": "box",
+       "material": "reflect_white",
+       "at": [
+        "($c2 + 0.006) * $kRed",
+        "(1.3 - 1.8) * $kRed",
+        "($zf - ($cab - 0.25) / 2 - 0.12) * $kRed"
+       ],
+       "mirror": "StripeCab_R",
+       "size": [
+        "0.012 * $kRed",
+        "0.14 * $kRed",
+        "($cab - 0.25) * $kRed"
+       ]
+      },
+      {
+       "name": "StripeFront",
+       "shape": "box",
+       "material": "reflect_white",
+       "at": [
+        0,
+        "(1.17 - 1.8) * $kRed",
+        "($zf + 0.004) * $kRed"
+       ],
+       "size": [
+        "($cw - 0.3) * $kRed",
+        "0.1 * $kRed",
+        "0.012 * $kRed"
+       ]
+      },
+      {
+       "name": "StripeRear",
+       "shape": "box",
+       "material": "reflect_white",
+       "at": [
+        0,
+        "($yb + 0.08 - 1.8) * $kRed",
+        "($zbr - 0.006) * $kRed"
+       ],
+       "size": [
+        "($width - 0.1) * $kRed",
+        "0.14 * $kRed",
+        "0.012 * $kRed"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Paint_Lime",
+     "at": [
+      0,
+      1.8,
+      0
+     ],
+     "children": [
+      {
+       "name": "CabShell",
+       "shape": "loft",
+       "material": "paint_lime",
+       "sections": [
+        {
+         "z": "($zf - 0.0) * $kLime",
+         "superellipse": {
+          "width": "($cw - 0.16) * $kLime",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kLime",
+          "n": 6,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kLime"
+         }
+        },
+        {
+         "z": "($zf - 0.06) * $kLime",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kLime",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kLime",
+          "n": 8,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kLime"
+         }
+        },
+        {
+         "z": "($zf - 0.2) * $kLime",
+         "superellipse": {
+          "width": "($cw) * $kLime",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kLime",
+          "n": 9,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kLime"
+         }
+        },
+        {
+         "z": "($zb + 0.12) * $kLime",
+         "superellipse": {
+          "width": "($cw) * $kLime",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kLime",
+          "n": 9,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kLime"
+         }
+        }
+       ]
+      },
+      {
+       "name": "CabRoof",
+       "shape": "loft",
+       "material": "paint_lime",
+       "sections": [
+        {
+         "z": "($zf - 0.17) * $kLime",
+         "superellipse": {
+          "width": "($cw - 0.14) * $kLime",
+          "height": "((2.82 - 1.8) - (2.76 - 1.8)) * $kLime",
+          "n": 4,
+          "count": 32,
+          "cy": "(((2.76 - 1.8) + (2.82 - 1.8)) / 2) * $kLime"
+         }
+        },
+        {
+         "z": "($zf - 0.24) * $kLime",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kLime",
+          "height": "(($ych - 1.8) - (2.72 - 1.8)) * $kLime",
+          "n": 6,
+          "count": 32,
+          "cy": "(((2.72 - 1.8) + ($ych - 1.8)) / 2) * $kLime"
+         }
+        },
+        {
+         "z": "($zb + 0.12) * $kLime",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kLime",
+          "height": "(($ych - 1.8) - (2.72 - 1.8)) * $kLime",
+          "n": 6,
+          "count": 32,
+          "cy": "(((2.72 - 1.8) + ($ych - 1.8)) / 2) * $kLime"
+         }
+        }
+       ]
+      },
+      {
+       "name": "PillarA_L",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        "($c2 - 0.04) * $kLime",
+        "(2.37 - 1.8) * $kLime",
+        "($zf - 0.17) * $kLime"
+       ],
+       "rotate": [
+        -8,
+        0,
+        0
+       ],
+       "mirror": "PillarA_R",
+       "size": [
+        "0.09 * $kLime",
+        "0.82 * $kLime",
+        "0.1 * $kLime"
+       ]
+      },
+      {
+       "name": "PillarB_L",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        "($c2 - 0.035) * $kLime",
+        "(2.37 - 1.8) * $kLime",
+        "($zf - 1.37) * $kLime"
+       ],
+       "mirror": "PillarB_R",
+       "size": [
+        "0.08 * $kLime",
+        "0.8 * $kLime",
+        "0.14 * $kLime"
+       ]
+      },
+      {
+       "name": "PillarC_L",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        "($c2 - 0.035) * $kLime",
+        "(2.37 - 1.8) * $kLime",
+        "($zb + 0.2) * $kLime"
+       ],
+       "mirror": "PillarC_R",
+       "size": [
+        "0.08 * $kLime",
+        "0.8 * $kLime",
+        "0.2 * $kLime"
+       ]
+      },
+      {
+       "name": "Header",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        0,
+        "(2.73 - 1.8) * $kLime",
+        "($zf - 0.21) * $kLime"
+       ],
+       "size": [
+        "($cw - 0.1) * $kLime",
+        "0.1 * $kLime",
+        "0.08 * $kLime"
+       ]
+      },
+      {
+       "name": "Body",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        0,
+        "($yb - 1.8) * $kLime",
+        "($zbm) * $kLime"
+       ],
+       "size": [
+        "($width) * $kLime",
+        "($H - $yb) * $kLime",
+        "($blen) * $kLime"
+       ],
+       "bevel": "0.05 * $kLime",
+       "anchor": "bottom"
+      },
+      {
+       "name": "RoofEdge_L",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        "($W2 - 0.04) * $kLime",
+        "($H + 0.02 - 1.8) * $kLime",
+        "($zbm) * $kLime"
+       ],
+       "mirror": "RoofEdge_R",
+       "size": [
+        "0.08 * $kLime",
+        "0.14 * $kLime",
+        "($blen) * $kLime"
+       ],
+       "bevel": "0.02 * $kLime"
+      },
+      {
+       "name": "SideboxFront_L",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        "($W2 - 0.25) * $kLime",
+        "(0.58 - 1.8) * $kLime",
+        "(($zb + $zRA + $r + 0.18) / 2) * $kLime"
+       ],
+       "mirror": "SideboxFront_R",
+       "size": [
+        "0.5 * $kLime",
+        "0.52 * $kLime",
+        "($zb - $zRA - $r - 0.22) * $kLime"
+       ],
+       "bevel": "0.03 * $kLime",
+       "anchor": "bottom"
+      },
+      {
+       "name": "SideboxRear_L",
+       "shape": "box",
+       "material": "paint_lime",
+       "at": [
+        "($W2 - 0.25) * $kLime",
+        "(0.58 - 1.8) * $kLime",
+        "(($zRA - $r - 0.18 + $zbr) / 2) * $kLime"
+       ],
+       "mirror": "SideboxRear_R",
+       "size": [
+        "0.5 * $kLime",
+        "0.52 * $kLime",
+        "($zRA - $r - 0.22 - $zbr) * $kLime"
+       ],
+       "bevel": "0.03 * $kLime",
+       "anchor": "bottom"
+      },
+      {
+       "name": "Stripe_L",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        "($W2 + 0.006) * $kLime",
+        "($yb + 0.08 - 1.8) * $kLime",
+        "($zbm) * $kLime"
+       ],
+       "mirror": "Stripe_R",
+       "size": [
+        "0.012 * $kLime",
+        "0.16 * $kLime",
+        "($blen - 0.1) * $kLime"
+       ]
+      },
+      {
+       "name": "StripeHigh_L",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        "($W2 + 0.006) * $kLime",
+        "($H - 0.12 - 1.8) * $kLime",
+        "($zbm) * $kLime"
+       ],
+       "mirror": "StripeHigh_R",
+       "size": [
+        "0.012 * $kLime",
+        "0.1 * $kLime",
+        "($blen - 0.1) * $kLime"
+       ]
+      },
+      {
+       "name": "StripeCab_L",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        "($c2 + 0.006) * $kLime",
+        "(1.3 - 1.8) * $kLime",
+        "($zf - ($cab - 0.25) / 2 - 0.12) * $kLime"
+       ],
+       "mirror": "StripeCab_R",
+       "size": [
+        "0.012 * $kLime",
+        "0.14 * $kLime",
+        "($cab - 0.25) * $kLime"
+       ]
+      },
+      {
+       "name": "StripeFront",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        0,
+        "(1.17 - 1.8) * $kLime",
+        "($zf + 0.004) * $kLime"
+       ],
+       "size": [
+        "($cw - 0.3) * $kLime",
+        "0.1 * $kLime",
+        "0.012 * $kLime"
+       ]
+      },
+      {
+       "name": "StripeRear",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        0,
+        "($yb + 0.08 - 1.8) * $kLime",
+        "($zbr - 0.006) * $kLime"
+       ],
+       "size": [
+        "($width - 0.1) * $kLime",
+        "0.14 * $kLime",
+        "0.012 * $kLime"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Paint_White",
+     "at": [
+      0,
+      1.8,
+      0
+     ],
+     "children": [
+      {
+       "name": "CabShell",
+       "shape": "loft",
+       "material": "paint_white",
+       "sections": [
+        {
+         "z": "($zf - 0.0) * $kWhite",
+         "superellipse": {
+          "width": "($cw - 0.16) * $kWhite",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kWhite",
+          "n": 6,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kWhite"
+         }
+        },
+        {
+         "z": "($zf - 0.06) * $kWhite",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kWhite",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kWhite",
+          "n": 8,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kWhite"
+         }
+        },
+        {
+         "z": "($zf - 0.2) * $kWhite",
+         "superellipse": {
+          "width": "($cw) * $kWhite",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kWhite",
+          "n": 9,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kWhite"
+         }
+        },
+        {
+         "z": "($zb + 0.12) * $kWhite",
+         "superellipse": {
+          "width": "($cw) * $kWhite",
+          "height": "((2.0 - 1.8) - ($yc0 - 1.8)) * $kWhite",
+          "n": 9,
+          "count": 32,
+          "cy": "((($yc0 - 1.8) + (2.0 - 1.8)) / 2) * $kWhite"
+         }
+        }
+       ]
+      },
+      {
+       "name": "CabRoof",
+       "shape": "loft",
+       "material": "paint_white",
+       "sections": [
+        {
+         "z": "($zf - 0.17) * $kWhite",
+         "superellipse": {
+          "width": "($cw - 0.14) * $kWhite",
+          "height": "((2.82 - 1.8) - (2.76 - 1.8)) * $kWhite",
+          "n": 4,
+          "count": 32,
+          "cy": "(((2.76 - 1.8) + (2.82 - 1.8)) / 2) * $kWhite"
+         }
+        },
+        {
+         "z": "($zf - 0.24) * $kWhite",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kWhite",
+          "height": "(($ych - 1.8) - (2.72 - 1.8)) * $kWhite",
+          "n": 6,
+          "count": 32,
+          "cy": "(((2.72 - 1.8) + ($ych - 1.8)) / 2) * $kWhite"
+         }
+        },
+        {
+         "z": "($zb + 0.12) * $kWhite",
+         "superellipse": {
+          "width": "($cw - 0.02) * $kWhite",
+          "height": "(($ych - 1.8) - (2.72 - 1.8)) * $kWhite",
+          "n": 6,
+          "count": 32,
+          "cy": "(((2.72 - 1.8) + ($ych - 1.8)) / 2) * $kWhite"
+         }
+        }
+       ]
+      },
+      {
+       "name": "PillarA_L",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        "($c2 - 0.04) * $kWhite",
+        "(2.37 - 1.8) * $kWhite",
+        "($zf - 0.17) * $kWhite"
+       ],
+       "rotate": [
+        -8,
+        0,
+        0
+       ],
+       "mirror": "PillarA_R",
+       "size": [
+        "0.09 * $kWhite",
+        "0.82 * $kWhite",
+        "0.1 * $kWhite"
+       ]
+      },
+      {
+       "name": "PillarB_L",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        "($c2 - 0.035) * $kWhite",
+        "(2.37 - 1.8) * $kWhite",
+        "($zf - 1.37) * $kWhite"
+       ],
+       "mirror": "PillarB_R",
+       "size": [
+        "0.08 * $kWhite",
+        "0.8 * $kWhite",
+        "0.14 * $kWhite"
+       ]
+      },
+      {
+       "name": "PillarC_L",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        "($c2 - 0.035) * $kWhite",
+        "(2.37 - 1.8) * $kWhite",
+        "($zb + 0.2) * $kWhite"
+       ],
+       "mirror": "PillarC_R",
+       "size": [
+        "0.08 * $kWhite",
+        "0.8 * $kWhite",
+        "0.2 * $kWhite"
+       ]
+      },
+      {
+       "name": "Header",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        0,
+        "(2.73 - 1.8) * $kWhite",
+        "($zf - 0.21) * $kWhite"
+       ],
+       "size": [
+        "($cw - 0.1) * $kWhite",
+        "0.1 * $kWhite",
+        "0.08 * $kWhite"
+       ]
+      },
+      {
+       "name": "Body",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        0,
+        "($yb - 1.8) * $kWhite",
+        "($zbm) * $kWhite"
+       ],
+       "size": [
+        "($width) * $kWhite",
+        "($H - $yb) * $kWhite",
+        "($blen) * $kWhite"
+       ],
+       "bevel": "0.05 * $kWhite",
+       "anchor": "bottom"
+      },
+      {
+       "name": "RoofEdge_L",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        "($W2 - 0.04) * $kWhite",
+        "($H + 0.02 - 1.8) * $kWhite",
+        "($zbm) * $kWhite"
+       ],
+       "mirror": "RoofEdge_R",
+       "size": [
+        "0.08 * $kWhite",
+        "0.14 * $kWhite",
+        "($blen) * $kWhite"
+       ],
+       "bevel": "0.02 * $kWhite"
+      },
+      {
+       "name": "SideboxFront_L",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        "($W2 - 0.25) * $kWhite",
+        "(0.58 - 1.8) * $kWhite",
+        "(($zb + $zRA + $r + 0.18) / 2) * $kWhite"
+       ],
+       "mirror": "SideboxFront_R",
+       "size": [
+        "0.5 * $kWhite",
+        "0.52 * $kWhite",
+        "($zb - $zRA - $r - 0.22) * $kWhite"
+       ],
+       "bevel": "0.03 * $kWhite",
+       "anchor": "bottom"
+      },
+      {
+       "name": "SideboxRear_L",
+       "shape": "box",
+       "material": "paint_white",
+       "at": [
+        "($W2 - 0.25) * $kWhite",
+        "(0.58 - 1.8) * $kWhite",
+        "(($zRA - $r - 0.18 + $zbr) / 2) * $kWhite"
+       ],
+       "mirror": "SideboxRear_R",
+       "size": [
+        "0.5 * $kWhite",
+        "0.52 * $kWhite",
+        "($zRA - $r - 0.22 - $zbr) * $kWhite"
+       ],
+       "bevel": "0.03 * $kWhite",
+       "anchor": "bottom"
+      },
+      {
+       "name": "Stripe_L",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        "($W2 + 0.006) * $kWhite",
+        "($yb + 0.08 - 1.8) * $kWhite",
+        "($zbm) * $kWhite"
+       ],
+       "mirror": "Stripe_R",
+       "size": [
+        "0.012 * $kWhite",
+        "0.16 * $kWhite",
+        "($blen - 0.1) * $kWhite"
+       ]
+      },
+      {
+       "name": "StripeHigh_L",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        "($W2 + 0.006) * $kWhite",
+        "($H - 0.12 - 1.8) * $kWhite",
+        "($zbm) * $kWhite"
+       ],
+       "mirror": "StripeHigh_R",
+       "size": [
+        "0.012 * $kWhite",
+        "0.1 * $kWhite",
+        "($blen - 0.1) * $kWhite"
+       ]
+      },
+      {
+       "name": "StripeCab_L",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        "($c2 + 0.006) * $kWhite",
+        "(1.3 - 1.8) * $kWhite",
+        "($zf - ($cab - 0.25) / 2 - 0.12) * $kWhite"
+       ],
+       "mirror": "StripeCab_R",
+       "size": [
+        "0.012 * $kWhite",
+        "0.14 * $kWhite",
+        "($cab - 0.25) * $kWhite"
+       ]
+      },
+      {
+       "name": "StripeFront",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        0,
+        "(1.17 - 1.8) * $kWhite",
+        "($zf + 0.004) * $kWhite"
+       ],
+       "size": [
+        "($cw - 0.3) * $kWhite",
+        "0.1 * $kWhite",
+        "0.012 * $kWhite"
+       ]
+      },
+      {
+       "name": "StripeRear",
+       "shape": "box",
+       "material": "reflect_red",
+       "at": [
+        0,
+        "($yb + 0.08 - 1.8) * $kWhite",
+        "($zbr - 0.006) * $kWhite"
+       ],
+       "size": [
+        "($width - 0.1) * $kWhite",
+        "0.14 * $kWhite",
+        "0.012 * $kWhite"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Cab",
+     "children": [
+      {
+       "name": "Glass",
+       "shape": "loft",
+       "material": "glass",
+       "sections": [
+        {
+         "z": "$zf - 0.12",
+         "superellipse": {
+          "width": "$cw - 0.12",
+          "height": "(2.76) - (1.92)",
+          "n": 7,
+          "count": 32,
+          "cy": "((1.92) + (2.76)) / 2"
+         }
+        },
+        {
+         "z": "$zf - 0.22",
+         "superellipse": {
+          "width": "$cw - 0.03",
+          "height": "(2.78) - (1.92)",
+          "n": 9,
+          "count": 32,
+          "cy": "((1.92) + (2.78)) / 2"
+         }
+        },
+        {
+         "z": "$zb + 0.1",
+         "superellipse": {
+          "width": "$cw - 0.03",
+          "height": "(2.78) - (1.92)",
+          "n": 9,
+          "count": 32,
+          "cy": "((1.92) + (2.78)) / 2"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Grille",
+       "shape": "box",
+       "material": "trim_black",
+       "at": [
+        0,
+        1.55,
+        "$zf + 0.004"
+       ],
+       "size": [
+        "$cw - 0.6",
+        0.42,
+        0.03
+       ],
+       "bevel": 0.01
+      },
+      {
+       "name": "Slat{i}",
+       "shape": "box",
+       "material": "lamp_bezel",
+       "at": [
+        0,
+        1.4,
+        "$zf + 0.014"
+       ],
+       "repeat": {
+        "count": 5,
+        "step": [
+         0,
+         0.075,
+         0
+        ]
+       },
+       "size": [
+        "$cw - 0.66",
+        0.03,
+        0.02
+       ]
+      },
+      {
+       "name": "Badge",
+       "shape": "box",
+       "material": "chrome",
+       "at": [
+        0,
+        1.84,
+        "$zf + 0.01"
+       ],
+       "size": [
+        0.3,
+        0.08,
+        0.03
+       ],
+       "bevel": 0.01
+      },
+      {
+       "name": "Bumper",
+       "children": [
+        {
+         "name": "Bar",
+         "shape": "box",
+         "material": "bumper",
+         "at": [
+          0,
+          0.78,
+          "$zf - 0.08"
+         ],
+         "size": [
+          "$cw + 0.04",
+          0.36,
+          0.3
+         ],
+         "bevel": 0.06
+        },
+        {
+         "name": "Step_L",
+         "shape": "box",
+         "material": "shutter",
+         "at": [
+          "$c2 - 0.36",
+          0.58,
+          "$zf - 0.02"
+         ],
+         "mirror": "Step_R",
+         "size": [
+          0.5,
+          0.05,
+          0.22
+         ]
+        },
+        {
+         "name": "Plate",
+         "shape": "box",
+         "material": "reflect_white",
+         "at": [
+          0,
+          0.8,
+          "$zf + 0.075"
+         ],
+         "size": [
+          0.52,
+          0.11,
+          0.02
+         ]
+        },
+        {
+         "name": "Flash_L",
+         "shape": "box",
+         "material": "light_blue",
+         "at": [
+          "$c2 - 0.75",
+          0.86,
+          "$zf + 0.075"
+         ],
+         "mirror": "Flash_R",
+         "size": [
+          0.14,
+          0.06,
+          0.02
+         ]
+        },
+        {
+         "name": "Fog_L",
+         "shape": "cylinder",
+         "material": "light",
+         "at": [
+          "$c2 - 0.25",
+          0.78,
+          "$zf + 0.07"
+         ],
+         "mirror": "Fog_R",
+         "radius": 0.06,
+         "height": 0.03,
+         "axis": "z",
+         "segments": 16
+        },
+        {
+         "name": "Horn_L",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "$c2 - 0.55",
+          0.72,
+          "$zf + 0.07"
+         ],
+         "mirror": "Horn_R",
+         "radius": 0.07,
+         "height": 0.06,
+         "axis": "z",
+         "segments": 14
+        }
+       ]
+      },
+      {
+       "name": "Headlight_L",
+       "at": [
+        "$c2 - 0.3",
+        1.28,
+        "$zf + 0.0"
+       ],
+       "mirror": "Headlight_R",
+       "children": [
+        {
+         "name": "Bezel",
+         "shape": "box",
+         "material": "lamp_bezel",
+         "size": [
+          0.42,
+          0.2,
+          0.06
+         ],
+         "bevel": 0.02
+        },
+        {
+         "name": "Lamp{i}",
+         "shape": "cylinder",
+         "material": "light",
+         "at": [
+          -0.09,
+          0,
+          0.03
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           0.15,
+           0,
+           0
+          ]
+         },
+         "radius": 0.06,
+         "height": 0.03,
+         "axis": "z",
+         "segments": 16
+        },
+        {
+         "name": "Indicator",
+         "shape": "box",
+         "material": "light_amber",
+         "at": [
+          0.16,
+          0,
+          0.032
+         ],
+         "size": [
+          0.07,
+          0.12,
+          0.02
+         ]
+        }
+       ]
+      },
+      {
+       "name": "LightBar",
+       "at": [
+        0,
+        "$ych - 0.01",
+        "$zf - 0.45"
+       ],
+       "children": [
+        {
+         "name": "Base",
+         "shape": "box",
+         "material": "trim_black",
+         "at": [
+          0,
+          0.035,
+          0
+         ],
+         "size": [
+          "$cw - 0.5",
+          0.07,
+          0.3
+         ],
+         "bevel": 0.02
+        },
+        {
+         "name": "Lens{i}",
+         "shape": "box",
+         "material": "light_blue",
+         "at": [
+          "-($cw - 0.78) / 2",
+          0.11,
+          0
+         ],
+         "repeat": {
+          "count": 4,
+          "step": [
+           "($cw - 0.78) / 3",
+           0,
+           0
+          ]
+         },
+         "size": [
+          0.24,
+          0.1,
+          0.26
+         ],
+         "bevel": 0.035
+        },
+        {
+         "name": "Flood",
+         "shape": "box",
+         "material": "light",
+         "at": [
+          0,
+          0.1,
+          0
+         ],
+         "size": [
+          "($cw - 0.78) / 3 - 0.26",
+          0.08,
+          0.24
+         ],
+         "bevel": 0.02
+        }
+       ]
+      },
+      {
+       "name": "Visor",
+       "shape": "box",
+       "material": "trim_black",
+       "at": [
+        0,
+        2.8,
+        "$zf + 0.03"
+       ],
+       "rotate": [
+        8,
+        0,
+        0
+       ],
+       "size": [
+        "$cw - 0.2",
+        0.04,
+        0.22
+       ]
+      },
+      {
+       "name": "Wiper_L",
+       "shape": "box",
+       "material": "trim_black",
+       "at": [
+        0.42,
+        2,
+        "$zf - 0.08"
+       ],
+       "rotate": [
+        90,
+        0,
+        -8
+       ],
+       "mirror": "Wiper_R",
+       "size": [
+        0.02,
+        0.02,
+        0.7
+       ]
+      },
+      {
+       "name": "Mirror_L",
+       "at": [
+        "$c2 - 0.02",
+        2.15,
+        "$zf - 0.12"
+       ],
+       "mirror": "Mirror_R",
+       "children": [
+        {
+         "name": "Arm",
+         "shape": "tube",
+         "material": "trim_black",
+         "path": [
+          [
+           0,
+           0,
+           0
+          ],
+          [
+           0.22,
+           0.05,
+           0.05
+          ],
+          [
+           0.28,
+           0.3,
+           0.05
+          ]
+         ],
+         "radius": 0.016,
+         "segments": 6
+        },
+        {
+         "name": "Main",
+         "shape": "box",
+         "material": "trim_black",
+         "at": [
+          0.32,
+          0.25,
+          0.05
+         ],
+         "size": [
+          0.07,
+          0.42,
+          0.24
+         ],
+         "bevel": 0.03
+        },
+        {
+         "name": "Glass",
+         "shape": "box",
+         "material": "chrome",
+         "at": [
+          0.32,
+          0.25,
+          -0.075
+         ],
+         "size": [
+          0.05,
+          0.36,
+          0.012
+         ]
+        },
+        {
+         "name": "Wide",
+         "shape": "box",
+         "material": "trim_black",
+         "at": [
+          0.32,
+          -0.06,
+          0.05
+         ],
+         "size": [
+          0.07,
+          0.2,
+          0.2
+         ],
+         "bevel": 0.03
+        }
+       ]
+      },
+      {
+       "name": "Door_L",
+       "at": [
+        "$c2 + 0.002",
+        "$yc0 + 0.02",
+        "$zf - 0.3"
+       ],
+       "mirror": "Door_R",
+       "children": [
+        {
+         "name": "SkinRed",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Panel",
+           "shape": "box",
+           "material": "paint_red",
+           "at": [
+            "0.3 * $kRed",
+            "(0.9 / 2) * $kRed",
+            "(-0.98 / 2) * $kRed"
+           ],
+           "size": [
+            "0.016 * $kRed",
+            "0.9 * $kRed",
+            "0.98 * $kRed"
+           ],
+           "bevel": "0.006 * $kRed"
+          },
+          {
+           "name": "Stripe",
+           "shape": "box",
+           "material": "reflect_white",
+           "at": [
+            "0.31 * $kRed",
+            "0.22 * $kRed",
+            "(-0.98 / 2) * $kRed"
+           ],
+           "size": [
+            "0.012 * $kRed",
+            "0.14 * $kRed",
+            "0.98 * $kRed"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "SkinLime",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Panel",
+           "shape": "box",
+           "material": "paint_lime",
+           "at": [
+            "0.3 * $kLime",
+            "(0.9 / 2) * $kLime",
+            "(-0.98 / 2) * $kLime"
+           ],
+           "size": [
+            "0.016 * $kLime",
+            "0.9 * $kLime",
+            "0.98 * $kLime"
+           ],
+           "bevel": "0.006 * $kLime"
+          },
+          {
+           "name": "Stripe",
+           "shape": "box",
+           "material": "reflect_red",
+           "at": [
+            "0.31 * $kLime",
+            "0.22 * $kLime",
+            "(-0.98 / 2) * $kLime"
+           ],
+           "size": [
+            "0.012 * $kLime",
+            "0.14 * $kLime",
+            "0.98 * $kLime"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "SkinWhite",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Panel",
+           "shape": "box",
+           "material": "paint_white",
+           "at": [
+            "0.3 * $kWhite",
+            "(0.9 / 2) * $kWhite",
+            "(-0.98 / 2) * $kWhite"
+           ],
+           "size": [
+            "0.016 * $kWhite",
+            "0.9 * $kWhite",
+            "0.98 * $kWhite"
+           ],
+           "bevel": "0.006 * $kWhite"
+          },
+          {
+           "name": "Stripe",
+           "shape": "box",
+           "material": "reflect_red",
+           "at": [
+            "0.31 * $kWhite",
+            "0.22 * $kWhite",
+            "(-0.98 / 2) * $kWhite"
+           ],
+           "size": [
+            "0.012 * $kWhite",
+            "0.14 * $kWhite",
+            "0.98 * $kWhite"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "Fittings",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Handle",
+           "shape": "box",
+           "material": "lamp_bezel",
+           "at": [
+            0.314,
+            0.72,
+            "-0.98 + 0.2"
+           ],
+           "size": [
+            0.03,
+            0.04,
+            0.2
+           ],
+           "bevel": 0.01
+          },
+          {
+           "name": "WindowSeal",
+           "shape": "box",
+           "material": "trim_black",
+           "at": [
+            0.29,
+            1.32,
+            "-0.98 / 2"
+           ],
+           "size": [
+            0.012,
+            0.74,
+            "0.98 - 0.06"
+           ]
+          },
+          {
+           "name": "Step",
+           "shape": "box",
+           "material": "shutter",
+           "at": [
+            0.15,
+            -0.28,
+            "-0.98 / 2"
+           ],
+           "size": [
+            0.3,
+            0.04,
+            "0.98 - 0.2"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "DoorRear_L",
+       "at": [
+        "lerp($c2 - 0.3, $c2 + 0.002, $crewCab)",
+        "$yc0 + 0.02",
+        "lerp($zf - 1.3, $zf - 1.45, $crewCab)"
+       ],
+       "mirror": "DoorRear_R",
+       "children": [
+        {
+         "name": "SkinRed",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Panel",
+           "shape": "box",
+           "material": "paint_red",
+           "at": [
+            "0.3 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "(0.9 / 2) * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "(-0.96 / 2) * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))"
+           ],
+           "size": [
+            "0.016 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "0.9 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "(0.96) * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))"
+           ],
+           "bevel": "0.006 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))"
+          },
+          {
+           "name": "Stripe",
+           "shape": "box",
+           "material": "reflect_white",
+           "at": [
+            "0.31 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "0.22 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "(-0.96 / 2) * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))"
+           ],
+           "size": [
+            "0.012 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "0.14 * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))",
+            "(0.96) * (0.02 + 0.98 * (((1 - $colour) * (2 - $colour) / 2) * $crewCab))"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "SkinLime",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Panel",
+           "shape": "box",
+           "material": "paint_lime",
+           "at": [
+            "0.3 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "(0.9 / 2) * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "(-0.96 / 2) * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))"
+           ],
+           "size": [
+            "0.016 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "0.9 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "(0.96) * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))"
+           ],
+           "bevel": "0.006 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))"
+          },
+          {
+           "name": "Stripe",
+           "shape": "box",
+           "material": "reflect_red",
+           "at": [
+            "0.31 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "0.22 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "(-0.96 / 2) * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))"
+           ],
+           "size": [
+            "0.012 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "0.14 * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))",
+            "(0.96) * (0.02 + 0.98 * (($colour * (2 - $colour)) * $crewCab))"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "SkinWhite",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Panel",
+           "shape": "box",
+           "material": "paint_white",
+           "at": [
+            "0.3 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "(0.9 / 2) * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "(-0.96 / 2) * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))"
+           ],
+           "size": [
+            "0.016 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "0.9 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "(0.96) * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))"
+           ],
+           "bevel": "0.006 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))"
+          },
+          {
+           "name": "Stripe",
+           "shape": "box",
+           "material": "reflect_red",
+           "at": [
+            "0.31 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "0.22 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "(-0.96 / 2) * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))"
+           ],
+           "size": [
+            "0.012 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "0.14 * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))",
+            "(0.96) * (0.02 + 0.98 * (($colour * ($colour - 1) / 2) * $crewCab))"
+           ]
+          }
+         ]
+        },
+        {
+         "name": "Fittings",
+         "at": [
+          -0.3,
+          0,
+          0
+         ],
+         "children": [
+          {
+           "name": "Handle",
+           "shape": "box",
+           "material": "lamp_bezel",
+           "at": [
+            "0.314 * $kCrew",
+            "0.72 * $kCrew",
+            "(-0.96 + 0.2) * $kCrew"
+           ],
+           "size": [
+            "0.03 * $kCrew",
+            "0.04 * $kCrew",
+            "0.2 * $kCrew"
+           ],
+           "bevel": "0.01 * $kCrew"
+          },
+          {
+           "name": "WindowSeal",
+           "shape": "box",
+           "material": "trim_black",
+           "at": [
+            "0.29 * $kCrew",
+            "1.32 * $kCrew",
+            "(-0.96 / 2) * $kCrew"
+           ],
+           "size": [
+            "0.012 * $kCrew",
+            "0.74 * $kCrew",
+            "(0.96 - 0.06) * $kCrew"
+           ]
+          },
+          {
+           "name": "Step",
+           "shape": "box",
+           "material": "shutter",
+           "at": [
+            "0.15 * $kCrew",
+            "-0.28 * $kCrew",
+            "(-0.96 / 2) * $kCrew"
+           ],
+           "size": [
+            "0.3 * $kCrew",
+            "0.04 * $kCrew",
+            "(0.96 - 0.2) * $kCrew"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Arch_L",
+       "shape": "tube",
+       "material": "trim_black",
+       "at": [
+        "$c2 - 0.1",
+        "$r",
+        "$zFA"
+       ],
+       "mirror": "Arch_R",
+       "path": [
+        [
+         0,
+         "0 * ($r + 0.09)",
+         "1 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.25882 * ($r + 0.09)",
+         "0.96593 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.5 * ($r + 0.09)",
+         "0.86603 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.70711 * ($r + 0.09)",
+         "0.70711 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.86603 * ($r + 0.09)",
+         "0.5 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.96593 * ($r + 0.09)",
+         "0.25882 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "1 * ($r + 0.09)",
+         "0 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.96593 * ($r + 0.09)",
+         "-0.25882 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.86603 * ($r + 0.09)",
+         "-0.5 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.70711 * ($r + 0.09)",
+         "-0.70711 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.5 * ($r + 0.09)",
+         "-0.86603 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0.25882 * ($r + 0.09)",
+         "-0.96593 * ($r + 0.09)"
+        ],
+        [
+         0,
+         "0 * ($r + 0.09)",
+         "-1 * ($r + 0.09)"
+        ]
+       ],
+       "radius": 0.05,
+       "segments": 8
+      },
+      {
+       "name": "Mudguard_L",
+       "shape": "box",
+       "material": "trim_black",
+       "at": [
+        "$c2 - 0.2",
+        "$yc0 - 0.02",
+        "$zFA"
+       ],
+       "mirror": "Mudguard_R",
+       "size": [
+        0.42,
+        0.04,
+        "2 * $r + 0.3"
+       ]
+      },
+      {
+       "name": "Underside",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        "$yc0 - 0.22",
+        "$zf - $cab / 2"
+       ],
+       "size": [
+        "$cw - 0.1",
+        0.5,
+        "$cab - 0.1"
+       ]
+      },
+      {
+       "name": "Interior",
+       "material": "upholstery",
+       "children": [
+        {
+         "name": "Dash",
+         "shape": "box",
+         "material": "trim_black",
+         "at": [
+          0,
+          1.75,
+          "$zf - 0.45"
+         ],
+         "size": [
+          "$cw - 0.2",
+          0.35,
+          0.5
+         ],
+         "bevel": 0.05
+        },
+        {
+         "name": "Seat_L",
+         "at": [
+          "$c2 - 0.5",
+          0,
+          "$zf - 1.0"
+         ],
+         "mirror": "Seat_R",
+         "children": [
+          {
+           "name": "Cushion",
+           "shape": "box",
+           "at": [
+            0,
+            1.55,
+            0
+           ],
+           "size": [
+            0.5,
+            0.14,
+            0.5
+           ],
+           "bevel": 0.04
+          },
+          {
+           "name": "Back",
+           "shape": "box",
+           "at": [
+            0,
+            1.98,
+            -0.28
+           ],
+           "rotate": [
+            -10,
+            0,
+            0
+           ],
+           "size": [
+            0.5,
+            0.75,
+            0.14
+           ],
+           "bevel": 0.05
+          }
+         ]
+        },
+        {
+         "name": "Bench",
+         "shape": "box",
+         "at": [
+          0,
+          1.85,
+          "$zb + 0.45"
+         ],
+         "size": [
+          "$cw - 0.3",
+          0.8,
+          0.5
+         ],
+         "bevel": 0.05
+        },
+        {
+         "name": "Floor",
+         "shape": "box",
+         "at": [
+          0,
+          1.45,
+          "$zf - $cab / 2"
+         ],
+         "size": [
+          "$cw - 0.1",
+          0.05,
+          "$cab - 0.2"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Steering",
+       "at": [
+        "$c2 - 0.5",
+        2,
+        "$zf - 0.62"
+       ],
+       "rotate": [
+        -55,
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Ring",
+         "shape": "lathe",
+         "material": "trim_black",
+         "profile": [
+          [
+           0.2,
+           -0.017
+          ],
+          [
+           0.22,
+           0
+          ],
+          [
+           0.2,
+           0.017
+          ],
+          [
+           0.18,
+           0
+          ],
+          [
+           0.2,
+           -0.017
+          ]
+         ],
+         "segments": 24,
+         "caps": false
+        },
+        {
+         "name": "Boss",
+         "shape": "cylinder",
+         "material": "trim_black",
+         "radius": 0.05,
+         "height": 0.05,
+         "segments": 12
+        }
+       ]
+      },
+      {
+       "name": "Hatch",
+       "shape": "box",
+       "material": "trim_black",
+       "at": [
+        0,
+        "$ych + 0.02",
+        "$zf - 1.3"
+       ],
+       "size": [
+        0.7,
+        0.06,
+        0.7
+       ],
+       "bevel": 0.02
+      }
+     ]
+    },
+    {
+     "name": "Chassis",
+     "children": [
+      {
+       "name": "Locker{i}_L",
+       "at": [
+        "$W2 + 0.003",
+        "$yb + 0.17",
+        "$zb - 0.1 - (($blen - 0.2) / $nl - 0.1) / 2 - 0.05"
+       ],
+       "repeat": {
+        "count": "$nl",
+        "step": [
+         0,
+         0,
+         "-((($blen - 0.2) / $nl - 0.1) + 0.1)"
+        ]
+       },
+       "mirror": "Locker{i}_R",
+       "children": [
+        {
+         "name": "Shutter",
+         "shape": "box",
+         "material": "shutter",
+         "at": [
+          0,
+          "($H - $yb - 0.32) / 2",
+          0
+         ],
+         "size": [
+          0.02,
+          "($H - $yb - 0.32)",
+          "(($blen - 0.2) / $nl - 0.1)"
+         ]
+        },
+        {
+         "name": "Slat{i}",
+         "shape": "box",
+         "material": "lamp_bezel",
+         "at": [
+          0.012,
+          0.02,
+          0
+         ],
+         "repeat": {
+          "count": 12,
+          "step": [
+           0,
+           "($H - $yb - 0.36) / 11",
+           0
+          ]
+         },
+         "size": [
+          0.008,
+          0.012,
+          "(($blen - 0.2) / $nl - 0.1)"
+         ]
+        },
+        {
+         "name": "Bar",
+         "shape": "box",
+         "material": "lamp_bezel",
+         "at": [
+          0.018,
+          0.03,
+          0
+         ],
+         "size": [
+          0.04,
+          0.05,
+          "(($blen - 0.2) / $nl - 0.1)"
+         ],
+         "bevel": 0.01
+        },
+        {
+         "name": "Handle",
+         "shape": "box",
+         "material": "chrome",
+         "at": [
+          0.034,
+          0.03,
+          0
+         ],
+         "size": [
+          0.05,
+          0.04,
+          0.28
+         ],
+         "bevel": 0.012
+        }
+       ]
+      },
+      {
+       "name": "RearShutter",
+       "at": [
+        0,
+        "($H + $yb) / 2 + 0.01",
+        "$zbr - 0.003"
+       ],
+       "children": [
+        {
+         "name": "Shutter",
+         "shape": "box",
+         "material": "shutter",
+         "size": [
+          "$width - 0.3",
+          "$H - $yb - 0.34",
+          0.02
+         ]
+        },
+        {
+         "name": "Slat{i}",
+         "shape": "box",
+         "material": "lamp_bezel",
+         "at": [
+          0,
+          "-($H - $yb - 0.38) / 2",
+          -0.012
+         ],
+         "repeat": {
+          "count": 12,
+          "step": [
+           0,
+           "($H - $yb - 0.38) / 11",
+           0
+          ]
+         },
+         "size": [
+          "$width - 0.3",
+          0.012,
+          0.008
+         ]
+        },
+        {
+         "name": "Bar",
+         "shape": "box",
+         "material": "lamp_bezel",
+         "at": [
+          0,
+          "-($H - $yb - 0.34) / 2 + 0.03",
+          -0.018
+         ],
+         "size": [
+          "$width - 0.3",
+          0.05,
+          0.04
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Taillight_L",
+       "at": [
+        "$W2 - 0.08",
+        "$yb + 0.5",
+        "$zbr - 0.02"
+       ],
+       "mirror": "Taillight_R",
+       "children": [
+        {
+         "name": "Housing",
+         "shape": "box",
+         "material": "lamp_bezel",
+         "size": [
+          0.14,
+          0.6,
+          0.05
+         ],
+         "bevel": 0.015
+        },
+        {
+         "name": "Red",
+         "shape": "box",
+         "material": "light_red",
+         "at": [
+          0,
+          0.16,
+          -0.025
+         ],
+         "size": [
+          0.1,
+          0.2,
+          0.02
+         ]
+        },
+        {
+         "name": "Amber",
+         "shape": "box",
+         "material": "light_amber",
+         "at": [
+          0,
+          -0.04,
+          -0.025
+         ],
+         "size": [
+          0.1,
+          0.14,
+          0.02
+         ]
+        },
+        {
+         "name": "Reverse",
+         "shape": "box",
+         "material": "frame_white",
+         "at": [
+          0,
+          -0.2,
+          -0.025
+         ],
+         "size": [
+          0.1,
+          0.12,
+          0.02
+         ]
+        }
+       ]
+      },
+      {
+       "name": "RearBeacon_L",
+       "at": [
+        "$W2 - 0.16",
+        "$H + 0.11",
+        "$zbr + 0.15"
+       ],
+       "mirror": "RearBeacon_R",
+       "children": [
+        {
+         "name": "Base",
+         "shape": "box",
+         "material": "trim_black",
+         "size": [
+          0.18,
+          0.05,
+          0.16
+         ],
+         "bevel": 0.015
+        },
+        {
+         "name": "Lens",
+         "shape": "box",
+         "material": "light_blue",
+         "at": [
+          0,
+          0.07,
+          0
+         ],
+         "size": [
+          0.16,
+          0.1,
+          0.14
+         ],
+         "bevel": 0.035
+        }
+       ]
+      },
+      {
+       "name": "SideFlash{i}_L",
+       "shape": "box",
+       "material": "light_blue",
+       "at": [
+        "$W2 + 0.006",
+        "$H - 0.25",
+        "$zb - 0.3"
+       ],
+       "repeat": {
+        "count": 2,
+        "step": [
+         0,
+         0,
+         "-($blen - 0.6)"
+        ]
+       },
+       "mirror": "SideFlash{i}_R",
+       "size": [
+        0.02,
+        0.07,
+        0.2
+       ]
+      },
+      {
+       "name": "Marker{i}_L",
+       "shape": "box",
+       "material": "light_amber",
+       "at": [
+        "$W2 + 0.006",
+        "$yb + 0.02",
+        "$zb - 0.3"
+       ],
+       "repeat": {
+        "count": 4,
+        "step": [
+         0,
+         0,
+         "-($blen - 0.6) / 3"
+        ]
+       },
+       "mirror": "Marker{i}_R",
+       "size": [
+        0.02,
+        0.05,
+        0.08
+       ]
+      },
+      {
+       "name": "RearSteps",
+       "at": [
+        "-$W2 + 0.3",
+        0,
+        "$zbr - 0.06"
+       ],
+       "children": [
+        {
+         "name": "Rail_L",
+         "shape": "box",
+         "material": "ladder_alu",
+         "at": [
+          0.2,
+          "($H + $yb) / 2 + 0.1",
+          0
+         ],
+         "mirror": "Rail_R",
+         "size": [
+          0.04,
+          "$H - $yb + 0.2",
+          0.04
+         ]
+        },
+        {
+         "name": "Rung{i}",
+         "shape": "box",
+         "material": "ladder_alu",
+         "at": [
+          0,
+          "$yb + 0.1",
+          0
+         ],
+         "repeat": {
+          "count": "floor(($H - $yb) / 0.3) + 1",
+          "step": [
+           0,
+           0.3,
+           0
+          ]
+         },
+         "size": [
+          0.4,
+          0.03,
+          0.03
+         ]
+        }
+       ]
+      },
+      {
+       "name": "RearBumper",
+       "children": [
+        {
+         "name": "Bar",
+         "shape": "box",
+         "material": "bumper",
+         "at": [
+          0,
+          0.68,
+          "$zbr + 0.02"
+         ],
+         "size": [
+          "$width - 0.2",
+          0.2,
+          0.22
+         ],
+         "bevel": 0.04
+        },
+        {
+         "name": "Step",
+         "shape": "box",
+         "material": "shutter",
+         "at": [
+          0,
+          0.52,
+          "$zbr + 0.06"
+         ],
+         "size": [
+          "$width - 0.6",
+          0.04,
+          0.3
+         ]
+        },
+        {
+         "name": "Plate",
+         "shape": "box",
+         "material": "reflect_white",
+         "at": [
+          0,
+          0.68,
+          "$zbr - 0.095"
+         ],
+         "size": [
+          0.52,
+          0.11,
+          0.02
+         ]
+        },
+        {
+         "name": "Chevron{i}",
+         "shape": "box",
+         "material": "reflect_red",
+         "at": [
+          "-$W2 + 0.3",
+          0.68,
+          "$zbr - 0.096"
+         ],
+         "rotate": [
+          0,
+          0,
+          45
+         ],
+         "repeat": {
+          "count": 2,
+          "step": [
+           "$width - 0.6",
+           0,
+           0
+          ]
+         },
+         "size": [
+          0.16,
+          0.18,
+          0.012
+         ]
+        }
+       ]
+      },
+      {
+       "name": "RoofDeck",
+       "shape": "box",
+       "material": "shutter",
+       "at": [
+        0,
+        "$H + 0.02",
+        "$zbm"
+       ],
+       "size": [
+        "$width - 0.2",
+        0.04,
+        "$blen - 0.2"
+       ]
+      },
+      {
+       "name": "RoofBox",
+       "shape": "box",
+       "material": "shutter",
+       "at": [
+        "-$W2 + 0.55",
+        "$H + 0.04",
+        "$zbr + 1.6"
+       ],
+       "size": [
+        0.9,
+        0.35,
+        1.4
+       ],
+       "bevel": 0.03,
+       "anchor": "bottom"
+      },
+      {
+       "name": "Rail_L",
+       "shape": "tube",
+       "material": "ladder_alu",
+       "mirror": "Rail_R",
+       "path": [
+        [
+         "$W2 - 0.06",
+         "$H + 0.06",
+         "$zb - 0.1"
+        ],
+        [
+         "$W2 - 0.06",
+         "$H + 0.3",
+         "$zb - 0.3"
+        ],
+        [
+         "$W2 - 0.06",
+         "$H + 0.3",
+         "$zbr + 0.3"
+        ],
+        [
+         "$W2 - 0.06",
+         "$H + 0.06",
+         "$zbr + 0.1"
+        ]
+       ],
+       "radius": 0.02,
+       "segments": 8
+      },
+      {
+       "name": "Mudflap_L",
+       "shape": "box",
+       "material": "rubber",
+       "at": [
+        "$W2 - 0.4",
+        0.55,
+        "$zRA - $r - 0.2"
+       ],
+       "mirror": "Mudflap_R",
+       "size": [
+        0.6,
+        0.4,
+        0.012
+       ]
+      },
+      {
+       "name": "Fender_L",
+       "shape": "box",
+       "material": "trim_black",
+       "at": [
+        "$W2 - 0.38",
+        "$yb - 0.02",
+        "$zRA"
+       ],
+       "mirror": "Fender_R",
+       "size": [
+        0.68,
+        0.05,
+        "2 * $r + 0.3"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Frame",
+     "children": [
+      {
+       "name": "Rail_L",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0.42,
+        0.88,
+        0
+       ],
+       "mirror": "Rail_R",
+       "size": [
+        0.09,
+        0.28,
+        "$length - 0.6"
+       ]
+      },
+      {
+       "name": "Cross{i}",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        0.9,
+        "$zf - 1.0"
+       ],
+       "repeat": {
+        "count": 5,
+        "step": [
+         0,
+         0,
+         "-($length - 1.6) / 4"
+        ]
+       },
+       "size": [
+        0.84,
+        0.1,
+        0.1
+       ]
+      },
+      {
+       "name": "AxleFront",
+       "shape": "cylinder",
+       "material": "frame_black",
+       "at": [
+        0,
+        "$r",
+        "$zFA"
+       ],
+       "radius": 0.07,
+       "height": "$width - 0.7",
+       "axis": "x",
+       "segments": 12
+      },
+      {
+       "name": "AxleRear",
+       "shape": "cylinder",
+       "material": "frame_black",
+       "at": [
+        0,
+        "$r",
+        "$zRA"
+       ],
+       "radius": 0.09,
+       "height": "$width - 0.7",
+       "axis": "x",
+       "segments": 12
+      },
+      {
+       "name": "Diff",
+       "shape": "ellipsoid",
+       "material": "frame_black",
+       "at": [
+        0,
+        "$r",
+        "$zRA"
+       ],
+       "radii": [
+        0.25,
+        0.22,
+        0.28
+       ],
+       "segments": 14
+      },
+      {
+       "name": "Tank",
+       "shape": "box",
+       "material": "steel",
+       "at": [
+        -0.75,
+        0.75,
+        "$zRA + $r + 0.9"
+       ],
+       "size": [
+        0.5,
+        0.5,
+        1
+       ],
+       "bevel": 0.08
+      },
+      {
+       "name": "Pump",
+       "shape": "box",
+       "material": "steel",
+       "at": [
+        0,
+        0.75,
+        "$zRA - $r - 0.8"
+       ],
+       "size": [
+        0.7,
+        0.55,
+        0.8
+       ],
+       "bevel": 0.05
+      },
+      {
+       "name": "Exhaust",
+       "shape": "tube",
+       "material": "steel",
+       "path": [
+        [
+         0.3,
+         0.6,
+         "$zFA - 0.5"
+        ],
+        [
+         0.68,
+         0.55,
+         "$zFA - 1.2"
+        ],
+        [
+         0.75,
+         0.55,
+         "$zRA + $r + 0.25"
+        ]
+       ],
+       "radius": 0.05,
+       "segments": 10
+      }
+     ]
+    },
+    {
+     "name": "Turntable",
+     "at": [
+      0,
+      "lerp($H - 0.3, $H + 0.04, $aer)",
+      "lerp($zbm, $zbr + 1.1, $aer)"
+     ],
+     "children": [
+      {
+       "name": "Ring",
+       "shape": "cylinder",
+       "material": "frame_black",
+       "radius": "0.85 * $kAer",
+       "height": "0.15 * $kAer",
+       "segments": 32,
+       "anchor": "base"
+      },
+      {
+       "name": "Pedestal",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        0,
+        "0.15 * $kAer",
+        0
+       ],
+       "size": [
+        "1.2 * $kAer",
+        "0.32 * $kAer",
+        "1.1 * $kAer"
+       ],
+       "bevel": "0.05 * $kAer",
+       "anchor": "bottom"
+      },
+      {
+       "name": "Console",
+       "shape": "box",
+       "material": "shutter",
+       "at": [
+        "0.75 * $kAer",
+        "0.15 * $kAer",
+        "-0.2 * $kAer"
+       ],
+       "size": [
+        "0.4 * $kAer",
+        "0.5 * $kAer",
+        "0.3 * $kAer"
+       ],
+       "bevel": "0.03 * $kAer",
+       "anchor": "bottom"
+      },
+      {
+       "name": "Lift_L",
+       "shape": "cylinder",
+       "material": "chrome",
+       "at": [
+        "0.35 * $kAer",
+        "0.42 * $kAer",
+        "0.75 * $kAer"
+       ],
+       "rotate": [
+        80,
+        0,
+        0
+       ],
+       "mirror": "Lift_R",
+       "radius": "0.07 * $kAer",
+       "height": "0.9 * $kAer",
+       "segments": 10
+      }
+     ]
+    },
+    {
+     "name": "Ladder",
+     "at": [
+      0,
+      "lerp($H - 0.4, lerp($H + 0.15, $H + 0.5, $aer), $roofl + $aer)",
+      "lerp($zbm, lerp($zbr + 0.2, $zbr + 0.6, $aer), $roofl + $aer)"
+     ],
+     "children": [
+      {
+       "name": "Rail_L",
+       "shape": "box",
+       "material": "ladder_alu",
+       "at": [
+        "(lerp(0.5, 0.9, $aer) / 2) * $kOn",
+        0,
+        "(lerp(0.92 * $blen, $length - 1.6, $aer) / 2) * $kOn"
+       ],
+       "mirror": "Rail_R",
+       "size": [
+        "0.06 * $kOn",
+        "(lerp(0.12, 0.3, $aer)) * $kOn",
+        "(lerp(0.92 * $blen, $length - 1.6, $aer)) * $kOn"
+       ],
+       "anchor": "bottom"
+      },
+      {
+       "name": "Rung{i}",
+       "shape": "box",
+       "material": "ladder_alu",
+       "at": [
+        0,
+        "0.06 * $kOn",
+        "0.15 * $kOn"
+       ],
+       "repeat": {
+        "count": "floor((lerp(0.92 * $blen, $length - 1.6, $aer) - 0.3) / 0.3) + 1",
+        "step": [
+         0,
+         0,
+         "0.3 * $kOn"
+        ]
+       },
+       "size": [
+        "(lerp(0.5, 0.9, $aer)) * $kOn",
+        "0.035 * $kOn",
+        "0.035 * $kOn"
+       ]
+      },
+      {
+       "name": "Fly_L",
+       "shape": "box",
+       "material": "ladder_alu",
+       "at": [
+        "(lerp(0.5, 0.9, $aer) / 2 - 0.07) * $kOn",
+        "0.04 * $kOn",
+        "(0.35 * lerp(0.92 * $blen, $length - 1.6, $aer) + 0.1) * $kOn"
+       ],
+       "mirror": "Fly_R",
+       "size": [
+        "0.05 * $kOn",
+        "(lerp(0.1, 0.24, $aer)) * $kOn",
+        "(0.7 * lerp(0.92 * $blen, $length - 1.6, $aer)) * $kOn"
+       ],
+       "anchor": "bottom"
+      },
+      {
+       "name": "Tip",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        0,
+        "0.02 * $kOn",
+        "(lerp(0.92 * $blen, $length - 1.6, $aer) - 0.05) * $kOn"
+       ],
+       "size": [
+        "(lerp(0.5, 0.9, $aer)) * $kOn",
+        "0.08 * $kOn",
+        "0.1 * $kOn"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "RoofRack",
+     "at": [
+      0,
+      "lerp($H - 0.3, $H + 0.04, $roofl)",
+      "lerp($zbm, $zbr + 0.4, $roofl)"
+     ],
+     "children": [
+      {
+       "name": "Roller{i}",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        "0.06 * (0.02 + 0.98 * ($roofl))",
+        0
+       ],
+       "repeat": {
+        "count": 3,
+        "step": [
+         0,
+         0,
+         "(0.4 * $blen) * (0.02 + 0.98 * ($roofl))"
+        ]
+       },
+       "size": [
+        "0.7 * (0.02 + 0.98 * ($roofl))",
+        "0.12 * (0.02 + 0.98 * ($roofl))",
+        "0.12 * (0.02 + 0.98 * ($roofl))"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "BoomRest",
+     "at": [
+      0,
+      "lerp(2.6, $ych, $aer)",
+      "lerp($zf - 1.0, $zf - 0.6, $aer)"
+     ],
+     "children": [
+      {
+       "name": "Post",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "size": [
+        "0.9 * $kAer",
+        "($H + 0.5 - $ych) * $kAer",
+        "0.2 * $kAer"
+       ],
+       "anchor": "bottom"
+      }
+     ]
+    },
+    {
+     "name": "Outrigger_FL",
+     "at": [
+      "lerp($W2 - 0.4, $W2 + 0.05, $aer)",
+      "lerp(0.6, 0, $aer)",
+      "$zb - 0.25"
+     ],
+     "children": [
+      {
+       "name": "Beam",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "-0.1 * $kAer",
+        "0.75 * $kAer",
+        0
+       ],
+       "size": [
+        "0.4 * $kAer",
+        "0.2 * $kAer",
+        "0.2 * $kAer"
+       ]
+      },
+      {
+       "name": "Leg",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        "0.08 * $kAer",
+        0
+       ],
+       "size": [
+        "0.14 * $kAer",
+        "0.75 * $kAer",
+        "0.14 * $kAer"
+       ],
+       "anchor": "bottom"
+      },
+      {
+       "name": "Foot",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        "0.02 * $kAer",
+        0
+       ],
+       "size": [
+        "0.4 * $kAer",
+        "0.06 * $kAer",
+        "0.4 * $kAer"
+       ],
+       "bevel": "0.01 * $kAer"
+      }
+     ],
+     "mirror": "Outrigger_FR"
+    },
+    {
+     "name": "Outrigger_RL",
+     "at": [
+      "lerp($W2 - 0.4, $W2 + 0.05, $aer)",
+      "lerp(0.6, 0, $aer)",
+      "$zbr + 0.3"
+     ],
+     "children": [
+      {
+       "name": "Beam",
+       "shape": "box",
+       "material": "paint_red",
+       "at": [
+        "-0.1 * $kAer",
+        "0.75 * $kAer",
+        0
+       ],
+       "size": [
+        "0.4 * $kAer",
+        "0.2 * $kAer",
+        "0.2 * $kAer"
+       ]
+      },
+      {
+       "name": "Leg",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        "0.08 * $kAer",
+        0
+       ],
+       "size": [
+        "0.14 * $kAer",
+        "0.75 * $kAer",
+        "0.14 * $kAer"
+       ],
+       "anchor": "bottom"
+      },
+      {
+       "name": "Foot",
+       "shape": "box",
+       "material": "frame_black",
+       "at": [
+        0,
+        "0.02 * $kAer",
+        0
+       ],
+       "size": [
+        "0.4 * $kAer",
+        "0.06 * $kAer",
+        "0.4 * $kAer"
+       ],
+       "bevel": "0.01 * $kAer"
+      }
+     ],
+     "mirror": "Outrigger_RR"
+    },
+    {
+     "name": "Wheels",
+     "children": [
+      {
+       "name": "Wheel_FL",
+       "at": [
+        "$c2 - 0.24",
+        "$r",
+        "$zFA"
+       ],
+       "mirror": "Wheel_FR",
+       "children": [
+        {
+         "name": "Tyre",
+         "shape": "lathe",
+         "material": "rubber",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r",
+           "-0.44 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.45 * ($r - 0.62 * $r)",
+           "-0.5 * $tw"
+          ],
+          [
+           "$r - 0.05 * $r",
+           "-0.47 * $tw"
+          ],
+          [
+           "$r",
+           "-0.33 * $tw"
+          ],
+          [
+           "$r",
+           "0.33 * $tw"
+          ],
+          [
+           "$r - 0.05 * $r",
+           "0.47 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.45 * ($r - 0.62 * $r)",
+           "0.5 * $tw"
+          ],
+          [
+           "0.62 * $r",
+           "0.44 * $tw"
+          ],
+          [
+           "0.62 * $r",
+           "-0.44 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Rim",
+         "shape": "lathe",
+         "material": "wheel_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r - 0.02 * $r",
+           "-0.42 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.03 * $r",
+           "-0.46 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.03 * $r",
+           "0.46 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.01 * $r",
+           "0.49 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.05 * $r",
+           "0.44 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.05 * $r",
+           "-0.38 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.02 * $r",
+           "-0.42 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Disc",
+         "shape": "lathe",
+         "material": "wheel_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r - 0.04 * $r",
+           "0.1 * $tw"
+          ],
+          [
+           "0.7 * 0.62 * $r",
+           "0.3 * $tw"
+          ],
+          [
+           "0.42 * 0.62 * $r",
+           "0.34 * $tw"
+          ],
+          [
+           "0.42 * 0.62 * $r",
+           "0.24 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.07 * $r",
+           "0.04 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.04 * $r",
+           "0.1 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Hole{i}",
+         "shape": "cylinder",
+         "material": "wheel_dark",
+         "at": [
+          "0.27 * $tw",
+          "0.62 * 0.62 * $r",
+          0
+         ],
+         "repeat": {
+          "count": 8,
+          "around": "x",
+          "phase": 22.5
+         },
+         "radius": "0.1 * 0.62 * $r",
+         "height": "0.04 * $tw",
+         "axis": "x",
+         "segments": 8
+        },
+        {
+         "name": "Hub",
+         "shape": "cylinder",
+         "material": "steel",
+         "at": [
+          "0.36 * $tw",
+          0,
+          0
+         ],
+         "radius": "0.36 * 0.62 * $r",
+         "height": "0.16 * $tw",
+         "axis": "x",
+         "segments": 16
+        },
+        {
+         "name": "Cap",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.45 * $tw",
+          0,
+          0
+         ],
+         "radius": "0.18 * 0.62 * $r",
+         "height": "0.1 * $tw",
+         "axis": "x",
+         "segments": 14
+        },
+        {
+         "name": "Nut{i}",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.44 * $tw",
+          "0.27 * 0.62 * $r",
+          0
+         ],
+         "repeat": {
+          "count": 10,
+          "around": "x"
+         },
+         "radius": "0.045 * 0.62 * $r",
+         "height": "0.06 * $tw",
+         "axis": "x",
+         "segments": 6
+        }
+       ]
+      },
+      {
+       "name": "Wheel_RL",
+       "at": [
+        "$W2 - 0.18",
+        "$r",
+        "$zRA"
+       ],
+       "mirror": "Wheel_RR",
+       "children": [
+        {
+         "name": "Tyre",
+         "shape": "lathe",
+         "material": "rubber",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r",
+           "-0.44 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.45 * ($r - 0.62 * $r)",
+           "-0.5 * $tw"
+          ],
+          [
+           "$r - 0.05 * $r",
+           "-0.47 * $tw"
+          ],
+          [
+           "$r",
+           "-0.33 * $tw"
+          ],
+          [
+           "$r",
+           "0.33 * $tw"
+          ],
+          [
+           "$r - 0.05 * $r",
+           "0.47 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.45 * ($r - 0.62 * $r)",
+           "0.5 * $tw"
+          ],
+          [
+           "0.62 * $r",
+           "0.44 * $tw"
+          ],
+          [
+           "0.62 * $r",
+           "-0.44 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Rim",
+         "shape": "lathe",
+         "material": "wheel_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r - 0.02 * $r",
+           "-0.42 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.03 * $r",
+           "-0.46 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.03 * $r",
+           "0.46 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.01 * $r",
+           "0.49 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.05 * $r",
+           "0.44 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.05 * $r",
+           "-0.38 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.02 * $r",
+           "-0.42 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Disc",
+         "shape": "lathe",
+         "material": "wheel_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r - 0.04 * $r",
+           "0.1 * $tw"
+          ],
+          [
+           "0.7 * 0.62 * $r",
+           "0.3 * $tw"
+          ],
+          [
+           "0.42 * 0.62 * $r",
+           "0.34 * $tw"
+          ],
+          [
+           "0.42 * 0.62 * $r",
+           "0.24 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.07 * $r",
+           "0.04 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.04 * $r",
+           "0.1 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Hole{i}",
+         "shape": "cylinder",
+         "material": "wheel_dark",
+         "at": [
+          "0.27 * $tw",
+          "0.62 * 0.62 * $r",
+          0
+         ],
+         "repeat": {
+          "count": 8,
+          "around": "x",
+          "phase": 22.5
+         },
+         "radius": "0.1 * 0.62 * $r",
+         "height": "0.04 * $tw",
+         "axis": "x",
+         "segments": 8
+        },
+        {
+         "name": "Hub",
+         "shape": "cylinder",
+         "material": "steel",
+         "at": [
+          "0.36 * $tw",
+          0,
+          0
+         ],
+         "radius": "0.36 * 0.62 * $r",
+         "height": "0.16 * $tw",
+         "axis": "x",
+         "segments": 16
+        },
+        {
+         "name": "Cap",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.45 * $tw",
+          0,
+          0
+         ],
+         "radius": "0.18 * 0.62 * $r",
+         "height": "0.1 * $tw",
+         "axis": "x",
+         "segments": 14
+        },
+        {
+         "name": "Nut{i}",
+         "shape": "cylinder",
+         "material": "chrome",
+         "at": [
+          "0.44 * $tw",
+          "0.27 * 0.62 * $r",
+          0
+         ],
+         "repeat": {
+          "count": 10,
+          "around": "x"
+         },
+         "radius": "0.045 * 0.62 * $r",
+         "height": "0.06 * $tw",
+         "axis": "x",
+         "segments": 6
+        }
+       ]
+      },
+      {
+       "name": "Wheel_RLInner",
+       "at": [
+        "$W2 - 0.18 - $tw - 0.03",
+        "$r",
+        "$zRA"
+       ],
+       "mirror": "Wheel_RRInner",
+       "children": [
+        {
+         "name": "Tyre",
+         "shape": "lathe",
+         "material": "rubber",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r",
+           "-0.44 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.45 * ($r - 0.62 * $r)",
+           "-0.5 * $tw"
+          ],
+          [
+           "$r - 0.05 * $r",
+           "-0.47 * $tw"
+          ],
+          [
+           "$r",
+           "-0.33 * $tw"
+          ],
+          [
+           "$r",
+           "0.33 * $tw"
+          ],
+          [
+           "$r - 0.05 * $r",
+           "0.47 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.45 * ($r - 0.62 * $r)",
+           "0.5 * $tw"
+          ],
+          [
+           "0.62 * $r",
+           "0.44 * $tw"
+          ],
+          [
+           "0.62 * $r",
+           "-0.44 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        },
+        {
+         "name": "Rim",
+         "shape": "lathe",
+         "material": "wheel_paint",
+         "rotate": [
+          0,
+          0,
+          -90
+         ],
+         "profile": [
+          [
+           "0.62 * $r - 0.02 * $r",
+           "-0.42 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.03 * $r",
+           "-0.46 * $tw"
+          ],
+          [
+           "0.62 * $r + 0.03 * $r",
+           "0.46 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.01 * $r",
+           "0.49 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.05 * $r",
+           "0.44 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.05 * $r",
+           "-0.38 * $tw"
+          ],
+          [
+           "0.62 * $r - 0.02 * $r",
+           "-0.42 * $tw"
+          ]
+         ],
+         "segments": 28,
+         "caps": false
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
