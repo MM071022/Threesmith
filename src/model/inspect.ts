@@ -1,0 +1,384 @@
+import { type Gltf, type GltfMaterial, type GltfNode, type GltfPrimitive, type LoadedGltf, ModelError, isIndex, loadGltf, loadGltfBytes, readAccessor, readUri } from "./gltf.js";
+import { imageSize } from "./images.js";
+import { at } from "./num.js";
+
+export interface NodeInfo {
+  index: number;
+  name: string;
+  path: string;
+  depth: number;
+  mesh?: string;
+  triangles: number;
+  /** The node's own scale as the file has it; a negative axis mirrors along that axis. */
+  scale: [number, number, number];
+  /** True where a mirror starts: the world transform mirrors and the parent's does not. Everything below it is mirrored too. */
+  mirrored: boolean;
+  /** Where the node's origin (its pivot) is in the world. */
+  origin: [number, number, number];
+}
+
+export interface PrimitiveInfo {
+  node: number;
+  nodeName: string;
+  material?: number;
+  /** glTF primitive mode: 0 to 3 are points and lines, 4 to 6 are triangles (list, strip, fan). */
+  mode: number;
+  triangles: number;
+  vertices: number;
+  hasNormals: boolean;
+  hasUv: boolean;
+  hasTangents: boolean;
+  /** COLOR_0: GLTFLoader then turns on `material.vertexColors`, which multiplies the colour by it. */
+  hasColors: boolean;
+  /** Morph targets on this primitive (GLTFLoader puts them in `geometry.morphAttributes`). */
+  morphTargets: number;
+  /**
+   * Set when the geometry is compressed (Draco or meshopt) and could not be read without a decoder. `positions` then hold
+   * the 8 corners of the accessor's bounding box and `indices` its 12 triangles, so sizes and views still work; the
+   * geometry checks skip it, and `triangles` is the real count from the accessor.
+   */
+  compressed?: "draco" | "meshopt";
+  /** True when the material is double sided: its edges are not holes when they are open. */
+  doubleSided: boolean;
+  uvOutOfRange: boolean;
+  /** Triangle indices into `positions` (local space). */
+  indices: Uint32Array;
+  /** Local-space positions, flat xyz. */
+  positions: Float64Array;
+  /** Vertex normals, flat xyz, when the mesh has them. */
+  normals?: Float64Array;
+  /** Column-major world matrix of the node that holds the mesh. */
+  world: number[];
+}
+
+export interface TextureInfo {
+  index: number;
+  name: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  /** Estimated GPU memory with a full mipmap chain: 4 bytes a pixel, or 1 for KTX2 (it stays compressed on the GPU). */
+  megabytes: number;
+  /** The glTF extension that holds the image (KHR_texture_basisu, EXT_texture_webp, EXT_texture_avif), when one does. */
+  extension?: string;
+  roles: string[];
+}
+
+export interface ModelInfo {
+  file: string;
+  bytes: number;
+  generator?: string;
+  nodes: NodeInfo[];
+  primitives: PrimitiveInfo[];
+  materials: {
+    index: number;
+    name: string;
+    doubleSided: boolean;
+    textured: boolean;
+    normalMapped: boolean;
+    /** Every texture of the material wraps around (glTF's default), so UVs outside 0..1 just tile it. */
+    repeats: boolean;
+    /** OPAQUE, MASK or BLEND (glTF's default is OPAQUE). */
+    alphaMode: string;
+    /** Alpha of the base colour factor (1 when not set). */
+    alpha: number;
+    /** Relative luminance of the base colour factor (1 when not set). */
+    luminance: number;
+    /** KHR_materials_transmission: light passes through, as through glass. */
+    transmission: boolean;
+    /** True when the material glows: an emissive colour above black, or an emissive texture. */
+    emissive: boolean;
+    /** KHR_materials_emissive_strength (GLTFLoader: `emissiveIntensity`); 1 when not set. */
+    emissiveStrength: number;
+    /** The KHR_materials_* and other extensions on this material. */
+    extensions: string[];
+  }[];
+  textures: TextureInfo[];
+  triangles: number;
+  animations: number;
+  skins: number;
+  cameras: number;
+  /** The glTF extensions the file uses, and the ones a loader must support to read it at all. */
+  extensionsUsed: string[];
+  extensionsRequired: string[];
+  /** World-space bounding box over all vertices, or undefined for a model without geometry. */
+  bounds?: { min: [number, number, number]; max: [number, number, number]; size: [number, number, number] };
+}
+
+export type Mat = number[];
+
+export function identity(): Mat {
+  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+}
+
+export function multiply(a: Mat, b: Mat): Mat {
+  const out = new Array<number>(16).fill(0);
+  for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) out[c * 4 + r] = at(out, c * 4 + r) + at(a, k * 4 + r) * at(b, c * 4 + k);
+  return out;
+}
+
+export function localMatrix(node: { matrix?: number[]; translation?: number[]; rotation?: number[]; scale?: number[] }): Mat {
+  if (node.matrix?.length === 16) return [...node.matrix];
+  const [tx = 0, ty = 0, tz = 0] = node.translation ?? [];
+  const [x = 0, y = 0, z = 0, w = 1] = node.rotation ?? [];
+  const [sx = 1, sy = 1, sz = 1] = node.scale ?? [];
+  return [
+    (1 - 2 * (y * y + z * z)) * sx, 2 * (x * y + z * w) * sx, 2 * (x * z - y * w) * sx, 0,
+    2 * (x * y - z * w) * sy, (1 - 2 * (x * x + z * z)) * sy, 2 * (y * z + x * w) * sy, 0,
+    2 * (x * z + y * w) * sz, 2 * (y * z - x * w) * sz, (1 - 2 * (x * x + y * y)) * sz, 0,
+    tx, ty, tz, 1,
+  ];
+}
+
+export function transformPoint(m: Mat, x: number, y: number, z: number): [number, number, number] {
+  const g = (i: number) => at(m, i);
+  return [g(0) * x + g(4) * y + g(8) * z + g(12), g(1) * x + g(5) * y + g(9) * z + g(13), g(2) * x + g(6) * y + g(10) * z + g(14)];
+}
+
+function determinant3(m: Mat): number {
+  const g = (i: number) => at(m, i);
+  return g(0) * (g(5) * g(10) - g(9) * g(6)) - g(4) * (g(1) * g(10) - g(9) * g(2)) + g(8) * (g(1) * g(6) - g(5) * g(2));
+}
+
+function scaleOf(m: Mat): [number, number, number] {
+  const g = (i: number) => at(m, i);
+  return [Math.hypot(g(0), g(1), g(2)), Math.hypot(g(4), g(5), g(6)), Math.hypot(g(8), g(9), g(10))];
+}
+
+/** The node's own scale, signed as the file has it. A matrix has no separate scale, so a mirror is put on x. */
+function ownScale(node: GltfNode, local: Mat): [number, number, number] {
+  if (node.matrix?.length !== 16 && node.scale !== undefined) {
+    const [x = 1, y = 1, z = 1] = node.scale;
+    return [x, y, z];
+  }
+  const [x, y, z] = scaleOf(local);
+  return determinant3(local) < 0 ? [-x, y, z] : [x, y, z];
+}
+
+function triangleIndices(model: LoadedGltf, prim: GltfPrimitive, vertexCount: number): Uint32Array {
+  let raw: number[];
+  if (prim.indices !== undefined) raw = Array.from(readAccessor(model, prim.indices).data);
+  else raw = Array.from({ length: vertexCount }, (_, i) => i);
+  const bad = raw.find((i) => !Number.isInteger(i) || i < 0 || i >= vertexCount);
+  if (bad !== undefined) throw new ModelError(`${model.file}: index ${bad} is not one of the ${vertexCount} vertices`);
+  const mode = prim.mode ?? 4;
+  if (mode === 4) return Uint32Array.from(raw.slice(0, raw.length - (raw.length % 3)));
+  const out: number[] = [];
+  const r = (i: number) => at(raw, i);
+  if (mode === 5) for (let i = 0; i + 2 < raw.length; i++) out.push(...(i % 2 ? [r(i + 1), r(i), r(i + 2)] : [r(i), r(i + 1), r(i + 2)]));
+  else if (mode === 6) for (let i = 1; i + 1 < raw.length; i++) out.push(r(0), r(i), r(i + 1));
+  return Uint32Array.from(out);
+}
+
+/** glTF's CLAMP_TO_EDGE: the only wrap mode that does not repeat a texture. */
+const CLAMP_TO_EDGE = 33071;
+
+function materialInfo(json: Gltf, m: GltfMaterial, index: number) {
+  const used = [m.pbrMetallicRoughness?.baseColorTexture, m.pbrMetallicRoughness?.metallicRoughnessTexture, m.normalTexture, m.emissiveTexture, m.occlusionTexture].filter((t) => t !== undefined);
+  const repeats = used.every((t) => {
+    const sampler = json.samplers?.[json.textures?.[t.index]?.sampler ?? -1];
+    return sampler?.wrapS !== CLAMP_TO_EDGE && sampler?.wrapT !== CLAMP_TO_EDGE;
+  });
+  const factor = m.pbrMetallicRoughness?.baseColorFactor;
+  const alpha = factor?.[3];
+  const channel = (i: number) => (typeof factor?.[i] === "number" && Number.isFinite(factor[i]) ? factor[i]! : 1);
+  return {
+    index,
+    name: m.name ?? `material_${index}`,
+    doubleSided: Boolean(m.doubleSided),
+    textured: used.length > 0,
+    normalMapped: Boolean(m.normalTexture),
+    repeats,
+    alphaMode: m.alphaMode ?? "OPAQUE",
+    alpha: typeof alpha === "number" && Number.isFinite(alpha) ? alpha : 1,
+    luminance: 0.2126 * channel(0) + 0.7152 * channel(1) + 0.0722 * channel(2),
+    transmission: Boolean(m.extensions?.["KHR_materials_transmission"]),
+    emissive: Boolean(m.emissiveTexture) || (Array.isArray(m.emissiveFactor) && m.emissiveFactor.some((v) => typeof v === "number" && v > 0)),
+    emissiveStrength: emissiveStrength(m),
+    extensions: Object.keys(m.extensions ?? {}).sort(),
+  };
+}
+
+function emissiveStrength(m: GltfMaterial): number {
+  const value = (m.extensions?.["KHR_materials_emissive_strength"] as { emissiveStrength?: unknown } | undefined)?.emissiveStrength;
+  return typeof value === "number" && Number.isFinite(value) ? value : 1;
+}
+
+/** Image extensions on a texture, in the order GLTFLoader tries them. */
+const IMAGE_EXTENSIONS = ["KHR_texture_basisu", "EXT_texture_avif", "EXT_texture_webp"];
+
+function textureRoles(json: Gltf): Map<number, string[]> {
+  const roles = new Map<number, string[]>();
+  const add = (index: number | undefined, role: string) => {
+    if (index !== undefined) roles.set(index, [...(roles.get(index) ?? []), role]);
+  };
+  for (const m of json.materials ?? []) {
+    add(m.pbrMetallicRoughness?.baseColorTexture?.index, "color");
+    add(m.pbrMetallicRoughness?.metallicRoughnessTexture?.index, "metal/rough");
+    add(m.normalTexture?.index, "normal");
+    add(m.occlusionTexture?.index, "occlusion");
+    add(m.emissiveTexture?.index, "emissive");
+  }
+  return roles;
+}
+
+function readTextures(model: LoadedGltf): TextureInfo[] {
+  const roles = textureRoles(model.json);
+  return (model.json.textures ?? []).map((t, index) => {
+    const extension = IMAGE_EXTENSIONS.find((e) => typeof t.extensions?.[e]?.source === "number");
+    const source = extension ? t.extensions?.[extension]?.source : t.source;
+    const image = source === undefined ? undefined : model.json.images?.[source];
+    let bytes: Buffer | undefined;
+    if (image?.bufferView !== undefined) {
+      const view = model.json.bufferViews?.[image.bufferView];
+      const buffer = view && model.buffers[view.buffer];
+      if (!view || !buffer) throw new ModelError(`${model.file}: image ${source} points at a missing buffer view or buffer`);
+      bytes = buffer.subarray(view.byteOffset ?? 0, (view.byteOffset ?? 0) + view.byteLength);
+    } else if (image?.uri) bytes = readUri(model.file, image.uri, model.dir);
+    const size = bytes && imageSize(bytes);
+    const perPixel = size?.format === "ktx2" ? 1 : 4;
+    return {
+      index,
+      name: image?.name ?? (typeof image?.uri === "string" ? image.uri.slice(0, 40) : undefined) ?? `texture_${index}`,
+      width: size?.width,
+      height: size?.height,
+      format: size?.format ?? (typeof image?.mimeType === "string" ? image.mimeType.replace("image/", "") : undefined),
+      megabytes: size ? (size.width * size.height * perPixel * (4 / 3)) / 1048576 : 0,
+      roles: roles.get(index) ?? [],
+      ...(extension ? { extension } : {}),
+    };
+  });
+}
+
+/** How a primitive is compressed, when it is: Draco on the primitive, or meshopt on the buffer view of its positions. */
+function compression(json: Gltf, prim: GltfPrimitive, posIndex: number): "draco" | "meshopt" | undefined {
+  if (prim.extensions?.["KHR_draco_mesh_compression"] !== undefined) return "draco";
+  const views = [posIndex, prim.indices].map((a) => (a === undefined ? undefined : json.accessors?.[a]?.bufferView));
+  const meshopt = views.some((v) => {
+    const ext = v === undefined ? undefined : json.bufferViews?.[v]?.extensions;
+    return ext?.["EXT_meshopt_compression"] !== undefined || ext?.["KHR_meshopt_compression"] !== undefined;
+  });
+  return meshopt ? "meshopt" : undefined;
+}
+
+/** The 12 triangles of a box from (min) to (max), wound counter-clockwise seen from outside. */
+const BOX_TRIANGLES = Uint32Array.from([0, 2, 1, 1, 2, 3, 4, 5, 6, 5, 7, 6, 0, 1, 4, 1, 5, 4, 2, 6, 3, 3, 6, 7, 0, 4, 2, 2, 4, 6, 1, 3, 5, 3, 7, 5]);
+
+/** The corners of an accessor's min/max box (corner k has x from bit 0, y from bit 1, z from bit 2). */
+function boxCorners(min: number[], max: number[]): Float64Array {
+  const out = new Float64Array(24);
+  for (let k = 0; k < 8; k++) for (let a = 0; a < 3; a++) out[k * 3 + a] = (k >> a) & 1 ? at(max, a) : at(min, a);
+  return out;
+}
+
+/**
+ * Reads a model and gathers everything the report and the lint rules need. Give a path, or the bytes of a .glb
+ * (then `name` is the name used in messages).
+ */
+export function inspectModel(source: string | Uint8Array, name = "model.glb"): ModelInfo {
+  const model = typeof source === "string" ? loadGltf(source) : loadGltfBytes(source, name);
+  const file = model.file;
+  const json = model.json;
+  const nodes: NodeInfo[] = [];
+  const primitives: PrimitiveInfo[] = [];
+  const min: [number, number, number] = [Infinity, Infinity, Infinity];
+  const max: [number, number, number] = [-Infinity, -Infinity, -Infinity];
+  const seen = new Set<number>();
+
+  const walk = (index: number, parent: Mat, parentPath: string, depth: number): void => {
+    const node = json.nodes?.[index];
+    if (!node) throw new ModelError(`${file}: node ${index} does not exist`);
+    if (seen.has(index)) throw new ModelError(`${file}: node ${index} is reached twice (cycle or shared child)`);
+    seen.add(index);
+    const local = localMatrix(node);
+    const world = multiply(parent, local);
+    const name = node.name ?? `node_${index}`;
+    const path = parentPath ? `${parentPath}/${name}` : name;
+    let triangles = 0;
+    if (node.mesh !== undefined) {
+      const mesh = json.meshes?.[node.mesh];
+      if (!mesh) throw new ModelError(`${file}: mesh ${node.mesh} does not exist`);
+      if (!Array.isArray(mesh.primitives)) throw new ModelError(`${file}: mesh ${node.mesh} has no primitive list`);
+      for (const [primIndex, prim] of mesh.primitives.entries()) {
+        const attributes = prim?.attributes;
+        if (typeof attributes !== "object" || attributes === null) throw new ModelError(`${file}: primitive ${primIndex} of mesh ${node.mesh} has no attributes`);
+        const posIndex = attributes.POSITION;
+        if (!isIndex(posIndex)) throw new ModelError(`${file}: primitive ${primIndex} of mesh ${node.mesh} has no POSITION`);
+        const packed = compression(json, prim, posIndex);
+        if (packed) {
+          const acc = json.accessors?.[posIndex];
+          if (!acc || !Array.isArray(acc.min) || !Array.isArray(acc.max) || acc.min.length < 3 || acc.max.length < 3) {
+            throw new ModelError(`${file}: primitive ${primIndex} of mesh ${node.mesh} is compressed and its POSITION has no min/max`);
+          }
+          const count = prim.indices === undefined ? acc.count : (json.accessors?.[prim.indices]?.count ?? 0);
+          const mode = prim.mode ?? 4;
+          const tris = mode === 4 ? Math.floor(count / 3) : mode === 5 || mode === 6 ? Math.max(0, count - 2) : 0;
+          const positions = boxCorners(acc.min, acc.max);
+          for (let k = 0; k < 8; k++) {
+            const p = transformPoint(world, at(positions, k * 3), at(positions, k * 3 + 1), at(positions, k * 3 + 2));
+            for (let a = 0; a < 3; a++) { min[a] = Math.min(at(min, a), at(p, a)); max[a] = Math.max(at(max, a), at(p, a)); }
+          }
+          triangles += tris;
+          primitives.push({
+            node: index, nodeName: path, material: prim.material, mode, triangles: tris, vertices: 8,
+            hasNormals: attributes.NORMAL !== undefined, hasUv: attributes.TEXCOORD_0 !== undefined, hasTangents: attributes.TANGENT !== undefined,
+            hasColors: attributes.COLOR_0 !== undefined, morphTargets: Array.isArray(prim.targets) ? prim.targets.length : 0, compressed: packed,
+            doubleSided: Boolean(prim.material !== undefined && json.materials?.[prim.material]?.doubleSided),
+            uvOutOfRange: false, indices: BOX_TRIANGLES, positions, world,
+          });
+          continue;
+        }
+        const pos = readAccessor(model, posIndex);
+        const indices = triangleIndices(model, prim, pos.count);
+        let uvOutOfRange = false;
+        if (prim.attributes.TEXCOORD_0 !== undefined) {
+          const uv = readAccessor(model, prim.attributes.TEXCOORD_0).data;
+          for (let i = 0; i < uv.length; i++) if (at(uv, i) < -0.001 || at(uv, i) > 1.001) { uvOutOfRange = true; break; }
+        }
+        for (let i = 0; i < pos.count; i++) {
+          const p = transformPoint(world, at(pos.data, i * 3), at(pos.data, i * 3 + 1), at(pos.data, i * 3 + 2));
+          for (let a = 0; a < 3; a++) { min[a] = Math.min(at(min, a), at(p, a)); max[a] = Math.max(at(max, a), at(p, a)); }
+        }
+        triangles += indices.length / 3;
+        primitives.push({
+          node: index, nodeName: path, material: prim.material, mode: prim.mode ?? 4, triangles: indices.length / 3, vertices: pos.count,
+          hasNormals: prim.attributes.NORMAL !== undefined, hasUv: prim.attributes.TEXCOORD_0 !== undefined,
+          hasTangents: prim.attributes.TANGENT !== undefined, hasColors: prim.attributes.COLOR_0 !== undefined,
+          morphTargets: Array.isArray(prim.targets) ? prim.targets.length : 0, doubleSided: Boolean(prim.material !== undefined && json.materials?.[prim.material]?.doubleSided),
+          uvOutOfRange, indices, positions: pos.data, world,
+          ...(prim.attributes.NORMAL === undefined ? {} : { normals: readAccessor(model, prim.attributes.NORMAL).data }),
+        });
+      }
+    }
+    nodes.push({ index, name, path, depth, mesh: node.mesh === undefined ? undefined : (json.meshes?.[node.mesh]?.name ?? `mesh_${node.mesh}`), triangles, scale: ownScale(node, local), mirrored: determinant3(world) < 0 && determinant3(parent) >= 0, origin: [at(world, 12), at(world, 13), at(world, 14)] });
+    if (node.children !== undefined && !Array.isArray(node.children)) throw new ModelError(`${file}: node ${index} children must be a list`);
+    for (const child of node.children ?? []) walk(child, world, path, depth + 1);
+  };
+
+  if (json.scene !== undefined && !json.scenes?.[json.scene]) throw new ModelError(`${file}: scene ${json.scene} does not exist`);
+  const roots = json.scenes?.[json.scene ?? 0]?.nodes ?? [];
+  if (!Array.isArray(roots)) throw new ModelError(`${file}: the scene's nodes must be a list`);
+  for (const root of roots) walk(root, identity(), "", 0);
+
+  const hasBounds = Number.isFinite(min[0]);
+  return {
+    file,
+    bytes: model.bytes,
+    generator: json.asset?.generator,
+    nodes,
+    primitives,
+    materials: (json.materials ?? []).map((m, i) => materialInfo(json, m, i)),
+    textures: readTextures(model),
+    triangles: primitives.reduce((n, p) => n + p.triangles, 0),
+    animations: json.animations?.length ?? 0,
+    skins: json.skins?.length ?? 0,
+    cameras: json.cameras?.length ?? 0,
+    extensionsUsed: stringList(json.extensionsUsed),
+    extensionsRequired: stringList(json.extensionsRequired),
+    bounds: hasBounds ? { min, max, size: [max[0] - min[0], max[1] - min[1], max[2] - min[2]] } : undefined,
+  };
+}
+
+function stringList(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+}

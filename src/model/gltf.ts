@@ -1,0 +1,287 @@
+import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { dirname, extname, isAbsolute, relative, resolve, sep } from "node:path";
+
+/** Subset of the glTF 2.0 JSON that Threesmith reads. */
+export interface Gltf {
+  asset?: { version?: string; generator?: string };
+  scene?: number;
+  scenes?: { name?: string; nodes?: number[] }[];
+  extensionsUsed?: string[];
+  extensionsRequired?: string[];
+  extensions?: Record<string, unknown>;
+  nodes?: GltfNode[];
+  meshes?: { name?: string; primitives: GltfPrimitive[]; weights?: number[] }[];
+  materials?: GltfMaterial[];
+  textures?: { source?: number; sampler?: number; extensions?: Record<string, { source?: number } | undefined> }[];
+  samplers?: { wrapS?: number; wrapT?: number; magFilter?: number; minFilter?: number }[];
+  images?: { uri?: string; bufferView?: number; mimeType?: string; name?: string }[];
+  accessors?: GltfAccessor[];
+  bufferViews?: { buffer: number; byteOffset?: number; byteLength: number; byteStride?: number; extensions?: Record<string, unknown> }[];
+  buffers?: { uri?: string; byteLength: number; extensions?: Record<string, unknown> }[];
+  skins?: unknown[];
+  cameras?: unknown[];
+  animations?: { name?: string; channels?: { target?: { node?: number; path?: string } }[] }[];
+}
+
+export interface GltfNode {
+  name?: string;
+  children?: number[];
+  mesh?: number;
+  skin?: number;
+  camera?: number;
+  extensions?: Record<string, unknown>;
+  matrix?: number[];
+  translation?: number[];
+  rotation?: number[];
+  scale?: number[];
+}
+
+export interface GltfPrimitive {
+  attributes: Record<string, number>;
+  indices?: number;
+  material?: number;
+  mode?: number;
+  targets?: Record<string, number>[];
+  extensions?: Record<string, unknown>;
+}
+
+export interface GltfMaterial {
+  name?: string;
+  doubleSided?: boolean;
+  alphaMode?: string;
+  normalTexture?: { index: number };
+  occlusionTexture?: { index: number };
+  emissiveTexture?: { index: number };
+  emissiveFactor?: number[];
+  pbrMetallicRoughness?: { baseColorFactor?: number[]; baseColorTexture?: { index: number }; metallicRoughnessTexture?: { index: number } };
+  extensions?: Record<string, unknown>;
+}
+
+export interface GltfAccessor {
+  bufferView?: number;
+  byteOffset?: number;
+  componentType: number;
+  normalized?: boolean;
+  count: number;
+  type: string;
+  min?: number[];
+  max?: number[];
+  sparse?: unknown;
+}
+
+export interface LoadedGltf {
+  file: string;
+  bytes: number;
+  json: Gltf;
+  buffers: Buffer[];
+  /** Directory used to resolve external images. */
+  dir: string;
+}
+
+const GLB_MAGIC = 0x46546c67;
+const CHUNK_JSON = 0x4e4f534a;
+const CHUNK_BIN = 0x004e4942;
+
+export class ModelError extends Error {}
+
+/** Loads a .glb or .gltf file (embedded or external buffers). Throws ModelError with a clear message. */
+export function loadGltf(file: string): LoadedGltf {
+  if (!existsSync(file)) throw new ModelError(`${file}: file not found`);
+  const data = readFileSync(file);
+  const dir = dirname(resolve(file));
+  const ext = extname(file).toLowerCase();
+  if (ext === ".glb" || (data.length >= 4 && data.readUInt32LE(0) === GLB_MAGIC)) return loadGlb(file, data, dir);
+  if (ext === ".gltf") return loadText(file, data, dir);
+  throw new ModelError(`${file}: not a .glb or .gltf file`);
+}
+
+/**
+ * Reads a model from bytes (a .glb, or the JSON of a .gltf). `name` is only used in messages. External files are
+ * read from `dir` when it is given; without it, only embedded buffers and data: URIs can be read.
+ */
+export function loadGltfBytes(bytes: Uint8Array, name = "model.glb", dir?: string): LoadedGltf {
+  const data = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const folder = dir === undefined ? NO_FOLDER : resolve(dir);
+  if (data.length >= 4 && data.readUInt32LE(0) === GLB_MAGIC) return loadGlb(name, data, folder);
+  const first = data.subarray(0, 64).toString("utf8").trimStart();
+  if (first.startsWith("{")) return loadText(name, data, folder);
+  throw new ModelError(`${name}: not a .glb or .gltf file`);
+}
+
+/** The folder of a model read from bytes without one: every external uri then reads as missing. */
+const NO_FOLDER = "\0no-folder";
+
+function loadGlb(file: string, data: Buffer, dir: string): LoadedGltf {
+  if (data.length < 20 || data.readUInt32LE(0) !== GLB_MAGIC) throw new ModelError(`${file}: not a GLB file (bad magic)`);
+  const version = data.readUInt32LE(4);
+  if (version !== 2) throw new ModelError(`${file}: GLB version ${version} is not supported (need 2)`);
+  const length = Math.min(data.readUInt32LE(8), data.length);
+  let json: Gltf | undefined;
+  let bin: Buffer | undefined;
+  for (let pos = 12; pos + 8 <= length; ) {
+    const size = data.readUInt32LE(pos);
+    const type = data.readUInt32LE(pos + 4);
+    const body = data.subarray(pos + 8, pos + 8 + size);
+    if (body.length < size) throw new ModelError(`${file}: GLB is truncated`);
+    if (type === CHUNK_JSON && !json) json = parseJson(file, body.toString("utf8"));
+    else if (type === CHUNK_BIN && !bin) bin = body;
+    pos += 8 + size + ((4 - (size % 4)) % 4);
+  }
+  if (!json) throw new ModelError(`${file}: GLB has no JSON chunk`);
+  const buffers = (json.buffers ?? []).map((b, i) => (i === 0 && !b.uri && bin ? bin : resolveBuffer(file, b.uri, dir, isFallback(b))));
+  return { file, bytes: data.length, json, buffers, dir };
+}
+
+function loadText(file: string, data: Buffer, dir: string): LoadedGltf {
+  const json = parseJson(file, data.toString("utf8"));
+  const buffers = (json.buffers ?? []).map((b) => resolveBuffer(file, b.uri, dir, isFallback(b)));
+  return { file, bytes: data.length, json, buffers, dir };
+}
+
+/** A buffer that only exists for loaders without a meshopt decoder (EXT/KHR_meshopt_compression "fallback"). */
+function isFallback(buffer: { extensions?: Record<string, unknown> }): boolean {
+  const ext = (buffer.extensions?.["EXT_meshopt_compression"] ?? buffer.extensions?.["KHR_meshopt_compression"]) as { fallback?: boolean } | undefined;
+  return ext?.fallback === true;
+}
+
+const LISTS = ["nodes", "meshes", "accessors", "bufferViews", "buffers", "images", "textures", "materials", "scenes"] as const;
+
+function parseJson(file: string, text: string): Gltf {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    throw new ModelError(`${file}: invalid glTF JSON (${(error as Error).message})`);
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) throw new ModelError(`${file}: not a glTF 2.0 file`);
+  const json = parsed as Gltf;
+  if (typeof json.asset?.version !== "string" || !json.asset.version.startsWith("2")) throw new ModelError(`${file}: not a glTF 2.0 file`);
+  // The lists are read by index all over the reader, so a list that is not one, or holds a non-object, fails here by name.
+  for (const key of LISTS) {
+    const list: unknown = (json as Record<string, unknown>)[key];
+    if (list === undefined) continue;
+    if (!Array.isArray(list)) throw new ModelError(`${file}: "${key}" must be a list`);
+    if (list.some((entry) => typeof entry !== "object" || entry === null)) throw new ModelError(`${file}: "${key}" must be a list of objects`);
+  }
+  return json;
+}
+
+function resolveBuffer(file: string, uri: string | undefined, dir: string, fallback = false): Buffer {
+  if (!uri) return Buffer.alloc(0);
+  const bytes = readUri(file, uri, dir);
+  // A meshopt fallback buffer may hold nothing at all: the decoder fills it in.
+  if (!bytes && fallback) return Buffer.alloc(0);
+  if (!bytes) throw new ModelError(`${file}: buffer file not found: ${uri}${dir === NO_FOLDER ? " (the model was given as bytes without its folder)" : ""}`);
+  return bytes;
+}
+
+/** Reads a data: URI, or a file inside the model's folder. Returns undefined when that file is missing. */
+export function readUri(file: string, uri: string, dir: string): Buffer | undefined {
+  if (typeof uri !== "string") throw new ModelError(`${file}: a uri must be text`);
+  if (uri.startsWith("data:")) {
+    const comma = uri.indexOf(",");
+    return comma < 0 ? undefined : Buffer.from(uri.slice(comma + 1), uri.slice(0, comma).includes(";base64") ? "base64" : "utf8");
+  }
+  if (dir === NO_FOLDER) return undefined;
+  const path = externalPath(file, uri, dir);
+  if (!existsSync(path)) return undefined;
+  // Checked again after following links, so a link inside the folder cannot point out of it.
+  const real = realpathSync(path);
+  if (!within(realpathSync(dir), real)) throw outsideFolder(file, uri);
+  try {
+    return readFileSync(real);
+  } catch (error) {
+    throw new ModelError(`${file}: cannot read ${uri} (${(error as Error).message})`);
+  }
+}
+
+/** Where an external uri points. Refuses absolute paths, URLs and anything that climbs out of the folder. */
+function externalPath(file: string, uri: string, dir: string): string {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(uri);
+  } catch {
+    throw new ModelError(`${file}: uri "${uri}" is not valid percent-encoding`);
+  }
+  if (isAbsolute(decoded) || /^[a-z][a-z\d+.-]*:/i.test(decoded)) throw outsideFolder(file, uri);
+  const path = resolve(dir, decoded);
+  if (!within(dir, path)) throw outsideFolder(file, uri);
+  return path;
+}
+
+/** True when `path` is `dir` itself or lies below it. */
+function within(dir: string, path: string): boolean {
+  const rel = relative(dir, path);
+  return rel === "" || (rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel));
+}
+
+function outsideFolder(file: string, uri: string): ModelError {
+  return new ModelError(`${file}: "${uri}" must be a file inside the model's folder (absolute paths and ".." are refused)`);
+}
+
+const COMPONENTS: Record<string, number> = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT2: 4, MAT3: 9, MAT4: 16 };
+const BYTES: Record<number, number> = { 5120: 1, 5121: 1, 5122: 2, 5123: 2, 5125: 4, 5126: 4 };
+
+/** A count, index or offset in a glTF file: a whole number from 0 up, exact in a double. */
+export function isIndex(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
+/** A zeroed Float64Array. A length the machine cannot allocate is an error about the file, not an allocator message. */
+function allocate(model: LoadedGltf, index: number, length: number): Float64Array {
+  try {
+    return new Float64Array(length);
+  } catch {
+    throw new ModelError(`${model.file}: accessor ${index} is too large to read`);
+  }
+}
+
+/** Reads an accessor into a flat Float64Array (normalized integers become 0..1 or -1..1). */
+export function readAccessor(model: LoadedGltf, index: number): { data: Float64Array; width: number; count: number } {
+  const acc = model.json.accessors?.[index];
+  if (!acc) throw new ModelError(`${model.file}: accessor ${index} does not exist`);
+  const width = Object.hasOwn(COMPONENTS, acc.type) ? COMPONENTS[acc.type] : undefined;
+  const size = typeof acc.componentType === "number" ? BYTES[acc.componentType] : undefined;
+  if (!width || !size) throw new ModelError(`${model.file}: accessor ${index} has an unsupported type`);
+  if (!isIndex(acc.count)) throw new ModelError(`${model.file}: accessor ${index} has no valid count`);
+  // Sparse values would be substituted over zeros; reading without them gives wrong geometry, so refuse.
+  if (acc.sparse !== undefined) throw new ModelError(`${model.file}: accessor ${index} is sparse, and sparse accessors are not supported`);
+  if (acc.bufferView === undefined) return { data: allocate(model, index, acc.count * width), width, count: acc.count };
+  if (!isIndex(acc.bufferView)) throw new ModelError(`${model.file}: accessor ${index} has an invalid bufferView`);
+  const view = model.json.bufferViews?.[acc.bufferView];
+  const buffer = view && model.buffers[view.buffer];
+  if (!view || !buffer) throw new ModelError(`${model.file}: accessor ${index} points at a missing buffer`);
+  const viewStart = view.byteOffset ?? 0;
+  if (!isIndex(viewStart) || !isIndex(view.byteLength)) throw new ModelError(`${model.file}: buffer view ${acc.bufferView} has an invalid byteOffset or byteLength`);
+  const viewEnd = viewStart + view.byteLength;
+  if (viewEnd > buffer.length) throw new ModelError(`${model.file}: buffer view ${acc.bufferView} reads past the end of its buffer`);
+  const element = width * size;
+  const stride = view.byteStride ?? element;
+  const accOffset = acc.byteOffset ?? 0;
+  if (!isIndex(accOffset) || !isIndex(stride) || stride < element) throw new ModelError(`${model.file}: accessor ${index} has an invalid byteOffset or byteStride`);
+  const base = viewStart + accOffset;
+  // Every element must lie inside its buffer view, and the view inside its buffer, before anything is allocated.
+  const last = acc.count === 0 ? base : base + (acc.count - 1) * stride + element;
+  if (last > viewEnd) throw new ModelError(`${model.file}: accessor ${index} reads past the end of its buffer view`);
+  const out = allocate(model, index, acc.count * width);
+  for (let i = 0; i < acc.count; i++) {
+    for (let c = 0; c < width; c++) {
+      const at = base + i * stride + c * size;
+      let v: number;
+      switch (acc.componentType) {
+        case 5126: v = buffer.readFloatLE(at); break;
+        case 5125: v = buffer.readUInt32LE(at); break;
+        case 5123: v = buffer.readUInt16LE(at); break;
+        case 5122: v = buffer.readInt16LE(at); break;
+        case 5121: v = buffer.readUInt8(at); break;
+        default: v = buffer.readInt8(at);
+      }
+      if (acc.normalized) {
+        const max = { 5121: 255, 5123: 65535, 5120: 127, 5122: 32767 }[acc.componentType as 5121 | 5123 | 5120 | 5122] ?? 1;
+        v = Math.max(v / max, -1);
+      }
+      out[i * width + c] = v;
+    }
+  }
+  return { data: out, width, count: acc.count };
+}

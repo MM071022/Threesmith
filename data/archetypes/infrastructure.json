@@ -1,0 +1,2177 @@
+[
+ {
+  "id": "infrastructure",
+  "name": "infrastructure",
+  "description": "Roads, rails, bridges, poles and other public works.",
+  "aliases": [
+   "infrastructure",
+   "infrastructuur",
+   "public works",
+   "street furniture",
+   "straatmeubilair"
+  ],
+  "extends": "thing",
+  "hints": [
+   "road",
+   "weg",
+   "street",
+   "straat",
+   "bridge",
+   "brug",
+   "rail",
+   "pole",
+   "paal",
+   "fence",
+   "hek"
+  ],
+  "conventions": [
+   "Linear objects (roads, rails, fences) are built as a repeatable segment with matching ends, so segments tile along z."
+  ],
+  "anticipate": [
+   "A segment that tiles end to end, plus curved or junction variants.",
+   "Collision and navigation surfaces separate from the visual mesh."
+  ]
+ },
+ {
+  "id": "infrastructure.road",
+  "name": "road",
+  "description": "A road or street segment.",
+  "aliases": [
+   "road",
+   "weg",
+   "street",
+   "straat",
+   "highway",
+   "snelweg",
+   "motorway",
+   "lane",
+   "rijbaan",
+   "asphalt road",
+   "crossing",
+   "kruispunt",
+   "roundabout",
+   "rotonde",
+   "junction",
+   "intersection"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Surface",
+    "role": "surface",
+    "required": true,
+    "aliases": [
+     "surface",
+     "asphalt",
+     "road",
+     "wegdek"
+    ]
+   },
+   {
+    "name": "Marking",
+    "role": "marking",
+    "required": false,
+    "aliases": [
+     "marking",
+     "markings",
+     "line",
+     "markering",
+     "belijning"
+    ]
+   },
+   {
+    "name": "Curb",
+    "role": "curb",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "aliases": [
+     "curb",
+     "kerb",
+     "trottoirband"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    5,
+    50
+   ],
+   "width": [
+    3,
+    40
+   ],
+   "height": [
+    0,
+    0.3
+   ],
+   "source": "lane width about 2.75-3.75 m (general knowledge: design guides differ per country); a segment is as long as you choose",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Segments must have identical cross-sections at both ends, or seams show.",
+   "Lane markings are a decal or texture, not geometry, or they z-fight with the surface."
+  ]
+ },
+ {
+  "id": "infrastructure.bridge",
+  "name": "bridge",
+  "description": "A bridge.",
+  "aliases": [
+   "bridge",
+   "brug",
+   "viaduct",
+   "overpass",
+   "flyover",
+   "suspension bridge",
+   "hangbrug",
+   "draaibrug",
+   "arch bridge",
+   "boogbrug",
+   "footbridge",
+   "voetgangersbrug"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Deck",
+    "role": "surface",
+    "required": true,
+    "aliases": [
+     "deck",
+     "brugdek",
+     "road"
+    ]
+   },
+   {
+    "name": "Pier",
+    "role": "support",
+    "required": false,
+    "count": [
+     0,
+     20
+    ],
+    "aliases": [
+     "pier",
+     "pillar",
+     "pijler"
+    ]
+   },
+   {
+    "name": "Cable",
+    "role": "cable",
+    "required": false,
+    "aliases": [
+     "cable",
+     "kabel"
+    ]
+   },
+   {
+    "name": "Leaf",
+    "role": "movable",
+    "required": false,
+    "count": [
+     1,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "leaf",
+     "span",
+     "klep"
+    ],
+    "note": "A bascule bridge leaf hinges about a horizontal axis at its end."
+   }
+  ],
+  "scale": {
+   "length": [
+    10,
+    3000
+   ],
+   "width": [
+    5,
+    40
+   ],
+   "height": [
+    3,
+    300
+   ],
+   "source": "general knowledge: typical production range, not a standard",
+   "confidence": "C"
+  }
+ },
+ {
+  "id": "infrastructure.railway-track",
+  "name": "railway track",
+  "description": "A length of railway track.",
+  "aliases": [
+   "railway",
+   "railway track",
+   "railroad",
+   "spoor",
+   "spoorlijn",
+   "rails",
+   "track",
+   "spoorbaan",
+   "tracks"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Rail",
+    "role": "rail",
+    "required": true,
+    "count": 2,
+    "aliases": [
+     "rail"
+    ]
+   },
+   {
+    "name": "Sleeper",
+    "role": "support",
+    "required": true,
+    "count": [
+     2,
+     200
+    ],
+    "aliases": [
+     "sleeper",
+     "tie",
+     "dwarsligger"
+    ]
+   },
+   {
+    "name": "Ballast",
+    "role": "bed",
+    "required": false,
+    "aliases": [
+     "ballast",
+     "gravel",
+     "grind"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    5,
+    50
+   ],
+   "width": [
+    3,
+    4.5
+   ],
+   "height": [
+    0.2,
+    0.4
+   ],
+   "source": "ballast bed width, general knowledge; gauge is 1.435 m (UIC standard)",
+   "confidence": "C"
+  },
+  "anticipate": [
+   "Standard gauge is 1.435 m between the inner rail edges (UIC/IEC standard); sleepers about 0.6 m apart (general knowledge); the ballast bed is about 3.4-4.5 m wide."
+  ]
+ },
+ {
+  "id": "infrastructure.street-lamp",
+  "name": "street lamp",
+  "description": "A lamp post or street light.",
+  "aliases": [
+   "street lamp",
+   "lamp post",
+   "lantaarnpaal",
+   "streetlight",
+   "street light",
+   "lamppost",
+   "straatlamp",
+   "light pole",
+   "lantern",
+   "lantaarn"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Pole",
+    "role": "support",
+    "required": true,
+    "aliases": [
+     "pole",
+     "post",
+     "paal"
+    ]
+   },
+   {
+    "name": "Lamp",
+    "role": "light",
+    "required": true,
+    "aliases": [
+     "lamp",
+     "light",
+     "armatuur",
+     "head"
+    ],
+    "note": "Emissive material plus a light node at the bulb."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.2,
+    2.5
+   ],
+   "width": [
+    0.2,
+    2.5
+   ],
+   "height": [
+    3,
+    12
+   ],
+   "source": "general knowledge: typical production range, not a standard",
+   "confidence": "C"
+  }
+ },
+ {
+  "id": "infrastructure.fence",
+  "name": "fence",
+  "description": "A fence, wall or railing.",
+  "aliases": [
+   "fence",
+   "hek",
+   "hekwerk",
+   "railing",
+   "wall",
+   "muur",
+   "gate",
+   "poort",
+   "barrier",
+   "slagboom",
+   "garden fence",
+   "tuinhek"
+  ],
+  "extends": "infrastructure",
+  "scale": {
+   "length": [
+    1,
+    5
+   ],
+   "width": [
+    0.03,
+    0.3
+   ],
+   "height": [
+    0.6,
+    2.5
+   ],
+   "source": "general knowledge: typical production range, not a standard",
+   "confidence": "C"
+  },
+  "anticipate": [
+   "A repeatable bay with a post at each end."
+  ],
+  "parts": [
+   {
+    "name": "Post",
+    "role": "post",
+    "required": true,
+    "aliases": [
+     "post",
+     "posts",
+     "paal",
+     "palen",
+     "pole",
+     "stake"
+    ],
+    "note": "Posts at the ends and between sections; set into the ground."
+   },
+   {
+    "name": "Rail",
+    "role": "rail",
+    "required": false,
+    "aliases": [
+     "rail",
+     "rails",
+     "beam",
+     "balk",
+     "rails",
+     "bar",
+     "wire",
+     "draad"
+    ]
+   },
+   {
+    "name": "Picket",
+    "role": "picket",
+    "required": false,
+    "aliases": [
+     "picket",
+     "pickets",
+     "slat",
+     "slats",
+     "plank",
+     "planks",
+     "paling",
+     "latten",
+     "board"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "infrastructure.crash-barrier",
+  "name": "crash barrier",
+  "description": "A motorsport barrier beside a race track: stacked steel W-beams (Armco) on posts, often with a catch fence behind it. A guard rail along a public road is infrastructure.guard-rail.",
+  "aliases": [
+   "crash barrier",
+   "armco",
+   "race barrier",
+   "track barrier",
+   "circuit barrier",
+   "catch fence",
+   "vangscherm",
+   "debris fence"
+  ],
+  "extends": "infrastructure",
+  "hints": [
+   "race track",
+   "circuit",
+   "motorway",
+   "snelweg"
+  ],
+  "parts": [
+   {
+    "name": "Post",
+    "role": "post",
+    "required": true,
+    "aliases": [
+     "post",
+     "posts",
+     "paal",
+     "palen",
+     "pole"
+    ],
+    "note": "Steel posts about every 2 m (guardrail) or 4 m (catch fence)."
+   },
+   {
+    "name": "Rail",
+    "role": "rail",
+    "required": true,
+    "aliases": [
+     "rail",
+     "rails",
+     "beam",
+     "w-beam",
+     "plank",
+     "ligger"
+    ],
+    "note": "The W-beam is about 0.31 m high with its centre about 0.55-0.75 m above the ground; motorsport uses two or three stacked."
+   },
+   {
+    "name": "Fence",
+    "role": "fence",
+    "required": false,
+    "aliases": [
+     "fence",
+     "catch fence",
+     "mesh",
+     "gaas",
+     "scherm",
+     "net"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    2,
+    8
+   ],
+   "width": [
+    0.15,
+    0.6
+   ],
+   "height": [
+    0.6,
+    4.8
+   ],
+   "source": "general knowledge: road and motorsport guardrail sections; not a standard",
+   "confidence": "C"
+  },
+  "anticipate": [
+   "A repeatable section with a post at each end; tile sections along the edge of the run-off area, not along the track edge."
+  ]
+ },
+ {
+  "id": "infrastructure.kerb",
+  "name": "race kerb",
+  "description": "A low red-and-white kerb at the edge of a race track in a corner.",
+  "aliases": [
+   "race kerb",
+   "racing kerb",
+   "kerb",
+   "kerbs",
+   "curb",
+   "rumble strip",
+   "sausage kerb",
+   "rood-wit",
+   "kerbstone"
+  ],
+  "extends": "infrastructure",
+  "hints": [
+   "race track",
+   "circuit",
+   "apex",
+   "corner"
+  ],
+  "parts": [
+   {
+    "name": "Block",
+    "role": "block",
+    "required": true,
+    "aliases": [
+     "block",
+     "blocks",
+     "stripe",
+     "stripes",
+     "segment",
+     "blok",
+     "strook"
+    ],
+    "note": "Alternating red and white blocks about 1-1.5 m long; the kerb rises a few centimetres towards the outside."
+   }
+  ],
+  "scale": {
+   "length": [
+    1,
+    30
+   ],
+   "width": [
+    0.5,
+    2
+   ],
+   "height": [
+    0.02,
+    0.2
+   ],
+   "source": "general knowledge: circuit kerbs; not a standard",
+   "confidence": "C"
+  },
+  "anticipate": [
+   "Kerbs run on the inside of a corner along the apex and on the outside at the exit; they lie on the track surface, not on the grass."
+  ]
+ },
+ {
+  "id": "infrastructure.power-pylon",
+  "name": "power pylon",
+  "description": "A high-voltage pylon or utility pole.",
+  "aliases": [
+   "pylon",
+   "power pylon",
+   "hoogspanningsmast",
+   "electricity pylon",
+   "transmission tower",
+   "utility pole",
+   "telegraph pole",
+   "telefoonpaal",
+   "elektriciteitsmast",
+   "mast",
+   "radio mast",
+   "zendmast",
+   "cell tower"
+  ],
+  "extends": "infrastructure",
+  "scale": {
+   "length": [
+    5,
+    20
+   ],
+   "width": [
+    5,
+    20
+   ],
+   "height": [
+    8,
+    70
+   ],
+   "source": "general knowledge: typical production range, not a standard: wooden poles 8-15 m, lattice pylons 25-70 m",
+   "confidence": "C"
+  },
+  "parts": [
+   {
+    "name": "Leg",
+    "role": "leg",
+    "required": true,
+    "aliases": [
+     "leg",
+     "legs",
+     "poot",
+     "poten",
+     "post",
+     "column",
+     "corner"
+    ],
+    "note": "The lattice legs lean in towards the top."
+   },
+   {
+    "name": "Beam",
+    "role": "arm",
+    "required": true,
+    "aliases": [
+     "beam",
+     "beams",
+     "crossarm",
+     "cross arm",
+     "arm",
+     "arms",
+     "traverse",
+     "bar"
+    ]
+   },
+   {
+    "name": "Insulator",
+    "role": "insulator",
+    "required": false,
+    "aliases": [
+     "insulator",
+     "insulators",
+     "isolator",
+     "isolatoren"
+    ]
+   },
+   {
+    "name": "Brace",
+    "role": "brace",
+    "required": false,
+    "aliases": [
+     "brace",
+     "braces",
+     "diagonal",
+     "diagonals",
+     "schoor",
+     "lattice",
+     "strut"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "infrastructure.traffic-sign",
+  "name": "traffic sign",
+  "description": "A road sign on a pole: a round, triangular or square plate with a reflective face.",
+  "aliases": [
+   "traffic sign",
+   "road sign",
+   "verkeersbord",
+   "bord",
+   "speed limit sign",
+   "snelheidsbord",
+   "maximumsnelheid",
+   "stop sign",
+   "stopbord",
+   "give way sign",
+   "voorrangsbord",
+   "street sign",
+   "straatnaambord",
+   "sign post",
+   "bordpaal"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Pole",
+    "role": "support",
+    "required": true,
+    "aliases": [
+     "pole",
+     "post",
+     "paal",
+     "bordpaal",
+     "mast"
+    ],
+    "note": "A round steel tube, about 76 mm across in many European countries."
+   },
+   {
+    "name": "Plate",
+    "role": "panel",
+    "required": true,
+    "aliases": [
+     "plate",
+     "sign",
+     "face",
+     "bord",
+     "plaat",
+     "panel"
+    ],
+    "note": "Front face reflective and facing the traffic; the back is plain metal with the mounting clamps."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.05,
+    1.5
+   ],
+   "width": [
+    0.4,
+    1.5
+   ],
+   "height": [
+    1.5,
+    4
+   ],
+   "source": "general knowledge: round signs of about 0.6, 0.7 or 0.9 m; the lower edge of the plate about 2.2 m above a footpath in built-up areas and lower (about 1.5-1.8 m) along rural roads; rules differ per country",
+   "confidence": "C"
+  },
+  "conventions": [
+   "The plate faces the traffic it is meant for, on the right of the carriageway in right-hand traffic, set back a little from the edge of the road."
+  ],
+  "pitfalls": [
+   "Text and symbols on many signs: use a texture, a decal or a distance-field shader, not one mesh per letter.",
+   "Hundreds of identical signs: one InstancedMesh per kind of plate, not hundreds of Mesh objects (each one is a draw call)."
+  ]
+ },
+ {
+  "id": "infrastructure.guard-rail",
+  "name": "guard rail",
+  "description": "A steel road safety barrier: a corrugated beam on posts along the edge of a road. A motorsport barrier with a catch fence is infrastructure.crash-barrier.",
+  "aliases": [
+   "guard rail",
+   "guardrail",
+   "crash rail",
+   "safety barrier",
+   "w-beam",
+   "vangrail",
+   "geleiderail",
+   "geleiderails",
+   "vangrails",
+   "barrier rail"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Beam",
+    "role": "rail",
+    "required": true,
+    "aliases": [
+     "beam",
+     "rail",
+     "w-beam",
+     "ligger",
+     "plank",
+     "profiel"
+    ]
+   },
+   {
+    "name": "Post",
+    "role": "support",
+    "required": true,
+    "count": [
+     2,
+     400
+    ],
+    "aliases": [
+     "post",
+     "paal",
+     "steun",
+     "palen"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    2,
+    200
+   ],
+   "width": [
+    0.2,
+    0.8
+   ],
+   "height": [
+    0.6,
+    1.1
+   ],
+   "source": "general knowledge: the beam about 0.3 m deep with its top near 0.75 m, posts every 2 to 4 m; national standards differ",
+   "confidence": "C"
+  },
+  "conventions": [
+   "Built as a repeatable segment along z whose length is a whole number of post spacings, so segments tile.",
+   "The ends are sloped or curved away from the traffic, never a blunt beam end facing it."
+  ],
+  "pitfalls": [
+   "A blunt end facing the traffic is the classic mistake; taper it down to the ground over several metres.",
+   "Collision: overlap the boxes of neighbouring segments a little, or a fast car slips through the seam."
+  ]
+ },
+ {
+  "id": "infrastructure.delineator",
+  "name": "delineator post",
+  "description": "A small white roadside post with a reflector that marks the edge of the road at night.",
+  "aliases": [
+   "delineator",
+   "delineator post",
+   "reflector post",
+   "marker post",
+   "edge marker",
+   "reflectorpaal",
+   "reflectorpaaltje",
+   "hectometerpaal",
+   "kilometerpaal",
+   "bermpaal",
+   "bermpaaltje"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Post",
+    "role": "support",
+    "required": true,
+    "aliases": [
+     "post",
+     "paal",
+     "body"
+    ]
+   },
+   {
+    "name": "Reflector",
+    "role": "light",
+    "required": true,
+    "aliases": [
+     "reflector",
+     "reflectors",
+     "reflectie",
+     "cat eye"
+    ],
+    "note": "Retroreflective; in a game an emissive or very bright material that only shows in headlight range."
+   }
+  ],
+  "scale": {
+   "length": [
+    0.05,
+    0.3
+   ],
+   "width": [
+    0.05,
+    0.3
+   ],
+   "height": [
+    0.6,
+    1.5
+   ],
+   "source": "general knowledge: about 1 m above the verge, every 50 m or so on rural roads; rules differ per country",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Thousands of them along a road network: one InstancedMesh per road tile (three.js culls an InstancedMesh as a whole), hidden beyond a short distance."
+  ]
+ },
+ {
+  "id": "infrastructure.lock",
+  "name": "canal lock",
+  "description": "A navigation lock: a chamber between two gated heads that lifts or lowers boats between two water levels.",
+  "aliases": [
+   "lock",
+   "canal lock",
+   "navigation lock",
+   "sluis",
+   "schutsluis",
+   "kanaalsluis",
+   "zeesluis",
+   "sea lock",
+   "shipping lock"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Chamber",
+    "role": "water",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "chamber",
+     "kolk",
+     "lock chamber"
+    ],
+    "note": "Concrete or brick walls with the water inside; the water level inside moves between the two outside levels."
+   },
+   {
+    "name": "Gate",
+    "role": "movable",
+    "required": true,
+    "count": [
+     2,
+     8
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "y"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "gate",
+     "deur",
+     "puntdeur",
+     "mitre gate",
+     "sluisdeur"
+    ],
+    "note": "Mitre gates come in pairs per head and close in a V that points upstream (towards the higher water); lift gates rise in a tall frame instead."
+   },
+   {
+    "name": "Head",
+    "role": "structure",
+    "required": false,
+    "count": [
+     2,
+     3
+    ],
+    "aliases": [
+     "head",
+     "sluishoofd",
+     "lock head"
+    ]
+   },
+   {
+    "name": "Fender",
+    "role": "guard",
+    "required": false,
+    "aliases": [
+     "fender",
+     "remmingwerk",
+     "guide wall",
+     "dolphin",
+     "dukdalf"
+    ],
+    "note": "Guide walls and dolphins in front of each head, where boats wait."
+   },
+   {
+    "name": "ControlHouse",
+    "role": "building",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "control house",
+     "lock keeper's house",
+     "sluiswachtershuis",
+     "bedieningsgebouw"
+    ]
+   },
+   {
+    "name": "Signal",
+    "role": "light",
+    "required": false,
+    "aliases": [
+     "signal",
+     "seinlicht",
+     "traffic light",
+     "light"
+    ],
+    "note": "Red/green lights at each head: red = wait, green = enter."
+   }
+  ],
+  "scale": {
+   "length": [
+    30,
+    500
+   ],
+   "width": [
+    5,
+    70
+   ],
+   "height": [
+    4,
+    25
+   ],
+   "source": "general knowledge of European inland locks: small polder locks about 30-50 x 5-7.5 m, CEMT class Va canal locks about 200-280 x 12.5-16 m, large sea locks up to about 500 x 70 m; lift 0.3-3 m inland, up to about 5 m with tides",
+   "confidence": "B"
+  },
+  "variants": [
+   {
+    "axis": "gates",
+    "options": [
+     "mitre gates",
+     "lift gates",
+     "sector gates"
+    ]
+   },
+   {
+    "axis": "size",
+    "options": [
+     "recreational",
+     "canal (CEMT IV-Va)",
+     "sea lock"
+    ]
+   }
+  ],
+  "conventions": [
+   "The chamber's long axis is the direction of travel; build the gates as separate nodes with their pivot on the hinge so they can be animated.",
+   "Each side of the lock has its own water level; the chamber surface is a separate mesh so its height can move."
+  ],
+  "anticipate": [
+   "Gates that open when a boat approaches and close behind it, with the signal lights following the state.",
+   "A waiting area with dolphins on both sides, and a road or footpath over one head."
+  ],
+  "pitfalls": [
+   "A lock with the same water level on both sides is decoration: give the two reaches their own levels, or the chamber has nothing to do.",
+   "Boats that steer by an offset from the centreline must aim for the centre inside the chamber, or they clip the walls.",
+   "Mitre gates drawn pointing downstream would be pushed open by the water."
+  ]
+ },
+ {
+  "id": "infrastructure.harbour-basin",
+  "name": "harbour basin",
+  "description": "An inland harbour: a dug basin off a canal or river, with quay walls, bollards, cranes and sheds.",
+  "aliases": [
+   "harbour basin",
+   "harbor basin",
+   "havenbekken",
+   "binnenhaven",
+   "inland port",
+   "inland harbour",
+   "quay",
+   "kade",
+   "kademuur",
+   "quay wall",
+   "marina",
+   "jachthaven",
+   "wharf",
+   "dock",
+   "dok",
+   "jetty",
+   "steiger"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Basin",
+    "role": "water",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "basin",
+     "bekken",
+     "water"
+    ],
+    "note": "Deeper than the boats' draught; joined to the waterway by its open end."
+   },
+   {
+    "name": "Quay",
+    "role": "surface",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "quay",
+     "kade",
+     "quay wall",
+     "kademuur",
+     "apron"
+    ],
+    "note": "A flat apron about 1.5 m above the water with a vertical wall to the water and a fender beam."
+   },
+   {
+    "name": "Bollard",
+    "role": "detail",
+    "required": false,
+    "count": [
+     0,
+     200
+    ],
+    "aliases": [
+     "bollard",
+     "bolder",
+     "meerpaal"
+    ]
+   },
+   {
+    "name": "Crane",
+    "role": "movable",
+    "required": false,
+    "count": [
+     0,
+     10
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "crane",
+     "kraan",
+     "havenkraan"
+    ]
+   },
+   {
+    "name": "Shed",
+    "role": "building",
+    "required": false,
+    "count": [
+     0,
+     20
+    ],
+    "aliases": [
+     "shed",
+     "loods",
+     "warehouse",
+     "pakhuis"
+    ]
+   },
+   {
+    "name": "AccessRoad",
+    "role": "road",
+    "required": false,
+    "aliases": [
+     "access road",
+     "havenweg",
+     "toegangsweg"
+    ],
+    "note": "Connected to the road graph, or traffic and emergency routes never reach it."
+   }
+  ],
+  "scale": {
+   "length": [
+    40,
+    2000
+   ],
+   "width": [
+    20,
+    400
+   ],
+   "height": [
+    3,
+    15
+   ],
+   "source": "general knowledge: marinas and small village harbours 40-200 m, inland cargo basins 150-1000 m long and 50-150 m wide, port basins larger; quay about 1.5-2 m above the water",
+   "confidence": "C"
+  },
+  "variants": [
+   {
+    "axis": "use",
+    "options": [
+     "cargo",
+     "container",
+     "marina",
+     "fishing"
+    ]
+   },
+   {
+    "axis": "form",
+    "options": [
+     "basin off the waterway",
+     "quay along the waterway"
+    ]
+   }
+  ],
+  "conventions": [
+   "Place the basin so its open end joins the waterway's water surface; the quay height is one value shared by the walls, bollards and sheds."
+  ],
+  "anticipate": [
+   "Moored boats along the quay, lights on masts, and a road that joins the road network."
+  ],
+  "pitfalls": [
+   "A basin dug only in the visual mesh but not in the terrain heights (or in only one of several terrain grids) shows land through the water.",
+   "Buildings left standing where the basin was dug: remove them and rebuild any spatial index that pointed at them."
+  ]
+ },
+ {
+  "id": "infrastructure.helideck",
+  "name": "helideck",
+  "description": "A landing platform for helicopters on a building, ship, platform or the ground.",
+  "aliases": [
+   "helideck",
+   "helipad",
+   "heliport",
+   "helideks",
+   "helidek",
+   "helikopterplatform",
+   "helikopterlandingsplaats",
+   "landingsplatform"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Deck",
+    "role": "surface",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "deck",
+     "pad",
+     "platform",
+     "dek"
+    ]
+   },
+   {
+    "name": "Marking",
+    "role": "marking",
+    "required": false,
+    "aliases": [
+     "marking",
+     "h marking",
+     "touchdown circle",
+     "markering"
+    ],
+    "note": "The H and the touchdown and positioning circle, painted on the deck."
+   },
+   {
+    "name": "PerimeterLight",
+    "role": "light",
+    "required": false,
+    "aliases": [
+     "perimeter light",
+     "edge light",
+     "randverlichting"
+    ]
+   },
+   {
+    "name": "SafetyNet",
+    "role": "guard",
+    "required": false,
+    "aliases": [
+     "safety net",
+     "net",
+     "vangnet"
+    ],
+    "note": "Around the edge, below deck level."
+   },
+   {
+    "name": "Windsock",
+    "role": "sign",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "aliases": [
+     "windsock",
+     "wind sock",
+     "windzak"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    12,
+    30
+   ],
+   "width": [
+    12,
+    30
+   ],
+   "height": [
+    0.2,
+    3
+   ],
+   "source": "general knowledge: a helideck is sized to the largest helicopter's overall length (the D-value), so about 12-26 m across; the deck structure is 0.2-3 m thick",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Nothing may stand above deck level inside the obstacle-free sector: railings, poles and nets of every level of detail included.",
+   "Landing needs a real collider at the deck top, bound to this deck; a marker alone cannot be landed on.",
+   "On a moving ship the deck moves on every physics tick and gives its velocity to what stands on it."
+  ]
+ },
+ {
+  "id": "infrastructure.offshore-platform",
+  "name": "offshore platform",
+  "description": "A fixed oil, gas or wind-substation platform at sea: a steel jacket with decks, modules and a helideck.",
+  "aliases": [
+   "offshore platform",
+   "oil platform",
+   "oil rig",
+   "gas platform",
+   "production platform",
+   "booreiland",
+   "olieplatform",
+   "gasplatform",
+   "productieplatform"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Jacket",
+    "role": "support",
+    "required": true,
+    "aliases": [
+     "jacket",
+     "legs",
+     "steel jacket",
+     "onderstel",
+     "poten"
+    ]
+   },
+   {
+    "name": "Deck",
+    "role": "surface",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "deck",
+     "topside",
+     "dek"
+    ]
+   },
+   {
+    "name": "Module",
+    "role": "building",
+    "required": false,
+    "aliases": [
+     "module",
+     "process module",
+     "living quarters",
+     "accommodatie"
+    ]
+   },
+   {
+    "name": "Helideck",
+    "role": "deck",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "helideck",
+     "helidek"
+    ]
+   },
+   {
+    "name": "Crane",
+    "role": "machine",
+    "required": false,
+    "count": [
+     0,
+     3
+    ],
+    "moves": [
+     {
+      "kind": "yaw",
+      "axis": "y"
+     }
+    ],
+    "pivot": "base",
+    "aliases": [
+     "crane",
+     "kraan"
+    ]
+   },
+   {
+    "name": "FlareBoom",
+    "role": "structure",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "flare boom",
+     "flare",
+     "fakkel"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    30,
+    120
+   ],
+   "width": [
+    30,
+    100
+   ],
+   "height": [
+    40,
+    150
+   ],
+   "source": "general knowledge: topsides are about 40-100 m across and stand 20-40 m above the sea; the helideck is often 30-60 m above the water",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Check the clearance above the helideck on the triangles of every level of detail, not on bounding boxes.",
+   "Use one collider definition for render, collision and landing data."
+  ]
+ },
+ {
+  "id": "infrastructure.underground-station",
+  "name": "underground station",
+  "description": "A station hall below ground: platforms beside the tracks, columns, stairs and escalators to the surface.",
+  "aliases": [
+   "underground station",
+   "metro station",
+   "subway station",
+   "station hall",
+   "ondergronds station",
+   "metrostation",
+   "tunnelstation",
+   "perronhal"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Platform",
+    "role": "surface",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "platform",
+     "perron",
+     "island platform",
+     "eilandperron"
+    ]
+   },
+   {
+    "name": "Column",
+    "role": "support",
+    "required": false,
+    "aliases": [
+     "column",
+     "pillar",
+     "kolom",
+     "pilaar"
+    ]
+   },
+   {
+    "name": "Escalator",
+    "role": "machine",
+    "required": false,
+    "count": [
+     0,
+     12
+    ],
+    "aliases": [
+     "escalator",
+     "roltrap",
+     "stairs",
+     "trap"
+    ]
+   },
+   {
+    "name": "Portal",
+    "role": "structure",
+    "required": false,
+    "count": [
+     0,
+     4
+    ],
+    "aliases": [
+     "tunnel portal",
+     "portal",
+     "tunnelmond"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    60,
+    460
+   ],
+   "width": [
+    10,
+    40
+   ],
+   "height": [
+    4,
+    12
+   ],
+   "source": "general knowledge: island platforms are about 10-15 m wide; metro platforms about 60-150 m and main-line platforms up to about 460 m long",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Place columns from the merged island platform, not per half, and keep them at least about 2.5 m from the platform edge.",
+   "Cut terrain, sea and water out of the hall in every terrain and water material, or they show inside it.",
+   "Thousands of tactile ribs and tiles belong in one InstancedMesh."
+  ]
+ },
+ {
+  "id": "infrastructure.bascule-bridge",
+  "name": "bascule bridge",
+  "description": "A movable bridge whose deck leaves swing up about a horizontal hinge to let ships pass.",
+  "aliases": [
+   "bascule bridge",
+   "drawbridge",
+   "double bascule bridge",
+   "ophaalbrug",
+   "dubbele ophaalbrug",
+   "basculebrug"
+  ],
+  "extends": "infrastructure.bridge",
+  "parts": [
+   {
+    "name": "Leaf",
+    "role": "movable",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "leaf",
+     "deck leaf",
+     "span",
+     "klep",
+     "val"
+    ],
+    "note": "Turns about the hinge line at its land end."
+   },
+   {
+    "name": "Counterweight",
+    "role": "structure",
+    "required": false,
+    "count": [
+     0,
+     2
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "x"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "counterweight",
+     "balance beam",
+     "gallows",
+     "contragewicht",
+     "balans",
+     "hameipoort"
+    ]
+   },
+   {
+    "name": "Barrier",
+    "role": "guard",
+    "required": false,
+    "count": [
+     0,
+     4
+    ],
+    "moves": [
+     {
+      "kind": "hinge",
+      "axis": "z"
+     }
+    ],
+    "pivot": "hinge",
+    "aliases": [
+     "barrier",
+     "boom gate",
+     "slagboom"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    6,
+    80
+   ],
+   "width": [
+    4,
+    35
+   ],
+   "height": [
+    4,
+    30
+   ],
+   "source": "general knowledge: small canal drawbridges span about 6-20 m; large city bascule bridges about 30-80 m",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Leaves and balance beams pivot about the real hinge line; check the opening direction, not only the point.",
+   "When open, keep the waterway clear of collision; when closed, the deck collision is part of the road."
+  ]
+ },
+ {
+  "id": "infrastructure.power-line",
+  "name": "overhead power line",
+  "description": "Conductors hanging between pylons in a sagging curve, with insulators and an earth wire.",
+  "aliases": [
+   "power line",
+   "power lines",
+   "overhead line",
+   "overhead power line",
+   "transmission line",
+   "high-voltage line",
+   "hoogspanningslijn",
+   "hoogspanningsleiding",
+   "bovenleiding"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Conductor",
+    "role": "cable",
+    "required": true,
+    "aliases": [
+     "conductor",
+     "wire",
+     "cable",
+     "draad",
+     "geleider"
+    ],
+    "note": "Hangs as a catenary between attachment points; often in bundles per phase."
+   },
+   {
+    "name": "EarthWire",
+    "role": "cable",
+    "required": false,
+    "aliases": [
+     "earth wire",
+     "ground wire",
+     "bliksemdraad"
+    ]
+   },
+   {
+    "name": "Insulator",
+    "role": "insulator",
+    "required": false,
+    "aliases": [
+     "insulator",
+     "insulator string",
+     "isolator"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    150,
+    500
+   ],
+   "width": [
+    10,
+    40
+   ],
+   "height": [
+    15,
+    70
+   ],
+   "source": "general knowledge: high-voltage spans are about 300-450 m between pylons 40-60 m high, with 10-15 m of sag; length here is one span",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Aircraft must be able to hit the wires: a few capsule shapes per conductor that follow the sag, under one static body per tile.",
+   "Attach conductors to the pylon's real attachment points, and keep the line clear of buildings, roads and trees."
+  ]
+ },
+ {
+  "id": "infrastructure.tunnel",
+  "name": "tunnel",
+  "description": "A rail or road tunnel: portals, a lined tube or box, walkways, lighting and emergency exits.",
+  "aliases": [
+   "tunnel",
+   "tunnels",
+   "rail tunnel",
+   "railway tunnel",
+   "road tunnel",
+   "spoortunnel",
+   "autotunnel",
+   "verkeerstunnel"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Portal",
+    "role": "structure",
+    "required": true,
+    "count": [
+     1,
+     2
+    ],
+    "aliases": [
+     "portal",
+     "tunnel portal",
+     "tunnelmond",
+     "portaal"
+    ]
+   },
+   {
+    "name": "Tube",
+    "role": "structure",
+    "required": true,
+    "count": [
+     1,
+     3
+    ],
+    "aliases": [
+     "tube",
+     "bore",
+     "lining",
+     "tunnelbuis",
+     "buis"
+    ]
+   },
+   {
+    "name": "Walkway",
+    "role": "surface",
+    "required": false,
+    "aliases": [
+     "walkway",
+     "emergency walkway",
+     "vluchtpad"
+    ]
+   },
+   {
+    "name": "EmergencyExit",
+    "role": "door",
+    "required": false,
+    "aliases": [
+     "emergency exit",
+     "escape door",
+     "nooduitgang",
+     "vluchtdeur"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    50,
+    60000
+   ],
+   "width": [
+    7,
+    15
+   ],
+   "height": [
+    6,
+    12
+   ],
+   "source": "general knowledge: a single-track high-speed tube is about 8-10 m inside diameter; road tunnel tubes about 10-15 m wide; emergency exits every few hundred metres",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Terrain, sea and water above or around the tunnel must be cut out in every material and level of detail, or they show inside.",
+   "Underground parts need no sun shadows and need not be built while the camera is far above."
+  ]
+ },
+ {
+  "id": "infrastructure.runway",
+  "name": "runway",
+  "description": "A paved strip for aircraft to take off and land, with markings, lights, taxiways and an apron.",
+  "aliases": [
+   "runway",
+   "runways",
+   "airstrip",
+   "airfield",
+   "landing strip",
+   "landingsbaan",
+   "startbaan",
+   "vliegveld",
+   "vliegbasis"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Runway",
+    "role": "surface",
+    "required": true,
+    "count": [
+     1,
+     4
+    ],
+    "aliases": [
+     "runway",
+     "strip",
+     "baan"
+    ]
+   },
+   {
+    "name": "Taxiway",
+    "role": "surface",
+    "required": false,
+    "aliases": [
+     "taxiway",
+     "taxibaan"
+    ]
+   },
+   {
+    "name": "Apron",
+    "role": "surface",
+    "required": false,
+    "aliases": [
+     "apron",
+     "platform",
+     "stand"
+    ]
+   },
+   {
+    "name": "RunwayLight",
+    "role": "light",
+    "required": false,
+    "aliases": [
+     "runway light",
+     "edge light",
+     "baanverlichting",
+     "approach light"
+    ]
+   },
+   {
+    "name": "Windsock",
+    "role": "sign",
+    "required": false,
+    "count": [
+     0,
+     4
+    ],
+    "aliases": [
+     "windsock",
+     "windzak"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    800,
+    4500
+   ],
+   "width": [
+    18,
+    60
+   ],
+   "height": [
+    0,
+    0.5
+   ],
+   "source": "general knowledge: ICAO code 4 runways are 45-60 m wide and 2-4 km long; small airfields have 18-30 m wide strips under 1.5 km",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "The runway surface must be flat in the collision, and collision must match what is drawn.",
+   "A runway follows its magnetic heading: the number at each end is the heading divided by ten."
+  ]
+ },
+ {
+  "id": "infrastructure.buoy",
+  "name": "navigation buoy",
+  "description": "A floating channel marker: a can, cone, pillar or spar buoy with a top mark and often a light.",
+  "aliases": [
+   "buoy",
+   "buoys",
+   "navigation buoy",
+   "channel marker",
+   "cardinal buoy",
+   "boei",
+   "boeien",
+   "betonning",
+   "vaargeulmarkering"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Float",
+    "role": "body",
+    "required": true,
+    "count": 1,
+    "aliases": [
+     "float",
+     "body",
+     "drijflichaam"
+    ]
+   },
+   {
+    "name": "TopMark",
+    "role": "sign",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "top mark",
+     "topteken"
+    ]
+   },
+   {
+    "name": "Light",
+    "role": "light",
+    "required": false,
+    "count": [
+     0,
+     1
+    ],
+    "aliases": [
+     "light",
+     "lamp",
+     "licht"
+    ]
+   }
+  ],
+  "scale": {
+   "length": [
+    0.8,
+    4
+   ],
+   "width": [
+    0.8,
+    4
+   ],
+   "height": [
+    1,
+    8
+   ],
+   "source": "general knowledge: lateral and cardinal buoys stand about 1.5-6 m above the water; IALA system A (Europe) uses red to port and green to starboard when entering",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Lights flash in their real pattern and only at night; a small lamp is smaller than a pixel at a few kilometres, so add a sprite that keeps its size.",
+   "Buoys follow the same water height function as everything else on the water."
+  ]
+ },
+ {
+  "id": "infrastructure.traffic-light",
+  "name": "traffic light",
+  "description": "A traffic signal for road traffic on a pole.",
+  "aliases": [
+   "traffic light",
+   "traffic lights",
+   "traffic signal",
+   "stop light",
+   "stoplight",
+   "verkeerslicht",
+   "verkeerslichten",
+   "stoplicht",
+   "stoplichten",
+   "signal light",
+   "verkeersregelinstallatie"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Pole",
+    "role": "support",
+    "required": true,
+    "aliases": [
+     "pole",
+     "post",
+     "paal",
+     "mast"
+    ]
+   },
+   {
+    "name": "Head",
+    "role": "head",
+    "required": true,
+    "aliases": [
+     "head",
+     "housing",
+     "signal head",
+     "lantaarn",
+     "kast"
+    ]
+   },
+   {
+    "name": "LightRed",
+    "role": "light",
+    "required": true,
+    "note": "Emissive material; only one of the three is lit at a time.",
+    "aliases": [
+     "light red",
+     "red",
+     "rood"
+    ]
+   },
+   {
+    "name": "LightAmber",
+    "role": "light",
+    "required": true,
+    "aliases": [
+     "light amber",
+     "amber",
+     "yellow",
+     "oranje",
+     "geel"
+    ]
+   },
+   {
+    "name": "LightGreen",
+    "role": "light",
+    "required": true,
+    "aliases": [
+     "light green",
+     "green",
+     "groen"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    0.3,
+    0.5
+   ],
+   "height": [
+    2.5,
+    6.5
+   ],
+   "source": "general knowledge: a three-light head is about 1 m high with 200 or 300 mm lenses; poles put the head at about 2.5-3.5 m, overhead masts higher; not a single standard",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Red is always at the top and green at the bottom.",
+   "Give each lamp its own node, so a script can switch them without swapping materials on one mesh."
+  ]
+ },
+ {
+  "id": "infrastructure.fire-hydrant",
+  "name": "fire hydrant",
+  "description": "An above-ground fire hydrant with a barrel, outlets and operating cap.",
+  "aliases": [
+   "fire hydrant",
+   "hydrant",
+   "brandkraan",
+   "bovengrondse brandkraan"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Barrel",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "barrel",
+     "body",
+     "standpipe"
+    ]
+   },
+   {
+    "name": "Outlet",
+    "role": "outlet",
+    "required": true,
+    "aliases": [
+     "outlet",
+     "nozzle",
+     "aansluiting"
+    ],
+    "count": [
+     1,
+     4
+    ]
+   },
+   {
+    "name": "Cap",
+    "role": "cap",
+    "required": true,
+    "aliases": [
+     "cap",
+     "operating nut",
+     "dop"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    0.25,
+    0.7
+   ],
+   "length": [
+    0.25,
+    0.7
+   ],
+   "height": [
+    0.5,
+    1.2
+   ],
+   "source": "General knowledge of above-ground pillar hydrants; size and outlet arrangement vary by jurisdiction, not a standard.",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Do not scale every outlet into the body; capped hose connections must remain visible and accessible."
+  ]
+ },
+ {
+  "id": "infrastructure.bus-stop",
+  "name": "bus stop",
+  "description": "A fixed bus stop with a shelter, roof, bench and sign, rather than a bus vehicle.",
+  "aliases": [
+   "bus stop",
+   "bus shelter",
+   "busstop",
+   "bushalte",
+   "bushokje",
+   "haltehokje"
+  ],
+  "extends": "infrastructure",
+  "parts": [
+   {
+    "name": "Shelter",
+    "role": "body",
+    "required": true,
+    "aliases": [
+     "shelter",
+     "frame",
+     "hokje"
+    ]
+   },
+   {
+    "name": "Roof",
+    "role": "roof",
+    "required": true,
+    "aliases": [
+     "roof",
+     "dak"
+    ]
+   },
+   {
+    "name": "Bench",
+    "role": "seat",
+    "required": true,
+    "aliases": [
+     "bench",
+     "seat",
+     "bank"
+    ]
+   },
+   {
+    "name": "Sign",
+    "role": "sign",
+    "required": true,
+    "aliases": [
+     "sign",
+     "stop sign",
+     "haltebord"
+    ]
+   }
+  ],
+  "scale": {
+   "width": [
+    1.5,
+    6
+   ],
+   "length": [
+    0.8,
+    2.5
+   ],
+   "height": [
+    2,
+    3.5
+   ],
+   "source": "General knowledge of compact roadside passenger shelters; local accessibility and road rules differ, not a standard.",
+   "confidence": "C"
+  },
+  "pitfalls": [
+   "Leave the boarding side open; the shelter is roadside infrastructure and must not be classified as a bus vehicle."
+  ]
+ }
+]
