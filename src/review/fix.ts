@@ -143,6 +143,12 @@ export const FIXES: Fix[] = [
   ),
 ];
 
+/**
+ * Fixes that rewrite code rather than rename it (one intent only, but more than a name changes). They run only when
+ * asked for: `rewrites: true`, or their rule id in `only`. A dry run counts what they would change.
+ */
+export const REWRITE_RULES: ReadonlySet<string> = new Set(["transform-controls-add", "addon-path-extension", "render-args-swapped", "color-assign-number"]);
+
 export interface FileFix {
   file: string;
   count: number;
@@ -156,15 +162,18 @@ export interface FixResult {
   files: FileFix[];
   total: number;
   written: boolean;
+  /** Places the rewrites would change when they were not asked for, per rule. */
+  rewritesSkipped?: Record<string, number>;
 }
 
-export function fix(opts: { path: string; three?: string; write?: boolean; only?: string[] }): FixResult {
+export function fix(opts: { path: string; three?: string; write?: boolean; only?: string[]; rewrites?: boolean }): FixResult {
   const isDir = statSync(opts.path).isDirectory();
   const install = findThree(isDir ? opts.path : opts.path + "/..", opts.three);
   const release = install?.release ?? Number.POSITIVE_INFINITY;
   const collected = collect(opts.path);
   const base = isDir ? opts.path : opts.path + "/..";
   const files: FileFix[] = [];
+  const skipped: Record<string, number> = {};
   const glsl = (f: SourceFile) => f.usesThree || /#include\s+<|\bgl_(?:Position|FragColor)\b/.test(f.text);
   const env: Env = { ...(install ? { root: install.root } : {}), all: collected.files.filter(glsl).map((f) => f.text).join("\n") };
   for (const f of collected.files) {
@@ -186,6 +195,10 @@ export function fix(opts: { path: string; three?: string; write?: boolean; only?
           const before = f.text.slice(Math.max(0, start - 400), start);
           const inImport = /import\s*\{[^}]*$/.test(before);
           if (inImport && new RegExp(String.raw`\b${text}\b`).test(f.text.slice(0, start + m[0].length + 400).split(/from\s+['"]/)[0] ?? "")) continue;
+        }
+        if (REWRITE_RULES.has(fx.rule) && !opts.rewrites && !opts.only?.includes(fx.rule)) {
+          skipped[fx.rule] = (skipped[fx.rule] ?? 0) + 1;
+          continue;
         }
         edits.push({ start, end: start + m[0].length, text, rule: fx.rule });
       }
@@ -209,13 +222,24 @@ export function fix(opts: { path: string; three?: string; write?: boolean; only?
   if (opts.write) {
     for (const f of files) writeFileSync(`${base}/${f.file}`.replace(/\/\.\//, "/"), f.fixed);
   }
-  return { release: install ? install.release : null, files, total: files.reduce((a, f) => a + f.count, 0), written: !!opts.write };
+  return {
+    release: install ? install.release : null,
+    files,
+    total: files.reduce((a, f) => a + f.count, 0),
+    written: !!opts.write,
+    ...(Object.keys(skipped).length ? { rewritesSkipped: skipped } : {}),
+  };
 }
 
 export function formatFix(r: FixResult): string {
-  if (!r.total) return "Nothing to fix mechanically.";
+  const rw = Object.entries(r.rewritesSkipped ?? {});
+  const rwLine = rw.length
+    ? `Rewrites not applied (more than a rename; check them, then pass rewrites: true / --rewrites or the rule in only): ${rw.map(([k, n]) => `${k} x${n}`).join(", ")}.`
+    : "";
+  if (!r.total) return rwLine ? `Nothing to rename mechanically.\n${rwLine}` : "Nothing to fix mechanically.";
   const lines = [r.written ? `Fixed ${r.total} place(s) in ${r.files.length} file(s):` : `Would fix ${r.total} place(s) in ${r.files.length} file(s) (add --write to apply):`];
   for (const f of r.files) lines.push(`  ${f.file}: ${f.count} (${f.rules.join(", ")})`);
+  if (rwLine) lines.push(rwLine);
   lines.push("Run `threesmith review` again; the rest needs a decision.");
   return lines.join("\n");
 }

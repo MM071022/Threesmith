@@ -272,13 +272,13 @@ export function createServer(options: ServerOptions = {}): McpServer {
       title: "Apply mechanical three.js fixes",
       description:
         "Apply the review fixes that need no decision: renames with exactly the same meaning (BoxBufferGeometry -> BoxGeometry, THREE.Math -> MathUtils, applyMatrix -> applyMatrix4, three/examples/jsm -> three/addons, outputEncoding/encoding -> colorSpace, merged geometry utils) and a capped pixel ratio. Shows what it would change unless write is true; a write is one undoable step (three_undo). Run three_review afterwards; the rest needs a decision.",
-      inputSchema: { path: pathParam, target: z.string().optional().describe("same as path (older name)"), write: z.boolean().optional(), only: z.array(z.string()).optional().describe("rule ids to fix"), three: threeParam },
+      inputSchema: { path: pathParam, target: z.string().optional().describe("same as path (older name)"), write: z.boolean().optional(), only: z.array(z.string()).optional().describe("rule ids to fix"), rewrites: z.boolean().optional().describe("also apply the rewrites that change more than a name (render argument order, color.set(), the missing .js, TransformControls.getHelper()); the dry run lists them"), three: threeParam },
       annotations: WRITES,
     },
-    async ({ path, target: older, write, only, three }) =>
+    async ({ path, target: older, write, only, rewrites, three }) =>
       guard(() => {
         const target = where(path ?? older);
-        const r = fix({ path: target, ...(three ? { three } : {}), ...(only ? { only } : {}) });
+        const r = fix({ path: target, ...(three ? { three } : {}), ...(only ? { only } : {}), ...(rewrites ? { rewrites } : {}) });
         if (!write || !r.total) return text(formatFix(r));
         const folder = statSync(target).isDirectory() ? target : join(target, "..");
         const root = projectRootOf(folder);

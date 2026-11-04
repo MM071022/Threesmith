@@ -138,9 +138,10 @@ export function buildProgram(): Command {
     .option("--three <dir>", "path to a three package")
     .option("--write", "change the files")
     .option("--only <rules>", "comma separated rule ids")
+    .option("--rewrites", "also apply the rewrites that change more than a name (listed by the dry run)")
     .option("--json", "JSON output")
-    .action((path: string, o: { three?: string; write?: boolean; only?: string; json?: boolean }) => {
-      const r = fix({ path, ...(o.three ? { three: o.three } : {}), ...(o.only ? { only: o.only.split(",") } : {}) });
+    .action((path: string, o: { three?: string; write?: boolean; only?: string; rewrites?: boolean; json?: boolean }) => {
+      const r = fix({ path, ...(o.three ? { three: o.three } : {}), ...(o.only ? { only: o.only.split(",") } : {}), ...(o.rewrites ? { rewrites: true } : {}) });
       let id = 0;
       if (o.write && r.total) {
         const folder = statSync(path).isDirectory() ? path : join(path, "..");

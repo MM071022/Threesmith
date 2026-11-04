@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { fix } from "../src/review/fix.js";
+import { fix, formatFix } from "../src/review/fix.js";
 import { isDisabled } from "../src/review/review.js";
 import { ids, project, reviewFiles, THREE_DIR } from "./helpers.js";
 
@@ -168,6 +168,17 @@ describe("fixes for the newer rules", () => {
       expect(ids(reviewFiles(after))).not.toContain(c.rule);
     });
   }
+
+  it("applies rewrites only when asked, and counts them in a dry run", () => {
+    const files = { "a.js": `${T}material.color = 0xff0000;\nrenderer.render(camera, scene);\nnew THREE.BoxBufferGeometry();\n` };
+    const dry = fix({ path: project(files), three: THREE_DIR });
+    expect(dry.files[0]?.rules).toEqual(["buffer-geometry-alias"]);
+    expect(dry.rewritesSkipped).toMatchObject({ "color-assign-number": 1, "render-args-swapped": 1 });
+    expect(formatFix(dry)).toContain("Rewrites not applied");
+    const all = fix({ path: project(files), three: THREE_DIR, rewrites: true });
+    expect(all.files[0]?.rules).toEqual(["buffer-geometry-alias", "color-assign-number", "render-args-swapped"]);
+    expect(all.rewritesSkipped).toBeUndefined();
+  });
 
   it("leaves a chunk the project registers itself alone", () => {
     const src = `import * as THREE from 'three';\nTHREE.ShaderChunk.output_fragment = 'gl_FragColor = vec4(1.0);';\nconst f = \`void main() {\n  gl_FragColor = vec4(1.0);\n  #include <output_fragment>\n}\`;\n`;
