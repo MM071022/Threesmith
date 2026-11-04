@@ -129,3 +129,21 @@ describe("mcp server", () => {
     expect(textOf(r)).toContain("npm install three");
   });
 });
+
+describe("lessons over mcp", () => {
+  it("finds lessons by error and words, records verdicts and keeps scrubbed local lessons", async () => {
+    const c = await client();
+    const e = await c.callTool({ name: "three_lessons", arguments: { error: "Multiple instances of Three.js being imported." } });
+    expect(textOf(e)).toMatch(/symptom:/);
+    const q = await c.callTool({ name: "three_lessons", arguments: { query: "washed out colors" } });
+    expect(q.isError).toBeFalsy();
+    const add = await c.callTool({ name: "three_lesson_add", arguments: { title: "Reset the mixer time when a level restarts", fix: "Call mixer.setTime(0) before the clips play again after a restart.", error: "clip ended at /home/someone/game/src/level.js:12" } });
+    expect(textOf(add)).toContain("local/");
+    expect(textOf(add)).not.toContain("/home/someone");
+    const id = /local\/[\w-]+/.exec(textOf(add))![0];
+    const v = await c.callTool({ name: "three_lessons", arguments: { id, verdict: "helped" } });
+    expect(textOf(v)).toContain("helped 1");
+    const x = await c.callTool({ name: "three_explain", arguments: { message: "THREE.WebGLRenderer: Context Lost." } });
+    expect(textOf(x)).toContain("lesson ");
+  });
+});

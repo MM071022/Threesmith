@@ -10,6 +10,7 @@ import { applyFeedback } from "../learn/feedback.js";
 import { checkAssets } from "../scan/assets.js";
 import { scanProject } from "../scan/scan.js";
 import { makeSourceFile } from "../review/source.js";
+import { lessonHintsForMessages } from "../lessons/hints.js";
 
 /**
  * Hooks for coding agents (Claude Code's hook events), so Threesmith is in the agent's loop without the agent having to
@@ -187,9 +188,11 @@ export function postBash(input: HookInput): HookOutput | undefined {
   const m = THREE_MESSAGE.exec(text);
   const known = explain(text);
   if (!m && !(known.length && /three/i.test(text))) return undefined;
+  const lessons = lessonHintsForMessages([text.slice(-20_000)]);
   return context_("PostToolUse", [
     `Threesmith: the output above has a three.js problem${m ? ` ("${m[0].slice(0, 120)}")` : ""}.`,
     ...known.slice(0, 3).map((e) => `- ${e.title}: ${e.cause} Fix: ${e.fix}`),
+    ...lessons.map((l) => `- ${l}`),
     "Next: look names up with three_api (exact API of the installed version); three_explain with the full message, three_inspect when the scene looks wrong.",
   ]);
 }

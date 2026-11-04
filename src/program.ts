@@ -24,6 +24,10 @@ import { applyFeedback, formatLearned } from "./learn/feedback.js";
 import { envFlag } from "./mcp/toolsets.js";
 import { checkTypes, formatTypes } from "./types/types.js";
 import { toSarif } from "./review/sarif.js";
+import { LESSON_TOPICS } from "./lessons/types.js";
+import { findLesson, lessonsForError, lessonsForRule, searchLessons } from "./lessons/search.js";
+import { formatLesson, formatLessonList } from "./lessons/format.js";
+import { recordLessonFeedback } from "./lessons/local.js";
 import { formatCompact } from "./review/compact.js";
 import { join, relative } from "node:path";
 import { statSync } from "node:fs";
@@ -286,6 +290,36 @@ export function buildProgram(): Command {
       const r = checkTypes(root, { ...(index ? { index } : {}) });
       out(o.json ? JSON.stringify(r, null, 2) : formatTypes(r, { ...(o.all ? { all: true } : {}) }));
       if (!r.ran || r.errors.some((e) => e.three)) process.exitCode = 1;
+    });
+
+  program
+    .command("lessons")
+    .description("Lessons from real three.js projects: by words, an error message, a rule or a topic; --id for one in full")
+    .argument("[query...]", "words")
+    .option("--error <message>", "a console or build message")
+    .option("--rule <id>", "a review rule id")
+    .option("--topic <topic>", LESSON_TOPICS.join(" | "))
+    .option("--id <id>", "one lesson in full")
+    .option("--verdict <helped|wrong>", "with --id: record whether it fit")
+    .option("--limit <n>", "max lessons", "10")
+    .option("--json", "JSON output")
+    .action((words: string[], o: { error?: string; rule?: string; topic?: string; id?: string; verdict?: string; limit: string; json?: boolean }) => {
+      if (o.id) {
+        if (o.verdict === "helped" || o.verdict === "wrong") {
+          const c = recordLessonFeedback(o.id, o.verdict);
+          out(`recorded: ${o.id} ${o.verdict} (helped ${c.helped}, wrong ${c.wrong})`);
+          return;
+        }
+        const hit = findLesson(o.id);
+        if (!hit) process.exitCode = 1;
+        out(hit ? (o.json ? JSON.stringify(hit, null, 2) : formatLesson(hit)) : `no lesson ${o.id}`);
+        return;
+      }
+      const limit = Number(o.limit);
+      const topic = o.topic && (LESSON_TOPICS as readonly string[]).includes(o.topic) ? (o.topic as (typeof LESSON_TOPICS)[number]) : undefined;
+      const hits = o.error ? lessonsForError(o.error, { limit }) : o.rule ? lessonsForRule(o.rule, { limit }) : searchLessons(words.join(" "), { ...(topic ? { topic } : {}), limit });
+      out(o.json ? JSON.stringify(hits, null, 2) : formatLessonList(hits, o.error ?? o.rule ?? words.join(" ")));
+      if (!hits.length) process.exitCode = 1;
     });
 
   program

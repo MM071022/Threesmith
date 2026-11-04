@@ -21,6 +21,11 @@ import { collect } from "../review/source.js";
 import { formatJournal, formatUndo, readJournal, undoJournal, writeFiles } from "../project/journal.js";
 import { checkTypes, formatTypes } from "../types/types.js";
 import { formatErrors, listSessions, pageOp, startSession, stopSession, type PageOp } from "../session/session.js";
+import { LESSON_TOPICS } from "../lessons/types.js";
+import { findLesson, lessonsForError, lessonsForRule, searchLessons, type LessonHit } from "../lessons/search.js";
+import { formatLesson, formatLessonList } from "../lessons/format.js";
+import { addLocalLesson, recordLessonFeedback, type LessonInput } from "../lessons/local.js";
+import { lessonHintsForMessages, lessonHintsForRules } from "../lessons/hints.js";
 import { VERSION } from "../version.js";
 import { renderInstructions, type Tier } from "./instructions.js";
 import { CheckOutput, DoctorOutput, ReviewOutput, checkData, doctorData, reviewData } from "./structured.js";
@@ -111,7 +116,7 @@ export function createServer(options: ServerOptions = {}): McpServer {
     async ({ path, three, detail }) =>
       guard(() => {
         const t = triage(where(path), { ...(three ? { three } : {}) });
-        return result(formatTriage(t, { detail: detail ?? profile.detail }), doctorData(t, profile.findings), false);
+        return result(formatTriage(t, { detail: detail ?? profile.detail, hints: (rules) => lessonHintsForRules(rules).slice(0, 1) }), doctorData(t, profile.findings), false);
       }),
   );
 
@@ -200,6 +205,8 @@ export function createServer(options: ServerOptions = {}): McpServer {
           if (code === undefined) reviewDelta(root, r);
           body = formatCompact(r, { limit: cap, noInfos: !(full || profile.infos), focus });
         }
+        const hints = lessonHintsForRules([...new Set(r.findings.filter((f) => f.severity !== "info").map((f) => f.rule))]);
+        if (hints.length) body += `\n${hints.join("\n")}`;
         const note = formatLearned(learned);
         const shown = focus.length ? { ...r, findings: r.findings.filter((f) => focus.includes(f.file)) } : r;
         return result(note ? `${body}\n${note}` : body, reviewData(shown, cap, full || tier === "premium"), false);
@@ -397,7 +404,8 @@ export function createServer(options: ServerOptions = {}): McpServer {
         });
         const extra: Content[] = [];
         if (r.screenshot && a.screenshot !== false) extra.push({ type: "image", data: readFileSync(r.screenshot).toString("base64"), mimeType: "image/png" });
-        return result(formatCheck(r), checkData(r, profile.findings), !r.ok, extra);
+        const hints = lessonHintsForMessages(r.issues.filter((i) => i.severity === "error").map((i) => i.detail ?? i.message));
+        return result(hints.length ? `${formatCheck(r)}\n${hints.join("\n")}` : formatCheck(r), checkData(r, profile.findings), !r.ok, extra);
       }),
   );
 
@@ -526,6 +534,83 @@ export function createServer(options: ServerOptions = {}): McpServer {
   );
 
   tool(
+    "three_lessons",
+    {
+      title: "Lessons from real three.js projects",
+      description:
+        "Lessons from real three.js and react-three-fiber projects: symptom, cause, fix and how to test it. Pass `error` with a console or build message to get the lessons that explain it; `rule` with a review rule id for why it matters; `query` with words ('textures washed out', 'shadow cut off', 'model invisible'); `topic` to list one topic; `id` for one lesson in full. With `id` and `verdict` (helped or wrong) it records whether the lesson fit, which ranks lessons on this machine. Lessons you kept with three_lesson_add are included.",
+      inputSchema: {
+        query: z.string().optional(),
+        error: z.string().optional().describe("a message as it was printed"),
+        rule: z.string().optional().describe("a review rule id"),
+        id: z.string().optional(),
+        topic: z.enum(LESSON_TOPICS).optional(),
+        verdict: z.enum(["helped", "wrong"]).optional().describe("with id: did the lesson fit?"),
+        limit: z.number().int().min(1).max(50).optional(),
+      },
+      annotations: WRITES,
+    },
+    async ({ query, error, rule, id, topic, verdict, limit }) =>
+      guard(() => {
+        const max = limit ?? (tier === "cheap" ? 5 : 12);
+        if (id) {
+          if (verdict) {
+            const c = recordLessonFeedback(id, verdict);
+            return text(`recorded: ${id} ${verdict} (helped ${c.helped}, wrong ${c.wrong} on this machine)`);
+          }
+          const hit = findLesson(id);
+          return hit ? text(formatLesson(hit)) : failure(`no lesson ${id}; three_lessons with query lists them.`);
+        }
+        let hits: LessonHit[];
+        if (error) hits = lessonsForError(error, { limit: max });
+        else if (rule) hits = lessonsForRule(rule, { limit: max });
+        else if (query || topic) hits = searchLessons(query ?? "", { ...(topic ? { topic } : {}), limit: max });
+        else return failure("Pass query, error, rule, topic or id.");
+        // the best match in full, the rest as a list: one call is usually enough
+        if (hits.length && (error || tier === "premium")) {
+          const [first, ...rest] = hits;
+          return text([formatLesson(first!), ...(rest.length ? ["", formatLessonList(rest)] : [])].join("\n"));
+        }
+        return text(formatLessonList(hits, error ?? rule ?? query ?? topic ?? ""), hits.length === 0);
+      }),
+  );
+
+  tool(
+    "three_lesson_add",
+    {
+      title: "Keep a lesson learned here",
+      description:
+        "Keep a lesson you learned while fixing a three.js problem, so it comes back the next time the same message or question shows up (in three_lessons, three_explain, three_check and the review). Write it in general words: title (the lesson in one line) and fix are required; symptom, cause, test, topic, tags, rules, and `error` with the exact console or build message. Names, paths, e-mail addresses, links and code are taken out before it is stored, and the file never leaves this machine ($THREESMITH_HOME). The same title updates the lesson.",
+      inputSchema: {
+        title: z.string(),
+        fix: z.string(),
+        symptom: z.string().optional(),
+        cause: z.string().optional(),
+        test: z.string().optional(),
+        topic: z.enum(LESSON_TOPICS).optional(),
+        tags: z.array(z.string()).optional(),
+        rules: z.array(z.string()).optional(),
+        error: z.string().optional(),
+        path: pathParam,
+      },
+      annotations: WRITES,
+    },
+    async (a) =>
+      guard(() => {
+        let knownNames: string[] | undefined;
+        try {
+          knownNames = [...indexFor(where(a.path)).exports.keys()];
+        } catch {
+          knownNames = undefined;
+        }
+        const { path: _p, ...input } = a;
+        const r = addLocalLesson(input as LessonInput, { ...(knownNames ? { knownNames } : {}) });
+        const scrubbed = Object.entries(r.replaced).map(([k, n]) => `${n} ${k}`).join(", ");
+        return text(`${r.updated ? "updated" : "kept"} ${r.lesson.id}${scrubbed ? ` (scrubbed: ${scrubbed})` : ""}\n${formatLesson({ lesson: r.lesson, local: true, helped: 0, wrong: 0 })}`);
+      }),
+  );
+
+  tool(
     "three_explain",
     {
       title: "Explain a three.js error",
@@ -543,7 +628,9 @@ export function createServer(options: ServerOptions = {}): McpServer {
           index = undefined;
         }
         const r = explain(message, index);
-        return text(formatExplanations(r));
+        const hints = lessonHintsForMessages([message]);
+        const body = r.length || !hints.length ? formatExplanations(r) : "No known pattern for this message.";
+        return text(hints.length ? `${body}\n${hints.join("\n")}` : body);
       }),
   );
 

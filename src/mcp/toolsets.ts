@@ -13,6 +13,8 @@ export const TOOLSETS = {
     "three_types",
     "three_fix",
     "three_explain",
+    "three_lessons",
+    "three_lesson_add",
     "three_rules",
     "three_feedback",
     "three_undo",
