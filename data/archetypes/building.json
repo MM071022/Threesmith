@@ -1931,7 +1931,7 @@
     "moves": [
      {
       "kind": "hinge",
-      "axis": "x"
+      "axis": "z"
      }
     ],
     "pivot": "hinge",
@@ -2014,8 +2014,7 @@
      "overkapping",
      "luifel",
      "roof",
-     "dak",
-     "fascia"
+     "dak"
     ]
    },
    {
