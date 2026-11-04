@@ -1270,6 +1270,10 @@
      "square sail",
      "yard",
      "ra"
+    ],
+    "note": "Sail and oars drive the ship; there is no engine.",
+    "replaces": [
+     "Engine"
     ]
    },
    {
@@ -1333,6 +1337,24 @@
      "schild",
      "schilden"
     ]
+   },
+   {
+    "name": "Seat",
+    "role": "seat",
+    "required": false,
+    "count": [
+     0,
+     80
+    ],
+    "aliases": [
+     "sea chest",
+     "chest",
+     "seat",
+     "zeekist",
+     "kist",
+     "roeibank"
+    ],
+    "note": "The rowers sat on their sea chests, one per oar."
    },
    {
     "name": "Figurehead",
