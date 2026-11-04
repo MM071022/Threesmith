@@ -1,0 +1,1641 @@
+{
+ "version": 1,
+ "name": "mushroom",
+ "archetype": "plant.mushroom",
+ "description": "A mushroom, from a 18 cm fly agaric in the woods to a giant fantasy toadstool: a lathed stem with a bulbous foot and a scaly volva, a hanging ring, a cap that blends from a dome to a flat plate or a bell, gills underneath as fine radial ridges, warts in seeded rings that follow the cap, and small sprouts at the foot. Three styles: a red fly agaric with white warts, a brown cep, and a violet fantasy mushroom with glowing gills and spots.",
+ "params": [
+  {
+   "name": "height",
+   "type": "number",
+   "default": 0.18,
+   "min": 0.05,
+   "max": 6,
+   "description": "Total height in metres: 0.05-0.3 is a real mushroom, 1-6 a giant fantasy one."
+  },
+  {
+   "name": "capWidth",
+   "type": "number",
+   "default": 1,
+   "min": 0.6,
+   "max": 2,
+   "description": "Cap width relative to the usual (1: the cap is about 3/4 of the height across)."
+  },
+  {
+   "name": "capShape",
+   "type": "integer",
+   "default": 1,
+   "min": 1,
+   "max": 3,
+   "description": "1 dome, 2 flat plate (parasol), 3 bell."
+  },
+  {
+   "name": "stemThickness",
+   "type": "number",
+   "default": 1,
+   "min": 0.6,
+   "max": 2.2,
+   "description": "Stem thickness relative to the usual (2 is a fat cep stem)."
+  },
+  {
+   "name": "style",
+   "type": "integer",
+   "default": 1,
+   "min": 1,
+   "max": 3,
+   "description": "1 fly agaric (red, white warts), 2 cep (brown), 3 fantasy (violet, glowing gills and warts)."
+  },
+  {
+   "name": "spots",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "Warts on the cap."
+  },
+  {
+   "name": "ring",
+   "type": "boolean",
+   "default": true,
+   "min": 0,
+   "max": 1,
+   "description": "The hanging ring (annulus) on the stem."
+  },
+  {
+   "name": "sprouts",
+   "type": "integer",
+   "default": 2,
+   "min": 0,
+   "max": 5,
+   "description": "Small young mushrooms at the foot."
+  },
+  {
+   "name": "tilt",
+   "type": "number",
+   "default": 6,
+   "min": -20,
+   "max": 20,
+   "description": "Tilt of the cap in degrees (forward is positive)."
+  },
+  {
+   "name": "seed",
+   "type": "integer",
+   "default": 3,
+   "min": 1,
+   "max": 999,
+   "description": "Seed for the warts and the sprouts."
+  }
+ ],
+ "materials": {
+  "stem": {
+   "color": [
+    0.72,
+    0.68,
+    0.58,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.75
+  },
+  "skirt": {
+   "color": [
+    0.78,
+    0.75,
+    0.66,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.8,
+   "doubleSided": true
+  },
+  "wart": {
+   "color": [
+    0.8,
+    0.78,
+    0.7,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.85,
+   "doubleSided": true
+  },
+  "gill": {
+   "color": [
+    0.7,
+    0.64,
+    0.5,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.85
+  },
+  "cap_red": {
+   "color": [
+    0.62,
+    0.035,
+    0.015,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.35
+  },
+  "cap_brown": {
+   "color": [
+    0.2,
+    0.09,
+    0.035,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.45
+  },
+  "cap_glow": {
+   "color": [
+    0.2,
+    0.05,
+    0.4,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.35,
+   "emissive": [
+    0.06,
+    0.01,
+    0.14
+   ]
+  },
+  "glow": {
+   "color": [
+    0.3,
+    0.9,
+    1,
+    1
+   ],
+   "metallic": 0,
+   "roughness": 0.4,
+   "emissive": [
+    0.2,
+    0.8,
+    1
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "name": "Mushroom",
+   "vars": {
+    "w1": "max(0, 1 - abs($capShape - 1))",
+    "w2": "max(0, 1 - abs($capShape - 2))",
+    "w3": "max(0, 1 - abs($capShape - 3))",
+    "H": "$height",
+    "R": "$height * 0.375 * $capWidth",
+    "bulb": "max(0, 1 - abs($style - 1)) + 0.6 * max(0, 1 - abs($style - 2))"
+   },
+   "children": [
+    {
+     "name": "Body",
+     "vars": {
+      "hs": "$H - $R * ($w1 * 0.64 + $w2 * 0.34 + $w3 * 1.02)",
+      "rs": "min($R * 0.4, $H * 0.06 * $stemThickness)"
+     },
+     "children": [
+      {
+       "name": "Stem",
+       "shape": "lathe",
+       "material": "stem",
+       "segments": 24,
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         "$rs * (1.1 + 0.5 * $bulb)",
+         0
+        ],
+        [
+         "$rs * (1.25 + 0.75 * $bulb)",
+         "$hs * 0.07"
+        ],
+        [
+         "$rs * (1.15 + 0.55 * $bulb)",
+         "$hs * 0.16"
+        ],
+        [
+         "$rs * 1.05",
+         "$hs * 0.3"
+        ],
+        [
+         "$rs * 0.95",
+         "$hs * 0.6"
+        ],
+        [
+         "$rs * 0.88",
+         "$hs * 0.85"
+        ],
+        [
+         "$rs * 0.95",
+         "$hs + $R * 0.02"
+        ],
+        [
+         0,
+         "$hs + $R * 0.04"
+        ]
+       ]
+      },
+      {
+       "name": "Volva",
+       "shape": "lathe",
+       "material": "wart",
+       "segments": 24,
+       "caps": false,
+       "profile": [
+        [
+         "$rs * (1.18 + 0.55 * $bulb)",
+         "$hs * 0.02"
+        ],
+        [
+         "$rs * (1.32 + 0.8 * $bulb)",
+         "$hs * 0.08"
+        ],
+        [
+         "$rs * (1.3 + 0.75 * $bulb)",
+         "$hs * 0.12"
+        ],
+        [
+         "$rs * (1.2 + 0.6 * $bulb)",
+         "$hs * 0.13"
+        ]
+       ]
+      },
+      {
+       "name": "Ring",
+       "shape": "lathe",
+       "material": "skirt",
+       "segments": 28,
+       "caps": false,
+       "profile": [
+        [
+         "$rs * 0.9",
+         "$hs * 0.82"
+        ],
+        [
+         "$rs * (0.92 + 0.45 * $ring)",
+         "$hs * (0.82 - 0.015 * $ring)"
+        ],
+        [
+         "$rs * (0.93 + 0.9 * $ring)",
+         "$hs * (0.82 - 0.05 * $ring)"
+        ],
+        [
+         "$rs * (0.92 + 1.25 * $ring)",
+         "$hs * (0.82 - 0.11 * $ring)"
+        ],
+        [
+         "$rs * (0.9 + 1.3 * $ring)",
+         "$hs * (0.82 - 0.14 * $ring)"
+        ]
+       ]
+      },
+      {
+       "name": "Cap",
+       "at": [
+        0,
+        "$hs",
+        0
+       ],
+       "rotate": [
+        "$tilt",
+        0,
+        0
+       ],
+       "children": [
+        {
+         "name": "Red",
+         "shape": "lathe",
+         "material": "cap_red",
+         "segments": 40,
+         "profile": [
+          [
+           0,
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.64 + $w2 * 0.34 + $w3 * 1.02)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.13053 + $w2 * 0.19614 + $w3 * 0.09829)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.6347 + $w2 * 0.32397 + $w3 * 0.97612)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.25882 + $w2 * 0.33915 + $w3 * 0.18342)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.61887 + $w2 * 0.30876 + $w3 * 0.91564)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.38268 + $w2 * 0.46374 + $w3 * 0.2642)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.59281 + $w2 * 0.29376 + $w3 * 0.84676)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.5 + $w2 * 0.57435 + $w3 * 0.34228)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.55694 + $w2 * 0.27838 + $w3 * 0.77179)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.60876 + $w2 * 0.67229 + $w3 * 0.41841)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.51188 + $w2 * 0.26207 + $w3 * 0.69193)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.70711 + $w2 * 0.75786 + $w3 * 0.49302)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.45841 + $w2 * 0.24431 + $w3 * 0.60796)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.79335 + $w2 * 0.83095 + $w3 * 0.56639)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.39743 + $w2 * 0.22454 + $w3 * 0.5204)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.86603 + $w2 * 0.8913 + $w3 * 0.63871)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.33 + $w2 * 0.20215 + $w3 * 0.42965)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.92388 + $w2 * 0.93863 + $w3 * 0.71014)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.25726 + $w2 * 0.1763 + $w3 * 0.33601)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.96593 + $w2 * 0.97265 + $w3 * 0.78077)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.18047 + $w2 * 0.14559 + $w3 * 0.23972)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.99144 + $w2 * 0.99315 + $w3 * 0.8507)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.10093 + $w2 * 0.10663 + $w3 * 0.141)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 1 + $w2 * 1 + $w3 * 0.92)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0.02 + $w2 * 0.03 + $w3 * 0.04)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 1 + $w2 * 1 + $w3 * 0.95)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * -0.05 + $w2 * -0.01 + $w3 * -0.03)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.94 + $w2 * 0.96 + $w3 * 0.9)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * -0.1 + $w2 * -0.05 + $w3 * -0.09)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.85 + $w2 * 0.88 + $w3 * 0.82)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * -0.1 + $w2 * -0.05 + $w3 * -0.09)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1))) * ($w1 * 0.4 + $w2 * 0.4 + $w3 * 0.4)",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * -0.03 + $w2 * -0.02 + $w3 * -0.03)"
+          ],
+          [
+           "$rs * 0.9 * max(0.3, max(0, 1 - abs($style - 1)))",
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * ($w1 * 0 + $w2 * 0 + $w3 * 0)"
+          ],
+          [
+           0,
+           "$R * max(0.06, max(0, 1 - abs($style - 1))) * 0.02"
+          ]
+         ]
+        },
+        {
+         "name": "Brown",
+         "shape": "lathe",
+         "material": "cap_brown",
+         "segments": 40,
+         "profile": [
+          [
+           0,
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.64 + $w2 * 0.34 + $w3 * 1.02)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.13053 + $w2 * 0.19614 + $w3 * 0.09829)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.6347 + $w2 * 0.32397 + $w3 * 0.97612)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.25882 + $w2 * 0.33915 + $w3 * 0.18342)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.61887 + $w2 * 0.30876 + $w3 * 0.91564)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.38268 + $w2 * 0.46374 + $w3 * 0.2642)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.59281 + $w2 * 0.29376 + $w3 * 0.84676)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.5 + $w2 * 0.57435 + $w3 * 0.34228)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.55694 + $w2 * 0.27838 + $w3 * 0.77179)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.60876 + $w2 * 0.67229 + $w3 * 0.41841)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.51188 + $w2 * 0.26207 + $w3 * 0.69193)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.70711 + $w2 * 0.75786 + $w3 * 0.49302)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.45841 + $w2 * 0.24431 + $w3 * 0.60796)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.79335 + $w2 * 0.83095 + $w3 * 0.56639)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.39743 + $w2 * 0.22454 + $w3 * 0.5204)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.86603 + $w2 * 0.8913 + $w3 * 0.63871)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.33 + $w2 * 0.20215 + $w3 * 0.42965)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.92388 + $w2 * 0.93863 + $w3 * 0.71014)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.25726 + $w2 * 0.1763 + $w3 * 0.33601)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.96593 + $w2 * 0.97265 + $w3 * 0.78077)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.18047 + $w2 * 0.14559 + $w3 * 0.23972)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.99144 + $w2 * 0.99315 + $w3 * 0.8507)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.10093 + $w2 * 0.10663 + $w3 * 0.141)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 1 + $w2 * 1 + $w3 * 0.92)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0.02 + $w2 * 0.03 + $w3 * 0.04)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 1 + $w2 * 1 + $w3 * 0.95)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * -0.05 + $w2 * -0.01 + $w3 * -0.03)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.94 + $w2 * 0.96 + $w3 * 0.9)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * -0.1 + $w2 * -0.05 + $w3 * -0.09)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.85 + $w2 * 0.88 + $w3 * 0.82)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * -0.1 + $w2 * -0.05 + $w3 * -0.09)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 2))) * ($w1 * 0.4 + $w2 * 0.4 + $w3 * 0.4)",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * -0.03 + $w2 * -0.02 + $w3 * -0.03)"
+          ],
+          [
+           "$rs * 0.9 * max(0.3, max(0, 1 - abs($style - 2)))",
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * ($w1 * 0 + $w2 * 0 + $w3 * 0)"
+          ],
+          [
+           0,
+           "$R * max(0.06, max(0, 1 - abs($style - 2))) * 0.02"
+          ]
+         ]
+        },
+        {
+         "name": "Violet",
+         "shape": "lathe",
+         "material": "cap_glow",
+         "segments": 40,
+         "profile": [
+          [
+           0,
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.64 + $w2 * 0.34 + $w3 * 1.02)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.13053 + $w2 * 0.19614 + $w3 * 0.09829)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.6347 + $w2 * 0.32397 + $w3 * 0.97612)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.25882 + $w2 * 0.33915 + $w3 * 0.18342)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.61887 + $w2 * 0.30876 + $w3 * 0.91564)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.38268 + $w2 * 0.46374 + $w3 * 0.2642)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.59281 + $w2 * 0.29376 + $w3 * 0.84676)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.5 + $w2 * 0.57435 + $w3 * 0.34228)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.55694 + $w2 * 0.27838 + $w3 * 0.77179)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.60876 + $w2 * 0.67229 + $w3 * 0.41841)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.51188 + $w2 * 0.26207 + $w3 * 0.69193)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.70711 + $w2 * 0.75786 + $w3 * 0.49302)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.45841 + $w2 * 0.24431 + $w3 * 0.60796)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.79335 + $w2 * 0.83095 + $w3 * 0.56639)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.39743 + $w2 * 0.22454 + $w3 * 0.5204)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.86603 + $w2 * 0.8913 + $w3 * 0.63871)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.33 + $w2 * 0.20215 + $w3 * 0.42965)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.92388 + $w2 * 0.93863 + $w3 * 0.71014)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.25726 + $w2 * 0.1763 + $w3 * 0.33601)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.96593 + $w2 * 0.97265 + $w3 * 0.78077)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.18047 + $w2 * 0.14559 + $w3 * 0.23972)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.99144 + $w2 * 0.99315 + $w3 * 0.8507)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.10093 + $w2 * 0.10663 + $w3 * 0.141)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 1 + $w2 * 1 + $w3 * 0.92)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0.02 + $w2 * 0.03 + $w3 * 0.04)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 1 + $w2 * 1 + $w3 * 0.95)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * -0.05 + $w2 * -0.01 + $w3 * -0.03)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.94 + $w2 * 0.96 + $w3 * 0.9)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * -0.1 + $w2 * -0.05 + $w3 * -0.09)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.85 + $w2 * 0.88 + $w3 * 0.82)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * -0.1 + $w2 * -0.05 + $w3 * -0.09)"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * ($w1 * 0.4 + $w2 * 0.4 + $w3 * 0.4)",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * -0.03 + $w2 * -0.02 + $w3 * -0.03)"
+          ],
+          [
+           "$rs * 0.9 * max(0.3, max(0, 1 - abs($style - 3)))",
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * ($w1 * 0 + $w2 * 0 + $w3 * 0)"
+          ],
+          [
+           0,
+           "$R * max(0.06, max(0, 1 - abs($style - 3))) * 0.02"
+          ]
+         ]
+        },
+        {
+         "name": "Gills",
+         "shape": "extrude",
+         "material": "gill",
+         "plan": [
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.9",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.06135"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.9"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.06135"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.9",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.06135"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.9"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * -0.06135"
+          ]
+         ],
+         "y0": "-$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.075",
+         "y1": "$R * max(0.3, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2))) * 0.01"
+        },
+        {
+         "name": "GillsGlow",
+         "shape": "extrude",
+         "material": "glow",
+         "plan": [
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.9",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.06135"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.9"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.06135"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.9",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.06135"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.9"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.06135",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.85781"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.12808",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.89084"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.18281",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.84035"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.25356",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.86354"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.30054",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.80578"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.37387",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.81867"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.41215",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.7548"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.48658",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.75713"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.51538",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68847"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.58937",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.68017"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.60811",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.60811"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68017",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.58937"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.68847",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.51538"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.75713",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.48658"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.7548",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.41215"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.81867",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.37387"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.80578",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.30054"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.86354",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.25356"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.84035",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.18281"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.89084",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.12808"
+          ],
+          [
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.85781",
+           "$R * max(0.3, max(0, 1 - abs($style - 3))) * -0.06135"
+          ]
+         ],
+         "y0": "-$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.075",
+         "y1": "$R * max(0.3, max(0, 1 - abs($style - 3))) * 0.01"
+        },
+        {
+         "name": "Spots1_{i}",
+         "repeat": {
+          "count": 5,
+          "around": "y",
+          "phase": "$seed * 18 + 13"
+         },
+         "rotate": [
+          0,
+          "30 * ((abs(sin($seed * 12.9898 + $i * 4.1414 + 4 * 78.233) * 43758.5453) % 1) - 0.5)",
+          0
+         ],
+         "children": [
+          {
+           "name": "Spot",
+           "at": [
+            0,
+            "$R * (0.96 * (($w1 * 0.61887 + $w2 * 0.30876 + $w3 * 0.91564)) + 0.04 * (($w1 * 0.59281 + $w2 * 0.29376 + $w3 * 0.84676)))",
+            "$R * (0.96 * (($w1 * 0.25882 + $w2 * 0.33915 + $w3 * 0.18342)) + 0.04 * (($w1 * 0.38268 + $w2 * 0.46374 + $w3 * 0.2642)))"
+           ],
+           "rotate": [
+            "deg(atan2(-((($w1 * 0.59281 + $w2 * 0.29376 + $w3 * 0.84676)) - (($w1 * 0.61887 + $w2 * 0.30876 + $w3 * 0.91564))), ((($w1 * 0.38268 + $w2 * 0.46374 + $w3 * 0.2642)) - (($w1 * 0.25882 + $w2 * 0.33915 + $w3 * 0.18342))) + 0.0001))",
+            0,
+            0
+           ],
+           "vars": {
+            "ws": "$R * (0.06 + 0.05 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 5 * 78.233) * 43758.5453) % 1))"
+           },
+           "children": [
+            {
+             "name": "Wart",
+             "shape": "ellipsoid",
+             "material": "wart",
+             "segments": 10,
+             "at": [
+              0,
+              "-$ws * 0.6 * (1 - max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              0
+             ],
+             "radii": [
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              "$ws * 0.4 * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)"
+             ]
+            },
+            {
+             "name": "WartGlow",
+             "shape": "ellipsoid",
+             "material": "glow",
+             "segments": 10,
+             "at": [
+              0,
+              "-$ws * 0.6 * (1 - max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              0
+             ],
+             "radii": [
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              "$ws * 0.4 * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "name": "Spots2_{i}",
+         "repeat": {
+          "count": 9,
+          "around": "y",
+          "phase": "$seed * 25 + 26"
+         },
+         "rotate": [
+          0,
+          "16.66667 * ((abs(sin($seed * 12.9898 + $i * 4.1414 + 7 * 78.233) * 43758.5453) % 1) - 0.5)",
+          0
+         ],
+         "children": [
+          {
+           "name": "Spot",
+           "at": [
+            0,
+            "$R * (0.96 * (($w1 * 0.51188 + $w2 * 0.26207 + $w3 * 0.69193)) + 0.04 * (($w1 * 0.45841 + $w2 * 0.24431 + $w3 * 0.60796)))",
+            "$R * (0.96 * (($w1 * 0.60876 + $w2 * 0.67229 + $w3 * 0.41841)) + 0.04 * (($w1 * 0.70711 + $w2 * 0.75786 + $w3 * 0.49302)))"
+           ],
+           "rotate": [
+            "deg(atan2(-((($w1 * 0.45841 + $w2 * 0.24431 + $w3 * 0.60796)) - (($w1 * 0.51188 + $w2 * 0.26207 + $w3 * 0.69193))), ((($w1 * 0.70711 + $w2 * 0.75786 + $w3 * 0.49302)) - (($w1 * 0.60876 + $w2 * 0.67229 + $w3 * 0.41841))) + 0.0001))",
+            0,
+            0
+           ],
+           "vars": {
+            "ws": "$R * (0.06 + 0.05 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 8 * 78.233) * 43758.5453) % 1))"
+           },
+           "children": [
+            {
+             "name": "Wart",
+             "shape": "ellipsoid",
+             "material": "wart",
+             "segments": 10,
+             "at": [
+              0,
+              "-$ws * 0.6 * (1 - max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              0
+             ],
+             "radii": [
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              "$ws * 0.4 * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)"
+             ]
+            },
+            {
+             "name": "WartGlow",
+             "shape": "ellipsoid",
+             "material": "glow",
+             "segments": 10,
+             "at": [
+              0,
+              "-$ws * 0.6 * (1 - max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              0
+             ],
+             "radii": [
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              "$ws * 0.4 * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)"
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "name": "Spots3_{i}",
+         "repeat": {
+          "count": 13,
+          "around": "y",
+          "phase": "$seed * 32 + 39"
+         },
+         "rotate": [
+          0,
+          "11.53846 * ((abs(sin($seed * 12.9898 + $i * 4.1414 + 10 * 78.233) * 43758.5453) % 1) - 0.5)",
+          0
+         ],
+         "children": [
+          {
+           "name": "Spot",
+           "at": [
+            0,
+            "$R * (0.84 * (($w1 * 0.33 + $w2 * 0.20215 + $w3 * 0.42965)) + 0.16 * (($w1 * 0.25726 + $w2 * 0.1763 + $w3 * 0.33601)))",
+            "$R * (0.84 * (($w1 * 0.86603 + $w2 * 0.8913 + $w3 * 0.63871)) + 0.16 * (($w1 * 0.92388 + $w2 * 0.93863 + $w3 * 0.71014)))"
+           ],
+           "rotate": [
+            "deg(atan2(-((($w1 * 0.25726 + $w2 * 0.1763 + $w3 * 0.33601)) - (($w1 * 0.33 + $w2 * 0.20215 + $w3 * 0.42965))), ((($w1 * 0.92388 + $w2 * 0.93863 + $w3 * 0.71014)) - (($w1 * 0.86603 + $w2 * 0.8913 + $w3 * 0.63871))) + 0.0001))",
+            0,
+            0
+           ],
+           "vars": {
+            "ws": "$R * (0.06 + 0.05 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 11 * 78.233) * 43758.5453) % 1))"
+           },
+           "children": [
+            {
+             "name": "Wart",
+             "shape": "ellipsoid",
+             "material": "wart",
+             "segments": 10,
+             "at": [
+              0,
+              "-$ws * 0.6 * (1 - max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              0
+             ],
+             "radii": [
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              "$ws * 0.4 * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)",
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 1)) + max(0, 1 - abs($style - 2)))) * $spots)"
+             ]
+            },
+            {
+             "name": "WartGlow",
+             "shape": "ellipsoid",
+             "material": "glow",
+             "segments": 10,
+             "at": [
+              0,
+              "-$ws * 0.6 * (1 - max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              0
+             ],
+             "radii": [
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              "$ws * 0.4 * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)",
+              "$ws * max(0.3, max(0, min(1, max(0, 1 - abs($style - 3)))) * $spots)"
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "Sprout_{i}",
+       "repeat": {
+        "count": "max(1, $sprouts)",
+        "around": "y",
+        "phase": "$seed * 29"
+       },
+       "at": [
+        "($rs * (1.6 + 0.8 * $bulb) + $R * 0.2) * min(1, $sprouts)",
+        0,
+        0
+       ],
+       "rotate": [
+        0,
+        "50 * ((abs(sin($seed * 12.9898 + $i * 4.1414 + 20 * 78.233) * 43758.5453) % 1) - 0.5)",
+        "-12 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 21 * 78.233) * 43758.5453) % 1)"
+       ],
+       "children": [
+        {
+         "name": "Bud",
+         "vars": {
+          "sr": "$R * (0.18 + 0.14 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 22 * 78.233) * 43758.5453) % 1)) * max(0.5, min(1, $sprouts))",
+          "sh": "$hs * (0.18 + 0.15 * (abs(sin($seed * 12.9898 + $i * 4.1414 + 23 * 78.233) * 43758.5453) % 1)) * max(0.5, min(1, $sprouts))"
+         },
+         "children": [
+          {
+           "name": "Shank",
+           "shape": "lathe",
+           "material": "stem",
+           "segments": 12,
+           "profile": [
+            [
+             0,
+             0
+            ],
+            [
+             "$sr * 0.32",
+             0
+            ],
+            [
+             "$sr * 0.26",
+             "$sh * 0.5"
+            ],
+            [
+             "$sr * 0.22",
+             "$sh + $sr * 0.1"
+            ],
+            [
+             0,
+             "$sh + $sr * 0.12"
+            ]
+           ]
+          },
+          {
+           "name": "BudRed",
+           "shape": "lathe",
+           "material": "cap_red",
+           "segments": 16,
+           "profile": [
+            [
+             0,
+             "$sh + $sr * 0.6 * max(0.06, max(0, 1 - abs($style - 1)))"
+            ],
+            [
+             "$sr * 0.7 * max(0.3, max(0, 1 - abs($style - 1)))",
+             "$sh + $sr * 0.45 * max(0.06, max(0, 1 - abs($style - 1)))"
+            ],
+            [
+             "$sr * max(0.3, max(0, 1 - abs($style - 1)))",
+             "$sh + $sr * 0.05 * max(0.06, max(0, 1 - abs($style - 1)))"
+            ],
+            [
+             "$sr * 0.9 * max(0.3, max(0, 1 - abs($style - 1)))",
+             "$sh - $sr * 0.05"
+            ],
+            [
+             "$sr * 0.3 * max(0.3, max(0, 1 - abs($style - 1)))",
+             "$sh"
+            ],
+            [
+             0,
+             "$sh + $sr * 0.02"
+            ]
+           ]
+          },
+          {
+           "name": "BudBrown",
+           "shape": "lathe",
+           "material": "cap_brown",
+           "segments": 16,
+           "profile": [
+            [
+             0,
+             "$sh + $sr * 0.6 * max(0.06, max(0, 1 - abs($style - 2)))"
+            ],
+            [
+             "$sr * 0.7 * max(0.3, max(0, 1 - abs($style - 2)))",
+             "$sh + $sr * 0.45 * max(0.06, max(0, 1 - abs($style - 2)))"
+            ],
+            [
+             "$sr * max(0.3, max(0, 1 - abs($style - 2)))",
+             "$sh + $sr * 0.05 * max(0.06, max(0, 1 - abs($style - 2)))"
+            ],
+            [
+             "$sr * 0.9 * max(0.3, max(0, 1 - abs($style - 2)))",
+             "$sh - $sr * 0.05"
+            ],
+            [
+             "$sr * 0.3 * max(0.3, max(0, 1 - abs($style - 2)))",
+             "$sh"
+            ],
+            [
+             0,
+             "$sh + $sr * 0.02"
+            ]
+           ]
+          },
+          {
+           "name": "BudViolet",
+           "shape": "lathe",
+           "material": "cap_glow",
+           "segments": 16,
+           "profile": [
+            [
+             0,
+             "$sh + $sr * 0.6 * max(0.06, max(0, 1 - abs($style - 3)))"
+            ],
+            [
+             "$sr * 0.7 * max(0.3, max(0, 1 - abs($style - 3)))",
+             "$sh + $sr * 0.45 * max(0.06, max(0, 1 - abs($style - 3)))"
+            ],
+            [
+             "$sr * max(0.3, max(0, 1 - abs($style - 3)))",
+             "$sh + $sr * 0.05 * max(0.06, max(0, 1 - abs($style - 3)))"
+            ],
+            [
+             "$sr * 0.9 * max(0.3, max(0, 1 - abs($style - 3)))",
+             "$sh - $sr * 0.05"
+            ],
+            [
+             "$sr * 0.3 * max(0.3, max(0, 1 - abs($style - 3)))",
+             "$sh"
+            ],
+            [
+             0,
+             "$sh + $sr * 0.02"
+            ]
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
