@@ -124,8 +124,7 @@
     0.18
    ],
    "metallic": 0,
-   "roughness": 0.85,
-   "texture": "concrete"
+   "roughness": 0.85
   },
   "gh_staging": {
    "color": [
@@ -134,8 +133,7 @@
     0.05
    ],
    "metallic": 0,
-   "roughness": 0.8,
-   "texture": "wood"
+   "roughness": 0.8
   },
   "gh_pot": {
    "color": [
@@ -172,8 +170,7 @@
     0.11
    ],
    "metallic": 0,
-   "roughness": 0.9,
-   "texture": "concrete"
+   "roughness": 0.9
   },
   "gh_rubber": {
    "color": [

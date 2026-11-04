@@ -164,8 +164,7 @@
     0.028
    ],
    "metallic": 0,
-   "roughness": 0.9,
-   "texture": "asphalt"
+   "roughness": 0.9
   },
   "gs_kerb": {
    "color": [
@@ -174,8 +173,7 @@
     0.42
    ],
    "metallic": 0,
-   "roughness": 0.85,
-   "texture": "concrete"
+   "roughness": 0.85
   },
   "gs_hose": {
    "color": [

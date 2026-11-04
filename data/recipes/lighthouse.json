@@ -79,8 +79,7 @@
     0.02
    ],
    "metallic": 0,
-   "roughness": 0.6,
-   "texture": "plaster"
+   "roughness": 0.6
   },
   "lh_black": {
    "color": [
@@ -89,8 +88,7 @@
     0.032
    ],
    "metallic": 0,
-   "roughness": 0.6,
-   "texture": "plaster"
+   "roughness": 0.6
   },
   "lh_stone": {
    "color": [
@@ -161,8 +159,7 @@
     0.08
    ],
    "metallic": 0.1,
-   "roughness": 0.5,
-   "texture": "wood"
+   "roughness": 0.5
   },
   "house_wall": {
    "color": [
@@ -191,8 +188,7 @@
     0.05
    ],
    "metallic": 0,
-   "roughness": 0.9,
-   "texture": "brick"
+   "roughness": 0.9
   }
  },
  "nodes": [

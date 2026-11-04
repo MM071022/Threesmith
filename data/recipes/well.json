@@ -87,8 +87,7 @@
     0.065
    ],
    "metallic": 0,
-   "roughness": 0.95,
-   "texture": "concrete"
+   "roughness": 0.95
   },
   "well_coping": {
    "color": [
@@ -166,8 +165,7 @@
     0.055
    ],
    "metallic": 0,
-   "roughness": 0.75,
-   "texture": "wood"
+   "roughness": 0.75
   }
  },
  "nodes": [

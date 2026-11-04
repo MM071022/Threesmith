@@ -105,8 +105,7 @@
     0.085
    ],
    "metallic": 0,
-   "roughness": 0.8,
-   "texture": "wood"
+   "roughness": 0.8
   },
   "stall_cloth_white": {
    "color": [
