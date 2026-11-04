@@ -1,0 +1,342 @@
+import { describe, expect, it, vi } from "vitest";
+import { buildGlb } from "../src/build/glb.js";
+import { evaluate } from "../src/build/expr.js";
+import { LIMITS, buildSpec, mirrorNode } from "../src/build/spec.js";
+import { EXAMPLE_SPEC } from "../src/build/spec-help.js";
+import { inspectModel } from "../src/model/inspect.js";
+import { lintModelFile } from "../src/model/lint.js";
+import { SPEC_HELP } from "../src/build/spec-help.js";
+import { buildModel, lintModelFile as lintAs } from "../src/model/index.js";
+import { sha, volume, writeScene } from "./build-helpers.js";
+
+// Building and linting the detailed ready-made models takes a few seconds on a busy machine.
+vi.setConfig({ testTimeout: 30_000 });
+
+const spec = (nodes: unknown[], extra: object = {}) => ({ version: 1, nodes, ...extra });
+const solid = (extra: object = {}) => ({ name: "A", shape: "box", size: [1, 1, 1], material: "paint", ...extra });
+const names = (raw: unknown, overrides = {}) => inspectModel(writeScene(buildSpec(raw, overrides))).nodes.map((n) => n.path);
+
+describe("expressions", () => {
+  it("does arithmetic with the usual precedence", () => {
+    expect(evaluate("1 + 2 * 3", {})).toBe(7);
+    expect(evaluate("(1 + 2) * 3", {})).toBe(9);
+    expect(evaluate("-2 ^ 2", {})).toBe(-4);
+    expect(evaluate("2 ^ 3 ^ 2", {})).toBe(512);
+    expect(evaluate("10 / 4 - 1", {})).toBe(1.5);
+    expect(evaluate("7 % 4", {})).toBe(3);
+    expect(evaluate("1.5e1 + .5", {})).toBe(15.5);
+  });
+
+  it("uses variables, constants and functions", () => {
+    expect(evaluate("$width / 2 - 0.1", { width: 4 })).toBeCloseTo(1.9);
+    expect(evaluate("max($a, 1) * min(2, 3)", { a: 5 })).toBe(10);
+    expect(evaluate("sin(rad(90)) + cos(0) + pi", {})).toBeCloseTo(2 + Math.PI);
+    expect(evaluate("clamp(5, 0, 3) + lerp(0, 10, 0.5) + abs(-1) + sqrt(16)", {})).toBe(3 + 5 + 1 + 4);
+    expect(evaluate("deg(atan2(1, 1))", {})).toBeCloseTo(45);
+    expect(evaluate("hypot(3, 4) + deg(asin(1)) + deg(acos(1)) + deg(atan(1))", {})).toBeCloseTo(5 + 90 + 0 + 45);
+  });
+
+  it("explains mistakes, and never runs code", () => {
+    expect(() => evaluate("$nope", { a: 1 })).toThrow(/unknown variable \$nope \(known: \$a\)/);
+    expect(() => evaluate("foo(1)", {})).toThrow(/unknown function foo\(\)/);
+    expect(() => evaluate("width", {})).toThrow(/variables start with \$/);
+    expect(() => evaluate("1 / 0", {})).toThrow(/division by zero/);
+    expect(() => evaluate("1 +", {})).toThrow(/ends too early/);
+    expect(() => evaluate("(1", {})).toThrow(/expected "\)"/);
+    expect(() => evaluate("1 2", {})).toThrow(/extra input/);
+    expect(() => evaluate("process.exit()", {})).toThrow();
+    expect(() => evaluate("require('fs')", {})).toThrow(/unexpected/);
+    expect(() => evaluate("(".repeat(100) + "1" + ")".repeat(100), {})).toThrow(/too deeply nested/);
+    expect(() => evaluate("1".repeat(600), {})).toThrow(/too long/);
+    expect(() => evaluate("pow(10, 999)", {})).toThrow(/not a finite number/);
+  });
+
+  it("refuses a NaN or an infinite value where it arises, even when a later step would hide it", () => {
+    expect(() => evaluate("min(pow(10, 999), 5)", {})).toThrow(/not a finite number/);
+    expect(() => evaluate("sqrt(-1) ^ 0", {})).toThrow(/not a finite number/);
+    expect(() => evaluate("min(1e999, 5)", {})).toThrow(/not a finite number/);
+    expect(() => evaluate("max(0, 1e300 * 1e300 - 1e300 * 1e300)", {})).toThrow(/not a finite number/);
+    expect(evaluate("min(2, 5) ^ 2", {})).toBe(4);
+  });
+
+  it("checks how many numbers each function takes", () => {
+    expect(() => evaluate("clamp($w, 0.2)", { w: 1 })).toThrow(/clamp\(\) takes 3 numbers, got 2 in expression/);
+    expect(() => evaluate("abs()", {})).toThrow(/abs\(\) takes 1 number, got 0/);
+    expect(() => evaluate("rad()", {})).toThrow(/rad\(\) takes 1 number, got 0/);
+    expect(() => evaluate("pow(2, 3, 4)", {})).toThrow(/pow\(\) takes 2 numbers, got 3/);
+    expect(() => evaluate("min(1)", {})).toThrow(/min\(\) takes 2 to 8 numbers, got 1/);
+    expect(evaluate("hypot(3, 4) + min(1, 2, 3) + clamp(5, 0, 1)", {})).toBe(5 + 1 + 1);
+  });
+
+  it("looks names up as the names of this spec, never ones inherited from Object", () => {
+    expect(() => evaluate("constructor", {})).toThrow(/unknown name "constructor"/);
+    expect(() => evaluate("$constructor", {})).toThrow(/unknown variable \$constructor/);
+    expect(() => evaluate("toString(1)", {})).toThrow(/unknown function toString\(\)/);
+  });
+});
+
+describe("the example car", () => {
+  const path = writeScene(buildSpec(EXAMPLE_SPEC));
+  it("builds a clean model with the shape a car has", () => {
+    const report = lintModelFile(path);
+    expect(report.findings.filter((f) => f.severity !== "info")).toEqual([]);
+    expect(report.overall).toBeGreaterThanOrEqual(95);
+    const info = inspectModel(path);
+    expect(info.nodes.map((n) => n.path)).toEqual(["Car", "Car/Body", "Car/Cabin", "Car/Wheels", "Car/Wheels/Wheel_FL", "Car/Wheels/Wheel_FR", "Car/Wheels/Wheel_RL", "Car/Wheels/Wheel_RR"]);
+    expect(info.bounds?.size[0]).toBeCloseTo(1.8);
+    expect(info.bounds?.size[2]).toBeCloseTo(4.4);
+    expect(info.bounds?.min[1]).toBeCloseTo(0);
+  });
+
+  it("puts each wheel's pivot at its hub, left and right mirrored", () => {
+    const info = inspectModel(path);
+    const wheel = (n: string) => info.nodes.find((x) => x.name === n)!;
+    expect(wheel("Wheel_FL").mirrored).toBe(false);
+    const scene = buildSpec(EXAMPLE_SPEC);
+    const wheels = scene.nodes[0]!.children!.find((c) => c.name === "Wheels")!.children!;
+    expect(wheels.map((w) => w.name)).toEqual(["Wheel_FL", "Wheel_FR", "Wheel_RL", "Wheel_RR"]);
+    // The front faces +z, so the car's left side is +x.
+    expect(wheels[0]!.translation).toEqual([0.78, 0.33, 1.3]);
+    expect(wheels[1]!.translation).toEqual([-0.78, 0.33, 1.3]);
+  });
+
+  it("has outward faces on every shell, and the parameters change the size", () => {
+    const scene = buildSpec(EXAMPLE_SPEC);
+    const body = scene.nodes[0]!.children!.find((c) => c.name === "Body")!;
+    expect(volume(body.mesh!)).toBeGreaterThan(1);
+    expect(inspectModel(writeScene(buildSpec(EXAMPLE_SPEC, { width: "2.2" }))).bounds?.size[0]).toBeCloseTo(2.2);
+  });
+
+  it("is deterministic", () => {
+    expect(sha(buildGlb(buildSpec(EXAMPLE_SPEC)))).toBe(sha(buildGlb(buildSpec(EXAMPLE_SPEC))));
+  });
+});
+
+describe("nodes", () => {
+  it("builds every shape into a clean closed solid", () => {
+    const shapes = [
+      { shape: "box", size: [1, 2, 3], anchor: "bottom" },
+      { shape: "cylinder", radius: 0.5, height: 2, axis: "z" },
+      { shape: "cylinder", radius: 0.5, height: 2, anchor: "base" },
+      { shape: "ellipsoid", radii: [1, 2, 1] },
+      { shape: "lathe", profile: [[0, 0], [1, 0.2], [1, 2], [0, 2.4]], segments: 16 },
+      { shape: "loft", sections: [{ z: 0, points: [[-1, 0], [1, 0], [1, 1], [-1, 1]] }, { z: 3, points: [[-0.5, 0], [0.5, 0], [0.5, 0.5], [-0.5, 0.5]] }] },
+      { shape: "extrude", plan: [[0, 0], [4, 0], [4, 2], [0, 2]], y1: 3 },
+      { shape: "roof", x0: -3, x1: 3, z0: -4, z1: 4, y: 3, rise: 1.5, kind: "hip" },
+    ];
+    for (const s of shapes) {
+      const report = lintModelFile(writeScene(buildSpec(spec([{ ...s, name: "S", material: "concrete" }]))));
+      expect(report.findings.filter((f) => f.severity !== "info"), JSON.stringify(s)).toEqual([]);
+    }
+  });
+
+  it("caps a concave loft section with its own outline, not a fan that covers the notch", () => {
+    const u = [[0, 0], [3, 0], [3, 3], [2, 3], [2, 1], [1, 1], [1, 3], [0, 3]];
+    const mesh = buildSpec(spec([{ name: "U", shape: "loft", material: "paint", sections: [{ z: 0, points: u }, { z: 1, points: u }] }])).nodes[0]!.mesh!;
+    // The U has an area of 7. Each cap must cover it exactly once, facing out: a fan from the centroid (inside the notch) would overlap itself.
+    const cap = (z: number) => {
+      let signed = 0;
+      let unsigned = 0;
+      for (const p of mesh.prims.values()) {
+        for (let t = 0; t < p.indices.length; t += 3) {
+          const corner = (k: number): number[] => {
+            const i = (p.indices[t + k] as number) * 3;
+            return [p.positions[i] as number, p.positions[i + 1] as number, p.positions[i + 2] as number];
+          };
+          const [a, b, c] = [corner(0), corner(1), corner(2)] as [number[], number[], number[]];
+          if (![a, b, c].every((q) => Math.abs((q[2] as number) - z) < 1e-9)) continue;
+          const area = (((b[0] as number) - (a[0] as number)) * ((c[1] as number) - (a[1] as number)) - ((c[0] as number) - (a[0] as number)) * ((b[1] as number) - (a[1] as number))) / 2;
+          signed += area;
+          unsigned += Math.abs(area);
+        }
+      }
+      return { signed, unsigned };
+    };
+    expect(cap(0).unsigned).toBeCloseTo(7);
+    expect(cap(0).signed).toBeCloseTo(-7);
+    expect(cap(1).unsigned).toBeCloseTo(7);
+    expect(cap(1).signed).toBeCloseTo(7);
+    expect(volume(mesh)).toBeCloseTo(7);
+  });
+
+  it("places, rotates and anchors", () => {
+    const info = inspectModel(writeScene(buildSpec(spec([solid({ size: [2, 1, 1], anchor: "bottom", at: [0, 3, 0], rotate: [0, 90, 0] })]))));
+    expect(info.bounds?.min[1]).toBeCloseTo(3);
+    expect(info.bounds?.size[0]).toBeCloseTo(1);
+    expect(info.bounds?.size[2]).toBeCloseTo(2);
+  });
+
+  it("repeats with a step and names the copies", () => {
+    expect(names(spec([solid({ repeat: { count: 3, step: [2, 0, 0] } })]))).toEqual(["A_1", "A_2", "A_3"]);
+    expect(names(spec([solid({ name: "Window{i}", repeat: { count: 2, step: [0, 1, 0] } })]))).toEqual(["Window1", "Window2"]);
+    const size = inspectModel(writeScene(buildSpec(spec([solid({ repeat: { count: 3, step: [2, 0, 0] } })])))).bounds?.size[0];
+    expect(size).toBeCloseTo(5);
+    expect(inspectModel(writeScene(buildSpec(spec([solid({ at: ["$i", 0, 0], repeat: { count: 2, step: [0, 0, 0] } })])))).bounds?.size[0]).toBeCloseTo(2);
+  });
+
+  it("mirrors a node and its children with the mirrored pivot", () => {
+    const raw = spec([{ name: "Arm_L", at: [2, 1, 0], rotate: [0, 30, 10], mirror: "Arm_R", children: [solid({ name: "Hand", at: [0, 0, 1] })] }]);
+    const scene = buildSpec(raw);
+    const [left, right] = scene.nodes;
+    expect(right!.name).toBe("Arm_R");
+    expect(right!.translation).toEqual([-2, 1, 0]);
+    expect(right!.rotation![1]).toBeCloseTo(-left!.rotation![1]);
+    expect(right!.rotation![2]).toBeCloseTo(-left!.rotation![2]);
+    expect(right!.rotation![0]).toBeCloseTo(left!.rotation![0]);
+    expect(right!.children![0]!.name).toBe("Hand");
+    expect(mirrorNode(left!, "X").children![0]!.mesh!.triangles).toBe(12);
+    // The two arms are 4 m apart on purpose, so the floating-part check does not apply to this fixture.
+    expect(lintModelFile(writeScene(scene)).findings.filter((f) => f.severity !== "info" && f.rule !== "model/floating-part")).toEqual([]);
+  });
+
+  it("inherits materials, and scopes variables to the node and its children", () => {
+    const raw = spec([{ name: "G", material: "brick", vars: { half: 2 }, children: [{ name: "B", shape: "box", size: ["$half", 1, 1] }] }, { name: "H", shape: "box", size: ["$half", 1, 1], material: "paint" }]);
+    expect(() => buildSpec(raw)).toThrow(/nodes\[1\].size\[0\]: unknown variable \$half/);
+    const ok = buildSpec(spec([{ name: "G", material: "brick", vars: { half: 2 }, children: [{ name: "B", shape: "box", size: ["$half", 1, 1] }] }]));
+    expect([...ok.nodes[0]!.children![0]!.mesh!.prims.keys()]).toEqual(["brick"]);
+  });
+
+  it("uses spec parameters and custom materials", () => {
+    const raw = spec([{ name: "A", shape: "box", size: ["$w", 1, 1], material: "mine" }], {
+      params: [{ name: "w", type: "number", default: 2, min: 1, max: 5 }, { name: "tall", type: "boolean", default: true }],
+      materials: { mine: { color: [0.1, 0.2, 0.3], metallic: 1, roughness: 0.1 } },
+    });
+    expect(inspectModel(writeScene(buildSpec(raw))).bounds?.size[0]).toBeCloseTo(2);
+    expect(inspectModel(writeScene(buildSpec(raw, { w: "4" }))).bounds?.size[0]).toBeCloseTo(4);
+    expect(() => buildSpec(raw, { w: 9 })).toThrow(/at most 5/);
+    expect(() => buildSpec(raw, { q: 1 })).toThrow(/unknown parameter "q"/);
+  });
+
+  it("writes the emissive colour of a material, and refuses a wrong one", () => {
+    const raw = (emissive: unknown) => spec([{ name: "Lamp", shape: "box", size: [1, 1, 1], material: "glow" }], { materials: { glow: { color: [1, 1, 0.8], emissive } } });
+    const glb = buildGlb(buildSpec(raw([1, 0.9, 0.6])));
+    const json = JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString("utf8")) as { materials: { name: string; emissiveFactor?: number[] }[] };
+    expect(json.materials.find((m) => m.name === "glow")!.emissiveFactor).toEqual([1, 0.9, 0.6]);
+    expect(() => buildSpec(raw([1, 2, 0]))).toThrow(/materials.glow.emissive: expected \[r, g, b\]/);
+    expect(() => buildSpec(raw([1, 0]))).toThrow(/materials.glow.emissive/);
+  });
+
+  it("refuses an alpha or doubleSided it does not know, instead of dropping it", () => {
+    const raw = (m: object) => spec([solid({ name: "Pane", material: "glass" })], { materials: { glass: { color: [0.5, 0.6, 0.7], ...m } } });
+    expect(() => buildSpec(raw({ alpha: "blend" }))).toThrow(/materials\.glass\.alpha: use "BLEND" or "OPAQUE"/);
+    expect(() => buildSpec(raw({ doubleSided: "yes" }))).toThrow(/materials\.glass\.doubleSided: expected true or false/);
+    expect(() => buildSpec(raw({ alpha: "OPAQUE", doubleSided: false }))).not.toThrow();
+    const glb = buildGlb(buildSpec(raw({ alpha: "BLEND", doubleSided: true })));
+    const json = JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString("utf8")) as { materials: object[] };
+    expect(json.materials).toEqual([expect.objectContaining({ name: "glass", alphaMode: "BLEND", doubleSided: true })]);
+  });
+});
+
+describe("mistakes get a path and a reason", () => {
+  const fail = (raw: unknown, pattern: RegExp) => expect(() => buildSpec(raw)).toThrow(pattern);
+  it("covers the common ones", () => {
+    fail(null, /must be a JSON object/);
+    fail({ nodes: [] }, /"version": 1/);
+    fail({ version: 1 }, /nodes: expected a list/);
+    fail({ version: 1, nodes: [], extra: 1 }, /unknown key "extra"/);
+    fail(spec([{ shape: "box" }]), /nodes\[0\]: every node needs a "name"/);
+    fail(spec([solid({ shape: "cube" })]), /unknown shape "cube"/);
+    fail(spec([solid({ radius: 1 })]), /nodes\[0\]: unknown key "radius"/);
+    fail(spec([solid({ material: "gold" })]), /unknown material "gold"/);
+    fail(spec([{ name: "A", shape: "box", size: [1, 1, 1] }]), /needs a "material"/);
+    fail(spec([solid({ size: [1, 1] })]), /size: expected a list of 3 numbers/);
+    fail(spec([solid({ size: [1, -1, 1] })]), /all sizes must be positive/);
+    fail(spec([solid({ size: ["$x", 1, 1] })]), /nodes\[0\]\.size\[0\]: unknown variable \$x/);
+    fail(spec([solid(), solid()]), /two nodes are called "A"/);
+    fail(spec([solid({ repeat: { count: 0, step: [1, 0, 0] } })]), /whole number from 1 to 500/);
+    fail(spec([solid({ mirror: "" })]), /give the name of the mirrored node/);
+    fail(spec([{ name: "A", bogus: 1 }]), /nodes\[0\]: unknown key "bogus"/);
+    fail(spec([{ name: "L", shape: "loft", material: "paint", sections: [{ z: 0, points: [[0, 0], [1, 0], [1, 1]] }, { z: 1, points: [[0, 0], [1, 0], [1, 1], [0, 1]] }] }]), /every section needs the same number/);
+    fail(spec([{ name: "L", shape: "loft", material: "paint", sections: [{ z: 0, superellipse: { width: 1, height: 1, count: 9 } }, { z: 1, superellipse: { width: 1, height: 1 } }] }]), /must be even/);
+    fail(spec([{ name: "R", shape: "roof", material: "paint", x0: 0, x1: 1, z0: 0, z1: 1, y: 0, rise: 1, kind: "dome" }]), /use "gable" or "hip"/);
+    fail(spec([solid({ at: [1, 2] })]), /expected a list of 3 numbers/);
+    fail(spec([solid({ at: ["clamp(1, 0.2)", 0, 0] })]), /at\[0\]: clamp\(\) takes 3 numbers, got 2/);
+  });
+
+  it("refuses shapes, materials and variables named like Object.prototype members", () => {
+    fail(spec([solid({ shape: "constructor" })]), /unknown shape "constructor"/);
+    fail(spec([solid({ material: "toString" })]), /unknown material "toString"/);
+    fail(spec([solid({ size: ["$constructor", 1, 1] })]), /unknown variable \$constructor/);
+    // A name that is really declared works, including one that a JSON file may use for a key.
+    const declared = JSON.parse('{"version":1,"materials":{"__proto__":{"color":[1,0,0]}},"nodes":[{"name":"A","shape":"box","size":["$__proto__",1,1],"material":"__proto__","vars":{"__proto__":2}}]}');
+    expect(inspectModel(writeScene(buildSpec(declared))).bounds?.size[0]).toBeCloseTo(2);
+  });
+
+  it("stops specs that grow without bound", () => {
+    const grid = { name: "Row{i}", repeat: { count: 400, step: [1, 0, 0] }, children: [{ name: "Cell{i}", repeat: { count: 400, step: [0, 1, 0] }, children: [solid({ name: "B" })] }] };
+    expect(() => buildSpec(spec([grid]))).toThrow(new RegExp(`too many nodes \\(max ${LIMITS.nodes}\\)`));
+    expect(() => buildSpec(spec([{ name: "E", shape: "ellipsoid", material: "paint", radii: [1, 1, 1], segments: 128, repeat: { count: 500, step: [1, 0, 0] } }]))).toThrow(/triangles/);
+  });
+
+  it("counts each copy of a repeat against the triangle limit, when the copies differ in size", () => {
+    // Copy 0 is tiny and later copies grow to 128 segments. The limit is lowered here so that the test stays quick.
+    const saved = LIMITS.triangles;
+    LIMITS.triangles = 50_000;
+    try {
+      const grow = { name: "E{i}", shape: "ellipsoid", material: "paint", radii: [1, 1, 1], segments: "min($i + 6, 128)", repeat: { count: 500, step: [3, 0, 0] } };
+      expect(() => buildSpec(spec([grow]))).toThrow(/grew past 50,000 triangles/);
+    } finally {
+      LIMITS.triangles = saved;
+    }
+  });
+
+  it("refuses nesting deeper than the limit, with a path, before the stack runs out", () => {
+    const chain = (levels: number): object => {
+      let node: object = solid({ name: "Leaf" });
+      for (let k = 1; k < levels; k++) node = { name: `N${k}`, children: [node] };
+      return node;
+    };
+    expect(() => buildSpec(spec([chain(LIMITS.depth)]))).not.toThrow();
+    expect(() => buildSpec(spec([chain(LIMITS.depth + 1)]))).toThrow(/nodes\[0\]\.children\[0\].*: nested too deeply \(max 100 levels\)/);
+    expect(() => buildSpec(spec([chain(3000)]))).toThrow(/nested too deeply/);
+  });
+
+  it("counts mirror copies against the node and triangle limits", () => {
+    // 500 pairs of 6 nodes is 3,000 nodes; mirrored, it is 6,000.
+    const pair = { name: "Pair{i}", repeat: { count: 500, step: [2, 0, 0] }, mirror: "Twin{i}", children: [1, 2, 3, 4, 5].map((k) => solid({ name: `P${k}` })) };
+    expect(() => buildSpec(spec([pair]))).toThrow(/too many nodes \(max 5000\)/);
+    // Each mirror copy is a model of its own: 2 domes of 128 segments are fine, but their mirrors are not.
+    const saved = LIMITS.triangles;
+    LIMITS.triangles = 50_000;
+    try {
+      const dome = { name: "Dome{i}", shape: "ellipsoid", material: "paint", radii: [1, 1, 1], segments: 128, repeat: { count: 2, step: [3, 0, 0] }, mirror: "Mirror{i}" };
+      expect(() => buildSpec(spec([dome]))).toThrow(/grew past 50,000 triangles/);
+      expect(() => buildSpec(spec([{ ...dome, mirror: undefined, name: "Solo{i}" }]))).not.toThrow();
+    } finally {
+      LIMITS.triangles = saved;
+    }
+  });
+
+  it("refuses a mirror inside a mirrored node, which would double its parts", () => {
+    const raw = spec([{ name: "Arm_L", mirror: "Arm_R", children: [solid({ name: "Hand", mirror: "Hand_R" })] }]);
+    expect(() => buildSpec(raw)).toThrow(/already have a mirror, so mirroring it again would double them/);
+    expect(() => buildSpec(spec([{ name: "Arm_L", mirror: "Arm_R", children: [solid({ name: "Hand" })] }]))).not.toThrow();
+  });
+
+  it("counts every copy of a repeated node against the node limit", () => {
+    // 200 rows of 200 cells is 40,000 nodes; the inner repeat must count each of its copies, not just one.
+    const cells = { name: "Cell{i}", shape: "box", size: [1, 1, 1], material: "paint", repeat: { count: 200, step: [0, 1, 0] } };
+    expect(() => buildSpec(spec([{ name: "Row{i}", repeat: { count: 200, step: [2, 0, 0] }, children: [cells] }]))).toThrow(/too many nodes \(max 5000\)/);
+    expect(() => buildSpec(spec([{ name: "Row", repeat: { count: 20, step: [2, 0, 0] }, children: [{ ...cells, repeat: { count: 20, step: [0, 1, 0] } }] }]))).not.toThrow();
+  });
+});
+
+describe("model build --spec and model spec", () => {
+  it("explains the format with an example that builds", () => {
+    expect(SPEC_HELP).toContain("A model spec is JSON");
+    expect(JSON.stringify(EXAMPLE_SPEC, null, 2)).toContain('"name": "Wheel_FL"');
+  });
+
+  it("builds a spec with an override, gives a contract and lints clean", () => {
+    const built = buildModel({ spec: EXAMPLE_SPEC, params: { width: "2" } });
+    expect(built.summary).toMatch(/built car\.glb: .* 8 nodes, 2\.00 x /);
+    const lint = lintAs(built.glb, { contract: built.contract });
+    expect(lint.failed).toBe(false);
+    expect(lint.report.overall).toBeGreaterThanOrEqual(95);
+  });
+
+  it("needs a kind or a spec, and reports a bad spec", () => {
+    expect(() => buildModel({})).toThrow(/give a kind/);
+    expect(() => buildModel({ spec: { version: 1, nodes: [{ name: "A", shape: "cube" }] } })).toThrow(/cube/);
+  });
+});

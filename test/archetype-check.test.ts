@@ -1,0 +1,278 @@
+import { describe, expect, it, vi } from "vitest";
+import { checkArchetype, chooseArchetype } from "../src/archetype/check.js";
+import { loadLibrary, validateArchetypes } from "../src/archetype/library.js";
+import { buildSpec } from "../src/build/spec.js";
+import { EXAMPLE_SPEC } from "../src/build/spec-help.js";
+import { buildKind } from "../src/build/generators/index.js";
+import { inspectModel } from "../src/model/inspect.js";
+import { lintModelFile } from "../src/model/lint.js";
+import { buildModel, formatLint, lintModelFile as lintAs } from "../src/model/index.js";
+import { writeScene } from "./build-helpers.js";
+
+// Building and linting the detailed ready-made models takes a few seconds on a busy machine.
+vi.setConfig({ testTimeout: 30_000 });
+
+const library = loadLibrary();
+type Node = Record<string, unknown>;
+const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
+
+/** The example car with a change applied to its node tree. */
+function car(change: (nodes: Node[]) => void): string {
+  const spec = clone(EXAMPLE_SPEC) as unknown as { nodes: Node[] };
+  change(spec.nodes);
+  return writeScene(buildSpec(spec));
+}
+const wheels = (nodes: Node[]) => ((nodes[0]!["children"] as Node[]).find((c) => c["name"] === "Wheels")!["children"] as Node[]);
+const check = (path: string, what: string) => checkArchetype(inspectModel(path), chooseArchetype(what, library).archetype);
+const rules = (path: string, what: string) => check(path, what).map((f) => f.rule);
+
+describe("a good model passes", () => {
+  it("the example car and the house have nothing above info", () => {
+    expect(check(writeScene(buildSpec(EXAMPLE_SPEC)), "car").filter((f) => f.severity !== "info")).toEqual([]);
+    expect(check(writeScene(buildKind("house")), "building.house").filter((f) => f.severity !== "info")).toEqual([]);
+    expect(check(writeScene(buildKind("house", { roof: "hip", floors: 3, chimney: false })), "huis").filter((f) => f.severity !== "info")).toEqual([]);
+  });
+
+  it("does not ask a glider for a propeller", () => {
+    const glider = writeScene(buildSpec({ version: 1, nodes: [{ name: "Glider", material: "paint", children: [
+      { name: "Fuselage", shape: "box", size: [0.6, 0.8, 8], at: [0, 0.6, 0] },
+      { name: "WingLeft", shape: "box", size: [8, 0.1, 1.2], at: [4.3, 0.8, 0] },
+      { name: "WingRight", shape: "box", size: [8, 0.1, 1.2], at: [-4.3, 0.8, 0] },
+    ] }] }));
+    expect(chooseArchetype("glider", library).archetype.id).toBe("aircraft.fixed-wing.glider");
+    expect(rules(glider, "glider")).not.toContain("archetype/missing-part");
+  });
+
+  it("lists the usual parts that are not there, once", () => {
+    const f = check(writeScene(buildSpec(EXAMPLE_SPEC)), "car").filter((x) => x.rule === "archetype/optional-part");
+    expect(f).toHaveLength(1);
+    expect(f[0]!.message).toContain("Door");
+    expect(f[0]!.message).toContain("Headlight");
+  });
+});
+
+describe("missing and miscounted parts", () => {
+  it("reports a car with no wheels as an error", () => {
+    const path = car((n) => { const c = n[0]!["children"] as Node[]; n[0]!["children"] = c.filter((x) => x["name"] !== "Wheels"); });
+    const f = check(path, "car").filter((x) => x.rule === "archetype/missing-part");
+    expect(f).toHaveLength(1);
+    expect(f[0]!.severity).toBe("error");
+    expect(f[0]!.message).toContain('"Wheel"');
+  });
+
+  it("reports a car with only two wheels", () => {
+    const path = car((n) => { wheels(n).splice(1, 1); });
+    const f = check(path, "car").filter((x) => x.rule === "archetype/part-count");
+    expect(f.map((x) => x.message).join(" ")).toMatch(/has 4 "Wheel", this model has 2/);
+  });
+
+  it("does not count a group like 'Wheels' as another wheel", () => {
+    expect(rules(writeScene(buildSpec(EXAMPLE_SPEC)), "car")).not.toContain("archetype/part-count");
+  });
+
+  it("recognises node names that end in a number, such as Wheel1 and Body2", () => {
+    const wheel = (name: string, x: number, z: number) => ({ name, shape: "cylinder", axis: "x", radius: 0.33, height: 0.2, at: [x, 0.33, z] });
+    const spec = { version: 1, nodes: [{ name: "Car", material: "paint", children: [
+      { name: "Body2", shape: "box", size: [1.8, 0.8, 4.4], at: [0, 0.7, 0] },
+      { name: "Glass1", shape: "box", size: [1.6, 0.6, 2.0], at: [0, 1.4, 0] },
+      wheel("Wheel1", 0.9, 1.4), wheel("Wheel2", -0.9, 1.4), wheel("Wheel3", 0.9, -1.4), wheel("Wheel4", -0.9, -1.4),
+    ] }] };
+    expect(check(writeScene(buildSpec(spec)), "car").filter((x) => x.severity !== "info")).toEqual([]);
+  });
+
+  it("recognises parts by their Dutch and English names, and by the most specific one", () => {
+    const spec = { version: 1, nodes: [{ name: "Tractor", material: "paint", children: [
+      { name: "Motorkap", shape: "box", size: [1, 1, 2], at: [0, 1.5, 0] },
+      { name: "Cabine", shape: "box", size: [1.5, 1.4, 1.5], at: [0, 2.6, -1] },
+      { name: "Achterwiel_L", shape: "cylinder", axis: "x", radius: 0.8, height: 0.5, at: [0.9, 0.8, -1.2], mirror: "Achterwiel_R" },
+      { name: "Voorwiel_L", shape: "cylinder", axis: "x", radius: 0.5, height: 0.3, at: [0.8, 0.5, 1.4], mirror: "Voorwiel_R" },
+    ] }] };
+    const f = check(writeScene(buildSpec(spec)), "tractor").filter((x) => x.severity !== "info");
+    expect(f).toEqual([]);
+  });
+
+  it("treats a part a more specific part replaces as not required (frame, rear wheel)", () => {
+    const tractor = library.resolve("vehicle.wheeled.tractor");
+    expect(tractor.parts.map((p) => p.name)).not.toContain("Wheel");
+    expect(tractor.parts.map((p) => p.name)).toEqual(expect.arrayContaining(["WheelRear", "WheelFront"]));
+    expect(library.resolve("vehicle.wheeled.truck").parts.map((p) => p.name)).not.toContain("Body");
+    expect(library.resolve("vehicle.wheeled.bicycle").parts.map((p) => p.name)).not.toContain("Wheel");
+  });
+});
+
+describe("pivots and wheel axes", () => {
+  it("accepts wheels with the pivot at the hub and flags one with the pivot at its edge", () => {
+    const bad = car((n) => {
+      const w = wheels(n)[0]!;
+      w["at"] = ["-$x - 0.33", "$wheelRadius", "-$z"];
+      w["shape"] = "cylinder";
+      delete w["mirror"];
+      // Same wheel, but the mesh is shifted so the node origin is off the hub.
+      const kids = { name: "Rubber", shape: "cylinder", material: "rubber", axis: "x", radius: "$wheelRadius", height: 0.22, at: [0, 0.4, 0] };
+      delete w["shape"]; delete w["radius"]; delete w["height"]; delete w["axis"]; delete w["material"];
+      w["children"] = [kids];
+    });
+    const f = check(bad, "car").filter((x) => x.rule === "archetype/pivot");
+    expect(f).toHaveLength(1);
+    expect(f[0]!.node).toBe("Car/Wheels/Wheel_FL");
+    expect(f[0]!.message).toMatch(/from its centre/);
+  });
+
+  it("checks the pivot of the node that spins, not of a mesh child that has a wheel name", () => {
+    const wheelWithMesh = (at: number[], mesh: number[]) => writeScene(buildSpec({ version: 1, nodes: [{ name: "Car", material: "paint", children: [
+      { name: "Body", shape: "box", size: [1.8, 0.8, 4.4], at: [0, 0.7, 0] },
+      { name: "Wheel_FL", at, children: [{ name: "WheelMesh", shape: "cylinder", axis: "x", radius: 0.33, height: 0.2, at: mesh }] },
+    ] }] }));
+    // The spinning node sits 0.57 m above the middle of its tyre: the wheel turns about the wrong point.
+    const off = check(wheelWithMesh([0.9, 0.9, 1.4], [0, -0.57, 0]), "car").filter((x) => x.rule === "archetype/pivot");
+    expect(off).toHaveLength(1);
+    expect(off[0]!.node).toBe("Car/Wheel_FL");
+    expect(off[0]!.message).toMatch(/from its centre/);
+    // The same tyre with its spinning node on the hub is right; the mesh child is only geometry.
+    expect(check(wheelWithMesh([0.9, 0.33, 1.4], [0, 0, 0]), "car").filter((x) => x.rule === "archetype/pivot")).toEqual([]);
+  });
+
+  it("flags a wheel that lies the wrong way", () => {
+    const path = car((n) => { for (const w of wheels(n)) w["axis"] = "z"; });
+    const f = check(path, "car").filter((x) => x.rule === "archetype/wheel-axis");
+    expect(f.length).toBeGreaterThanOrEqual(1);
+    expect(f[0]!.message).toMatch(/short side should lie along x/);
+  });
+
+  it("checks a hinged part: a door hinged in its middle is wrong, on its edge is right", () => {
+    const door = (at: number[]) => ({ version: 1, nodes: [{ name: "Car", material: "paint", children: [
+      { name: "Body", shape: "box", size: [1.8, 0.8, 4.4], at: [0, 0.7, 0] },
+      { name: "Door", at: [0.9, 0.7, 0.5], children: [{ name: "Panel", shape: "box", size: [0.05, 0.7, 1.0], at }] },
+    ] }] });
+    const bad = check(writeScene(buildSpec(door([0, 0, 0]))), "car").filter((x) => x.rule === "archetype/pivot");
+    const good = check(writeScene(buildSpec(door([0, 0, 0.5]))), "car").filter((x) => x.rule === "archetype/pivot");
+    expect(bad).toHaveLength(1);
+    expect(bad[0]!.message).toMatch(/not on an edge of the part/);
+    expect(good).toEqual([]);
+  });
+});
+
+describe("size and direction", () => {
+  it("flags a car that is ten times too big or too small, with the likely factor", () => {
+    const big = buildSpec({ version: 1, nodes: [{ name: "Car", material: "paint", children: [{ name: "Body", shape: "box", size: [18, 6, 44], at: [0, 3, 0] }, { name: "Wheel_A", shape: "cylinder", axis: "x", radius: 3, height: 2, at: [9, 3, 12] }] }] });
+    const f = check(writeScene(big), "car").filter((x) => x.rule === "archetype/size");
+    expect(f).toHaveLength(1);
+    expect(f[0]!.message).toMatch(/about 10 times too big, likely a unit mistake/);
+    const small = buildSpec({ version: 1, nodes: [{ name: "Car", material: "paint", children: [{ name: "Body", shape: "box", size: [0.18, 0.14, 0.44], at: [0, 0.07, 0] }] }] });
+    expect(check(writeScene(small), "car").find((x) => x.rule === "archetype/size")!.message).toMatch(/times too small/);
+  });
+
+  it("does not flag a size inside the range, or a helicopter whose rotor is wider than its body", () => {
+    expect(rules(writeScene(buildSpec(EXAMPLE_SPEC)), "car")).not.toContain("archetype/size");
+    const heli = { version: 1, nodes: [{ name: "Helicopter", material: "metal", children: [
+      { name: "Fuselage", shape: "ellipsoid", radii: [1.2, 1.4, 7], at: [0, 2.2, 0] },
+      { name: "MainRotor", shape: "cylinder", radius: 8.2, height: 0.05, at: [0, 4.3, 0] },
+    ] }] };
+    expect(rules(writeScene(buildSpec(heli)), "helicopter")).not.toContain("archetype/size");
+  });
+
+  it("flags a car that points sideways, but not a ship or a house", () => {
+    const sideways = (name: string) => ({ version: 1, nodes: [{ name, material: "paint", children: [{ name: "Body", shape: "box", size: [4.4, 1.4, 1.8], at: [0, 0.7, 0] }, { name: "Wheel_A", shape: "cylinder", axis: "z", radius: 0.33, height: 0.2, at: [1.5, 0.33, 0] }] }] });
+    expect(rules(writeScene(buildSpec(sideways("Car"))), "car")).toContain("archetype/orientation");
+    expect(rules(writeScene(buildSpec(sideways("Ship"))), "ship")).not.toContain("archetype/orientation");
+    expect(rules(writeScene(buildKind("house", { width: 14, depth: 6 })), "house")).not.toContain("archetype/orientation");
+  });
+});
+
+describe("lint with an archetype", () => {
+  it("adds the archetype category and shares the score; without one nothing changes", () => {
+    const path = writeScene(buildSpec(EXAMPLE_SPEC));
+    const plain = lintModelFile(path);
+    expect(plain.categories.map((c) => c.category)).toEqual(["geometry", "materials", "performance", "rig", "loading"]);
+    expect(plain.archetype).toBeUndefined();
+    const withArch = lintModelFile(path, { archetype: library.resolve("vehicle.wheeled.car") });
+    expect(withArch.categories.map((c) => c.category)).toEqual(["geometry", "materials", "performance", "rig", "loading", "archetype"]);
+    expect(withArch.archetype).toBe("vehicle.wheeled.car");
+    const broken = lintModelFile(car((n) => { const c = n[0]!["children"] as Node[]; n[0]!["children"] = c.filter((x) => x["name"] !== "Wheels"); }), { archetype: library.resolve("vehicle.wheeled.car") });
+    expect(broken.categories.find((c) => c.category === "archetype")!.errors).toBe(1);
+    expect(broken.overall).toBeLessThan(withArch.overall);
+  });
+
+  it("ignores the root 'thing' and an archetype nobody names exactly still gives a family", () => {
+    const path = writeScene(buildSpec(EXAMPLE_SPEC));
+    expect(lintModelFile(path, { archetype: library.resolve("thing") }).categories).toHaveLength(5);
+    const guess = chooseArchetype("something with wheels and an engine", library);
+    expect(guess.generic).toBe(true);
+    expect(guess.archetype.id).toBe("vehicle.wheeled");
+    expect(chooseArchetype("vehicle.wheeled.truck", library).archetype.id).toBe("vehicle.wheeled.truck");
+  });
+});
+
+describe("lint with an archetype by name", () => {
+  it("says what it checked as, and fails on a missing part", () => {
+    const good = writeScene(buildSpec(EXAMPLE_SPEC));
+    const ok = lintAs(good, { archetype: "auto" });
+    expect(ok.failed).toBe(false);
+    expect(formatLint(ok)).toContain("checked as: car (vehicle.wheeled.car)");
+    expect(formatLint(ok)).toContain("archetype");
+    const bad = car((n) => { const c = n[0]!["children"] as Node[]; n[0]!["children"] = c.filter((x) => x["name"] !== "Wheels"); });
+    const run = lintAs(bad, { archetype: "car" });
+    expect(run.failed).toBe(true);
+    expect(formatLint(run)).toContain("archetype/missing-part");
+    expect(JSON.parse(JSON.stringify(lintAs(good, { archetype: "car" }).report)).archetype).toBe("vehicle.wheeled.car");
+  });
+
+  it("says what it compared: parts found, nodes that matched nothing, and whether size was checked", () => {
+    const good = writeScene(buildSpec(EXAMPLE_SPEC));
+    const ok = formatLint(lintAs(good, { archetype: "car" }));
+    expect(ok).toContain("required parts found: ");
+    expect(ok).toContain("Wheel x4");
+    expect(ok).toContain("size: compared with the typical range");
+    const noWheels = car((n) => { const c = n[0]!["children"] as Node[]; n[0]!["children"] = c.filter((x) => x["name"] !== "Wheels"); });
+    expect(formatLint(lintAs(noWheels, { archetype: "car" }))).toMatch(/not found: Wheel/);
+    const extra = car((n) => { (n[0]!["children"] as Node[]).push({ name: "Antenna", shape: "box", material: "metal", size: [0.02, 0.4, 0.02], at: [0, 1.5, 0] }); });
+    expect(formatLint(lintAs(extra, { archetype: "car" }))).toContain("nodes that match no part: Car/Antenna");
+    const compared = lintAs(good, { archetype: "car" }).report.compared!;
+    expect(compared.required.every((r) => r.found > 0)).toBe(true);
+    expect(compared.sizeChecked).toBe(true);
+  });
+
+  it("does not let a guess or an unknown thing look like a real check", () => {
+    const good = writeScene(buildSpec(EXAMPLE_SPEC));
+    const unknown = formatLint(lintAs(good, { archetype: "flurbo" }));
+    expect(unknown).toContain("compared: nothing");
+    expect(unknown).toContain("not that it is the right thing");
+    const family = formatLint(lintAs(good, { archetype: "something with wheels" }));
+    expect(family).toContain("This is a guess from the words");
+    expect(family).toContain("not compared (no typical size known)");
+  });
+
+  it("build checks the result against the spec's archetype", () => {
+    expect(buildModel({ spec: EXAMPLE_SPEC }).summary).toContain("(checked as vehicle.wheeled.car)");
+    expect(() => buildModel({ spec: { ...EXAMPLE_SPEC, archetype: "vehicle.nope" } })).toThrow(/unknown archetype/);
+    expect(buildModel({ kind: "house" }).summary).toContain("(checked as building.house)");
+  });
+});
+
+describe("every thing that can be built has parts to compare", () => {
+  it("each archetype with a ready-made kind defines at least one required part, and the kind has them all", async () => {
+    const { allKinds } = await import("../src/build/generators/index.js");
+    for (const k of allKinds()) {
+      if (!k.archetype) continue;
+      const a = library.resolve(k.archetype);
+      expect(a.parts.some((p) => p.required), k.kind).toBe(true);
+      const report = lintModelFile(writeScene(buildKind(k.kind)), { archetype: a });
+      const missing = report.compared?.required.filter((r) => r.found === 0).map((r) => r.part) ?? [];
+      expect(missing, `${k.kind} is missing required parts`).toEqual([]);
+    }
+  }, 60000);
+
+  it("says so when an archetype defines no required parts, instead of reporting 0 of 0", async () => {
+    const good = writeScene(buildSpec(EXAMPLE_SPEC));
+    const out = formatLint(lintAs(good, { archetype: "building" }));
+    expect(out).toContain("none are defined for this thing, so parts were not compared");
+    expect(out).not.toContain("0 of 0");
+  });
+});
+
+describe("the data", () => {
+  it("rejects a replaces that no ancestor can satisfy", () => {
+    const list = library.archetypes.map((a) => (a.id === "vehicle.wheeled.car" ? { ...a, parts: [...(a.parts ?? []), { name: "Extra", role: "x", required: false, replaces: ["Nope"] }] } : a));
+    expect(validateArchetypes(list).join("\n")).toMatch(/replaces "Nope", which no ancestor has/);
+  });
+});
