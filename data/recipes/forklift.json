@@ -1060,7 +1060,7 @@
      "name": "Mast",
      "at": [
       0,
-      0,
+      "max(0, -sin(rad($mastTilt))) * 0.16 + 0.005",
       "$zM - 0.08"
      ],
      "rotate": [
@@ -1250,7 +1250,7 @@
        "name": "Carriage",
        "at": [
         0,
-        "$fy",
+        "$fy + max(0, -sin(rad($mastTilt))) * ($forkLength + 0.3)",
         "0.16 + (0.1 + $forkLength) / 2"
        ],
        "children": [
