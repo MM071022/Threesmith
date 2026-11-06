@@ -205,6 +205,13 @@ CI: `threesmith ci --check dist --junit junit.xml --sarif threesmith.sarif`. Com
 `bench/` has tasks and a deterministic grader for comparing an agent with and without Threesmith. No results are
 published yet; see `bench/README.md` for the method.
 
+## Sister tools
+
+From the same author, local and open source: [ReversePort](https://github.com/laaielichter/Reverseport)
+(reverse engineer and port games between engines), [Godotwright](https://github.com/laaielichter/Godotwright)
+(check the Godot code your agent writes), [Stashpad](https://github.com/laaielichter/Stashpad)
+(agent memory you can trust) and [agentdisk](https://github.com/laaielichter/Agentdisk) (clean up after agents).
+
 ## Develop
 
 ```sh
