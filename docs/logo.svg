@@ -1,18 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Threesmith">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#16212c"/>
-      <stop offset="1" stop-color="#0b1117"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="15" fill="url(#g)"/>
-  <rect x="1" y="1" width="62" height="62" rx="14" fill="none" stroke="#2b3a49" stroke-width="2"/>
-  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
-    <!-- an isometric wireframe cube: the scene -->
-    <path d="M30 11 L49 21.5 L49 42.5 L30 53 L11 42.5 L11 21.5 Z" stroke="#4fd1c5" stroke-width="3"/>
-    <path d="M11 21.5 L30 32 L49 21.5 M30 32 L30 53" stroke="#4fd1c5" stroke-width="3" opacity=".55"/>
-  </g>
-  <!-- checked -->
-  <circle cx="46" cy="46" r="12" fill="#f6c453"/>
-  <path d="M40.5 46.2 L44.6 50.2 L51.8 42.2" fill="none" stroke="#0b1117" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Threesmith"><rect width="64" height="64" rx="17" fill="#f0e9ff"/><g stroke="#302540" stroke-width="2.4" stroke-linejoin="round"><path d="m31 11 18 10-18 11-18-11Z" fill="#ff9e79"/><path d="M13 21v21l18 11V32Z" fill="#d95b35"/><path d="m31 32 18-11v21L31 53Z" fill="#f38059"/></g><path d="m23 36 7 7 15-16" fill="none" stroke="#fff8ec" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M51 7v10m-5-5h10" stroke="#6850a1" stroke-width="2.5" stroke-linecap="round"/></svg>

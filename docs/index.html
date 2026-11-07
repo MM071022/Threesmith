@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,20 +7,20 @@
 <meta name="description" content="Threesmith checks the three.js code your coding agent writes and runs the page headless. MCP server, CLI and Claude Code plugin: the API of your installed three version, a 97-rule review, asset and decoder checks, the live scene read back, claims proven frame by frame, perf and leak checks, and 3D models without Blender.">
 <link rel="canonical" href="https://laaielichter.github.io/Threesmith/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0b1117">
+<meta name="theme-color" content="#faf8f3">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Threesmith">
 <meta property="og:title" content="Threesmith: make any coding agent better at three.js">
 <meta property="og:description" content="The API of your installed three version, a 97-rule review, asset checks, the page run headless with the live scene read back, and 3D models without Blender. MCP server, CLI and Claude Code plugin. MIT.">
 <meta property="og:url" content="https://laaielichter.github.io/Threesmith/">
-<meta property="og:image" content="https://laaielichter.github.io/Threesmith/og.png">
+<meta property="og:image" content="https://laaielichter.github.io/Threesmith/assets/social.jpg">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
 <meta property="og:image:alt" content="Threesmith: make any coding agent better at three.js">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Threesmith: make any coding agent better at three.js">
 <meta name="twitter:description" content="Version-pinned three.js API and review, asset checks, headless runs with the live scene read back, 3D models without Blender.">
-<meta name="twitter:image" content="https://laaielichter.github.io/Threesmith/og.png">
+<meta name="twitter:image" content="https://laaielichter.github.io/Threesmith/assets/social.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -59,41 +59,24 @@
 }
 </script>
 <link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="assets/studio.css">
 </head>
-<body>
-<header class="top"><div class="wrap">
-  <a class="brand" href="./"><img src="logo.svg" alt="" width="30" height="30">Threesmith</a>
-  <nav class="links">
-    <a href="#how">How it works</a>
-    <a class="opt" href="#tools">Tools</a>
-    <a class="opt" href="models.html">Models</a>
-    <a href="install.html">Install</a>
-    <a class="gh" href="https://github.com/laaielichter/Threesmith">GitHub</a>
-    <button class="theme" id="theme" aria-label="Switch light and dark">◐</button>
-  </nav>
-</div></header>
-
-<div class="hero"><div class="wrap">
-  <div>
-    <span class="eyebrow">MCP server · CLI · Claude Code plugin · MIT</span>
-    <h1>Your coding agent writes three.js.<br><em>Threesmith checks it.</em></h1>
-    <p class="lead">three.js ships a release almost every month and removes old APIs. Agents learned it from years of old code, and they cannot see the canvas they draw on. Threesmith gives them the API of <b>the three version you have installed</b>, a review pinned to it, the assets and decoders the code needs, and the live scene in headless Chromium.</p>
-    <div class="btns">
-      <a class="btn" href="install.html">Install in your agent</a>
-      <a class="btn alt" href="https://github.com/laaielichter/Threesmith">View on GitHub</a>
-    </div>
-    <div class="cmd"><span>$</span><code id="c1">npx -y threesmith doctor</code><button data-copy="c1">Copy</button></div>
-  </div>
-  <div class="ba">
-    <figure><img src="before.jpg" alt="A black canvas: the scene the agent wrote draws nothing" width="960" height="540"><figcaption><span class="tag bad">before</span><b>As the agent wrote it.</b> A black canvas, 3 errors in the review, 2 asset paths that 404.</figcaption></figure>
-    <figure><img src="after.jpg" alt="The same scene after the fixes: a textured crate and a character model, lit" width="960" height="540"><figcaption><span class="tag good">after</span><b>After the doctor's list.</b> Review 100/100, check passes, every asset loads.</figcaption></figure>
-  </div>
-</div></div>
-
+<body class="home">
+<noscript><style>.viewer-toolbar,.gallery-filters,.setup-tabs,.comparison-control,[data-copy]{display:none}</style></noscript>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap"><a class="brand" href="./"><img src="logo.svg" alt="" width="36" height="36">threesmith<span class="brand-period">.</span></a><nav class="links" aria-label="Main"><a href="#how">The toolkit</a><a href="models.html">3D models</a><a href="install.html">Docs</a><a class="github-link" href="https://github.com/laaielichter/Threesmith">GitHub <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a><a class="nav-cta" href="#install">Get started</a></nav></div></header>
+<main id="main">
+<section class="studio-hero"><div class="wrap">
+  <div class="hero-copy"><a class="release" href="https://github.com/laaielichter/Threesmith/blob/main/CHANGELOG.md"><span></span> v0.3.0 · Made for three.js <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a><p class="eyebrow">A little less guessing. A lot more creating.</p><h1>Less debugging.<br>More <em>dimension.</em></h1><p class="hero-lead">Your agent brings the ideas. Threesmith checks the three.js, inspects the scene, and helps you make something worth exploring.</p><div class="btns"><a class="btn" href="#install">Give your agent the tools <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a><a class="text-link" href="#proof">See the difference <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></div><div class="hero-command cmd"><span>$</span><code id="c1">npx -y threesmith doctor</code><button type="button" data-copy="c1">Copy</button></div><p class="hero-note">Local. Open source. MIT licensed. Yours to build with.</p></div>
+  <div class="showcase"><div class="showcase-bar"><span><i></i> The creation space</span><span>01 / ROBOT</span></div><div class="model-stage" id="model-stage" data-state="loading"><img id="model-fallback" src="assets/robot-poster.jpg" alt="Friendly orange-and-white robot built by Threesmith" width="800" height="800"><span class="axis-label axis-y" aria-hidden="true">Y</span><span class="axis-label axis-x" aria-hidden="true">X</span><span class="axis-label axis-z" aria-hidden="true">Z</span></div><div class="viewer-toolbar" role="group" aria-label="Model preview controls"><button type="button" data-viewer="left" aria-label="Rotate model left" disabled><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m12 4-6 6 6 6"/></svg></button><button type="button" data-viewer="right" aria-label="Rotate model right" disabled><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></button><button type="button" data-viewer="wireframe" aria-pressed="false" disabled>Wireframe</button><button type="button" data-viewer="rotation" aria-pressed="false" disabled>Rotate model</button><button type="button" data-viewer="reset" disabled>Reset view</button></div><div class="model-details"><div><b>Say hello to possibility.</b><p>Real output of <code>model build robot --param scheme=1 -o robot.glb</code></p></div><a href="models.html" aria-label="Explore the model gallery"><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></div><p class="viewer-status" id="viewer-status" role="status">Real Threesmith model · interactive preview optional</p></div>
+</div></section>
+<div class="compat wrap"><span>One toolkit. Your favorite agent.</span><b>Claude Code</b><b>Codex</b><b>Cursor</b><b>VS Code</b><a href="install.html">Any MCP client <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></div>
+<section class="intro" id="how"><div class="wrap"><div class="section-heading"><div><p class="eyebrow">FROM FIRST IDEA TO LAST FIX</p><h2>A creative partner.<br>With a reality check.</h2></div><p class="sub">Keep your flow. Give your agent the installed API, a second pair of eyes, and an actual browser to check its work.</p></div><div class="feature-grid"><article><span class="feature-index">01 / KNOW</span><div class="feature-symbol symbol-api" aria-hidden="true">{ }</div><h3>The right API.<br>For your version.</h3><p>No invented methods. Look up the three.js release installed in your project, with signatures and the right import paths.</p><a href="#tools">Explore the tools <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></article><article><span class="feature-index">02 / CHECK</span><div class="feature-symbol symbol-check" aria-hidden="true">✓</div><h3>See what<br>actually happens.</h3><p>Run the page headless. Find broken assets, shader errors and black canvases, then inspect the live scene.</p><a href="#check">Look inside the check <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></article><article><span class="feature-index">03 / MAKE</span><div class="feature-symbol symbol-cube" aria-hidden="true">◇</div><h3>Something from<br>a few lines of code.</h3><p>Build, view and lint 110 kinds of 3D models as clean .glb files, with a named node for every part.</p><a href="#models">Meet the models <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></article></div></div></section>
+<section id="proof"><div class="wrap"><div class="section-heading"><div><p class="eyebrow">A REAL SCENE. A REAL DIFFERENCE.</p><h2>Good ideas deserve<br>more than a black canvas.</h2></div><p class="sub">The same example, before and after the fixes. Move the slider to compare the actual renders.</p></div><div class="proof-layout"><div class="image-compare" style="--split:50%"><img class="comparison-after" src="after.jpg" width="960" height="540" alt="Fixed scene: a lit crate and character model"><div class="comparison-before"><img src="before.jpg" width="960" height="540" alt="Original scene: a black canvas"></div><span class="compare-badge original">Before</span><span class="compare-badge fixed">After</span><div class="compare-line" aria-hidden="true"><span>↔</span></div></div><div class="comparison-control"><label for="compare-range">Compare the scene</label><input type="range" id="compare-range" min="0" max="100" value="50" aria-valuetext="50% original scene, 50% fixed scene"><span aria-hidden="true">Drag to reveal</span></div><div class="proof-captions"><p><span class="proof-dot bad"></span><b>As the agent wrote it.</b> 3 review errors, 2 asset paths that 404, a black canvas.</p><p><span class="proof-dot good"></span><b>After fix + doctor’s list.</b> Review 100/100, check passes, every asset loads.</p></div></div><p class="caption">Real run on <a href="https://github.com/laaielichter/Threesmith/tree/main/examples/agent-mistakes">examples/agent-mistakes</a>. Mechanical fixes plus the manual fixes listed by <code>doctor</code>; not an automatic one-click repair.</p><a class="text-link" href="#doctor">Read the actual diagnostic output <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></div></section>
 <section id="doctor"><div class="wrap">
-  <h2>One call says what is wrong, and in which order</h2>
-  <p class="sub">The scene above, as a coding agent wrote it (<a href="https://github.com/laaielichter/Threesmith/tree/main/examples/agent-mistakes">examples/agent-mistakes</a>). <code>three_doctor</code> reads the files, groups the problems by cause, most urgent first, and says which ones <code>three_fix</code> does by itself. Real output, unedited:</p>
-  <div class="term"><div class="bar"><i></i><i></i><i></i><b>threesmith doctor</b></div><pre><!--out:doctor--><span class="h">Threesmith doctor: 5 error(s), 8 warning(s), review 73/100 (C), three r187, none (import map / CDN)</span>
+  <p class="eyebrow">THE NEXT STEP, MADE CLEAR</p><h2>A diagnosis.<br>And a way forward.</h2>
+  <p class="sub">The scene in the comparison, as a coding agent wrote it (<a href="https://github.com/laaielichter/Threesmith/tree/main/examples/agent-mistakes">examples/agent-mistakes</a>). <code>three_doctor</code> reads the files, groups the problems by cause, most urgent first, and says which ones <code>three_fix</code> does by itself. Real output, unedited:</p>
+  <details class="diagnostic"><summary>Read the full doctor report <span aria-hidden="true">+</span></summary>  <div class="term"><div class="bar"><i></i><i></i><i></i><b>threesmith doctor</b></div><pre><!--out:doctor--><span class="h">Threesmith doctor: 5 error(s), 8 warning(s), review 73/100 (C), three r187, none (import map / CDN)</span>
 
 <span class="e">1. ✖ Why the scene shows nothing (or nothing right) (1): nothing else can be judged while the picture is black or empty</span>
    [add-gltf-result] main.js:27
@@ -145,13 +128,13 @@
   3. Fix the 'shows nothing' group first, then confirm with three_check (screenshot) or three_inspect (why objects are not visible).
   4. Fix the remaining 1 error(s) by hand; three_api gives the exact names for the installed release.
   5. Call three_review with only_new: true after each change, until no errors are left.
-  6. Run three_check on the page (index.html) before you call it done.<!--/out--></pre></div>
+  6. Run three_check on the page (index.html) before you call it done.<!--/out--></pre></div></details>
 </div></section>
 
 <section id="check"><div class="wrap">
   <div class="split">
     <div>
-      <h2>Then it opens the page</h2>
+      <p class="eyebrow">BEYOND THE SOURCE CODE</p><h2>Then it opens<br>the actual page.</h2>
       <p class="sub">A review reads text. <code>three_check</code> runs the page in headless Chromium with software WebGL 2 (it works in CI) and reports what a user would see: page and console errors with their cause, failed requests, blank frames, and a screenshot. When the frame is blank, the scene inspector reads the live scene through three's devtools hook and says why nothing shows.</p>
       <div class="term"><div class="bar"><i></i><i></i><i></i><b>threesmith fix</b></div><pre><!--out:fix--><span class="h">Would fix 5 place(s) in 2 file(s) (add --write to apply):</span>
   index.html: 1 (addons-path)
@@ -204,19 +187,6 @@ screenshot: ./examples/agent-mistakes/.threesmith/last.png<!--/out--></pre></div
   </table></div>
 </div></section>
 
-<section id="how"><div class="wrap">
-  <h2>Made for agents, not only for people</h2>
-  <p class="sub">Everything an agent reads costs tokens and every wrong step costs a turn. Threesmith is built around that.</p>
-  <div class="grid">
-    <div class="card"><h3><span class="ico">①</span>Cheap by default</h3><p><code>--tier cheap</code> gives capped output and numbered steps small models follow; <code>--tools core</code> loads 14 of the 31 tools. Instructions only name tools that are loaded.</p></div>
-    <div class="card"><h3><span class="ico">↻</span>Fix loops that cost less</h3><p><code>only_new</code> shows new findings in full, seen ones as one line, and how many are fixed. <code>code</code> + <code>file</code> reviews code before it is saved.</p></div>
-    <div class="card"><h3><span class="ico">≡</span>One line per finding</h3><p><code>file:line severity [rule] message Fix: …</code>, the same in the CLI, MCP and hooks, plus <code>structuredContent</code> with a schema.</p></div>
-    <div class="card"><h3><span class="ico">⟲</span>Safe writes</h3><p>Every write is one journal entry <code>three_undo</code> takes back. Protected folders, <code>--read-only</code>, dry runs first.</p></div>
-    <div class="card"><h3><span class="ico">◉</span>In Claude's loop</h3><p>The plugin's hooks review each edited file and name broken asset paths right after the edit, explain three.js errors in command output, and brief the session at the start.</p></div>
-    <div class="card"><h3><span class="ico">✦</span>It learns, locally</h3><p>100 lessons from real projects come back under the same error. A false alarm marked once stays hidden. Nothing leaves the machine.</p></div>
-  </div>
-</div></section>
-
 <section id="tools"><div class="wrap">
   <h2>31 MCP tools, one CLI</h2>
   <p class="sub">Load the sets you need: <code>--tools core,run</code>. Most tools are also CLI commands (<code>threesmith &lt;command&gt; --help</code>).</p>
@@ -257,21 +227,11 @@ screenshot: ./examples/agent-mistakes/.threesmith/last.png<!--/out--></pre></div
   </div>
 </div></section>
 
-<section id="models"><div class="wrap">
-  <h2>It builds 3D models too, no Blender</h2>
-  <p class="sub">110 ready-made kinds, from vehicles and buildings to fantasy props and creatures, or your own JSON spec, as clean, deterministic <code>.glb</code> files with a node per part. Agents that cannot see pictures check them with <code>three_model_view</code> (front, side and top views as text) and <code>three_model_lint</code>. These are rendered by three.js itself, headless. <a href="models.html">All renders</a>.</p>
-  <div class="gallery" id="gallery"></div>
-</div></section>
-
+<section id="models"><div class="wrap"><div class="section-heading"><div><p class="eyebrow">A SMALL START. A WHOLE WORLD OF POSSIBILITIES.</p><h2>Make your next<br>“what if” tangible.</h2></div><p class="sub">110 ready-made model kinds. Clean .glb files. No Blender needed. These are actual Threesmith models, rendered by three.js.</p></div><div class="gallery-filters" role="group" aria-label="Filter model previews"><button type="button" data-filter="all" aria-pressed="true">Everything</button><button type="button" data-filter="worlds" aria-pressed="false">Worldbuilding</button><button type="button" data-filter="vehicles" aria-pressed="false">Vehicles</button><button type="button" data-filter="creatures" aria-pressed="false">Characters</button><span id="gallery-count" role="status">6 model previews</span></div><div class="model-grid" id="gallery"><a class="model-card" data-category="creatures" href="models.html"><div class="model-picture"><img src="gallery/robot.jpg" width="640" height="480" loading="lazy" alt="Robot, built by Threesmith and rendered by three.js"><span class="model-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></span></div><div class="model-info"><span>Characters</span><h3>Robot</h3><p>A friendly face for your next scene.</p><code>model build robot</code></div></a><a class="model-card" data-category="worlds" href="models.html"><div class="model-picture"><img src="gallery/wizard-tower.jpg" width="640" height="480" loading="lazy" alt="Wizard Tower, built by Threesmith and rendered by three.js"><span class="model-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></span></div><div class="model-info"><span>Worldbuilding</span><h3>Wizard Tower</h3><p>A little room for a big imagination.</p><code>model build wizard-tower</code></div></a><a class="model-card" data-category="vehicles" href="models.html"><div class="model-picture"><img src="gallery/excavator.jpg" width="640" height="480" loading="lazy" alt="Excavator, built by Threesmith and rendered by three.js"><span class="model-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></span></div><div class="model-info"><span>Vehicles</span><h3>Excavator</h3><p>Built one moving part at a time.</p><code>model build excavator</code></div></a><a class="model-card" data-category="creatures" href="models.html"><div class="model-picture"><img src="gallery/dragon.jpg" width="640" height="480" loading="lazy" alt="Dragon, built by Threesmith and rendered by three.js"><span class="model-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></span></div><div class="model-info"><span>Characters</span><h3>Dragon</h3><p>Give your world a little fire.</p><code>model build dragon</code></div></a><a class="model-card" data-category="worlds" href="models.html"><div class="model-picture"><img src="gallery/lighthouse.jpg" width="640" height="480" loading="lazy" alt="Lighthouse, built by Threesmith and rendered by three.js"><span class="model-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></span></div><div class="model-info"><span>Worldbuilding</span><h3>Lighthouse</h3><p>A landmark worth finding.</p><code>model build lighthouse</code></div></a><a class="model-card" data-category="vehicles" href="models.html"><div class="model-picture"><img src="gallery/viking-longship.jpg" width="640" height="480" loading="lazy" alt="Viking Longship, built by Threesmith and rendered by three.js"><span class="model-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></span></div><div class="model-info"><span>Vehicles</span><h3>Viking Longship</h3><p>Set a different course.</p><code>model build viking-longship</code></div></a></div><div class="btns"><a class="btn" href="models.html">Explore all 110 kinds <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a><span class="gallery-note">From a JSON spec to a model you can make your own.</span></div></div></section>
 <section id="install"><div class="wrap">
   <div class="split">
     <div>
-      <h2>Install</h2>
-      <p class="sub">Node.js 22.12+ and <code>three</code> in the project. The browser tools need <code>playwright-core</code> and a Chromium; <code>threesmith doctor --env</code> shows what is missing.</p>
-      <div class="cmd" style="margin-bottom:10px"><span>›</span><code id="c2">/plugin marketplace add laaielichter/Threesmith</code><button data-copy="c2">Copy</button></div>
-      <div class="cmd" style="margin-bottom:10px"><span>›</span><code id="c3">/plugin install threesmith@threesmith</code><button data-copy="c3">Copy</button></div>
-      <div class="cmd"><span>$</span><code id="c4">claude mcp add threesmith -- npx -y threesmith mcp</code><button data-copy="c4">Copy</button></div>
-      <p><a href="install.html">Codex, Cursor, VS Code, Gemini CLI, Cline, Windsurf, Zed, Docker →</a></p>
+      <p class="eyebrow">READY WHEN YOU ARE</p><h2>A new tool.<br>A better creative flow.</h2><p class="sub">Node.js 22.12+ and <code>three</code> in your project. Browser checks also need Chromium and <code>playwright-core</code>; <code>threesmith doctor --env</code> shows what is missing.</p><div class="install-box"><div class="setup-tabs" role="tablist" aria-label="Choose your setup"><button type="button" role="tab" id="setup-cli" aria-controls="setup-panel" aria-selected="true" data-setup="cli">CLI</button><button type="button" role="tab" id="setup-codex" aria-controls="setup-panel" aria-selected="false" tabindex="-1" data-setup="codex">Codex</button><button type="button" role="tab" id="setup-claude" aria-controls="setup-panel" aria-selected="false" tabindex="-1" data-setup="claude">Claude Code</button><button type="button" role="tab" id="setup-mcp" aria-controls="setup-panel" aria-selected="false" tabindex="-1" data-setup="mcp">Other MCP</button></div><div id="setup-panel" role="tabpanel" aria-labelledby="setup-cli" tabindex="0"><p id="setup-description">Start with a diagnosis of the current project.</p><div class="cmd"><code id="setup-command">npx -y threesmith doctor</code><button type="button" data-copy="setup-command">Copy</button></div></div></div><a class="text-link" href="install.html">All clients and one-click installs <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a>
     </div>
     <div>
       <h2>Honest limits</h2>
@@ -286,7 +246,7 @@ screenshot: ./examples/agent-mistakes/.threesmith/last.png<!--/out--></pre></div
 </div></section>
 
 <section id="faq"><div class="wrap">
-  <h2>FAQ</h2>
+  <p class="eyebrow">A FEW THINGS YOU MIGHT WONDER</p><h2>Good questions.<br>Clear answers.</h2>
   <details><summary>Does it need a GPU or a browser window?</summary><p>No. Most tools read files. The browser tools use headless Chromium with software WebGL 2, which also runs in GitHub Actions.</p></details>
   <details><summary>Which three.js version does it check against?</summary><p>The one in your <code>node_modules/three</code>. A rule knows the release that removed or renamed an API, so the same line is an error on a new release and a warning on an old one, and a rule whose replacement does not exist yet in your release stays quiet.</p></details>
   <details><summary>Does it work with React Three Fiber?</summary><p>Yes: rules for <code>useFrame</code> (state set every frame, allocations), objects created in render and render priority, and rules R3F handles itself (dispose, colour space) are skipped.</p></details>
@@ -294,26 +254,13 @@ screenshot: ./examples/agent-mistakes/.threesmith/last.png<!--/out--></pre></div
   <details><summary>Is there one for Godot?</summary><p>Yes: <a href="https://github.com/laaielichter/Godotwright">Godotwright</a> is the same toolkit for Godot 4. Threesmith follows its design.</p></details>
 </div></section>
 
+<section class="closing"><div class="wrap"><div class="closing-symbol" aria-hidden="true">✳</div><p class="eyebrow">MADE BY LAAIELICHTER. BUILT IN THE OPEN.</p><h2>The next dimension<br>is yours to make.</h2><p>Bring your ideas. Give your agent the right tools.</p><div class="btns"><a class="btn" href="#install">Start creating <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a><a class="btn alt" href="https://github.com/laaielichter/Threesmith">Star on GitHub <svg class="ui-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="m10 2 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L2.2 7.7l5.4-.8Z"/></svg></a></div><p class="caption">Find it useful? A GitHub star is always welcome.</p></div></section></main>
 <footer><div class="wrap">
   <span>Threesmith · made by laaielichter · MIT</span>
   <span><a href="https://github.com/laaielichter/Threesmith">GitHub</a> · <a href="install.html">Install</a> · <a href="models.html">Models</a> · <a href="https://github.com/laaielichter/Threesmith/blob/main/CHANGELOG.md">Changelog</a> · <a href="llms.txt">llms.txt</a></span>
 </div></footer>
 
-<script>
-for (const b of document.querySelectorAll("[data-copy]")) {
-  b.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); } catch { /* no clipboard */ }
-  });
-}
-const pick = ["car", "airship", "wizard-tower", "excavator", "treasure-chest", "dragon", "lighthouse", "mech-walker", "viking-longship", "stone-golem", "hot-air-balloon", "castle"];
-document.getElementById("gallery").innerHTML = pick.map((k) => `<figure><img loading="lazy" src="gallery/${k}.jpg" alt="${k}, built by threesmith model build and rendered by three.js" width="640" height="480"><figcaption>${k}</figcaption></figure>`).join("");
-const root = document.documentElement, t = document.getElementById("theme");
-try { const s = localStorage.getItem("theme"); if (s) root.dataset.theme = s; } catch {}
-t.addEventListener("click", () => {
-  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-  root.dataset.theme = dark ? "light" : "dark";
-  try { localStorage.setItem("theme", root.dataset.theme); } catch {}
-});
-</script>
+<script src="assets/site.js" defer></script>
+<script type="module" src="assets/viewer.js"></script>
 </body>
 </html>
