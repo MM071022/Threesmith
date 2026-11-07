@@ -10,6 +10,7 @@ Run `npm run build:site` to rebuild the model, metadata and self-hosted viewer f
 `scripts/site/viewer.js`. three.js r187 is bundled under the MIT license in
 `three-LICENSE.txt`. Rolldown is a development dependency, already used by the test runner.
 CI verifies that the checked-in preview assets match their source.
+The bundle uses `crypto.randomUUID()` for three.js internal object identifiers; no global random function is patched.
 
 `scripts/site.mjs` still refreshes the real CLI output blocks in the home page.
 `scripts/models-page.py` still refreshes the full model catalogue with the shared stylesheet.
