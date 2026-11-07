@@ -2,7 +2,7 @@
   <img src="docs/logo.svg" alt="Threesmith logo" width="72" height="72">
 </p>
 <h1 align="center">Threesmith</h1>
-<p align="center"><b>Checks the three.js code your coding agent writes, runs the page headless, and gives the agent the tools to fix it.</b><br>
+<p align="center"><b>Less debugging. More dimension.</b><br>
 MCP server, CLI and Claude Code plugin. Works with Claude Code, Codex, Cursor, VS Code, Gemini CLI and any MCP client.</p>
 <p align="center">
   <a href="https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml"><img src="https://github.com/laaielichter/Threesmith/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -18,6 +18,10 @@ MCP server, CLI and Claude Code plugin. Works with Claude Code, Codex, Cursor, V
   <a href="https://laaielichter.github.io/Threesmith/models.html">3D models</a> ·
   <a href="examples/agent-mistakes">Example</a> ·
   <a href="CHANGELOG.md">Changelog</a>
+</p>
+<p align="center">
+  <a href="https://laaielichter.github.io/Threesmith/"><img src="docs/assets/social.jpg" alt="Threesmith: less debugging, more dimension; a real model built from code" width="1000"></a><br>
+  <sub>Explore the <a href="https://laaielichter.github.io/Threesmith/">interactive model preview</a>, toolkit and real before-and-after demo.</sub>
 </p>
 <p align="center">
   <img src="docs/before-after.jpg" alt="Left: the black canvas of a scene a coding agent wrote. Right: the same scene after the fixes Threesmith listed, a lit crate and a character model" width="860"><br>

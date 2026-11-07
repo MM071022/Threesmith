@@ -14,7 +14,7 @@ for kind, g in rendered.items():
 rows = "\n".join(f"<tr><td><code>{k}</code></td><td>{html.escape(d)}</td></tr>" for k, d in kinds)
 
 page = f"""<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,15 +22,16 @@ page = f"""<!doctype html>
 <meta name="description" content="{len(kinds)} ready-made kinds of 3D models (vehicles, aircraft, ships, buildings, furniture, weapons, fantasy props, creatures, plants, terrain) built as clean .glb files from code by Threesmith, viewed as text and linted for three.js.">
 <link rel="canonical" href="https://laaielichter.github.io/Threesmith/models.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0b1117">
+<meta name="theme-color" content="#faf8f3">
 <meta property="og:title" content="Threesmith models: 3D models for three.js without Blender">
-<meta property="og:image" content="https://laaielichter.github.io/Threesmith/og.png">
+<meta property="og:image" content="https://laaielichter.github.io/Threesmith/assets/social.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="site.css">
 <style>.gallery {{ grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }} .gallery figcaption b {{ color: var(--fg); }}</style>
+<link rel="stylesheet" href="assets/studio.css">
 </head>
 <body>
 <header class="top"><div class="wrap">

@@ -1,0 +1,11 @@
+{
+  "kind": "robot",
+  "params": {
+    "scheme": 1
+  },
+  "triangles": 21620,
+  "nodes": 121,
+  "bytes": 1493168,
+  "score": 100,
+  "summary": "built robot.glb: 1458 KB, 21,620 triangles, 121 nodes, 0.54 x 1.39 x 0.29 m (x y z), lint 100/100 (checked as creature.humanoid)"
+}
