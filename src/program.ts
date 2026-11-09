@@ -1,6 +1,6 @@
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import { toAscii, useAscii } from "./ascii.js";
 import { formatSearch, levenshtein, lookup, search } from "./api/lookup.js";
 import { check, formatCheck, parseSteps } from "./check/check.js";
@@ -438,9 +438,17 @@ export function buildProgram(): Command {
     .command("view")
     .description("A model as text: front, side and top views, parts with sizes, parts that do not touch")
     .argument("<file>")
-    .option("--only <view>", "front | side | top")
-    .option("--width <n>", "characters per view")
-    .action((file: string, o: { only?: "front" | "side" | "top"; width?: string }) => out(viewModel(file, { ...(o.only ? { only: o.only } : {}), ...(o.width ? { width: Number(o.width) } : {}) })));
+    .addOption(new Option("--only <view>", "front | side | top").choices(["front", "side", "top"]))
+    .option("--width <n>", "characters per view (whole number >= 1)")
+    .action((file: string, o: { only?: "front" | "side" | "top"; width?: string }) => {
+      if (o.width !== undefined) {
+        const width = Number(o.width);
+        if (!Number.isInteger(width) || width < 1) {
+          throw new Error(`threesmith: --width must be a whole number of 1 or more (got "${o.width}")`);
+        }
+      }
+      out(viewModel(file, { ...(o.only ? { only: o.only } : {}), ...(o.width ? { width: Number(o.width) } : {}) }));
+    });
   model
     .command("lint")
     .description("Score a model for the web; --archetype also checks it is what it should be")
