@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- `threesmith lessons` refuses an unknown `--topic` or `--verdict`, and `--verdict` without `--id`, with a clear message and exit code 2 instead of quietly showing nothing (#12).
+
+### Thanks
+
+- @bfs2021 for the stricter `lessons` options (#13).
+
 ## 0.3.0
 
 The first release on npm since 0.1.0: it holds everything below, 0.2.0 included.
