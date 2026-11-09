@@ -585,10 +585,18 @@ export function buildProgram(): Command {
     .option("--limit <n>", "max lessons", "10")
     .option("--json", "JSON output")
     .action((words: string[], o: { error?: string; rule?: string; topic?: string; id?: string; verdict?: string; limit: string; json?: boolean }) => {
+      const verdict = o.verdict;
+      if (verdict !== undefined) {
+        if (!o.id) throw new Error("--verdict needs --id");
+        if (verdict !== "helped" && verdict !== "wrong") throw new Error(`--verdict must be helped or wrong (got "${verdict}")`);
+      }
+      if (o.topic !== undefined && !(LESSON_TOPICS as readonly string[]).includes(o.topic)) {
+        throw new Error(`--topic must be one of ${LESSON_TOPICS.join(", ")} (got "${o.topic}")`);
+      }
       if (o.id) {
-        if (o.verdict === "helped" || o.verdict === "wrong") {
-          const c = recordLessonFeedback(o.id, o.verdict);
-          out(`recorded: ${o.id} ${o.verdict} (helped ${c.helped}, wrong ${c.wrong})`);
+        if (verdict === "helped" || verdict === "wrong") {
+          const c = recordLessonFeedback(o.id, verdict);
+          out(`recorded: ${o.id} ${verdict} (helped ${c.helped}, wrong ${c.wrong})`);
           return;
         }
         const hit = findLesson(o.id);
@@ -597,7 +605,7 @@ export function buildProgram(): Command {
         return;
       }
       const limit = Number(o.limit);
-      const topic = o.topic && (LESSON_TOPICS as readonly string[]).includes(o.topic) ? (o.topic as (typeof LESSON_TOPICS)[number]) : undefined;
+      const topic = o.topic as (typeof LESSON_TOPICS)[number] | undefined;
       const hits = o.error ? lessonsForError(o.error, { limit }) : o.rule ? lessonsForRule(o.rule, { limit }) : searchLessons(words.join(" "), { ...(topic ? { topic } : {}), limit });
       out(o.json ? JSON.stringify(hits, null, 2) : formatLessonList(hits, o.error ?? o.rule ?? words.join(" ")));
       if (!hits.length) process.exitCode = 1;
