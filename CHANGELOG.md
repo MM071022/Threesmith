@@ -2,11 +2,13 @@
 
 ## Unreleased
 
+- `review --disable`, `ci --disable` and `fix --only` refuse an unknown rule id with exit code 2 and suggest the closest real one, instead of silently ignoring it (#17).
 - `threesmith lessons` refuses an unknown `--topic` or `--verdict`, and `--verdict` without `--id`, with a clear message and exit code 2 instead of quietly showing nothing (#12).
 
 ### Thanks
 
 - @bfs2021 for the stricter `lessons` options (#13).
+- @chiragjangiir for the rule-id check in `review`, `ci` and `fix` (#20), their first contribution to Threesmith.
 
 ## 0.3.0
 
