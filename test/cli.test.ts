@@ -26,6 +26,19 @@ describe.skipIf(!existsSync("dist/cli.js"))("built cli", () => {
     expect(r.stdout.toString()).toContain("geometry-class");
     const miss = spawnSync("node", ["dist/cli.js", "api", "Nope", "--three", THREE_DIR]);
     expect(miss.status).toBe(1);
+
+    const badDisable = spawnSync("node", ["dist/cli.js", "review", dir, "--three", THREE_DIR, "--disable", "output-encodin"]);
+    expect(badDisable.status).toBe(2);
+    expect(badDisable.stderr.toString()).toContain('unknown rule "output-encodin" in --disable (did you mean output-encoding?)');
+
+    const badFix = spawnSync("node", ["dist/cli.js", "fix", dir, "--only", "output-encodin"]);
+    expect(badFix.status).toBe(2);
+    expect(badFix.stderr.toString()).toContain('unknown rule "output-encodin" in --only (did you mean output-encoding?)');
+
+    const disabled = spawnSync("node", ["dist/cli.js", "review", dir, "--three", THREE_DIR, "--disable", "geometry-class"]);
+    expect(disabled.status).toBe(0);
+    expect(disabled.stdout.toString()).not.toContain("geometry-class");
+
     // doctor and undo take the folder as an argument too, like review and scan
     const pos = spawnSync("node", ["dist/cli.js", "doctor", "examples/agent-mistakes", "--no-env"]).stdout.toString();
     expect(pos).toMatch(/^Threesmith doctor: \d+ error/);
